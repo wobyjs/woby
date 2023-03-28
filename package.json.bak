@@ -1,0 +1,105 @@
+{
+  "name": "voby",
+  "repository": "github:fabiospampinato/voby",
+  "description": "A high-performance framework with fine-grained observable-based reactivity for building rich applications.",
+  "version": "0.46.2",
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+ 		},
+        "./via": {
+            "import": "./dist/via.js",
+            "types": "./dist/via.d.ts"
+        },
+        "./ssr": {
+            "import": "./dist/ssr.js",
+            "types": "./dist/ssr.d.ts"
+        },
+        "./jsx-runtime": {
+            "import": "./dist/jsx-runtime/index.js",
+            "types": "./dist/jsx-runtime/index.d.ts"
+        },
+        "./jsx-dev-runtime": {
+            "import": "./dist/jsx/jsx-runtime.js",
+            "types": "./dist/jsx/jsx-runtime.d.ts"
+        },
+        "./via/jsx-runtime": {
+            "import": "./dist/via/jsx-runtime/index.js",
+            "types": "./dist/via/jsx-runtime/index.d.ts"
+        },
+        "./ssr/jsx-runtime": {
+            "import": "./dist/ssr/jsx-runtime/index.js",
+            "types": "./dist/ssr/jsx-runtime/index.d.ts"
+        }
+    },
+  "typesVersions": {
+    "*": {
+      "jsx-runtime": [
+        "./dist/jsx/runtime.d.ts"
+      ],
+      "jsx-dev-runtime": [
+        "./dist/jsx/runtime.d.ts"
+      ]
+    }
+  },
+  "scripts": {
+    "clean": "tsex clean",
+    "compile": "tsex compile",
+    "compile:watch": "tsex compile --watch",
+    "dev:benchmark": "cd demo/benchmark && npm i && npm update && npm run dev",
+    "prod:benchmark": "cd demo/benchmark && npm i && npm update && npm run prod",
+    "dev:boxes": "cd demo/boxes && npm i && npm update && npm run dev",
+    "prod:boxes": "cd demo/boxes && npm i && npm update && npm run prod",
+    "dev:clock": "cd demo/clock && npm i && npm update && npm run dev",
+    "prod:clock": "cd demo/clock && npm i && npm update && npm run prod",
+    "dev:counter": "cd demo/counter && npm i && npm update && npm run dev",
+    "prod:counter": "cd demo/counter && npm i && npm update && npm run prod",
+    "dev:emoji_counter": "cd demo/emoji_counter && npm i && npm update && npm run dev",
+    "prod:emoji_counter": "cd demo/emoji_counter && npm i && npm update && npm run prod",
+    "dev:html": "cd demo/html && npm i && npm update && npm run dev",
+    "prod:html": "cd demo/html && npm i && npm update && npm run prod",
+    "dev:hyperscript": "cd demo/hyperscript && npm i && npm update && npm run dev",
+    "prod:hyperscript": "cd demo/hyperscript && npm i && npm update && npm run prod",
+    "dev:playground": "cd demo/playground && npm i && npm update && npm run dev",
+    "prod:playground": "cd demo/playground && npm i && npm update && npm run prod",
+    "dev:spiral": "cd demo/spiral && npm i && npm update && npm run dev",
+    "prod:spiral": "cd demo/spiral && npm i && npm update && npm run prod",
+    "dev:standalone": "cd demo/standalone && open index.html",
+    "prod:standalone": "cd demo/standalone && open index.html",
+    "dev:store_counter": "cd demo/store_counter && npm i && npm update && npm run dev",
+    "prod:store_counter": "cd demo/store_counter && npm i && npm update && npm run prod",
+    "dev:triangle": "cd demo/triangle && npm i && npm update && npm run dev",
+    "prod:triangle": "cd demo/triangle && npm i && npm update && npm run prod",
+    "dev:uibench": "cd demo/uibench && npm i && npm update && npm run dev",
+    "prod:uibench": "cd demo/uibench && npm i && npm update && npm run prod",
+    "dev": "npm run dev:playground",
+    "prod": "npm run prod:playground",
+    "prepublishOnly": "tsex prepare"
+  },
+  "keywords": [
+    "ui",
+    "framework",
+    "reactive",
+    "observable",
+    "fast",
+    "performant",
+    "performance",
+    "small",
+    "fine-grained",
+    "updates"
+  ],
+  "dependencies": {
+    "htm": "^3.1.1",
+    "oby": "^12.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.0",
+    "tsex": "^2.2.2",
+    "typescript": "^4.9.5"
+  }
+}

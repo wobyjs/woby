@@ -1,0 +1,10 @@
+{
+  "extends": "tsex/tsconfig.json",
+  "compilerOptions": {
+    "isolatedModules": false,
+    "noImplicitAny": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUnusedParameters": false,
+    "target": "es2020"
+  }
+}
