@@ -7,7 +7,7 @@ importers:
       '@types/node': ^18.15.0
       htm: ^3.1.1
       oby: workspace:../oby
-      tsex: ^2.2.2
+      tsex: ^2.2.4
       typescript: ^4.9.5
       vhtml: workspace:../vhtml
       via: workspace:../via
@@ -19,7 +19,7 @@ importers:
       via: link:../via
     devDependencies:
       '@types/node': 18.15.2
-      tsex: 2.2.3
+      tsex: 2.2.4
       typescript: 4.9.5
       vite: 4.1.4_@types+node@18.15.2
 
@@ -439,8 +439,8 @@ packages:
       when-exit: 2.1.0
     dev: true
 
-  /tsex/2.2.3:
-    resolution: {integrity: sha512-8BNYIkg9GuKBQg9dG7ifys28nLXzW4e3yLxGuwaydNaO5iM2REeYDYHH5ptgaujlXBPL843wTooA7+Cyp4C2Tw==}
+  /tsex/2.2.4:
+    resolution: {integrity: sha512-obJ/nD2z2NR3CXkP7GlqqqbS0HTAqAKb3F8em5pWhgFs+kNLA221+RxyD5HkriUFwvEAL/1dYtu8jFM+E6szuA==}
     hasBin: true
     dependencies:
       atomically: 2.0.1
