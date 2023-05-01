@@ -19,7 +19,7 @@ import resolve from '../methods/resolve'
 import store from '../methods/store'
 import template from '../methods/template'
 import untrack from '../methods/untrack'
-
+export * from '../methods/wrap_clone_element'
 /* EXPORT */
 
 export { $, $$, batch, createContext, createDirective, createElement, h, html, isBatching, isObservable, isStore, lazy, render, renderToString, resolve, store, template, untrack }

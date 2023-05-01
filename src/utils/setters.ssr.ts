@@ -133,7 +133,7 @@ const setClassesStatic = <T extends { children: any }, V>(props: T, key: string,
       } else if (isArray(objectPrev)) {
         objectPrev = store(objectPrev, { unwrap: true } as any)
 
-        for (let i = 0, l = objectPrev.length; i < l; i++) {
+        for (let i = 0, l = objectPrev.length as number; i < l; i++) {
           if (!objectPrev[i]) continue
           setClassBoolean(props, false, objectPrev[i])
         }
@@ -618,7 +618,7 @@ const setProp = <T extends { children: any }, V>(props: T, key: string, value: V
   {
     // setDirective(props, key.slice(4), value as any)
   }
-  else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' || key === 'className') {
+  else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' /* || key === 'className' */) {
     // Forbidden props
   } else //if (key in props)
     setProperty(props, key, value as any)

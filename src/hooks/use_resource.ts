@@ -89,7 +89,7 @@ const useResource = <T>(fetcher: (() => ObservableMaybe<PromiseMaybe<T>>)): Reso
 
                     onPending()
 
-                    value.then(onResolve, onReject)
+                    value.then(onResolve as any, onReject)
                     value.then(unsuspend, unsuspend)
 
                 } else {

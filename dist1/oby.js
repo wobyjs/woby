@@ -1,0 +1,2 @@
+/* EXPORT */
+export * from 'oby';

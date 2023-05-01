@@ -1,26 +1,27 @@
 /* IMPORT */
 
-import '../types'
-import Fragment from '../components/fragment'
-import createElement from '../methods/create_element.via'
-import type { Component, Element } from '../types'
-
+import '../types';
+import Fragment from '../components/fragment';
+import createElement from '../methods/create_element.via';
+import { wrapCloneElement } from '../methods/wrap_clone_element';
+import type { Component, Element } from '../types';
+import 'viajs'
 /* MAIN */
 
 const debugHTML = (p: HTMLElement, name: string) => {
     if (p)
         (async () => {
-            const nn = await get(p.nodeName)
-            const nt = await get(p.nodeType)
-            console.log(name + "; ")
+            const nn = await get(p.nodeName);
+            const nt = await get(p.nodeType);
+            console.log(name + "; ");
             // const html = await get(p.outerHTML)
-            console.log(name, p, nn, nt/* , html */)
-        })()
-}
+            console.log(name, p, nn, nt/* , html */);
+        })();
+};
 
 
-const jsx = <P extends { children: any | any[] }>(component: Component<P>, props?: P | null): Element => {
-    return createElement<P>(component, props)
+const jsx = <P extends { children: any | any[]; }>(component: Component<P>, props?: P | null): Element => {
+    return wrapCloneElement(createElement<P>(component as any, props), component, props);
 
 
     // if (isFunction<Element>(component)) {
@@ -81,7 +82,7 @@ const jsx = <P extends { children: any | any[] }>(component: Component<P>, props
     // }
 
     // // return (isFunction<Element>(component)) ? component() as any : createElement<P>(component, props as any)
-}
+};
 
 // const jsxs = <P extends { children: any | any[] }>(component: Component<P>, props?: P | null): Element => {
 //     // return $.memo(() => {
@@ -97,4 +98,4 @@ const jsx = <P extends { children: any | any[] }>(component: Component<P>, props
 // }
 /* EXPORT */
 
-export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment, }
+export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment, };

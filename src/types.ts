@@ -1,138 +1,157 @@
 
 /* HELPERS */
 
-import type { JSX } from './jsx/types'
+import './jsx/types';
+import type * as CSS from 'csstype';
 
-declare const ContextWithDefaultSymbol: unique symbol
+declare const ContextWithDefaultSymbol: unique symbol;
 
 /* MAIN */
 
-type ArrayMaybe<T = unknown> = T[] | T
+type ArrayMaybe<T = unknown> = T[] | T;
 
-type Callback = () => void
+type Callback = () => void;
 
-type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | (() => Child)
+type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | (() => Child);
 
-type ChildWithMetadata<T = unknown> = (() => Child) & { metadata: T }
+type ChildWithMetadata<T = unknown> = (() => Child) & { metadata: T; };
 
-type Classes = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | boolean>> | (FunctionMaybe<null | undefined | boolean | string> | Classes)[]>
+type Classes = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | boolean>> | (FunctionMaybe<null | undefined | boolean | string> | Classes)[]>;
 
-type ComponentFunction<P = {}> = (props: P) => Child
+type ComponentFunction<P extends Props = {}> = (props: P) => Child;
 
-type ComponentIntrinsicElement = keyof JSX.IntrinsicElements
+type ComponentClass<P = {}> = new (props: P) => Child;
 
-type ComponentNode = Node
+type ComponentIntrinsicElement = keyof JSX.IntrinsicElements;
 
-type Component<P = {}> = ComponentFunction<P> | ComponentIntrinsicElement | ComponentNode
+type ComponentNode = Node;
 
-type ComponentsMap = Record<string, ComponentFunction<any>>
+type Component<P extends Props = {}> = ComponentFunction<P> | ComponentIntrinsicElement | ComponentClass; //| ComponentNode
 
-type Constructor<T = unknown> = { new(): T }
+type ComponentsMap = Record<string, ComponentFunction<any>>;
 
-type ConstructorWith<T = unknown, Arguments extends unknown[] = []> = { new(...args: Arguments): T }
+type Constructor<T = unknown> = { new(): T; };
 
-type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T }
+type ConstructorWith<T = unknown, Arguments extends unknown[] = []> = { new(...args: Arguments): T; };
 
-type ContextProvider<T = unknown> = (props: { value: T, children: Child }) => Child
+type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T; };
 
-type ContextRegister<T = unknown> = (value: T) => void
+type ContextProvider<T = unknown> = (props: { value: ObservableMaybe<T>, children: Child; }) => Child;
 
-type Context<T = unknown> = { Provider: ContextProvider<T>, register: ContextRegister<T> }
+type ContextRegister<T = unknown> = (value: T) => void;
 
-type ContextWithDefault<T = unknown> = Context<T> & { readonly [ContextWithDefaultSymbol]: true }
+type Context<T = unknown> = { Provider: ContextProvider<T>, register: ContextRegister<T>; };
 
-type DirectiveFunction<Arguments extends unknown[] = []> = (ref: globalThis.Element, ...args: Arguments) => void
+type ContextWithDefault<T = unknown> = Context<T> & { readonly [ContextWithDefaultSymbol]: true; };
 
-type DirectiveProvider = (props: { children: Child }) => Child
+type DirectiveFunction<Arguments extends unknown[] = []> = (ref: globalThis.Element, ...args: Arguments) => void;
 
-type DirectiveRef<Arguments extends unknown[] = []> = (...args: Arguments) => ((ref: globalThis.Element) => void)
+type DirectiveProvider = (props: { children: Child; }) => Child;
 
-type DirectiveRegister = () => void
+type DirectiveRef<Arguments extends unknown[] = []> = (...args: Arguments) => ((ref: globalThis.Element) => void);
 
-type Directive<Arguments extends unknown[] = []> = { Provider: DirectiveProvider, ref: DirectiveRef<Arguments>, register: DirectiveRegister }
+type DirectiveRegister = () => void;
 
-type DirectiveData<Arguments extends unknown[] = []> = { fn: DirectiveFunction<Arguments>, immediate: boolean }
+type Directive<Arguments extends unknown[] = []> = { Provider: DirectiveProvider, ref: DirectiveRef<Arguments>, register: DirectiveRegister; };
 
-type DirectiveOptions = { immediate?: boolean }
+type DirectiveData<Arguments extends unknown[] = []> = { fn: DirectiveFunction<Arguments>, immediate: boolean; };
 
-type Disposer = () => void
+type DirectiveOptions = { immediate?: boolean; };
 
-type Element<T = Child> = () => T
+type Disposer = () => void;
 
-type EventListener = (event: Event) => void
+type Element<T = Child> = () => T;
 
-type Falsy<T = unknown> = Extract<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>
+type EventListener = (event: Event) => void;
 
-type FN<Arguments extends unknown[], Return extends unknown = void> = (...args: Arguments) => Return
+type Falsy<T = unknown> = Extract<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>;
 
-type FragmentUndefined = { values: undefined, fragmented?: false, length: 0 }
+type FN<Arguments extends unknown[], Return extends unknown = void> = (...args: Arguments) => Return;
 
-type FragmentNode = { values: Node, fragmented?: false, length: 1 }
+type FragmentUndefined = { values: undefined, fragmented?: false, length: 0; };
 
-type FragmentFragment = { values: Fragment, fragmented: true, length: 1 }
+type FragmentNode = { values: Node, fragmented?: false, length: 1; };
 
-type FragmentNodes = { values: Node[], fragmented?: false, length: 2 | 3 | 4 | 5 }
+type FragmentFragment = { values: Fragment, fragmented: true, length: 1; };
 
-type FragmentFragments = { values: Fragment[], fragmented: true, length: 2 | 3 | 4 | 5 }
+type FragmentNodes = { values: Node[], fragmented?: false, length: 2 | 3 | 4 | 5; };
 
-type FragmentMixed = { values: (Node | Fragment)[], fragmented: true, length: 2 | 3 | 4 | 5 }
+type FragmentFragments = { values: Fragment[], fragmented: true, length: 2 | 3 | 4 | 5; };
 
-type Fragment = FragmentUndefined | FragmentNode | FragmentFragment | FragmentNodes | FragmentFragments | FragmentMixed
+type FragmentMixed = { values: (Node | Fragment)[], fragmented: true, length: 2 | 3 | 4 | 5; };
 
-type FunctionMaybe<T = unknown> = (() => T) | T
+type Fragment = FragmentUndefined | FragmentNode | FragmentFragment | FragmentNodes | FragmentFragments | FragmentMixed;
 
-type LazyComponent<P = {}> = (props: P) => ObservableReadonly<Child>
+type FunctionMaybe<T = unknown> = (() => T) | T;
 
-type LazyFetcher<P = {}> = () => Promise<{ default: ComponentFunction<P> } | ComponentFunction<P>>
+type LazyComponent<P = {}> = (props: P) => ObservableReadonly<Child>;
 
-type LazyResult<P = {}> = LazyComponent<P> & ({ preload: () => Promise<void> })
+type LazyFetcher<P = {}> = () => Promise<{ default: ComponentFunction<P>; } | ComponentFunction<P>>;
 
-type Observable<T = unknown> = import('oby').Observable<T>
+type LazyResult<P = {}> = LazyComponent<P> & ({ preload: () => Promise<void>; });
 
-type ObservableReadonly<T = unknown> = import('oby').ObservableReadonly<T>
+type Observable<T = unknown> = import('oby').Observable<T>;
 
-type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | T
+type ObservableReadonly<T = unknown> = import('oby').ObservableReadonly<T>;
 
-type ObservableOptions<T = unknown> = import('oby').ObservableOptions<T>
+type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | T;
 
-type PromiseMaybe<T = unknown> = Promise<T> | T
+type ObservableOptions<T = unknown> = import('oby').ObservableOptions<T>;
 
-type Props = Record<string, any>
+type PromiseMaybe<T = unknown> = Promise<T> | T;
 
-type Ref<T = unknown> = (value: T) => void
+type Props = Record<string, any>;
 
-type ResourceStaticPending<T = unknown> = { pending: true, error?: never, value?: any, latest?: T }
+type Ref<T = unknown> = (value: T) => void;
 
-type ResourceStaticRejected = { pending: false, error: Error, value?: never, latest?: never }
+type ResourceStaticPending<T = unknown> = { pending: true, error?: never, value?: any, latest?: T; };
 
-type ResourceStaticResolved<T = unknown> = { pending: false, error?: never, value: T, latest: T }
+type ResourceStaticRejected = { pending: false, error: Error, value?: never, latest?: never; };
 
-type ResourceStatic<T = unknown> = ResourceStaticPending<T> | ResourceStaticRejected | ResourceStaticResolved<T>
+type ResourceStaticResolved<T = unknown> = { pending: false, error?: never, value: T, latest: T; };
 
-type ResourceFunction<T = unknown> = { pending(): boolean, error(): Error | undefined, value(): T | undefined, latest(): T | undefined }
+type ResourceStatic<T = unknown> = ResourceStaticPending<T> | ResourceStaticRejected | ResourceStaticResolved<T>;
 
-type Resource<T = unknown> = ObservableReadonly<ResourceStatic<T>> & ResourceFunction<T>
+type ResourceFunction<T = unknown> = { pending(): boolean, error(): Error | undefined, value(): T | undefined, latest(): T | undefined; };
 
-type StoreOptions = import('oby').StoreOptions
+type Resource<T = unknown> = ObservableReadonly<ResourceStatic<T>> & ResourceFunction<T>;
 
-type SuspenseData = { active: Observable<boolean>, increment: (nr?: number) => void, decrement: (nr?: number) => void }
+type StoreOptions = import('oby').StoreOptions;
 
-type TemplateActionPath = number[]
+type SuspenseData = { active: Observable<boolean>, increment: (nr?: number) => void, decrement: (nr?: number) => void; };
 
-type TemplateActionProxy = (target: Node, method: string, key?: string, targetNode?: Node) => void
+type TemplateActionPath = number[];
 
-type TemplateActionWithNodes = [Node, string, string, string?, Node?]
+type TemplateActionProxy = (target: Node, method: string, key?: string, targetNode?: Node) => void;
 
-type TemplateActionWithPaths = [TemplateActionPath, string, string, string?, TemplateActionPath?]
+type TemplateActionWithNodes = [Node, string, string, string?, Node?];
 
-type TemplateVariableProperties = string[]
+type TemplateActionWithPaths = [TemplateActionPath, string, string, string?, TemplateActionPath?];
 
-type TemplateVariableData = { path: TemplateActionPath, properties: TemplateVariableProperties }
+type TemplateVariableProperties = string[];
 
-type TemplateVariablesMap = Map<TemplateActionPath, string>
+type TemplateVariableData = { path: TemplateActionPath, properties: TemplateVariableProperties; };
 
-type Truthy<T = unknown> = Exclude<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>
+type TemplateVariablesMap = Map<TemplateActionPath, string>;
+
+type Truthy<T = unknown> = Exclude<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>;
 
 /* EXPORT */
 
-export type { ArrayMaybe, Callback, Child, ChildWithMetadata, Classes, ComponentFunction, ComponentIntrinsicElement, ComponentNode, Component, ComponentsMap, Constructor, ConstructorWith, ContextData, ContextProvider, ContextRegister, Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData, DirectiveOptions, Disposer, Element, EventListener, Falsy, FN, FragmentUndefined, FragmentNode, FragmentFragment, FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, LazyComponent, LazyFetcher, LazyResult, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, PromiseMaybe, Props, Ref, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource, StoreOptions, SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy }
+// copy from react
+// export interface CSSProperties extends CSS.Properties<string | number> {
+//   /**
+//    * The index signature was removed to enable closed typing for style
+//    * using CSSType. You're able to use type assertion or module augmentation
+//    * to add properties or an index signature of your own.
+//    *
+//    * For examples and more information, visit:
+//    * https://github.com/frenic/csstype#what-should-i-do-when-i-get-type-errors
+//    */
+// }
+
+export type CSSProperties = {
+  [K in keyof CSS.Properties<string | number>]: FunctionMaybe<CSS.Properties<string | number>[K]>
+};
+
+export type { ArrayMaybe, Callback, Child, ChildWithMetadata, Classes, ComponentFunction, ComponentIntrinsicElement, ComponentNode, Component, ComponentsMap, Constructor, ConstructorWith, ContextData, ContextProvider, ContextRegister, Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData, DirectiveOptions, Disposer, Element, EventListener, Falsy, FN, FragmentUndefined, FragmentNode, FragmentFragment, FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, LazyComponent, LazyFetcher, LazyResult, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, PromiseMaybe, Props, Ref, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource, StoreOptions, SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy };

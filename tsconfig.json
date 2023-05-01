@@ -9,7 +9,7 @@
     "disableSizeLimit": true,
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
-    "importsNotUsedAsValues": "error",
+    // "importsNotUsedAsValues": "error",
     "inlineSourceMap": false,
     "inlineSources": false,
     // "isolatedModules": true,
@@ -23,17 +23,12 @@
     "moduleResolution": "node",
     "newLine": "lf",
     "noEmitOnError": false,
-    // "noFallthroughCasesInSwitch": true,
-    // "noImplicitOverride": false,
-    // "noImplicitReturns": true,
     "noImplicitThis": true,
     "noPropertyAccessFromIndexSignature": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "outDir": "dist",
-    "preserveValueImports": true,
     "pretty": true,
-    // "resolveJsonModule": true,
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "sourceMap": false,
@@ -41,7 +36,6 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": false,
-    // "strictPropertyInitialization": true,
     "target": "es2020",
     "useDefineForClassFields": false,
     "useUnknownInCatchVariables": true,
@@ -52,10 +46,11 @@
     "typeRoots": [
       "types"
     ],
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     "composite": true,
   },
   "exclude": [
     "vite.config.ts",
-    "dist/"
+    "dist*/"
   ]
 }
