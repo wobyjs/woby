@@ -5,6 +5,7 @@
     "version": "0.46.2",
     "type": "module",
     "sideEffects": false,
+<<<<<<< HEAD
     "main": "./dist/index.cjs.js",
     "module": "./dist/index.es.js",
     "//browser": "./dist/index.umd.js",
@@ -67,15 +68,80 @@
             ],
             "ssr/jsx-runtime": [
                 "./dist/ssr/ssr-runtime.d.ts"
+=======
+    "main": "dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        },
+        "./via": {
+            "import": "./dist/index.via.js",
+            "types": "./dist/index.via.d.ts"
+        },
+        "./via/controller": {
+            "import": "./dist/via/controller/index.js",
+            "types": "./dist/via/controller/index.d.ts"
+        },
+        "./via/receiver": {
+            "import": "./dist/via/receiver/index.js",
+            "types": "./dist/via/receiver/index.d.ts"
+        },
+        "./ssr": {
+            "import": "./dist/ssr.js",
+            "types": "./dist/ssr.d.ts"
+        },
+        "./jsx-runtime": {
+            "import": "./dist/jsx-runtime/index.js",
+            "types": "./dist/jsx-runtime/index.d.ts"
+        },
+        "./jsx-dev-runtime": {
+            "import": "./dist/jsx/jsx-runtime.js",
+            "types": "./dist/jsx/jsx-runtime.d.ts"
+        },
+        "./via/jsx-runtime": {
+            "import": "./dist/via/jsx-runtime/index.js",
+            "types": "./dist/via/jsx-runtime/index.d.ts"
+        },
+        "./ssr/jsx-runtime": {
+            "import": "./dist/ssr/jsx-runtime/index.js",
+            "types": "./dist/ssr/jsx-runtime/index.d.ts"
+        }
+    },
+    "typesVersions": {
+        "*": {
+            "jsx-runtime": [
+                "./dist/jsx/runtime.d.ts"
+            ],
+            "jsx-dev-runtime": [
+                "./dist/jsx/runtime.d.ts"
+            ],
+            "via": [
+                "./dist/via/index.d.ts"
+            ],
+            "via/jsx-runtime": [
+                "./dist/via/runtime.d.ts"
+            ],
+            "ssr/jsx-runtime": [
+                "./dist/ssr/runtime.d.ts"
+>>>>>>> 106521524fd7778b0e412c08843f2696eca58d6b
             ]
         }
     },
     "scripts": {
+<<<<<<< HEAD
         "release": "git add . && git commit -m \"Bump version\" git push && pnpm version patch",
         "clean": "tsex clean",
         "build": "vite build",
         "watch": "tsc --declaration --watch",
         "compile": "tsex compile && tsc --declaration --emitDeclarationOnly",
+=======
+        "clean": "tsex clean",
+        "build": "tsc --declaration",
+        "watch": "tsc --declaration --watch",
+        "compile": "tsex compile",
+>>>>>>> 106521524fd7778b0e412c08843f2696eca58d6b
         "compile:watch": "tsex compile --watch",
         "dev:benchmark": "cd demo/benchmark && npm i && npm update && npm run dev",
         "prod:benchmark": "cd demo/benchmark && npm i && npm update && npm run prod",
@@ -121,6 +187,7 @@
     ],
     "dependencies": {
         "htm": "^3.1.1",
+<<<<<<< HEAD
         "oby": "workspace:../oby",
         "pnpm": "^8.3.1",
         "vhtml": "workspace:../vhtml",
@@ -137,5 +204,19 @@
     "files": [
         "dist",
         "*.d.ts"
+=======
+        "vhtml": "workspace:../vhtml",
+        "oby": "workspace:../oby",
+        "via": "workspace:../via"
+    },
+    "devDependencies": {
+        "@types/node": "^18.15.0",
+        "tsex": "^2.2.4",
+        "typescript": "^4.9.5",
+        "vite": "^4.1.4"
+    },
+    "workspaces": [
+        "packages/*"
+>>>>>>> 106521524fd7778b0e412c08843f2696eca58d6b
     ]
 }
