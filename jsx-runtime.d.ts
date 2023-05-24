@@ -1,2 +1,2 @@
 // do not delete, used by package.json exporting
-export * from './dist/jsx/jsx-runtime';
+export * from './dist/types/jsx/jsx-runtime';

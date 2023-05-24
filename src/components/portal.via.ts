@@ -45,7 +45,7 @@ const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when
 
   })
 
-  return assign(() => $$(condition) || children, { metadata: { portal } })
+  return assign(() => $$(condition) || children, { metadata: { portal } }) as any
 
 }
 

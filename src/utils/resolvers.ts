@@ -11,21 +11,17 @@ import type { Classes, ObservableMaybe } from '../types';
 
 /* MAIN */
 
-const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean) => void), _dynamic: boolean = false): Element | Element[] => {
+const resolveChild = <T extends Element | Element[]>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean) => void), _dynamic: boolean = false): void => {
 
     if (isFunction(value)) {
 
-        if (SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value) {
-
-            return resolveChild(value(), setter, _dynamic);
-
-        } else {
-            let t: Element | Element[];
+        if (SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value)
+            resolveChild(value(), setter, _dynamic);
+        else
             useReaction(() => {
-                t = resolveChild(value(), setter, true);
+                resolveChild(value(), setter, true);
             });
-            return t;
-        }
+
 
     } else if (isArray(value)) {
 
@@ -34,12 +30,10 @@ const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dy
         values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED]; // Preserving this special symbol
 
         setter(values, hasObservables || _dynamic);
-        return values;
 
     } else {
 
         setter(value, _dynamic);
-        return value;
 
     }
 

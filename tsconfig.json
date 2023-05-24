@@ -51,6 +51,6 @@
   },
   "exclude": [
     "vite.config.ts",
-    "dist*/"
+    "dist*"
   ]
 }

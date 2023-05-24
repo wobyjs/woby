@@ -1,22 +1,24 @@
 
 /* IMPORT */
 
-import isServer from './methods/is_server'
+import isServer from './methods/is_server';
 
 /* MAIN */
 
 if (!isServer()) {
 
-  const isLoaded = !!globalThis.VOBY
+    const isLoaded = !!globalThis.VOBY;
 
-  if (isLoaded) {
+    if (isLoaded) {
 
-    throw new Error('Voby has already been loaded')
+        throw new Error('Voby has already been loaded');
 
-  } else {
+    } else {
 
-    globalThis.VOBY = true
+        globalThis.VOBY = true;
 
-  }
+    }
 
 }
+
+export default { };

@@ -8,7 +8,7 @@
     "main": "./dist/index.cjs.js",
     "module": "./dist/index.es.js",
     "//browser": "./dist/index.umd.js",
-    "types": "./dist/index.d.ts",
+    "types": "./dist/types/index.d.ts",
     "exports": {
         ".": {
             "require": "./dist/index.cjs.js",
@@ -73,9 +73,7 @@
     "scripts": {
         "release": "git add . && git commit -m \"Bump version\" git push && pnpm version patch",
         "clean": "tsex clean",
-        "declaration": "tsc --declaration --emitDeclarationOnly",
-        "build:only": "vite build",
-        "build": "run-s build:only declaration",
+        "build": "vite build",
         "watch": "tsc --declaration --watch",
         "compile": "tsex compile && tsc --declaration --emitDeclarationOnly",
         "compile:watch": "tsex compile --watch",
@@ -124,6 +122,7 @@
     "dependencies": {
         "htm": "^3.1.1",
         "oby": "workspace:../oby",
+        "pnpm": "^8.3.1",
         "vhtml": "workspace:../vhtml",
         "viajs": "workspace:../via"
     },
@@ -132,13 +131,11 @@
         "csstype": "^3.1.2",
         "tsex": "^2.2.2",
         "typescript": "^5.0.4",
-        "vite": "^4.3.3"
+        "vite": "^4.3.3",
+        "vite-plugin-dts": "^2.3.0"
     },
     "files": [
         "dist",
         "*.d.ts"
-    ],
-    "workspaces": [
-        "packages/*"
     ]
 }

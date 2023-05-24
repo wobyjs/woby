@@ -3,33 +3,34 @@
 import useRoot from '../hooks/use_root';
 import { setChild } from '../utils/setters';
 import type { Child, Disposer } from '../types';
+import $ from './S';
 
-// import { render as rd, $, } from 'voby';
-
-export const render = (child: Child) => {
-    const fragment = document.createDocumentFragment()
+export const render = (child: Element) => {
+    const fragment = document.createElement('div');
 
     fragment.textContent = '';
 
-    let c: Element | Element[];
-
     let disposer;
     useRoot(dispose => {
+        setChild(fragment as any, child);
+        // fragment.appendChild(child);
 
-        c = setChild(fragment as any, child);
+        console.log('f', fragment.outerHTML);
+        console.log('c', (fragment.children[0] as any).outerHTML);
 
         return disposer = (): void => {
             dispose();
             fragment.textContent = '';
+            fragment.remove()
+
+            console.log('dispose')
         };
     });
 
     const unmount = () => {
-        if (Array.isArray(c))
-            c.forEach(c => fragment.removeChild(c));
-        else
-            fragment.removeChild(c);
+        fragment.innerHTML = '';
     };
+
     const getByRole = <K extends keyof IntrinsicElementsMap>(tag: K) => fragment.querySelector(tag) as any as IntrinsicElementsMap[K];
     const getByTestId = <T extends HTMLElement = HTMLElement>(id: string) => fragment.querySelector(`[data-testid="${id}"]`) as T;
 

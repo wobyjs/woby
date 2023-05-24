@@ -17,7 +17,7 @@ const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when
 
   if (!(portal instanceof HTMLElement)) throw new Error('Invalid wrapper node');
 
-  const condition = boolean(when);
+  const condition = boolean($$(when));
 
   useEffect(() => {
 
@@ -45,7 +45,7 @@ const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when
 
   });
 
-  return assign(() => $$(condition) || children, { metadata: { portal } });
+  return assign(() => $$(condition) || children, { metadata: { portal } }) as any;
 
 };
 

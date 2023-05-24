@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'path';
-
+import dts from 'vite-plugin-dts';
 
 const config = defineConfig({
     build: {
@@ -8,7 +8,7 @@ const config = defineConfig({
         lib: {
             entry: ["./src/index.ts", "./src/jsx/jsx-runtime.ts", "./src/ssr/ssr-runtime.ts", "./src/via/via-runtime.ts",
                 './src/ssr.ts', './src/via.ts', './src/testing.ts'],
-            name: "oby",
+            name: "voby",
             formats: ['cjs', 'es'],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
@@ -18,6 +18,7 @@ const config = defineConfig({
         jsx: 'automatic',
     },
     plugins: [
+        dts({ entryRoot: './src', outputDir: './dist/types' })
     ],
     resolve: {
         alias: {

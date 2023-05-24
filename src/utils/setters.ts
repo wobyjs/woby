@@ -107,7 +107,7 @@ const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, ch
 
         useReaction(() => {
 
-            let valueNext = child();
+            let valueNext = (child as () => Child)();
 
             while (isFunction(valueNext)) {
 
@@ -261,7 +261,7 @@ const setChildStatic = (parent: HTMLElement, fragment: Fragment, child: Child, d
 
             FragmentUtils.pushFragment(fragmentNext, fragment);
 
-            resolveChild(child, setChildStatic.bind(undefined, parent, fragment));
+            resolveChild(child as any, setChildStatic.bind(undefined, parent, fragment));
 
         }
 
@@ -377,7 +377,7 @@ const setChildStatic = (parent: HTMLElement, fragment: Fragment, child: Child, d
 
 const setChild = (parent: HTMLElement, child: Child, fragment: Fragment = FragmentUtils.make()) => {
 
-    return resolveChild(child, setChildStatic.bind(undefined, parent, fragment));
+    resolveChild(child as any, setChildStatic.bind(undefined, parent, fragment));
 
 };
 
@@ -830,7 +830,7 @@ const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<nul
 
             useReaction(() => {
 
-                setPropertyStatic(element, key, value());
+                setPropertyStatic(element, key, (value as Function)());
 
             });
 
@@ -988,7 +988,7 @@ const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined 
 
             useReaction(() => {
 
-                const objectNext = object();
+                const objectNext = (object as Function)();
 
                 setStylesStatic(element, objectNext, objectPrev);
 

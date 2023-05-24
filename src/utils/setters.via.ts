@@ -91,7 +91,7 @@ const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<nu
 
             useReaction(() => {
 
-                setAttributeStatic(element, key, value());
+                setAttributeStatic(element, key, (value as Function)());
 
             });
 
@@ -185,7 +185,7 @@ const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMayb
 
             useReaction(() => {
 
-                const keyNext = key();
+                const keyNext = (key as Function)();
 
                 setClassBooleanStatic(element, value, keyNext, keyPrev);
 
@@ -652,7 +652,7 @@ const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null |
         } else {
 
             useReaction(() => {
-                setStyleStatic(element, key, value());
+                setStyleStatic(element, key, (value as Function)());
 
             });
 
@@ -736,7 +736,7 @@ const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined 
 
             useReaction(() => {
 
-                const objectNext = object();
+                const objectNext = (object as Function)();
 
                 setStylesStatic(element, objectNext, objectPrev);
 

@@ -16,4 +16,4 @@ export * from './jsx/types';
 // export type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component };
 // export * from './constants';
 
-export {render} from './methods/render.testing'
+export { render } from './methods/render.testing';

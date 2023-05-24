@@ -5,7 +5,7 @@ import Fragment from '../components/fragment';
 import createElement from '../methods/create_element.via';
 import { wrapCloneElement } from '../methods/wrap_clone_element';
 import type { Component, Element } from '../types';
-import 'viajs'
+import 'viajs';
 /* MAIN */
 
 const debugHTML = (p: HTMLElement, name: string) => {
@@ -20,8 +20,8 @@ const debugHTML = (p: HTMLElement, name: string) => {
 };
 
 
-const jsx = <P extends { children: any | any[]; }>(component: Component<P>, props?: P | null): Element => {
-    return wrapCloneElement(createElement<P>(component as any, props), component, props);
+const jsx = <P extends { children: any | any[]; }>(component: Component<P>, props?: P | null, ...children: Child[]): Element => {
+    return wrapCloneElement(createElement<P>(component as any, props, ...children), component, props);
 
 
     // if (isFunction<Element>(component)) {

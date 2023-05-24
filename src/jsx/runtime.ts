@@ -1,19 +1,20 @@
+export * from './jsx-runtime';
 
-/* IMPORT */
+// /* IMPORT */
 
-import './types'
-import Fragment from '../components/fragment'
-import createElement from '../methods/create_element'
-import type { Component, Element } from '../types'
+// import './types'
+// import Fragment from '../components/fragment'
+// import createElement from '../methods/create_element'
+// import type { Component, Element } from '../types'
 
-/* MAIN */
+// /* MAIN */
 
-const jsx = <P = {}>(component: Component<P>, props?: P | null): Element => {
+// const jsx = <P = {}>(component: Component<P>, props?: P | null): Element => {
 
-    return createElement<P>(component, props)
+//     return createElement<P>(component, props)
 
-}
+// }
 
-/* EXPORT */
+// /* EXPORT */
 
-export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment }
+// export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment }

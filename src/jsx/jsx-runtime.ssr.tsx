@@ -10,8 +10,8 @@ import { Fragment, createElement, wrapCloneElement } from '../ssr';
 
 /* MAIN */
 
-const jsx = <P extends { children: any | any[]; }>(component: Component<P>, props?: P | null): Element => {
-    return wrapCloneElement(createElement<P>(component as any, props), component, props);
+const jsx = <P extends { children: any | any[]; }>(component: Component<P>, props?: P | null, ...children: Child[]): Element => {
+    return wrapCloneElement(createElement<P>(component as any, props, ...children), component, props);
 };
 
 // const jsxs = <P extends { children: any | any[] }>(component: Component<P>, props?: P | null): Element => {
