@@ -279,6 +279,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
             } else {
 
+        //@ts-ignore
                 for (let i = 0, l = object.length; i < l; i++) {
 
                     if (!object[i]) continue;
@@ -710,6 +711,7 @@ const setStylesStatic = (element: HTMLElement, object: null | undefined | string
 
         } else {
 
+        //@ts-ignore
             for (const key in object) {
 
                 setStyle(element, key, object[key]);

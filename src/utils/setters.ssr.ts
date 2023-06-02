@@ -166,7 +166,7 @@ const setClassesStatic = <T extends { children: any }, V>(props: T, key: string,
         }
 
       } else {
-
+        //@ts-ignore
         for (let i = 0, l = object.length; i < l; i++) {
 
           if (!object[i]) continue
@@ -509,6 +509,7 @@ const setStylesStatic = <S extends { cssText: string }, T extends { style: S | s
         setStyle(props, key as any, fn as any)
       }
     else
+        //@ts-ignore
       for (const key in object)
         setStyle(props, key as any, object[key] as any)
   }
