@@ -20,8 +20,12 @@ const debugHTML = (p: HTMLElement, name: string) => {
 };
 
 
-const jsx = <P extends { children: any | any[]; }>(component: Component<P>, props?: P | null, ...children: Child[]): Element => {
-    return wrapCloneElement(createElement<P>(component as any, props, ...children), component, props);
+const jsxDEV = <P = {}>(component: Component<P>, props: P | null, key: string, isStatic: boolean, source: { fileName: string, lineNumber: number, columnNumber: number; }, self: any): Element => {
+    return wrapCloneElement(createElement<P>(component as any, props, key, isStatic, source, self), component, props);
+};
+
+const jsx = <P extends { children: any | any[]; }>(component: Component<P>, props: P | null, key: string): Element => {
+    return wrapCloneElement(createElement<P>(component as any, props, key), component, props);
 
 
     // if (isFunction<Element>(component)) {
@@ -98,4 +102,4 @@ const jsx = <P extends { children: any | any[]; }>(component: Component<P>, prop
 // }
 /* EXPORT */
 
-export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment, };
+export { jsx, jsx as jsxs, jsxDEV, Fragment, };

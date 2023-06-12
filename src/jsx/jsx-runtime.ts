@@ -10,10 +10,18 @@ import { wrapCloneElement, createElement } from '../index';
 
 /* MAIN */
 
-const jsx = <P = {}>(component: Component<P>, props?: P | null, ...children: Child[]): Element => {
-    return wrapCloneElement(createElement<P>(component as any, props, ...children), component, props);
+// const jsx = <P = {}>(component: Component<P>, props?: P | null, ...children: Child[]): Element => {
+//     return wrapCloneElement(createElement<P>(component as any, props, ...children), component, props);
+// };
+
+const jsx = <P = {}>(component: Component<P>, props: P | null, key: string): Element => {
+    return wrapCloneElement(createElement<P>(component as any, props, key), component, props);
+};
+
+const jsxDEV = <P = {}>(component: Component<P>, props: P | null, key: string, isStatic: boolean, source: { fileName: string, lineNumber: number, columnNumber: number; }, self: any): Element => {
+    return wrapCloneElement(createElement<P>(component as any, props, key), component, props);
 };
 
 /* EXPORT */
 
-export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment };
+export { jsx, jsx as jsxs, jsxDEV, Fragment };

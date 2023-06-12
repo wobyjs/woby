@@ -19,16 +19,17 @@ IgnoreSymbols[IsSvgSymbol] = IsSvgSymbol;
 
 // It's important to wrap components, so that they can be executed in the right order, from parent to child, rather than from child to parent in some cases
 
-const createElement = <P = {}>(component: Component<P> | keyof JSX.IntrinsicElements | string, props?: P | null, ..._children: Child[]): Element => {
-    const { children: __children, key, ref, ...rest } = (props || {}) as Props; //TSC
-    let children = (_children.length === 1) ? _children[0] : (_children.length === 0) ? __children : _children;
+const createElement = <P = {}>(component: Component<P> | keyof JSX.IntrinsicElements | string, props?: P | null, _key?: string, _isStatic?: boolean, _source?: { fileName: string, lineNumber: number, columnNumber: number; }, _self?: any): Element => {
+    // const { children: __children, key, ref, ...rest } = (props || {}) as Props; //TSC
+    // let children = (_children.length === 1) ? _children[0] : (_children.length === 0) ? __children : _children;
+    const { ...rest } = props;
 
     if (isFunction(component)) {
 
         const props = rest;
 
-        if (!isNil(children)) props.children = children;
-        if (!isNil(ref)) props.ref = ref;
+        // if (!isNil(children)) props.children = children;
+        // if (!isNil(ref)) props.ref = ref;
 
         // return wrapElement(() => untrack(() => component.call(component, props as P)))
         return wrapElement(() => component.call(component, props as P) as any);
@@ -39,8 +40,8 @@ const createElement = <P = {}>(component: Component<P> | keyof JSX.IntrinsicElem
         const isSVG = isSVGElement(component);
         const createNode = isSVG ? createSVGNode : createHTMLNode;
 
-        if (!isVoidChild(children)) props.children = children;
-        if (!isNil(ref)) props.ref = ref;
+        // if (!isVoidChild(children)) props.children = children;
+        // if (!isNil(ref)) props.ref = ref;
 
         return wrapElement((): Child => {
             const child = createNode(component as any) as any as HTMLElement; //TSC
@@ -50,7 +51,7 @@ const createElement = <P = {}>(component: Component<P> | keyof JSX.IntrinsicElem
                 child[IsSvgSymbol] = true; // set proxy
             }
 
-            untrack(() => setProps(child as any, props));
+            untrack(() => setProps(child as any, props as any));
 
             return child as any;
 
