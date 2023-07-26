@@ -17,7 +17,7 @@ export const cloneElement = <P extends Props>(element: Child | Element, props: P
       throw new Error('target is not cloneable, it is not created by jsx.createElement');
 
     const { component, props: oldProps } = element[SYMBOL_CLONE] as CloneableType<P>;
-    const newProps = { ...oldProps, props };
+    const newProps = { ...oldProps, ...props };
 
     return wrapCloneElement(createElement<P>(component as any, newProps), component, newProps);
   }
