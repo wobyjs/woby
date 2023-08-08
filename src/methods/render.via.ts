@@ -1,31 +1,34 @@
-
 /* IMPORT */
 
 import useRoot from '../hooks/use_root'
-import type { Child } from '../types'
-import { isFunction } from '../utils/lang'
 import { setChild } from '../utils/setters.via'
-
+import type { Child, Disposer } from '../types'
 
 /* MAIN */
 
-const render = (child: Child, parent?: HTMLElement | null)/* : Disposer */ => {
+const render = (child: Child, parent?: Element | null): Disposer => {
 
-    if (!parent || !(parent[Symbol.for("__isProxy")])) throw new Error('Invalid parent node')
+    if (!parent || !(parent instanceof HTMLElement)) throw new Error('Invalid parent node')
 
     parent.textContent = ''
 
     return useRoot(dispose => {
+
         setChild(parent, child)
 
         return (): void => {
-            if (isFunction(dispose))
-                dispose()
+
+            dispose()
 
             parent.textContent = ''
+
         }
+
     })
+
 }
+
 /* EXPORT */
 
 export default render
+

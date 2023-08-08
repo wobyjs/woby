@@ -44,13 +44,15 @@
         "baseUrl": ".",
         "rootDir": "./src",
         "typeRoots": [
-            "types"
-        ],
+            "types",
+          ],
         // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
         "composite": true,
     },
+    "include":["./src/jsx/types.ts"],
     "exclude": [
         "vite.config.ts",
-        "dist*"
+        "dist*",
+        "dist1*"
     ]
 }

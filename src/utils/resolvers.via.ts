@@ -1,9 +1,9 @@
 
 /* IMPORT */
 
-import { SYMBOL_OBSERVABLE_FROZEN, SYMBOL_UNCACHED, SYMBOL_UNTRACKED_UNWRAPPED } from '../constants';
-import useReaction from '../hooks/use_reaction';
+import { SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_UNTRACKED_UNWRAPPED } from '../constants';
 import isObservable from '../methods/is_observable';
+import useRenderEffect from '../hooks/use_render_effect';
 import $$ from '../methods/SS';
 import { isArray, isFunction, isString, isProxy, fixBigInt, toArray } from '../utils/lang';
 import type { Classes, ObservableMaybe } from '../types';
@@ -16,7 +16,7 @@ IgnoreSymbols[HTMLValue] = HTMLValue;
 
 /* MAIN */
 console.log('resolveChild');
-const resolveChild = <T>(value: ObservableMaybe<T>, _dynamic: boolean = false): T | T[] => {
+const resolveChild = <T> ( value: ObservableMaybe<T>, setter?: ( ( value: T | T[], dynamic: boolean ) => void ), _dynamic: boolean = false ): T | T[] => {
     const updateElement = (/** null placeholder */e: Text, f: boolean, v: any, pv: HTMLElement[] /** in proxy */) => {
         e.textContent = '';
 
@@ -97,16 +97,19 @@ const resolveChild = <T>(value: ObservableMaybe<T>, _dynamic: boolean = false): 
         return value as T;
     }
     //Observable
-    else if (isFunction(value)) {
-        if (SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value) {
-            return resolveChild(value());
-        } else {
+    else if ( isFunction ( value ) ) {
+
+    if ( SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value || value[SYMBOL_OBSERVABLE_READABLE]?.parent?.disposed ) {
+
+      resolveChild ( value (), setter, _dynamic );
+
+    } else {
             const e = createText(''); //('div') as any as HTMLDivElement
             let f = true;  //first time no parent
             let v: any[];
-            useReaction(() => {
+            useRenderEffect( () => {
                 const pv = v;
-                v = resolveChild(value()) as any;
+                v = resolveChild( value() ) as any;
                 v = updateElement(e, f, v, pv);
                 f = false;
             });
@@ -121,7 +124,7 @@ const resolveChild = <T>(value: ObservableMaybe<T>, _dynamic: boolean = false): 
             const e = createText('');
             let f = true;  //first time no parent
             let v: any[];
-            useReaction(() => {
+            useRenderEffect(() => {
                 const pv = v;
                 v = values.map(v => resolveChild(v)).filter(v => typeof v !== 'undefined'); //, true)
                 v = updateElement(e, f, v, pv);
@@ -178,32 +181,6 @@ const resolveClass = (classes: Classes, resolved: Record<string, true> = {}): Re
     return resolved;
 
 };
-
-// const resolveResolved = <T>(value: T, values: any[]): any => {
-
-//     while (isObservable<T>(value)) {
-
-//         value = value()
-
-//     }
-
-//     if (isArray(value)) {
-
-//         for (let i = 0, l = value.length; i < l; i++) {
-
-//             resolveResolved(value[i], values)
-
-//         }
-
-//     } else if (!isVoidChild(value)) { // It's cheaper to discard void children here
-
-//         values.push(value)
-
-//     }
-
-//     return values
-
-// }
 
 const resolveArraysAndStatics = (() => {
 

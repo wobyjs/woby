@@ -1,22 +1,23 @@
 
 /* IMPORT */
 
-import useScheduler from '../hooks/use_scheduler'
-import $$ from '../methods/SS'
-import type { Callback, Disposer, FunctionMaybe, ObservableMaybe } from '../types'
+import useScheduler from '../hooks/use_scheduler';
+import $$ from '../methods/SS';
+import type {Disposer, FunctionMaybe, ObservableMaybe} from '../types';
 
 /* MAIN */
 
-const useInterval = (callback: ObservableMaybe<Callback>, ms?: FunctionMaybe<number>): Disposer => {
+const useIdleLoop = ( callback: ObservableMaybe<IdleRequestCallback>, options?: FunctionMaybe<IdleRequestOptions> ): Disposer => {
 
-    return useScheduler({
-        callback,
-        cancel: clearInterval,
-        schedule: callback => setInterval(callback, $$(ms))
-    })
+  return useScheduler ({
+    callback,
+    loop: true,
+    cancel: cancelIdleCallback,
+    schedule: callback => requestIdleCallback ( callback, $$(options) )
+  });
 
-}
+};
 
 /* EXPORT */
 
-export default useInterval
+export default useIdleLoop;

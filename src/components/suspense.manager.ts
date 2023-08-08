@@ -1,77 +1,77 @@
 
 /* IMPORT */
 
-import { useCleanup } from '../hooks'
-import SuspenseContext from '../components/suspense.context'
-import type { SuspenseData } from '../types'
+import SuspenseContext from '../components/suspense.context';
+import useCleanup from '../hooks/use_cleanup';
+import type {SuspenseData} from '../types';
 
 /* MAIN */
 
 class SuspenseManager {
 
-    /* VARIABLES */
+  /* VARIABLES */
 
-    private suspenses = new Map<SuspenseData, number>();
+  private suspenses = new Map<SuspenseData, number> ();
 
-    /* API */
+  /* API */
 
-    change = (suspense: SuspenseData, nr: number): void => {
+  change = ( suspense: SuspenseData, nr: number ): void => {
 
-        const counter = this.suspenses.get(suspense) || 0
-        const counterNext = Math.max(0, counter + nr)
+    const counter = this.suspenses.get ( suspense ) || 0;
+    const counterNext = Math.max ( 0, counter + nr );
 
-        if (counter === counterNext) return
+    if ( counter === counterNext ) return;
 
-        if (counterNext) {
+    if ( counterNext ) {
 
-            this.suspenses.set(suspense, counterNext)
+      this.suspenses.set ( suspense, counterNext );
 
-        } else {
+    } else {
 
-            this.suspenses.delete(suspense)
+      this.suspenses.delete ( suspense );
 
-        }
+    }
 
-        if (nr > 0) {
+    if ( nr > 0 ) {
 
-            suspense.increment(nr)
+      suspense.increment ( nr );
 
-        } else {
+    } else {
 
-            suspense.decrement(nr)
+      suspense.decrement ( nr );
 
-        }
+    }
 
-    };
+  };
 
-    suspend = (): void => {
+  suspend = (): void => {
 
-        const suspense = SuspenseContext.get()
+    const suspense = SuspenseContext.get ();
 
-        if (!suspense) return
+    if ( !suspense ) return;
 
-        this.change(suspense, 1)
+    this.change ( suspense, 1 );
 
-        useCleanup(() => {
+    useCleanup ( () => {
 
-            this.change(suspense, -1)
+      this.change ( suspense, -1 );
 
-        })
+    });
 
-    };
+  };
 
-    unsuspend = (): void => {
+  unsuspend = (): void => {
 
-        this.suspenses.forEach((counter, suspense) => {
+    this.suspenses.forEach ( ( counter, suspense ) => {
 
-            this.change(suspense, - counter)
+      this.change ( suspense, - counter );
 
-        })
+    });
 
-    };
+  };
 
 };
 
 /* EXPORT */
 
-export default SuspenseManager
+export default SuspenseManager;

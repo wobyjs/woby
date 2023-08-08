@@ -1,27 +1,29 @@
 
 /* IMPORT */
 
-import useDisposed from '../hooks/use_disposed'
-import { with as _with } from '../oby'
-import type { Callback } from '../types'
+import useCheapDisposed from '../hooks/use_cheap_disposed';
+import {with as _with} from '../oby';
+import type {Callback} from '../types';
 
 /* MAIN */
 
-const useMicrotask = (fn: Callback): void => {
+//TODO: Maybe port this to oby
 
-    const disposed = useDisposed()
-    const runWithOwner = _with()
+const useMicrotask = ( fn: Callback ): void => {
 
-    queueMicrotask(() => {
+  const disposed = useCheapDisposed ();
+  const runWithOwner = _with ();
 
-        if (disposed()) return
+  queueMicrotask ( () => {
 
-        runWithOwner(fn)
+    if ( disposed () ) return;
 
-    })
+    runWithOwner ( fn );
 
-}
+  });
+
+};
 
 /* EXPORT */
 
-export default useMicrotask
+export default useMicrotask;

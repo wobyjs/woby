@@ -1,7 +1,7 @@
 {
     "name": "voby",
     "repository": "github:fabiospampinato/voby",
-    "description": "A high-performance framework with fine-grained observable-based reactivity for building rich applications.",
+    "description": "A high-performance framework with fine-grained observable/signal-based reactivity for building rich applications.",
     "version": "0.46.2",
     "type": "module",
     "sideEffects": false,

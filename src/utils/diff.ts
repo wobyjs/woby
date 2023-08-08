@@ -26,23 +26,23 @@ const dummyNode = createComment('')
 const beforeDummyWrapper: [Node] = [dummyNode]
 const afterDummyWrapper: [Node] = [dummyNode]
 
-const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null): void => {
-  if (before === after) return
-  if (before instanceof Node) {
-    beforeDummyWrapper[0] = before
-    before = beforeDummyWrapper
+const diff = ( parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null ): void => {
+  if ( before === after ) return;
+  if ( before instanceof Node ) {
+    beforeDummyWrapper[0] = before;
+    before = beforeDummyWrapper;
   }
-  if (after instanceof Node) {
-    afterDummyWrapper[0] = after
-    after = afterDummyWrapper
+  if ( after instanceof Node ) {
+    afterDummyWrapper[0] = after;
+    after = afterDummyWrapper;
   }
-  const bLength = after.length
-  let aEnd = before.length
-  let bEnd = bLength
-  let aStart = 0
-  let bStart = 0
-  let map: Map<any, any> | null = null
-  let removable: Node | undefined
+  const bLength = after.length;
+  let aEnd = before.length;
+  let bEnd = bLength;
+  let aStart = 0;
+  let bStart = 0;
+  let map: Map<any, any> | null = null;
+  let removable: Node | undefined;
   while (aStart < aEnd || bStart < bEnd) {
     // append head, tail, or nodes in between: fast path
     if (aEnd === aStart) {
@@ -54,15 +54,15 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
         (bStart ?
           (after[bStart - 1].nextSibling) :
           after[bEnd - bStart]) :
-        nextSibling
+        nextSibling;
       if (bStart < bEnd) {
         // parent.insertBefore(after[bStart++], node);
-        if (node) {
-          (node as ChildNode).before.apply(node, after.slice(bStart, bEnd))
+        if ( node ) {
+          ( node as ChildNode ).before.apply ( node, after.slice ( bStart, bEnd ) );
         } else {
-          (parent as ParentNode).append.apply(parent, after.slice(bStart, bEnd))
+          ( parent as ParentNode ).append.apply ( parent, after.slice ( bStart, bEnd ) );
         }
-        bStart = bEnd
+        bStart = bEnd;
       }
     }
     // remove head or tail: fast path
@@ -70,21 +70,25 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
       while (aStart < aEnd) {
         // remove the node only if it's unknown or not live
         if (!map || !map.has(before[aStart])) {
-          removable = before[aStart]
-          parent.removeChild(removable)
+          removable = before[aStart];
+          try {
+            parent.removeChild(removable);
+          } catch {
+            //FIXME: This try..catch block shouldn't exist, though sometimes setChildStatic wants to update the DOM immediately -- tricky
+          }
         }
-        aStart++
+        aStart++;
       }
     }
     // same node: fast path
     else if (before[aStart] === after[bStart]) {
-      aStart++
-      bStart++
+      aStart++;
+      bStart++;
     }
     // same tail: fast path
     else if (before[aEnd - 1] === after[bEnd - 1]) {
-      aEnd--
-      bEnd--
+      aEnd--;
+      bEnd--;
     }
     // The once here single last swap "fast path" has been removed in v1.1.0
     // https://github.com/WebReflection/udomdiff/blob/single-final-swap/esm/index.js#L69-L85
@@ -99,19 +103,19 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
       // or asymmetric too
       // [1, 2, 3, 4, 5]
       // [1, 2, 3, 5, 6, 4]
-      const node = before[--aEnd].nextSibling
+      const node = before[--aEnd].nextSibling;
       parent.insertBefore(
         after[bStart++],
         before[aStart++].nextSibling
-      )
-      parent.insertBefore(after[--bEnd], node)
+      );
+      parent.insertBefore(after[--bEnd], node);
       // mark the future index as identical (yeah, it's dirty, but cheap 👍)
       // The main reason to do this, is that when a[aEnd] will be reached,
       // the loop will likely be on the fast path, as identical to b[bEnd].
       // In the best case scenario, the next loop will skip the tail,
       // but in the worst one, this node will be considered as already
       // processed, bailing out pretty quickly from the map index check
-      before[aEnd] = after[bEnd]
+      before[aEnd] = after[bEnd];
     }
     // map based fallback, "slow" path
     else {
@@ -121,22 +125,22 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
       // and such scenario happens at least when all nodes are different,
       // but also if both first and last items of the lists are different
       if (!map) {
-        map = new Map
-        let i = bStart
+        map = new Map;
+        let i = bStart;
         while (i < bEnd)
-          map.set(after[i], i++)
+          map.set(after[i], i++);
       }
       // if it's a future node, hence it needs some handling
       if (map.has(before[aStart])) {
         // grab the index of such node, 'cause it might have been processed
-        const index = map.get(before[aStart])
+        const index = map.get(before[aStart]);
         // if it's not already processed, look on demand for the next LCS
         if (bStart < index && index < bEnd) {
-          let i = aStart
+          let i = aStart;
           // counts the amount of nodes that are the same in the future
-          let sequence = 1
+          let sequence = 1;
           while (++i < aEnd && i < bEnd && map.get(before[i]) === (index + sequence))
-            sequence++
+            sequence++;
           // effort decision here: if the sequence is longer than replaces
           // needed to reach such sequence, which would brings again this loop
           // to the fast path, prepend the difference before a sequence,
@@ -148,15 +152,15 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
           // this would place 7 before 1 and, from that time on, 1, 2, and 3
           // will be processed at zero cost
           if (sequence > (index - bStart)) {
-            const node = before[aStart]
+            const node = before[aStart];
             if (bStart < index) {
               // parent.insertBefore(after[bStart++], node);
-              if (node) {
-                (node as ChildNode).before.apply(node, after.slice(bStart, index))
+              if ( node ) {
+                ( node as ChildNode ).before.apply ( node, after.slice ( bStart, index ) );
               } else {
-                (parent as ParentNode).append.apply(parent, after.slice(bStart, index))
+                ( parent as ParentNode ).append.apply ( parent, after.slice ( bStart, index ) );
               }
-              bStart = index
+              bStart = index;
             }
           }
           // if the effort wasn't good enough, fallback to a replace,
@@ -166,26 +170,30 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
             parent.replaceChild(
               after[bStart++],
               before[aStart++]
-            )
+            );
           }
         }
         // otherwise move the source forward, 'cause there's nothing to do
         else
-          aStart++
+          aStart++;
       }
       // this node has no meaning in the future list, so it's more than safe
       // to remove it, and check the next live node out instead, meaning
       // that only the live list index should be forwarded
       else {
-        removable = before[aStart++]
-        parent.removeChild(removable)
+        removable = before[aStart++];
+        try {
+          parent.removeChild(removable);
+        } catch {
+          //FIXME: This try..catch block shouldn't exist, though sometimes setChildStatic wants to update the DOM immediately -- tricky
+        }
       }
     }
   }
-  beforeDummyWrapper[0] = dummyNode
-  afterDummyWrapper[0] = dummyNode
-}
+  beforeDummyWrapper[0] = dummyNode;
+  afterDummyWrapper[0] = dummyNode;
+};
 
 /* EXPORT */
 
-export default diff
+export default diff;

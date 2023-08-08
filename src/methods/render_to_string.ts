@@ -1,47 +1,45 @@
 
 /* IMPORT */
 
-import Portal from '../components/portal'
-import Suspense from '../components/suspense'
-import SuspenseContext from '../components/suspense.context'
-import { SYMBOL_SUSPENSE } from '../constants'
-import useReaction from '../hooks/use_reaction'
-import useRoot from '../hooks/use_root'
-import { context } from '../oby'
-import type { Child } from '../types'
+import Portal from '../components/portal';
+import SuspenseCollector from '../components/suspense.collector';
+import useEffect from '../hooks/use_effect';
+import useRoot from '../hooks/use_root';
+import $$ from '../methods/SS';
+import type {Child} from '../types';
 
 /* MAIN */
 
 //TODO: Implement this properly, without relying on JSDOM or stuff like that
 
-const renderToString = (child: Child): Promise<string> => {
+const renderToString = ( child: Child ): Promise<string> => {
 
-    return new Promise(resolve => {
+  return new Promise ( resolve => {
 
-        useRoot(dispose => {
+    useRoot ( dispose => {
 
-            context(SYMBOL_SUSPENSE, undefined) // Ensuring the parent Suspense boundary, if any, is not triggered
+      $$(SuspenseCollector.wrap ( suspenses => {
 
-            const suspense = SuspenseContext.new()
+        const {portal} = Portal ({ children: child }).metadata;
 
-            const { portal } = Portal({ children: Suspense({ children: child }) }).metadata
+        useEffect ( () => {
 
-            useReaction(() => {
+          if ( suspenses.active () ) return;
 
-                if (suspense.active()) return
+          resolve ( portal.innerHTML );
 
-                resolve(portal.innerHTML)
+          dispose ();
 
-                dispose()
+        }, { suspense: false } );
 
-            })
+      }));
 
-        })
+    });
 
-    })
+  });
 
-}
+};
 
 /* EXPORT */
 
-export default renderToString
+export default renderToString;

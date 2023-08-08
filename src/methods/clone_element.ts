@@ -23,8 +23,8 @@ export const cloneElement = <P extends Props>(element: Child | Element, props: P
   }
   else if (Array.isArray(element))
     return element.map(e => cloneElement(e, props));
-  else if (element.cloneNode) //native html
-    return element.cloneNode();
+  else if ((element as Element).cloneNode) //native html
+    return (element as Element).cloneNode();
 
   throw new Error("Unknown element");
 };

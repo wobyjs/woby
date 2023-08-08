@@ -1,13 +1,12 @@
 
 /* IMPORT */
 
-// import untrack from '../methods/untrack'
+import untrack from '../methods/untrack';
 import wrapElement from '../methods/wrap_element';
-import { createHTMLNode, createSVGNode } from '../utils/creators.via';
-import { isFunction, isNil, isNode, isString, isSVGElement, isVoidChild } from '../utils/lang';
-import { setProps } from '../utils/setters.via';
-import type { Child, Component, Element, Props } from '../types';
-import { untrack } from 'oby';
+import {createHTMLNode, createSVGNode} from '../utils/creators.via';
+import {isFunction, isNil, isNode, isString, isSVGElement, isVoidChild} from '../utils/lang';
+import {setProps} from '../utils/setters';
+import type {Child, Component, Element, Props} from '../types';
 import { IgnoreSymbols } from 'viajs';
 import '../jsx/types';
 
