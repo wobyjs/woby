@@ -943,7 +943,7 @@ const setTemplateAccessor = ( element: HTMLElement, key: string, value: Template
 
     value ( element, 'setStyles' );
 
-  } else if ( key === 'class' ) {
+  } else if ( key === 'class' || key === 'className' ) {
 
     if ( !isSVG ( element ) ) {
 
@@ -1001,7 +1001,7 @@ const setProp = ( element: HTMLElement, key: string, value: any ): void => {
 
     setStyles ( element, value );
 
-  } else if ( key === 'class' ) {
+  } else if ( key === 'class' || key === 'className' ) {
 
     setClasses ( element, value );
 

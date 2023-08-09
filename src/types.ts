@@ -1,5 +1,6 @@
 // import {JSX} from './jsx/types';
 import type * as CSS from 'csstype';
+import { JSX } from './jsx/types';
 
 // const a: JSX.IntrinsicElements
 

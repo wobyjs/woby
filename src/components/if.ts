@@ -18,7 +18,7 @@ const If = <T> ({ when, fallback, children }: { when: FunctionMaybe<T>, fallback
 
     const truthy = useGuarded ( when, isTruthy );
 
-    return ternary ( when, useUntracked ( () => children ( truthy ) ), fallback );
+    return ternary ( when, useUntracked ( () => (children as Function) ( truthy ) ), fallback );
 
   } else { // Just passing the children along
 

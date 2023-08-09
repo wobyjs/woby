@@ -4,6 +4,7 @@ import useRoot from '../hooks/use_root';
 import { setChild } from '../utils/setters';
 import type { Child, Disposer } from '../types';
 import $ from './S';
+import { JSX } from 'src/jsx/types';
 
 export const render = (child: Element) => {
     const fragment = document.createElement('div');
@@ -40,7 +41,7 @@ export const render = (child: Element) => {
     });
     document.body.append(renderDiv)
 
-    const getByRole = <K extends keyof IntrinsicElementsMap>(tag: K) => fragment.querySelector(tag) as any as IntrinsicElementsMap[K];
+    const getByRole = <K extends keyof JSX.IntrinsicElementsMap>(tag: K) => fragment.querySelector(tag) as any as JSX.IntrinsicElementsMap[K];
     const getByTestId = <T extends HTMLElement = HTMLElement>(id: string) => fragment.querySelector(`[data-testid="${id}"]`) as T;
  
     return { fragment, unmount, getByRole, getByTestId };

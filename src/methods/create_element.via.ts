@@ -8,7 +8,7 @@ import {isFunction, isNil, isNode, isString, isSVGElement, isVoidChild} from '..
 import {setProps} from '../utils/setters';
 import type {Child, Component, Element, Props} from '../types';
 import { IgnoreSymbols } from 'viajs';
-import '../jsx/types';
+import { JSX } from '../jsx/types';
 
 /* MAIN */
 

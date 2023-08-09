@@ -8,7 +8,7 @@ import { isFunction, isNil, isNode, isString, isSVGElement, isVoidChild } from '
 import { setProps } from '../utils/setters.ssr';
 import type { Child, Component, Element, Props } from '../types';
 import { untrack } from 'oby';
-import '../jsx/types';
+import { JSX } from '../jsx/types';
 
 /* MAIN */
 

@@ -2,6 +2,7 @@
 /* IMPORT */
 
 import {DIRECTIVES, SYMBOLS_DIRECTIVES} from '../constants';
+import { JSX } from '../jsx/types';
 import resolve from '../methods/resolve';
 import {context} from '../oby';
 import type {Child, DirectiveFunction, Directive, DirectiveData, DirectiveOptions, ExtractArray} from '../types';

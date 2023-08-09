@@ -9,24 +9,26 @@ import { CloneableType, wrapCloneElement } from '../methods/wrap_clone_element';
 
 /* MAIN */
 
-export const cloneElement = <P extends Props>(element: Child | Element, props: P): Child => {
-  if (isPrimitive(element))
+export const cloneElement = <P extends Props> ( element: Child | Element, props: P, ...children: Child[] ): Child => {
+  if ( isPrimitive( element ) )
     return element;
-  else if (isFunction(element)) {
-    if (!element[SYMBOL_CLONE])
-      throw new Error('target is not cloneable, it is not created by jsx.createElement');
+  else if ( isFunction( element ) ) {
+    if ( !element[ SYMBOL_CLONE ] )
+      throw new Error( 'target is not cloneable, it is not created by jsx.createElement' );
 
-    const { component, props: oldProps } = element[SYMBOL_CLONE] as CloneableType<P>;
+    const { component, props: oldProps } = element[ SYMBOL_CLONE ] as CloneableType<P>;
     const newProps = { ...oldProps, ...props };
+    if ( children.length > 0 )
+      Object.assign( props, { children } );
 
-    return wrapCloneElement(createElement<P>(component as any, newProps), component, newProps);
+    return wrapCloneElement( createElement<P>( component as any, newProps ), component, newProps );
   }
-  else if (Array.isArray(element))
-    return element.map(e => cloneElement(e, props));
-  else if ((element as Element).cloneNode) //native html
-    return (element as Element).cloneNode();
+  else if ( Array.isArray( element ) )
+    return element.map( e => cloneElement( e, props ) );
+  else if ( ( element as Element ).cloneNode ) //native html
+    return ( element as Element ).cloneNode();
 
-  throw new Error("Unknown element");
+  throw new Error( "Unknown element" );
 };
 
 export default cloneElement
