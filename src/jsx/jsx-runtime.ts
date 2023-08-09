@@ -5,7 +5,7 @@ import '../types';
 import Fragment from '../components/fragment';
 // import createElement from '../methods/create_element';
 // import { wrapCloneElement } from '../methods/wrap_clone_element';
-import type { Component, Element } from '../types';
+import type { Child, Component, Element } from '../types';
 import { wrapCloneElement, createElement } from '../index';
 
 /* MAIN */

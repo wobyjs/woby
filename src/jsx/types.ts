@@ -16,7 +16,7 @@ interface SVGElement extends EventTarget{
 
 /* JSX */
 
-declare namespace JSX {
+export namespace JSX {
 
   /* HELPERS */
 
