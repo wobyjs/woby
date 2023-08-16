@@ -4,8 +4,9 @@ import useRoot from '../hooks/use_root';
 import { setChild } from '../utils/setters';
 import type { Child, Disposer } from '../types';
 import $ from './S';
+// import { JSX } from 'src/jsx/types';
 
-export const render = (child: Element) => {
+export const render = (child: JSX.Child) => {
     const fragment = document.createElement('div');
     const renderDiv = document.createElement("div")
     // const buildTable = (div)=>{

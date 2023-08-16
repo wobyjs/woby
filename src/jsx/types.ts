@@ -1,109 +1,110 @@
-/* GLOBALS */
-// declare global {
-//   export interface Element {
-//     cloneNode(deep?: boolean): Element;
-//   }
 
-//   export interface HTMLElement {
-//     cloneNode(deep?: boolean): HTMLElement;
-//     innerText: string;
-//     innerHTML: string;
-//     outerText: string;
-//     outerHTML: string;
-//     className: string;
-//   }
+/* IMPORT */
+//console.log('ssr.ts')
 
-//   export interface SVGElement {
-//     cloneNode(deep?: boolean): SVGElement;
-//   }
-// }
-export { };
+// import './jsx/types'
+//  * from './jsx/jsx'
+//  * from './jsx/types.ts'
+// import type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component } from './types';
 
+/*  */
+
+//  * from './components/index.ssr';
+//  * from './jsx/jsx-runtime.ssr'
+//  * from './hooks';
+//  * from './methods/index.ssr';
+//  type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component };
+//  * from './constants';
+
+//  { render } from './methods/render.testing'
+export { }
+
+//copy all from ../types into JSX
 declare global {
-  export namespace JSX {
+  namespace JSX {
 
     /* HELPERS */
 
-    export type ArrayMaybe<T = unknown> = T[] | T;
+    type ArrayMaybe<T = unknown> = T[] | T;
 
-    export type FunctionMaybe<T = unknown> = ({ (): T; }) | T;
+    type FunctionMaybe<T = unknown> = ( { (): T; } ) | T;
 
-    export type ObservableMaybe<T = unknown> = ({ (): T; }) | T;
+    type ObservableMaybe<T = unknown> = ( { (): T; } ) | T;
 
-    export type Nullable<T = unknown> = T | undefined | null;
+    type Nullable<T = unknown> = T | undefined | null;
 
-    export type AllClassProperties = {
-      [key: string]: FunctionMaybe<Nullable<boolean>>;
+    type AllClassProperties = {
+      [ key: string ]: FunctionMaybe<Nullable<boolean>>;
     };
 
-    export type DOMCSSProperties = {
-      [key in keyof Omit<CSSStyleDeclaration, 'item' | 'setProperty' | 'removeProperty' | 'getPropertyValue' | 'getPropertyPriority'>]?: FunctionMaybe<Nullable<string | number>>
+    type DOMCSSProperties = {
+      [ key in keyof Omit<CSSStyleDeclaration, 'item' | 'setProperty' | 'removeProperty' | 'getPropertyValue' | 'getPropertyPriority'> ]?: FunctionMaybe<Nullable<string | number>>
     };
 
-    export type DOMCSSVariables = {
-      [key: `--${string}`]: FunctionMaybe<Nullable<string | number>>;
+    type DOMCSSVariables = {
+      [ key: `--${ string }` ]: FunctionMaybe<Nullable<string | number>>;
     };
 
-    export type HTMLAttributeReferrerPolicy = '' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';
+    type HTMLAttributeReferrerPolicy = '' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';
 
     /* MAIN */
 
-    export type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | (() => Child);
+    type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | ( () => Child );
 
-    export type Children = Child;
+    type Children = Child;
 
-    export type Class = FunctionMaybe<Nullable<string | ClassProperties | (FunctionMaybe<null | undefined | boolean | string> | Class)[]>>;
+    type Class = FunctionMaybe<Nullable<string | ClassProperties | ( FunctionMaybe<null | undefined | boolean | string> | Class )[]>>;
 
-    export type Component<P = {}> = (props: P) => Child;
+    type Component<P = {}> = ( props: P ) => Child;
 
-    // export type Element = Child;
+    type Element = Child;
 
-    export type Ref<T = unknown> = ((value: T) => void);
+    type Ref<T = unknown> = ( ( value: T ) => void );
 
-    export type Refs<T = unknown> = ArrayMaybe<Nullable<Ref<T>>> | Refs<T>[];
+    type Refs<T = unknown> = ArrayMaybe<Nullable<Ref<T>>> | Refs<T>[];
 
-    export type Style = FunctionMaybe<Nullable<string | StyleProperties>>;
+    type Style = FunctionMaybe<Nullable<string | StyleProperties>>;
 
-    export type IntrinsicElement<T extends keyof IntrinsicElements> = IntrinsicElements[T];
+    type IntrinsicElement<T extends keyof IntrinsicElements> = IntrinsicElements[ T ];
 
-    export interface ClassProperties extends AllClassProperties { }
+    interface ClassProperties extends AllClassProperties { }
 
-    export interface StyleProperties extends DOMCSSProperties, DOMCSSVariables { }
+    interface StyleProperties extends DOMCSSProperties, DOMCSSVariables { }
 
-    export type TargetedEvent<T extends EventTarget = EventTarget, TypedEvent extends Event = Event> = Omit<TypedEvent, 'currentTarget'> & { readonly currentTarget: T; };
-    export type TargetedAnimationEvent<T extends EventTarget> = TargetedEvent<T, AnimationEvent>;
-    export type TargetedClipboardEvent<T extends EventTarget> = TargetedEvent<T, ClipboardEvent>;
-    export type TargetedChangeEvent<T extends EventTarget> = TargetedEvent<T, Event & { target: T; }>;
-    export type TargetedCompositionEvent<T extends EventTarget> = TargetedEvent<T, CompositionEvent>;
-    export type TargetedDragEvent<T extends EventTarget> = TargetedEvent<T, DragEvent>;
-    export type TargetedFocusEvent<T extends EventTarget> = TargetedEvent<T, FocusEvent>;
-    export type TargetedInputEvent<T extends EventTarget> = TargetedEvent<T, InputEvent>;
-    export type TargetedKeyboardEvent<T extends EventTarget> = TargetedEvent<T, KeyboardEvent>;
-    export type TargetedMouseEvent<T extends EventTarget> = TargetedEvent<T, MouseEvent>;
-    export type TargetedPointerEvent<T extends EventTarget> = TargetedEvent<T, PointerEvent>;
-    export type TargetedSubmitEvent<T extends EventTarget> = TargetedEvent<T, SubmitEvent>;
-    export type TargetedTouchEvent<T extends EventTarget> = TargetedEvent<T, TouchEvent>;
-    export type TargetedTransitionEvent<T extends EventTarget> = TargetedEvent<T, TransitionEvent>;
-    export type TargetedUIEvent<T extends EventTarget> = TargetedEvent<T, UIEvent>;
-    export type TargetedWheelEvent<T extends EventTarget> = TargetedEvent<T, WheelEvent>;
+    type TargetedEvent<T extends EventTarget = EventTarget, TypedEvent extends Event = Event> = Omit<TypedEvent, 'currentTarget'> & { readonly currentTarget: T; };
+    type TargetedAnimationEvent<T extends EventTarget> = TargetedEvent<T, AnimationEvent>;
+    type TargetedClipboardEvent<T extends EventTarget> = TargetedEvent<T, ClipboardEvent>;
+    type TargetedChangeEvent<T extends EventTarget> = TargetedEvent<T, Event & { target: T; }>;
+    type TargetedCompositionEvent<T extends EventTarget> = TargetedEvent<T, CompositionEvent>;
+    type TargetedDragEvent<T extends EventTarget> = TargetedEvent<T, DragEvent>;
+    type TargetedFocusEvent<T extends EventTarget> = TargetedEvent<T, FocusEvent>;
+    type TargetedInputEvent<T extends EventTarget> = TargetedEvent<T, InputEvent>;
+    type TargetedKeyboardEvent<T extends EventTarget> = TargetedEvent<T, KeyboardEvent>;
+    type TargetedMouseEvent<T extends EventTarget> = TargetedEvent<T, MouseEvent>;
+    type TargetedPointerEvent<T extends EventTarget> = TargetedEvent<T, PointerEvent>;
+    type TargetedSubmitEvent<T extends EventTarget> = TargetedEvent<T, SubmitEvent>;
+    type TargetedTouchEvent<T extends EventTarget> = TargetedEvent<T, TouchEvent>;
+    type TargetedTransitionEvent<T extends EventTarget> = TargetedEvent<T, TransitionEvent>;
+    type TargetedUIEvent<T extends EventTarget> = TargetedEvent<T, UIEvent>;
+    type TargetedWheelEvent<T extends EventTarget> = TargetedEvent<T, WheelEvent>;
 
-    export type EventHandler<Event extends TargetedEvent> = { (/* this: never,  */event: Event): void; };
-    export type AnimationEventHandler<T extends EventTarget> = EventHandler<TargetedAnimationEvent<T>>;
-    export type ClipboardEventHandler<T extends EventTarget> = EventHandler<TargetedClipboardEvent<T>>;
-    export type ChangeEventHandler<T extends EventTarget> = EventHandler<TargetedChangeEvent<T>>;
-    export type CompositionEventHandler<T extends EventTarget> = EventHandler<TargetedCompositionEvent<T>>;
-    export type DragEventHandler<T extends EventTarget> = EventHandler<TargetedDragEvent<T>>;
-    export type FocusEventHandler<T extends EventTarget> = EventHandler<TargetedFocusEvent<T>>;
-    export type GenericEventHandler<T extends EventTarget> = EventHandler<TargetedEvent<T>>;
-    export type InputEventHandler<T extends EventTarget> = EventHandler<TargetedInputEvent<T>>;
-    export type KeyboardEventHandler<T extends EventTarget> = EventHandler<TargetedKeyboardEvent<T>>;
-    export type MouseEventHandler<T extends EventTarget> = EventHandler<TargetedMouseEvent<T>>;
-    export type PointerEventHandler<T extends EventTarget> = EventHandler<TargetedPointerEvent<T>>;
-    export type SubmitEventHandler<T extends EventTarget> = EventHandler<TargetedSubmitEvent<T>>;
-    export type TouchEventHandler<T extends EventTarget> = EventHandler<TargetedTouchEvent<T>>;
-    export type TransitionEventHandler<T extends EventTarget> = EventHandler<TargetedTransitionEvent<T>>;
-    export type UIEventHandler<T extends EventTarget> = EventHandler<TargetedUIEvent<T>>;
-    export type WheelEventHandler<T extends EventTarget> = EventHandler<TargetedWheelEvent<T>>;
+    type EventHandler<Event extends TargetedEvent> = { (/* this: never,  */event: Event ): void; };
+    type AnimationEventHandler<T extends EventTarget> = EventHandler<TargetedAnimationEvent<T>>;
+    type ClipboardEventHandler<T extends EventTarget> = EventHandler<TargetedClipboardEvent<T>>;
+    type ChangeEventHandler<T extends EventTarget> = EventHandler<TargetedChangeEvent<T>>;
+    type CompositionEventHandler<T extends EventTarget> = EventHandler<TargetedCompositionEvent<T>>;
+    type DragEventHandler<T extends EventTarget> = EventHandler<TargetedDragEvent<T>>;
+    type FocusEventHandler<T extends EventTarget> = EventHandler<TargetedFocusEvent<T>>;
+    type GenericEventHandler<T extends EventTarget> = EventHandler<TargetedEvent<T>>;
+    type InputEventHandler<T extends EventTarget> = EventHandler<TargetedInputEvent<T>>;
+    type KeyboardEventHandler<T extends EventTarget> = EventHandler<TargetedKeyboardEvent<T>>;
+    type MouseEventHandler<T extends EventTarget> = EventHandler<TargetedMouseEvent<T>>;
+    type PointerEventHandler<T extends EventTarget> = EventHandler<TargetedPointerEvent<T>>;
+    type SubmitEventHandler<T extends EventTarget> = EventHandler<TargetedSubmitEvent<T>>;
+    type TouchEventHandler<T extends EventTarget> = EventHandler<TargetedTouchEvent<T>>;
+    type TransitionEventHandler<T extends EventTarget> = EventHandler<TargetedTransitionEvent<T>>;
+    type UIEventHandler<T extends EventTarget> = EventHandler<TargetedUIEvent<T>>;
+    type WheelEventHandler<T extends EventTarget> = EventHandler<TargetedWheelEvent<T>>;
 
     //   interface ChangeEvent<T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> extends Event {
     //     target: T;
@@ -121,18 +122,18 @@ declare global {
     //   changed?: FunctionMaybe<Nullable<ChangeEvent<HTMLTextAreaElement>>>,
     // }
 
-    export interface ElementAttributesProperty {
+    interface ElementAttributesProperty {
       props: Record<string, any>;
     }
 
-    export interface ElementChildrenAttribute {
+    interface ElementChildrenAttribute {
       children: any;
     }
 
-    export interface IntrinsicAttributes {
+    interface IntrinsicAttributes {
     }
 
-    export interface AriaAttributes {
+    interface AriaAttributes {
       ariaActivedescendant?: FunctionMaybe<Nullable<string>>,
       ariaAtomic?: FunctionMaybe<Nullable<boolean | 'true' | 'false'>>,
       ariaAutocomplete?: FunctionMaybe<Nullable<'none' | 'inline' | 'list' | 'both'>>,
@@ -183,15 +184,15 @@ declare global {
       ariaValuetext?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface Directives {
+    interface Directives {
       // name: [arg1: unknown, arg2: unknown, ...argN: unknown]
     }
 
-    export type DirectiveAttributes = {
-      [Directive in keyof Directives as `use:${Directive}`]?: Directives[Directive] extends [infer U] ? U | [U] : Directives[Directive]
+    type DirectiveAttributes = {
+      [ Directive in keyof Directives as `use:${ Directive }` ]?: Directives[ Directive ] extends [ infer U ] ? U | [ U ] : Directives[ Directive ]
     };
 
-    export interface EventAttributes<T extends EventTarget> {
+    interface EventAttributes<T extends EventTarget> {
       /* IMAGE EVENTS */
       onLoad?: ObservableMaybe<Nullable<GenericEventHandler<T>>>,
       onLoadCapture?: ObservableMaybe<Nullable<GenericEventHandler<T>>>,
@@ -387,18 +388,18 @@ declare global {
       onTransitionEndCapture?: ObservableMaybe<Nullable<TransitionEventHandler<T>>>;
     }
 
-    export interface ViewAttributes {
+    interface ViewAttributes {
       children?: Children,
       dangerouslySetInnerHTML?: FunctionMaybe<{
         __html: FunctionMaybe<Nullable<string>>;
       }>;
     }
 
-    export interface DOMAttributes<T extends EventTarget> extends EventAttributes<T> {
+    interface DOMAttributes<T extends EventTarget> extends EventAttributes<T> {
 
     }
 
-    export interface VoidHTMLAttributes<T extends EventTarget> extends AriaAttributes, DOMAttributes<T>, DirectiveAttributes {
+    interface VoidHTMLAttributes<T extends EventTarget> extends AriaAttributes, DOMAttributes<T>, DirectiveAttributes {
       ref?: Refs<T>,
 
       accept?: FunctionMaybe<Nullable<string>>,
@@ -576,11 +577,11 @@ declare global {
       itemRef?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface HTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T>, ViewAttributes {
-
+    interface HTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T>, ViewAttributes {
+      key?: string; //will be removed
     }
 
-    export interface SVGAttributes<T extends EventTarget = SVGElement> extends HTMLAttributes<T>, DirectiveAttributes {
+    interface SVGAttributes<T extends EventTarget = SVGElement> extends HTMLAttributes<T>, DirectiveAttributes {
       ref?: Refs<T>,
 
       accentHeight?: FunctionMaybe<Nullable<number | string>>,
@@ -828,7 +829,7 @@ declare global {
       'xmlns:xlink'?: FunctionMaybe<Nullable<string>>,
     }
 
-    export interface AnchorHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface AnchorHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       download?: FunctionMaybe<Nullable<boolean>>,
       href?: FunctionMaybe<Nullable<string>>,
       hrefLang?: FunctionMaybe<Nullable<string>>,
@@ -840,11 +841,11 @@ declare global {
       referrerPolicy?: FunctionMaybe<Nullable<HTMLAttributeReferrerPolicy>>;
     }
 
-    export interface AudioHTMLAttributes<T extends EventTarget> extends MediaHTMLAttributes<T> {
+    interface AudioHTMLAttributes<T extends EventTarget> extends MediaHTMLAttributes<T> {
 
     }
 
-    export interface AreaHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface AreaHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       alt?: FunctionMaybe<Nullable<string>>,
       coords?: FunctionMaybe<Nullable<string>>,
       download?: FunctionMaybe<Nullable<boolean>>,
@@ -857,20 +858,20 @@ declare global {
       target?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface BaseHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface BaseHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       href?: FunctionMaybe<Nullable<string>>,
       target?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface BlockquoteHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface BlockquoteHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       cite?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface BrHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface BrHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
 
     }
 
-    export interface ButtonHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface ButtonHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       autoFocus?: FunctionMaybe<Nullable<boolean>>,
       disabled?: FunctionMaybe<Nullable<boolean>>,
       form?: FunctionMaybe<Nullable<string>>,
@@ -884,52 +885,52 @@ declare global {
       value?: FunctionMaybe<Nullable<string | ReadonlyArray<string> | number>>;
     }
 
-    export interface CanvasHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface CanvasHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       height?: FunctionMaybe<Nullable<number | string>>,
       width?: FunctionMaybe<Nullable<number | string>>;
     }
 
-    export interface ColHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface ColHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       span?: FunctionMaybe<Nullable<number>>,
       width?: FunctionMaybe<Nullable<number | string>>;
     }
 
-    export interface ColgroupHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface ColgroupHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       span?: FunctionMaybe<Nullable<number>>;
     }
 
-    export interface DataHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface DataHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       value?: FunctionMaybe<Nullable<string | ReadonlyArray<string> | number>>;
     }
 
-    export interface DetailsHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface DetailsHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       open?: FunctionMaybe<Nullable<boolean>>,
       onToggle?: ObservableMaybe<Nullable<GenericEventHandler<T>>>;
     }
 
-    export interface DelHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface DelHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       cite?: FunctionMaybe<Nullable<string>>,
       dateTime?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface DialogHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface DialogHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       open?: FunctionMaybe<Nullable<boolean>>;
     }
 
-    export interface EmbedHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface EmbedHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       height?: FunctionMaybe<Nullable<number | string>>,
       src?: FunctionMaybe<Nullable<string>>,
       type?: FunctionMaybe<Nullable<string>>,
       width?: FunctionMaybe<Nullable<number | string>>;
     }
 
-    export interface FieldsetHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface FieldsetHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       disabled?: FunctionMaybe<Nullable<boolean>>,
       form?: FunctionMaybe<Nullable<string>>,
       name?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface FormHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface FormHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       acceptCharset?: FunctionMaybe<Nullable<string>>,
       action?: FunctionMaybe<Nullable<string>>,
       autoComplete?: FunctionMaybe<Nullable<string>>,
@@ -940,15 +941,15 @@ declare global {
       target?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface HrHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface HrHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
 
     }
 
-    export interface HtmlHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface HtmlHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       manifest?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface IframeHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface IframeHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       allow?: FunctionMaybe<Nullable<string>>,
       allowFullScreen?: FunctionMaybe<Nullable<boolean>>,
       allowTransparency?: FunctionMaybe<Nullable<boolean>>,
@@ -971,7 +972,7 @@ declare global {
       width?: FunctionMaybe<Nullable<number | string>>;
     }
 
-    export interface ImgHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface ImgHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       alt?: FunctionMaybe<Nullable<string>>,
       crossOrigin?: FunctionMaybe<Nullable<'anonymous' | 'use-credentials' | ''>>,
       decoding?: FunctionMaybe<Nullable<'async' | 'auto' | 'sync'>>,
@@ -985,12 +986,12 @@ declare global {
       width?: FunctionMaybe<Nullable<number | string>>;
     }
 
-    export interface InsHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface InsHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       cite?: FunctionMaybe<Nullable<string>>,
       dateTime?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface InputHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface InputHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       accept?: FunctionMaybe<Nullable<string>>,
       alt?: FunctionMaybe<Nullable<string>>,
       autoComplete?: FunctionMaybe<Nullable<string>>,
@@ -1027,7 +1028,7 @@ declare global {
       onChange?: ObservableMaybe<Nullable<KeyboardEventHandler<T>>>;
     }
 
-    export interface KeygenHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface KeygenHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       autoFocus?: FunctionMaybe<Nullable<boolean>>,
       challenge?: FunctionMaybe<Nullable<string>>,
       disabled?: FunctionMaybe<Nullable<boolean>>,
@@ -1037,17 +1038,17 @@ declare global {
       name?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface LabelHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface LabelHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       form?: FunctionMaybe<Nullable<string>>,
       htmlFor?: FunctionMaybe<Nullable<string>>,
       for?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface LiHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface LiHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       value?: FunctionMaybe<Nullable<string | ReadonlyArray<string> | number>>;
     }
 
-    export interface LinkHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface LinkHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       as?: FunctionMaybe<Nullable<string>>,
       crossOrigin?: FunctionMaybe<Nullable<string>>,
       href?: FunctionMaybe<Nullable<string>>,
@@ -1062,15 +1063,15 @@ declare global {
       charSet?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface MapHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface MapHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       name?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface MenuHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface MenuHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       type?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface MediaHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface MediaHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       autoPlay?: FunctionMaybe<Nullable<boolean>>,
       controls?: FunctionMaybe<Nullable<boolean>>,
       controlsList?: FunctionMaybe<Nullable<string>>,
@@ -1083,7 +1084,7 @@ declare global {
       src?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface MetaHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface MetaHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       charSet?: FunctionMaybe<Nullable<string>>,
       content?: FunctionMaybe<Nullable<string>>,
       httpEquiv?: FunctionMaybe<Nullable<string>>,
@@ -1091,7 +1092,7 @@ declare global {
       media?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface MeterHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface MeterHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       form?: FunctionMaybe<Nullable<string>>,
       high?: FunctionMaybe<Nullable<number>>,
       low?: FunctionMaybe<Nullable<number>>,
@@ -1101,11 +1102,11 @@ declare global {
       value?: FunctionMaybe<Nullable<string | ReadonlyArray<string> | number>>;
     }
 
-    export interface QuoteHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface QuoteHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       cite?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface ObjectHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface ObjectHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       classID?: FunctionMaybe<Nullable<string>>,
       data?: FunctionMaybe<Nullable<string>>,
       form?: FunctionMaybe<Nullable<string>>,
@@ -1117,46 +1118,46 @@ declare global {
       wmode?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface OlHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface OlHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       reversed?: FunctionMaybe<Nullable<boolean>>,
       start?: FunctionMaybe<Nullable<number>>,
       type?: FunctionMaybe<Nullable<'1' | 'a' | 'A' | 'i' | 'I'>>;
     }
 
-    export interface OptgroupHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface OptgroupHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       disabled?: FunctionMaybe<Nullable<boolean>>,
       label?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface OptionHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface OptionHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       disabled?: FunctionMaybe<Nullable<boolean>>,
       label?: FunctionMaybe<Nullable<string>>,
       selected?: FunctionMaybe<Nullable<boolean>>,
       value?: FunctionMaybe<Nullable<string | ReadonlyArray<string> | number>>;
     }
 
-    export interface OutputHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface OutputHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       form?: FunctionMaybe<Nullable<string>>,
       htmlFor?: FunctionMaybe<Nullable<string>>,
       for?: FunctionMaybe<Nullable<string>>,
       name?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface ParamHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface ParamHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       name?: FunctionMaybe<Nullable<string>>,
       value?: FunctionMaybe<Nullable<string | ReadonlyArray<string> | number>>;
     }
 
-    export interface ProgressHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface ProgressHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       max?: FunctionMaybe<Nullable<number | string>>,
       value?: FunctionMaybe<Nullable<string | ReadonlyArray<string> | number>>,
     }
 
-    export interface SlotHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface SlotHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       name?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface ScriptHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface ScriptHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       async?: FunctionMaybe<Nullable<boolean>>,
       /** @deprecated */
       charSet?: FunctionMaybe<Nullable<string>>,
@@ -1170,7 +1171,7 @@ declare global {
       type?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface SelectHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface SelectHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       autoComplete?: FunctionMaybe<Nullable<string>>,
       autoFocus?: FunctionMaybe<Nullable<boolean>>,
       disabled?: FunctionMaybe<Nullable<boolean>>,
@@ -1183,7 +1184,7 @@ declare global {
       onChange?: ObservableMaybe<Nullable<KeyboardEventHandler<T>>>;
     }
 
-    export interface SourceHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface SourceHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       height?: FunctionMaybe<Nullable<number | string>>,
       media?: FunctionMaybe<Nullable<string>>,
       sizes?: FunctionMaybe<Nullable<string>>,
@@ -1193,21 +1194,21 @@ declare global {
       width?: FunctionMaybe<Nullable<number | string>>;
     }
 
-    export interface StyleHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface StyleHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       media?: FunctionMaybe<Nullable<string>>,
       nonce?: FunctionMaybe<Nullable<string>>,
       scoped?: FunctionMaybe<Nullable<boolean>>,
       type?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface TableHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface TableHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       cellPadding?: FunctionMaybe<Nullable<number | string>>,
       cellSpacing?: FunctionMaybe<Nullable<number | string>>,
       summary?: FunctionMaybe<Nullable<string>>,
       width?: FunctionMaybe<Nullable<number | string>>;
     }
 
-    export interface TextareaHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface TextareaHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       autoComplete?: FunctionMaybe<Nullable<string>>,
       autoFocus?: FunctionMaybe<Nullable<boolean>>,
       cols?: FunctionMaybe<Nullable<number>>,
@@ -1226,7 +1227,7 @@ declare global {
       onChange?: ObservableMaybe<Nullable<KeyboardEventHandler<T>>>;
     }
 
-    export interface TdHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface TdHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       align?: FunctionMaybe<Nullable<'left' | 'center' | 'right' | 'justify' | 'char'>>,
       colSpan?: FunctionMaybe<Nullable<number>>,
       headers?: FunctionMaybe<Nullable<string>>,
@@ -1238,7 +1239,7 @@ declare global {
       valign?: FunctionMaybe<Nullable<'top' | 'middle' | 'bottom' | 'baseline'>>;
     }
 
-    export interface ThHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface ThHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       align?: FunctionMaybe<Nullable<'left' | 'center' | 'right' | 'justify' | 'char'>>,
       colSpan?: FunctionMaybe<Nullable<number>>,
       headers?: FunctionMaybe<Nullable<string>>,
@@ -1247,11 +1248,11 @@ declare global {
       abbr?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface TimeHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface TimeHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       dateTime?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface TrackHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface TrackHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
       default?: FunctionMaybe<Nullable<boolean>>,
       kind?: FunctionMaybe<Nullable<string>>,
       label?: FunctionMaybe<Nullable<string>>,
@@ -1259,7 +1260,7 @@ declare global {
       srcLang?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface VideoHTMLAttributes<T extends EventTarget> extends MediaHTMLAttributes<T> {
+    interface VideoHTMLAttributes<T extends EventTarget> extends MediaHTMLAttributes<T> {
       height?: FunctionMaybe<Nullable<number | string>>,
       playsInline?: FunctionMaybe<Nullable<boolean>>,
       poster?: FunctionMaybe<Nullable<string>>,
@@ -1268,11 +1269,11 @@ declare global {
       disableRemotePlayback?: FunctionMaybe<Nullable<boolean>>;
     }
 
-    export interface WbrHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
+    interface WbrHTMLAttributes<T extends EventTarget> extends VoidHTMLAttributes<T> {
 
     }
 
-    export interface WebViewHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
+    interface WebViewHTMLAttributes<T extends EventTarget> extends HTMLAttributes<T> {
       allowFullScreen?: FunctionMaybe<Nullable<boolean>>,
       allowpopups?: FunctionMaybe<Nullable<boolean>>,
       autoFocus?: FunctionMaybe<Nullable<boolean>>,
@@ -1292,7 +1293,7 @@ declare global {
       webpreferences?: FunctionMaybe<Nullable<string>>;
     }
 
-    export interface IntrinsicElementsMap {
+    interface IntrinsicElementsMap {
       // HTML
       a: HTMLAnchorElement,
       abbr: HTMLElement,
@@ -1464,7 +1465,7 @@ declare global {
       use: SVGUseElement;
     }
 
-    export interface IntrinsicElements {
+    interface IntrinsicElements {
       // HTML
       a: AnchorHTMLAttributes<HTMLAnchorElement>,
       abbr: HTMLAttributes<HTMLElement>,

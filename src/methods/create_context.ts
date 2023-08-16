@@ -1,43 +1,34 @@
 
 /* IMPORT */
 
-import { CONTEXTS_DATA } from '../constants';
-import useMemo from '../hooks/use_memo';
+import {CONTEXTS_DATA} from '../constants';
 import resolve from '../methods/resolve';
-import { context } from '../oby';
-import type { Child, Context, ContextWithDefault } from '../types';
+import {context} from '../oby';
+import type {Child, Context, ContextWithDefault} from '../types';
 
 /* MAIN */
 
-function createContext<T>(defaultValue: T): ContextWithDefault<T>;
-function createContext<T>(defaultValue?: T): Context<T>;
-function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> {
+function createContext <T> ( defaultValue: T ): ContextWithDefault<T>;
+function createContext <T> ( defaultValue?: T ): Context<T>;
+function createContext <T> ( defaultValue?: T ): ContextWithDefault<T> | Context<T> {
 
-  const symbol = Symbol();
+  const symbol = Symbol ();
 
-  const Provider = ({ value, children }: { value: ObservableMaybe<T>, children: Child; }): Child => {
+  const Provider = ({ value, children }: { value: T, children: Child }): Child => {
 
-    return useMemo(() => {
+    return context ( { [symbol]: value }, () => {
 
-      register(value);
-
-      return resolve(children);
+      return resolve ( children );
 
     });
 
   };
 
-  const register = (value: ObservableMaybe<T>): void => {
+  const Context = {Provider};
 
-    context(symbol, value);
+  CONTEXTS_DATA.set ( Context as any, { symbol, defaultValue } );
 
-  };
-
-  const Context = { Provider, register };
-
-  CONTEXTS_DATA.set(Context, { symbol, defaultValue });
-
-  return Context;
+  return Context as any;
 
 }
 

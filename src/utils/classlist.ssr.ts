@@ -1,39 +1,39 @@
 
 /* IMPORT */
 
-import { isString } from '../utils/lang'
+import {isString} from '../utils/lang';
 
 /* MAIN */
 
 // This function exists to optimize memory usage in some cases, where the classList API won't be touched without sacrificing performance
 
-const classesToggle = <T extends { className: string, classList }, K extends keyof T, V extends T[K]>(props: T, classes: string, force: null | undefined | boolean): void => {
+const classesToggle = ( element: HTMLElement, classes: string, force: null | undefined | boolean ): void => {
 
-  const { className } = props
+  const {className} = element;
 
   /* OPTIMIZED PATH */
 
-  if (isString(className)) {
+  if ( isString ( className ) ) {
 
-    if (!className) { // Optimized addition/deletion
+    if ( !className ) { // Optimized addition/deletion
 
-      if (force) { // Optimized addition
+      if ( force ) { // Optimized addition
 
-        props.className = classes
+        element.className = classes;
 
-        return
+        return;
 
       } else { // Optimized deletion, nothing to do really
 
-        return
+        return;
 
       }
 
-    } else if (!force && className === classes) { // Optimized deletion
+    } else if ( !force && className === classes ) { // Optimized deletion
 
-      props.className = ''
+      element.className = '';
 
-      return
+      return;
 
     }
 
@@ -41,24 +41,24 @@ const classesToggle = <T extends { className: string, classList }, K extends key
 
   /* REGULAR PATH */
 
-  if (classes.includes(' ')) {
+  if ( classes.includes ( ' ' ) ) {
 
-    classes.split(' ').forEach(cls => {
+    classes.split ( ' ' ).forEach ( cls => {
 
-      if (!cls.length) return
+      if ( !cls.length ) return;
 
-      props.classList.toggle(cls, !!force)
+      element.classList.toggle ( cls, !!force );
 
-    })
+    });
 
   } else {
 
-    props.classList.toggle(classes, !!force)
+    element.classList.toggle ( classes, !!force );
 
   }
 
-}
+};
 
 /* EXPORT */
 
-export { classesToggle }
+export {classesToggle};

@@ -2,6 +2,7 @@
 /* IMPORT */
 
 import type { ComponentIntrinsicElement, FN } from '../types'
+declare const via
 
 /* MAIN */
 

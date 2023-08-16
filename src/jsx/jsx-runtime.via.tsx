@@ -4,102 +4,45 @@ import '../types';
 import Fragment from '../components/fragment';
 import createElement from '../methods/create_element.via';
 import { wrapCloneElement } from '../methods/wrap_clone_element';
-import type { Component, Element } from '../types';
+import type { Child, Component, Element } from '../types';
 import 'viajs';
+import { SYMBOL_CLONE } from '../constants';
 /* MAIN */
 
-const debugHTML = (p: HTMLElement, name: string) => {
-    if (p)
-        (async () => {
-            const nn = await get(p.nodeName);
-            const nt = await get(p.nodeType);
-            console.log(name + "; ");
-            // const html = await get(p.outerHTML)
-            console.log(name, p, nn, nt/* , html */);
-        })();
+const debugHTML = ( p: HTMLElement, name: string ) => {
+  if ( p )
+    ( async () => {
+      const nn = await get( p.nodeName );
+      const nt = await get( p.nodeType );
+      console.log( name + "; " );
+      // const html = await get(p.outerHTML)
+      console.log( name, p, nn, nt/* , html */ );
+    } )();
 };
 
+// React 16
+function jsx<P = {}> ( component: Component<P>, props?: P, ...children: Child[] ): Element;
+//React 17
+function jsx<P = { key?: string; children?: Child; }> ( component: Component<P>, props?: P, key?: string ): Element;
+function jsx<P = { key?: string; children?: Child; }> ( component: Component<P>, props?: P, ...children: ( string | Child )[] ): Element {
+  if ( typeof children === 'string' ) // React 16, key
+    return wrapCloneElement( createElement<P>( component as any, props ?? {} as P, children as string ), component, props );
 
-const jsxDEV = <P = {}>(component: Component<P>, props: P | null, key: string, isStatic: boolean, source: { fileName: string, lineNumber: number, columnNumber: number; }, self: any): Element => {
-    return wrapCloneElement(createElement<P>(component as any, props, key, isStatic, source, self), component, props);
+  if ( !props ) props = {} as any;
+  Object.assign( props as any, { children } );
+
+  return wrapCloneElement( createElement<P>( component as any, props, ( props as any )?.key as string ), component, props );
 };
 
-const jsx = <P extends { children: any | any[]; }>(component: Component<P>, props: P | null, key: string): Element => {
-    return wrapCloneElement(createElement<P>(component as any, props, key), component, props);
-
-
-    // if (isFunction<Element>(component)) {
-    //     const F = $.memo(() => $.root(dispose => {
-    //         const getComp = component(props) //return memo
-    //         const ele = $<HTMLElement>()
-    //         // debugHTML(getComp as any, "getComp")
-
-    //         ele(getComp as any)
-
-    //         return getComp
-    //     }, { tag: 'f root' }))
-
-    //     // $.effect(() => {
-    //     //     console.log('jsx f changed:', F())
-    //     // })
-
-    //     const r = F()
-    //     r[SYMBOL_$] = F
-    //     return r
-    // }
-    // else {
-    //     const r = createElement<P>(component, props as any) as any as HTMLElement
-
-    //     // if (props) {
-    //     //     const { children } = props
-    //     //     if (children)
-    //     //         if (children instanceof Box)
-    //     //             $.effect(() => {
-    //     //                 const o = children[SYMBOL_$] as Observable
-
-    //     //                 //debugs
-    //     //                 // console.log("Box changed: " + o())
-    //     //                 // debugHTML(r, "single boxed child")
-
-    //     //                 r.replaceChildren(o().toString())
-    //     //             })
-    //     //         else if (Array.isArray(children)) {
-    //     //             children.forEach((v, i, a) => {
-    //     //                 if (v instanceof Box) {
-    //     //                     const o = v[SYMBOL_$] as Observable
-    //     //                     let e = (createElement('span', { children: o() }) as any as HTMLElement)
-    //     //                     $.effect(() => {
-    //     //                         //debugs
-    //     //                         // console.log("Box item changed: ", i, o())
-    //     //                         // debugHTML(e, "wrap observable into span")
-
-    //     //                         e.replaceChildren(o().valueOf() as any)
-    //     //                     })
-
-    //     //                     children[i] = e
-    //     //                 }
-    //     //             })
-    //     //             r.replaceChildren(...children)
-    //     //         }
-    //     // }
-    //     return r as any
-    // }
-
-    // // return (isFunction<Element>(component)) ? component() as any : createElement<P>(component, props as any)
+//React 17 only
+const jsxDEV = <P = {}> ( component: Component<P>, props: P | null, key: string, isStatic: boolean, source: { fileName: string, lineNumber: number, columnNumber: number; }, self: any ): Element => {
+  if ( key )
+    Object.assign( props, { key } )
+  return wrapCloneElement( createElement<P>( component as any, props ), component, props );
 };
 
-// const jsxs = <P extends { children: any | any[] }>(component: Component<P>, props?: P | null): Element => {
-//     // return $.memo(() => {
-//     // if ((props as any).children) {
-//     //     // some debugs
-//     //     // (async () => {
-//     //     //     const c = (props as any).children.map(async (c: HTMLElement) => await get(c.outerHTML))
-//     //     //     console.log('jsxs', c)
-//     //     // })()
-//     // }
-//     return jsx(component, props)
-//     // })
-// }
+export const getMeta = ( target: Element ) => target[ SYMBOL_CLONE ];
+
 /* EXPORT */
 
 export { jsx, jsx as jsxs, jsxDEV, Fragment, };

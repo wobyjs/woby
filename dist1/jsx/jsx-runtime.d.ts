@@ -1,5 +1,5 @@
 import '../types';
-import type { Component, Element } from '../types';
+import type { Component, JSX.Element } from '../types';
 import { Fragment } from '../index';
-declare const jsx: <P = {}>(component: Component<P>, props?: P) => Element;
+declare const jsx: <P = {}>(component: Component<P>, props?: P) => JSX.Element;
 export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment };

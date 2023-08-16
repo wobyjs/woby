@@ -9,13 +9,13 @@ import type { Child, Component, FunctionMaybe } from '../types';
 
 /* MAIN */
 
-const Dynamic = <P = {}>({ component, props/* , children */ }: { component: Component<P>, props?: FunctionMaybe<P | null>;/* , children?: Child */ }): Child => {
+const Dynamic = <P = {}> ( { component, props, children }: { component: Component<P>, props?: FunctionMaybe<P | null>, children?: Child } ): Child => {
 
-    return useMemo(() => {
+  return useMemo( () => {
 
-        return resolve(createElement<P>($$(component, false), $$(props)/* , children */));
+    return resolve( createElement<P>( $$( component, false ), $$( props ), children as any) );
 
-    });
+  } );
 
 };
 

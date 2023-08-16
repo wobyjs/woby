@@ -1,29 +1,33 @@
 
 /* IMPORT */
 
-import useTruthy from '../hooks/use_truthy'
-import { ternary, untrack } from '../oby'
-import { isFunction } from '../utils/lang'
-import type { Child, FunctionMaybe, ObservableReadonly, Truthy } from '../types'
+import isObservable from '../methods/is_observable';
+import useGuarded from '../hooks/use_guarded';
+import useUntracked from '../hooks/use_untracked';
+import {ternary} from '../oby';
+import {isComponent, isFunction, isTruthy} from '../utils/lang';
+import type {Child, FunctionMaybe, ObservableReadonly, Truthy} from '../types';
 
 /* MAIN */
 
-const If = <T>({ when, fallback, children }: { when: FunctionMaybe<T>, fallback?: Child, children: Child | ((value: (() => Truthy<T>)) => Child) }): ObservableReadonly<Child> => {
+//TODO: Support an is/guard prop, maybe
 
-    if (isFunction(children) && children.length) { // Calling the children function with an (() => Truthy<T>)
+const If = <T> ({ when, fallback, children }: { when: FunctionMaybe<T>, fallback?: Child, children: Child | (( value: (() => Truthy<T>) ) => Child) }): ObservableReadonly<Child> => {
 
-        const truthy = useTruthy(when)
+  if ( isFunction ( children ) && !isObservable ( children as any ) && !isComponent ( children ) ) { // Calling the children function with an (() => Truthy<T>)
 
-        return ternary(when, () => untrack(() => children(truthy)), fallback)
+    const truthy = useGuarded ( when, isTruthy );
 
-    } else { // Just passing the children along
+    return ternary ( when, useUntracked ( () => (children as Function) ( truthy ) ), fallback );
 
-        return ternary(when, () => untrack(children as Child), fallback) //TSC
+  } else { // Just passing the children along
 
-    }
+    return ternary ( when, children as Child, fallback ); //TSC
 
-}
+  }
+
+};
 
 /* EXPORT */
 
-export default If
+export default If;

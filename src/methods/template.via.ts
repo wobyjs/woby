@@ -1,317 +1,315 @@
 
 /* IMPORT */
 
-import { SYMBOL_TEMPLATE_ACCESSOR } from '../constants'
-import wrapElement from '../methods/wrap_element'
-import { assign, indexOf, isFunction, isProxy, isString } from '../utils/lang'
-import { /* setAttribute, */ /* setChildReplacement, */ setClasses, setEvent, setHTML, setProperty, setRef, setStyles } from '../utils/setters.via'
-import type { Child, TemplateActionPath, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap } from '../types'
+import {SYMBOL_TEMPLATE_ACCESSOR} from '../constants';
+import wrapElement from '../methods/wrap_element';
+import {assign, indexOf, isFunction, isString} from '../utils/lang';
+import {setAttribute, setClasses, setEvent, setHTML, setProperty, setRef, setStyles} from '../utils/setters.via';
+import type {Child, TemplateActionPath, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap} from '../types';
 
 /* MAIN */
 
-//TODO: avoid using "Function" and "eval", while still keeping similar performance, if possible
+//TODO: Avoid using "Function" and "eval", while still keeping similar performance, if possible
 //TODO: support complex children in the template function
 
-const template = <P = {}>(fn: ((props: P) => Child)): ((props: P) => () => Child) => {
+const template = <P = {}> ( fn: (( props: P ) => Child) ): (( props: P ) => () => Child) => {
 
-    const safePropertyRe = /^[a-z0-9-_]+$/i
+  const safePropertyRe = /^[a-z0-9-_]+$/i;
 
-    const checkValidProperty = (property: unknown): property is string => {
+  const checkValidProperty = ( property: unknown ): property is string => {
 
-        if (isString(property) && safePropertyRe.test(property)) return true
+    if ( isString ( property ) && safePropertyRe.test ( property ) ) return true;
 
-        throw new Error(`Invalid property, only alphanumeric properties are allowed inside templates, received: "${property}"`)
+    throw new Error ( `Invalid property, only alphanumeric properties are allowed inside templates, received: "${property}"` );
+
+  };
+
+  const makeAccessor = ( actionsWithNodes: TemplateActionWithNodes[] ): any => {
+
+    return new Proxy ( {}, {
+
+      get ( target: unknown, prop: string ) {
+
+        checkValidProperty ( prop );
+
+        const accessor = ( node: Node, method: string, key?: string, targetNode?: Node ): void => {
+
+          if ( key ) checkValidProperty ( key );
+
+          actionsWithNodes.push ([ node, method, prop, key, targetNode ]);
+
+        };
+
+        const metadata = { [SYMBOL_TEMPLATE_ACCESSOR]: true };
+
+        return assign ( accessor, metadata );
+
+      }
+
+    });
+
+  };
+
+  const makeActionsWithNodesAndTemplate = (): { actionsWithNodes: TemplateActionWithNodes[], root: Element } => {
+
+    const actionsWithNodes: TemplateActionWithNodes[] = [];
+    const accessor = makeAccessor ( actionsWithNodes );
+    const component = fn ( accessor );
+
+    if ( isFunction ( component ) ) {
+
+      const root = component ();
+
+      if ( root instanceof Element ) {
+
+        return { actionsWithNodes, root };
+
+      }
 
     }
 
-    const makeAccessor = (actionsWithNodes: TemplateActionWithNodes[]): any => {
+    throw new Error ( 'Invalid template, it must return a function that returns an Element' );
 
-        return new Proxy({}, {
+  };
 
-            get(target: unknown, prop: string) {
+  const makeActionsWithPaths = ( actionsWithNodes: TemplateActionWithNodes[] ): TemplateActionWithPaths[] => {
 
-                checkValidProperty(prop)
+    const actionsWithPaths: TemplateActionWithPaths[] = [];
 
-                const accessor = (node: Node, method: string, key?: string, targetNode?: Node): void => {
+    for ( let i = 0, l = actionsWithNodes.length; i < l; i++ ) {
 
-                    if (key) checkValidProperty(key)
+      const [node, method, prop, key, targetNode] = actionsWithNodes[i];
 
-                    actionsWithNodes.push([node, method, prop, key, targetNode])
+      const nodePath = makeNodePath ( node );
+      const targetNodePath = targetNode ? makeNodePath ( targetNode ) : undefined;
 
-                }
-
-                const metadata = { [SYMBOL_TEMPLATE_ACCESSOR]: true }
-
-                return assign(accessor, metadata)
-
-            }
-
-        })
+      actionsWithPaths.push ([ nodePath, method, prop, key, targetNodePath ]);
 
     }
 
-    const makeActionsWithNodesAndTemplate = (): { actionsWithNodes: TemplateActionWithNodes[], root: typeof Proxy } => {
+    return actionsWithPaths;
 
-        const actionsWithNodes: TemplateActionWithNodes[] = []
-        const accessor = makeAccessor(actionsWithNodes)
-        const component = fn(accessor)
+  };
 
-        if (isFunction(component)) {
+  const makeNodePath = (() => {
 
-            const root = component()
+    let prevNode: Node | null = null;
+    let prevPath: TemplateActionPath;
 
-            if (isProxy(root)) {
+    return ( node: Node ): TemplateActionPath => {
 
-                return { actionsWithNodes, root }
+      if ( node === prevNode ) return prevPath; // Cache hit
 
-            }
+      const path: TemplateActionPath = [];
+
+      let child = node;
+      let parent = child.parentNode;
+
+      while ( parent ) {
+
+        const index = !child.previousSibling ? 0 : !child.nextSibling ? -0 : indexOf ( parent.childNodes, child );
+
+        path.push ( index );
+
+        child = parent;
+        parent = parent.parentNode;
+
+      }
+
+      prevNode = node;
+      prevPath = path;
+
+      return path;
+
+    };
+
+  })();
+
+  const makeNodePathProperties = ( path: TemplateActionPath ): TemplateVariableProperties => {
+
+    const properties: TemplateVariableProperties = ['root'];
+
+    const parts = path.slice ().reverse ();
+
+    for ( let i = 0, l = parts.length; i < l; i++ ) {
+
+      const part = parts[i];
+
+      if ( Object.is ( 0, part ) ) {
+
+        properties.push ( 'firstChild' );
+
+      } else if ( Object.is ( -0, part ) ) {
+
+        properties.push ( 'lastChild' );
+
+      } else {
+
+        properties.push ( 'firstChild' );
+
+        for ( let nsi = 0; nsi < part; nsi++ ) {
+
+          properties.push ( 'nextSibling' );
 
         }
 
-        throw new Error('Invalid template, it must return a function that returns an Element')
+      }
 
     }
 
-    const makeActionsWithPaths = (actionsWithNodes: TemplateActionWithNodes[]): TemplateActionWithPaths[] => {
+    return properties;
 
-        const actionsWithPaths: TemplateActionWithPaths[] = []
+  };
 
-        for (let i = 0, l = actionsWithNodes.length; i < l; i++) {
+  const makeReviverPaths = ( actionsWithPaths: TemplateActionWithPaths[] ): TemplateActionPath[] => {
 
-            const [node, method, prop, key, targetNode] = actionsWithNodes[i]
+    const paths: TemplateActionPath[] = [];
 
-            const nodePath = makeNodePath(node)
-            const targetNodePath = targetNode ? makeNodePath(targetNode) : undefined
+    for ( let i = 0, l = actionsWithPaths.length; i < l; i++ ) {
 
-            actionsWithPaths.push([nodePath, method, prop, key, targetNodePath])
+      const action = actionsWithPaths[i];
+      const nodePath = action[0];
+      const targetNodePath = action[4];
 
-        }
+      paths.push ( nodePath );
 
-        return actionsWithPaths
+      if ( targetNodePath ) {
 
-    }
+        paths.push ( targetNodePath );
 
-    const makeNodePath = (() => {
-
-        let prevNode: Node | null = null
-        let prevPath: TemplateActionPath
-
-        return (node: Node): TemplateActionPath => {
-
-            if (node === prevNode) return prevPath // Cache hit
-
-            const path: TemplateActionPath = []
-
-            let child = node
-            let parent = child.parentNode
-
-            while (parent) {
-                debugger
-
-                const index = !child.previousSibling ? 0 : !child.nextSibling ? -0 : indexOf(parent.childNodes, child)
-
-                path.push(index)
-
-                child = parent
-                parent = parent.parentNode
-
-            }
-
-            prevNode = node
-            prevPath = path
-
-            return path
-
-        }
-
-    })()
-
-    const makeNodePathProperties = (path: TemplateActionPath): TemplateVariableProperties => {
-
-        const properties: TemplateVariableProperties = ['root']
-
-        const parts = path.slice().reverse()
-
-        for (let i = 0, l = parts.length; i < l; i++) {
-
-            const part = parts[i]
-
-            if (Object.is(0, part)) {
-
-                properties.push('firstChild')
-
-            } else if (Object.is(-0, part)) {
-
-                properties.push('lastChild')
-
-            } else {
-
-                properties.push('firstChild')
-
-                for (let nsi = 0; nsi < part; nsi++) {
-                    debugger
-
-                    properties.push('nextSibling')
-
-                }
-
-            }
-
-        }
-
-        return properties
+      }
 
     }
 
-    const makeReviverPaths = (actionsWithPaths: TemplateActionWithPaths[]): TemplateActionPath[] => {
+    return paths;
 
-        const paths: TemplateActionPath[] = []
+  };
 
-        for (let i = 0, l = actionsWithPaths.length; i < l; i++) {
+  const makeReviverVariablesData = ( paths: TemplateActionPath[], properties: TemplateVariableProperties[] ): TemplateVariableData[] => {
 
-            const action = actionsWithPaths[i]
-            const nodePath = action[0]
-            const targetNodePath = action[4]
+    const data: TemplateVariableData[] = new Array ( paths.length );
 
-            paths.push(nodePath)
+    for ( let i = 0, l = paths.length; i < l; i++ ) {
 
-            if (targetNodePath) {
-
-                paths.push(targetNodePath)
-
-            }
-
-        }
-
-        return paths
+      data[i] = {
+        path: paths[i],
+        properties: properties[i]
+      };
 
     }
 
-    const makeReviverVariablesData = (paths: TemplateActionPath[], properties: TemplateVariableProperties[]): TemplateVariableData[] => {
+    return data;
 
-        const data: TemplateVariableData[] = new Array(paths.length)
+  };
 
-        for (let i = 0, l = paths.length; i < l; i++) {
+  const makeReviverVariables = ( actionsWithPaths: TemplateActionWithPaths[] ): { assignments: string[], map: Map<TemplateActionPath, string> } => { //TODO: Optimize this further, there's some duplication and unnecessary work being done
 
-            data[i] = {
-                path: paths[i],
-                properties: properties[i]
-            }
+    const paths = makeReviverPaths ( actionsWithPaths );
+    const properties = paths.map ( makeNodePathProperties );
+    const data = makeReviverVariablesData ( paths, properties );
+    const assignments: string[] = [];
+    const map: TemplateVariablesMap = new Map ();
 
-        }
+    let variableId = 0;
 
-        return data
+    while ( true ) {
 
-    }
+      const datum = data.find ( datum => datum.properties.length > 1 );
 
-    const makeReviverVariables = (actionsWithPaths: TemplateActionWithPaths[]): { assignments: string[], map: Map<TemplateActionPath, string> } => { //TODO: Optimize this further, there's some duplication and unnecessary work being done
+      if ( !datum ) break;
 
-        const paths = makeReviverPaths(actionsWithPaths)
-        const properties = paths.map(makeNodePathProperties)
-        const data = makeReviverVariablesData(paths, properties)
-        const assignments: string[] = []
-        const map: TemplateVariablesMap = new Map()
+      const [current, next] = datum.properties;
+      const variable = `$${variableId++}`;
+      const assignment = `const ${variable} = ${current}.${next};`;
 
-        let variableId = 0
+      assignments.push ( assignment );
 
-        while (true) {
+      for ( let i = 0, l = data.length; i < l; i++ ) {
 
-            const datum = data.find(datum => datum.properties.length > 1)
+        const datum = data[i];
+        const [otherCurrent, otherNext] = datum.properties;
 
-            if (!datum) break
+        if ( otherCurrent !== current || otherNext !== next ) continue;
 
-            const [current, next] = datum.properties
-            const variable = `$${variableId++}`
-            const assignment = `const ${variable} = ${current}.${next};`
+        datum.properties[0] = variable;
+        datum.properties.splice ( 1, 1 );
 
-            assignments.push(assignment)
-
-            for (let i = 0, l = data.length; i < l; i++) {
-
-                const datum = data[i]
-                const [otherCurrent, otherNext] = datum.properties
-
-                if (otherCurrent !== current || otherNext !== next) continue
-
-                datum.properties[0] = variable
-                datum.properties.splice(1, 1)
-
-            }
-
-        }
-
-        for (let i = 0, l = data.length; i < l; i++) {
-
-            const datum = data[i]
-
-            map.set(datum.path, datum.properties[0])
-
-        }
-
-        return { assignments, map }
+      }
 
     }
 
-    const makeReviverActions = (actionsWithPaths: TemplateActionWithPaths[], variables: Map<TemplateActionPath, string>): string[] => {
+    for ( let i = 0, l = data.length; i < l; i++ ) {
 
-        const actions: string[] = []
+      const datum = data[i];
 
-        for (let i = 0, l = actionsWithPaths.length; i < l; i++) { //TODO: Write this more cleanly, with a single case
-
-            const [nodePath, method, prop, key, targetNodePath] = actionsWithPaths[i]
-
-            if (targetNodePath) {
-
-                actions.push(`this.${method} ( props["${prop}"], ${variables.get(targetNodePath)} );`)
-
-            } else if (key) {
-
-                actions.push(`this.${method} ( ${variables.get(nodePath)}, "${key}", props["${prop}"] );`)
-
-            } else {
-
-                actions.push(`this.${method} ( ${variables.get(nodePath)}, props["${prop}"] );`)
-
-            }
-
-        }
-
-        return actions
+      map.set ( datum.path, datum.properties[0] );
 
     }
 
-    const makeReviver = (actionsWithPaths: TemplateActionWithPaths[]): ((root: Element, props: P) => Element) => {
+    return {assignments, map};
 
-        const { assignments, map } = makeReviverVariables(actionsWithPaths)
-        const actions = makeReviverActions(actionsWithPaths, map)
-        const fn = new Function('root', 'props', `${assignments.join('')}${actions.join('')}return root;`)
-        const apis = { /* setAttribute, */ /* setChildReplacement, */ setClasses, setEvent, setHTML, setProperty, setRef, setStyles }
-        const reviver = fn.bind(apis)
+  };
 
-        return reviver
+  const makeReviverActions = ( actionsWithPaths: TemplateActionWithPaths[], variables: Map<TemplateActionPath, string> ): string[] => {
+
+    const actions: string[] = [];
+
+    for ( let i = 0, l = actionsWithPaths.length; i < l; i++ ) { //TODO: Write this more cleanly, with a single case
+
+      const [nodePath, method, prop, key, targetNodePath] = actionsWithPaths[i];
+
+      if ( targetNodePath ) {
+
+        actions.push ( `this.${method} ( props["${prop}"], ${variables.get ( targetNodePath )} );` );
+
+      } else if ( key ) {
+
+        actions.push ( `this.${method} ( ${variables.get ( nodePath )}, "${key}", props["${prop}"] );` );
+
+      } else {
+
+        actions.push ( `this.${method} ( ${variables.get ( nodePath )}, props["${prop}"] );` );
+
+      }
 
     }
 
-    const makeComponent = (): ((props: P) => () => Child) => {
+    return actions;
 
-        const { actionsWithNodes, root } = makeActionsWithNodesAndTemplate()
-        const actionsWithPaths = makeActionsWithPaths(actionsWithNodes)
-        const reviver = makeReviver(actionsWithPaths)
+  };
 
-        return (props: P): (() => Child) => {
+  const makeReviver = ( actionsWithPaths: TemplateActionWithPaths[] ): (( root: Element, props: P ) => Element) => {
 
-            const clone = (root as any).cloneNode(true)
+    const {assignments, map} = makeReviverVariables ( actionsWithPaths );
+    const actions = makeReviverActions ( actionsWithPaths, map );
+    const fn = new Function ( 'root', 'props', `${assignments.join ( '' )}${actions.join ( '' )}return root;` );
+    const apis = {setAttribute, setClasses, setEvent, setHTML, setProperty, setRef, setStyles};
+    const reviver = fn.bind ( apis );
 
-            return wrapElement(reviver.bind(undefined, clone, props))
+    return reviver;
 
-        }
+  };
 
-    }
+  const makeComponent = (): (( props: P ) => () => Child) => {
 
-    return makeComponent()
+    const {actionsWithNodes, root} = makeActionsWithNodesAndTemplate ();
+    const actionsWithPaths = makeActionsWithPaths ( actionsWithNodes );
+    const reviver = makeReviver ( actionsWithPaths );
 
-}
+    return ( props: P ): (() => Child) => {
+
+      const clone = root.cloneNode ( true );
+
+      return wrapElement ( reviver.bind ( undefined, clone as any, props ) );
+
+    };
+
+  };
+
+  return makeComponent ();
+
+};
 
 /* EXPORT */
 
-export default template
+export default template;

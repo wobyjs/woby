@@ -2,9 +2,8 @@
 /* IMPORT */
 //console.log('ssr.ts')
 
-// import './jsx/types'
-export * from './jsx/jsx';
-export * from './jsx/types';
+export * from './jsx/jsx'
+export * from './jsx/types'
 // import type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component } from './types';
 
 /* EXPORT */
@@ -16,4 +15,4 @@ export * from './jsx/types';
 // export type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component };
 // export * from './constants';
 
-export { render } from './methods/render.testing';
+export { render } from './methods/render.testing'

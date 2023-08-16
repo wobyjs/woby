@@ -19,7 +19,7 @@ const { createComment, createHTMLNode, createSVGNode, createText, createDocument
     else {
         const createComment = document.createComment.bind(document, '') as FN<[any], Comment>
         const createHTMLNode = document.createElement.bind(document) as FN<[ComponentIntrinsicElement], HTMLElement>
-        const createSVGNode = document.createElementNS.bind(document, 'http://www.w3.org/2000/svg') as FN<[ComponentIntrinsicElement], Element>
+        const createSVGNode = document.createElementNS.bind(document, 'http://www.w3.org/2000/svg') as FN<[ComponentIntrinsicElement], JSX.Element>
         const createText = document.createTextNode.bind(document) as FN<[any], Text>
         const createDocumentFragment = document.createDocumentFragment.bind(document) as FN<[], DocumentFragment>
         return { createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment }

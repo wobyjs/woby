@@ -1,5 +1,5 @@
 export declare const isWorker: boolean;
-export declare class Element {
+export declare class JSX.Element {
 }
 export declare class HTMLElement {
 }

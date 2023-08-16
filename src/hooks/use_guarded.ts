@@ -1,41 +1,42 @@
 
 /* IMPORT */
 
-import useReaction from '../hooks/use_reaction'
-import $ from '../methods/S'
-import { isFunction, isNil } from '../utils/lang'
-import type { FunctionMaybe } from '../types'
+import useMemo from '../hooks/use_memo';
+import $$ from '../methods/SS';
+import {isNil} from '../utils/lang';
+import type {FunctionMaybe} from '../types';
 
 /* MAIN */
 
-//TODO: Maybe port this to oby
+//TODO: Maybe port this to oby, as "when" or "is" or "guarded"
+//TODO: Optimize this, checking if the value is actually potentially reactive
 
-const useGuarded = <T, U extends T>(value: FunctionMaybe<T>, guard: ((value: T) => value is U)): (() => U) => {
+const useGuarded = <T, U extends T> ( value: FunctionMaybe<T>, guard: (( value: T ) => value is U) ): (() => U) => {
 
-    const guarded = $<U | undefined>()
+  let valueLast: U | undefined;
 
-    useReaction(() => {
+  const guarded = useMemo ( () => {
 
-        const current = isFunction(value) ? value() : value
+    const current = $$(value);
 
-        if (!guard(current)) return
+    if ( !guard ( current ) ) return valueLast;
 
-        guarded(() => current)
+    return valueLast = current;
 
-    })
+  });
 
-    return (): U => {
+  return (): U => {
 
-        const current = guarded()
+    const current = guarded ();
 
-        if (isNil(current)) throw new Error('The value never passed the type guard')
+    if ( isNil ( current ) ) throw new Error ( 'The value never passed the type guard' );
 
-        return current
+    return current;
 
-    }
+  };
 
-}
+};
 
 /* EXPORT */
 
-export default useGuarded
+export default useGuarded;

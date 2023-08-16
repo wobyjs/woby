@@ -3,64 +3,63 @@
 
 import untrack from '../methods/untrack';
 import wrapElement from '../methods/wrap_element';
-import { createHTMLNode, createSVGNode } from '../utils/creators';
-import { isFunction, isNil, isNode, isString, isSVGElement, isVoidChild } from '../utils/lang';
-import { setProps } from '../utils/setters';
-import type { Child, Component, Element, Props } from '../types';
+import {createHTMLNode, createSVGNode} from '../utils/creators';
+import {isFunction, isNil, isNode, isString, isSVGElement, isVoidChild} from '../utils/lang';
+import {setProps} from '../utils/setters';
+import type {Child, Component, Element, Props} from '../types';
 
 /* MAIN */
 
 // It's important to wrap components, so that they can be executed in the right order, from parent to child, rather than from child to parent in some cases
 
-const createElement = <P = { children?: Child; }>(component: Component<P>, props?: P | null, _key?: string, _isStatic?: boolean, _source?: { fileName: string, lineNumber: number, columnNumber: number; }, _self?: any): Element => {
+const createElement = <P = {}> ( component: Component<P>, props?: P | null, ..._children: Child[] ): Element => {
 
-    //   const { children: __children, key, ref, ...rest } = (props || {}) as Props //TSC
-    //   const children = (_children.length === 1) ? _children[0] : (_children.length === 0) ? __children : _children
-    const { ...rest } = props;
+  const { children: __children, key, ref, ...rest } = ( props || {} ) as Props; //TSC
+  const children = ( _children.length === 1 ) ? _children[0] : ( _children.length === 0 ) ? __children : _children;
 
-    if (isFunction(component)) {
+  if ( isFunction ( component ) ) {
 
-        const props = rest;
+    const props = rest;
 
-        // if (!isNil(children)) props.children = children;
-        // if (!isNil(ref)) props.ref = ref;
+    if ( !isNil ( children ) ) props.children = children;
+    if ( !isNil ( ref ) ) props.ref = ref;
 
-        return wrapElement(() => {
+    return wrapElement ( () => {
 
-            return untrack(() => component.call(component, props as P)); //TSC
+      return untrack ( () => component.call ( component, props as P ) ); //TSC
 
-        });
+    });
 
-    } else if (isString(component)) {
+  } else if ( isString ( component ) ) {
 
-        const props = rest;
-        const isSVG = isSVGElement(component);
-        const createNode = isSVG ? createSVGNode : createHTMLNode;
+    const props = rest;
+    const isSVG = isSVGElement ( component );
+    const createNode = isSVG ? createSVGNode : createHTMLNode;
 
-        // if (!isVoidChild(children)) props.children = children;
-        // if (!isNil(ref)) props.ref = ref;
+    if ( !isVoidChild ( children ) ) props.children = children;
+    if ( !isNil ( ref ) ) props.ref = ref;
 
-        return wrapElement((): Child => {
+    return wrapElement ( (): Child => {
 
-            const child = createNode(component) as HTMLElement; //TSC
+      const child = createNode ( component ) as HTMLElement; //TSC
 
-            if (isSVG) child['isSVG'] = true;
+      if ( isSVG ) child['isSVG'] = true;
 
-            untrack(() => setProps(child, props as any));
+      untrack ( () => setProps ( child, props ) );
 
-            return child;
+      return child;
 
-        });
+    });
 
-    } else if (isNode(component)) {
+  } else if ( isNode ( component ) ) {
 
-        return wrapElement(() => component);
+    return wrapElement ( () => component );
 
-    } else {
+  } else {
 
-        throw new Error('Invalid component');
+    throw new Error ( 'Invalid component' );
 
-    }
+  }
 
 };
 

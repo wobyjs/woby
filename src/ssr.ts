@@ -2,7 +2,6 @@
 /* IMPORT */
 //console.log('ssr.ts')
 
-// import './jsx/types'
 export * from './jsx/jsx';
 export * from './jsx/types';
 import type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component } from './types';
