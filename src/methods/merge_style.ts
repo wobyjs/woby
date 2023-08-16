@@ -1,6 +1,6 @@
 import { isObject } from '../utils/lang';
 import { CSSProperties } from '../types';
-import { JSX } from '../jsx/types'
+// import { JSX } from '../jsx/types'
 type StyleProperties = JSX.StyleProperties
 
 export function mergeStyles(style: string | CSSProperties | StyleProperties = {}, css: string | CSSProperties | StyleProperties = ""): CSSProperties & StyleProperties {

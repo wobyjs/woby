@@ -36,7 +36,7 @@ export { };
 
 //   type Component<P = {}> = ( props: P ) => Child;
 //   //@ts-ignore
-//   type Element = Child;
+//   type JSX.Element = Child;
 
 //   type Ref<T = unknown> = (( value: T ) => void);
 
@@ -1597,12 +1597,12 @@ export { };
 
 // }
 
-// export var Element: Element & Child;
+// export var JSX.Element: JSX.Element & Child;
 // // {
-// //     prototype: Element;
-// //     new(): Element;
+// //     prototype: JSX.Element;
+// //     new(): JSX.Element;
 // // };
 
-// // export type Element = Child & globalThis.Element;
-//     // interface Element extends (Node | Child[] | (() => Child)) {
+// // export type JSX.Element = Child & globalThis.Element;
+//     // interface JSX.Element extends (Node | Child[] | (() => Child)) {
 //     // } 

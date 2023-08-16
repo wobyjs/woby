@@ -5,11 +5,11 @@ export * from './jsx-runtime';
 // import './types'
 // import Fragment from '../components/fragment'
 // import createElement from '../methods/create_element'
-// import type { Component, Element } from '../types'
+// import type { Component, JSX.Element } from '../types'
 
 // /* MAIN */
 
-// const jsx = <P = {}>(component: Component<P>, props?: P | null): Element => {
+// const jsx = <P = {}>(component: Component<P>, props?: P | null): JSX.Element => {
 
 //     return createElement<P>(component, props)
 

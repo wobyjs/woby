@@ -1,10 +1,9 @@
-// import {JSX} from './jsx/types';
+
+/* IMPORT */
 import type * as CSS from 'csstype';
-import { JSX } from './jsx/types';
+import './jsx/types' //import once to make entire project compilable.
 
-// const a: JSX.IntrinsicElements
-
-/* HELPERS */
+/* EXPORT */
 
 declare const ContextWithDefaultSymbol: unique symbol;
 
@@ -38,9 +37,7 @@ type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T };
 
 type ContextProvider<T = unknown> = ( props: { value: T, children: Child } ) => Child;
 
-type ContextRegister<T = unknown> = ( value: T ) => void;
-
-type Context<T = unknown> = { Provider: ContextProvider<T>, register: ContextRegister<T> };
+type Context<T = unknown> = { Provider: ContextProvider<T> };
 
 type ContextWithDefault<T = unknown> = Context<T> & { readonly [ContextWithDefaultSymbol]: true };
 
@@ -72,6 +69,8 @@ type EventListener = ( event: Event ) => void;
 
 type Falsy<T = unknown> = Extract<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>;
 
+type ForOptions = import ( 'oby' ).ForOptions;
+
 type FN<Arguments extends unknown[], Return extends unknown = void> = ( ...args: Arguments ) => Return;
 
 type FragmentUndefined = { values: undefined, fragmented?: false, length: 0 };
@@ -98,9 +97,15 @@ type LazyFetcher<P = {}> = () => Promise<{ default: ComponentFunction<P> } | Com
 
 type LazyResult<P = {}> = LazyComponent<P> & ({ preload: () => Promise<void> });
 
+type MemoOptions<T = unknown> = import ( 'oby' ).MemoOptions<T>;
+
 type Observable<T = unknown> = import ( 'oby' ).Observable<T>;
 
+type ObservableLike<T = unknown> = import ( 'oby' ).ObservableLike<T>;
+
 type ObservableReadonly<T = unknown> = import ( 'oby' ).ObservableReadonly<T>;
+
+type ObservableReadonlyLike<T = unknown> = import ( 'oby' ).ObservableReadonlyLike<T>;
 
 type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | T;
 
@@ -124,7 +129,7 @@ type ResourceFunction<T = unknown> = { pending (): boolean, error (): Error | un
 
 type Resource<T = unknown> = ObservableReadonly<ResourceStatic<T>> & ResourceFunction<T>;
 
-type StoreOptions = import( 'oby' ).StoreOptions;
+type StoreOptions = import ( 'oby' ).StoreOptions;
 
 type SuspenseCollectorData = { active: Observable<boolean>, register: ( suspense: SuspenseData ) => void, unregister: ( suspense: SuspenseData ) => void };
 
@@ -161,8 +166,8 @@ type Truthy<T = unknown> = Exclude<T, 0 | -0 | 0n | -0n | '' | false | null | un
 // }
 
 export type CSSProperties = {
-    [K in keyof CSS.Properties<string | number>]: FunctionMaybe<CSS.Properties<string | number>[K]>
+  [K in keyof CSS.Properties<string | number>]: FunctionMaybe<CSS.Properties<string | number>[K]>
 };
 
-export type {ArrayMaybe, Callback, Child, ChildWithMetadata, Classes, ComponentFunction, ComponentIntrinsicElement, ComponentNode, Component, ComponentsMap, Constructor, ConstructorWith, ContextData, ContextProvider, ContextRegister, Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData, DirectiveOptions, Disposer, EffectFunction, EffectOptions, Element, ExtractArray, EventListener, Falsy, FN, FragmentUndefined, FragmentNode, FragmentFragment, FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, Indexed, LazyComponent, LazyFetcher, LazyResult, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, PromiseMaybe, Props, Ref, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource, StoreOptions, SuspenseCollectorData, SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy};
 
+export type {ArrayMaybe, Callback, Child, ChildWithMetadata, Classes, ComponentFunction, ComponentIntrinsicElement, ComponentNode, Component, ComponentsMap, Constructor, ConstructorWith, ContextData, ContextProvider, Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData, DirectiveOptions, Disposer, EffectFunction, EffectOptions, Element, ExtractArray, EventListener, Falsy, ForOptions, FN, FragmentUndefined, FragmentNode, FragmentFragment, FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, Indexed, LazyComponent, LazyFetcher, LazyResult, MemoOptions, Observable, ObservableLike, ObservableReadonly, ObservableReadonlyLike, ObservableMaybe, ObservableOptions, PromiseMaybe, Props, Ref, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource, StoreOptions, SuspenseCollectorData, SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy};

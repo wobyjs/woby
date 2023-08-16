@@ -17,7 +17,6 @@
 //  * from './constants';
 
 //  { render } from './methods/render.testing'
-export { }
 
 //copy all from ../types into JSX
 declare global {
@@ -57,7 +56,7 @@ declare global {
 
     type Component<P = {}> = ( props: P ) => Child;
 
-    type Element = Child;
+    //  type JSX.Element = Child;
 
     type Ref<T = unknown> = ( ( value: T ) => void );
 

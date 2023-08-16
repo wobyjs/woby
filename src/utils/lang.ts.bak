@@ -115,7 +115,7 @@ const isString = ( value: unknown ): value is string => {
 
 };
 
-const isSVG = ( value: Element ): value is SVGElement => {
+const isSVG = ( value: JSX.Element ): value is SVGElement => {
 
   return !!value['isSVG'];
 
