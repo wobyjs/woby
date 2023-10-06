@@ -15,7 +15,7 @@ import { createText, createComment } from '../utils/creators';
 import diff from '../utils/diff';
 import FragmentUtils from '../utils/fragment';
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor } from '../utils/lang';
-import { resolveChild, resolveClass } from '../utils/resolvers';
+import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers';
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types';
 
 /* MAIN */
@@ -743,17 +743,17 @@ const setPropertyStatic = ( element: HTMLElement, key: string, value: null | und
 
   try { // Trying setting the property
 
-    element[ key ] = value;
+    element[key] = value;
 
-    if ( isNil( value ) ) {
+    if ( isNil ( value ) ) {
 
-      setAttributeStatic( element, key, null );
+      setAttributeStatic ( element, key, null );
 
     }
 
   } catch { // If it fails, maybe because like HTMLInputElement.form there's only a getter, we try as an attribute instead //TODO: Figure out something better than this
 
-    setAttributeStatic( element, key, value );
+    setAttributeStatic ( element, key, value );
 
   }
 
@@ -903,23 +903,23 @@ const setStylesStatic = ( element: HTMLElement, object: null | undefined | strin
 
 const setStyles = ( element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>> ): void => {
 
-  if ( isFunction( object ) && isFunctionReactive( object ) ) {
+  if ( isFunction ( object ) || isArray ( object ) ) {
 
-    let objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>;
+    let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>;
 
-    useRenderEffect( () => {
+    useRenderEffect ( () => {
 
-      const objectNext = object();
+      const objectNext = resolveStyle ( object );
 
-      setStylesStatic( element, objectNext, objectPrev );
+      setStylesStatic ( element, objectNext, objectPrev );
 
       objectPrev = objectNext;
 
-    } );
+    });
 
   } else {
 
-    setStylesStatic( element, $$( object ) );
+    setStylesStatic ( element, $$(object) );
 
   }
 

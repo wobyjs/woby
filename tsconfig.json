@@ -42,18 +42,29 @@
     "useUnknownInCatchVariables": true,
     "noImplicitAny": false,
     "noUncheckedIndexedAccess": false,
+    "preserveSymlinks": true,
     "baseUrl": ".",
     "rootDir": "./src",
     "typeRoots": [
       "types",
     ],
+    "paths": {
+      "~/*":["./src/*"],
+    }
     // "incremental": true,
     // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     // "composite": true,
   },
   "exclude": [
     "vite.config.ts",
-    "dist*",
-    "dist1*"
+    "dist",
+    "dist1",
+    "dist/*",
+    "src1",
+    "jsx-runtime.d.tsx",
+    "ssr.d.tsx",
+    "testing.d.tsx",
+    "via.d.tsx",
+    "node_modules",
   ]
 }

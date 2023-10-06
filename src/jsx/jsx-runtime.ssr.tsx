@@ -19,7 +19,8 @@ function jsx<P = { key?: string; children?: Child; }> ( component: Component<P>,
     return wrapCloneElement( createElement<P>( component as any, props ?? {} as P, children as string ), component, props );
 
   if ( !props ) props = {} as any;
-  Object.assign( props as any, { children } );
+  if ( typeof children === 'string' ) // React 16, key
+    Object.assign( props as any, { children } );
 
   return wrapCloneElement( createElement<P>( component as any, props, ( props as any )?.key as string ), component, props );
 };

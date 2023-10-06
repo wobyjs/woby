@@ -15,7 +15,7 @@ import {createText} from '../utils/creators';
 import diff from '../utils/diff';
 import FragmentUtils from '../utils/fragment';
 import {castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isProxy, isString, isSVG, isTemplateAccessor} from '../utils/lang';
-import {resolveChild, resolveClass} from '../utils/resolvers.via';
+import {resolveChild, resolveClass, resolveStyle} from '../utils/resolvers.via';
 import type {Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy} from '../types';
 import { __ArgsSymbol } from 'viajs';
 import { IsSvgSymbol } from '../methods/create_element.via';
@@ -720,15 +720,15 @@ const setStylesStatic = ( element: HTMLElement, object: null | undefined | strin
 
 const setStyles = ( element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>> ): void => {
 
-  if ( isFunction( object ) && isFunctionReactive ( object ) ) {
+  if ( isFunction ( object ) || isArray ( object ) ) {
 
     if ( isObservable( object ) ) {
 
-      let objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>;
+      let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>;
 
       useRenderEffect( () => {
 
-        const objectNext = object();
+        const objectNext = resolveStyle ( object );
 
         setStylesStatic( element, objectNext, objectPrev );
 
@@ -738,11 +738,11 @@ const setStyles = ( element: HTMLElement, object: FunctionMaybe<null | undefined
 
     } else {
 
-      let objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>;
+      let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>;
 
       useRenderEffect( () => {
 
-        const objectNext = ( object as Function )();
+        const objectNext = resolveStyle ( object );
 
         setStylesStatic( element, objectNext, objectPrev );
 

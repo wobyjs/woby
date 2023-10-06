@@ -12,17 +12,19 @@ import type {Child, Component, Element, Props} from '../types';
 
 // It's important to wrap components, so that they can be executed in the right order, from parent to child, rather than from child to parent in some cases
 
-const createElement = <P = {}> ( component: Component<P>, props?: P | null, ..._children: Child[] ): Element => {
+const createElement = <P = { children?: Child; }> ( component: Component<P>, props?: P | null, ..._children: Child[] ): Element => {
 
-  const { children: __children, key, ref, ...rest } = ( props || {} ) as Props; //TSC
-  const children = ( _children.length === 1 ) ? _children[0] : ( _children.length === 0 ) ? __children : _children;
+  // const { children: __children, key, ref, ...rest } = ( props || {} ) as Props; //TSC
+  // const children = ( _children.length === 1 ) ? _children[0] : ( _children.length === 0 ) ? __children : _children;
+  
+  const { ...rest } = props ?? {};
 
   if ( isFunction ( component ) ) {
 
     const props = rest;
 
-    if ( !isNil ( children ) ) props.children = children;
-    if ( !isNil ( ref ) ) props.ref = ref;
+    // if ( !isNil ( children ) ) props.children = children;
+    // if ( !isNil ( ref ) ) props.ref = ref;
 
     return wrapElement ( () => {
 
@@ -36,8 +38,8 @@ const createElement = <P = {}> ( component: Component<P>, props?: P | null, ..._
     const isSVG = isSVGElement ( component );
     const createNode = isSVG ? createSVGNode : createHTMLNode;
 
-    if ( !isVoidChild ( children ) ) props.children = children;
-    if ( !isNil ( ref ) ) props.ref = ref;
+    // if ( !isVoidChild ( children ) ) props.children = children;
+    // if ( !isNil ( ref ) ) props.ref = ref;
 
     return wrapElement ( (): Child => {
 
@@ -45,7 +47,7 @@ const createElement = <P = {}> ( component: Component<P>, props?: P | null, ..._
 
       if ( isSVG ) child['isSVG'] = true;
 
-      untrack ( () => setProps ( child, props ) );
+      untrack ( () => setProps ( child, props as any) );
 
       return child;
 

@@ -5,7 +5,7 @@ import type { Child } from '../types';
 
 /* MAIN */
 
-const Fragment = ({ children, ...props }: { children: Child; }): Child => {
+const Fragment = ({ children, ...props }: { children?: Child; }): Child => {
 
     return children;
 

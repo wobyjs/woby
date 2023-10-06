@@ -1,5 +1,4 @@
 import type { FN } from '../types';
-import 'via';
 export declare const createComment: FN<[any], Comment>;
 export declare const createHTMLNode: FN<[keyof JSX.IntrinsicElements], HTMLElement>;
 export declare const createSVGNode: (name: string) => FN<[keyof JSX.IntrinsicElements], SVGElement>;

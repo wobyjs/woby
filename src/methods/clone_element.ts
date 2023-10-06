@@ -16,12 +16,12 @@ export const cloneElement = <P extends Props> ( element: Child | Element, props:
     if ( !element[ SYMBOL_CLONE ] )
       throw new Error( 'target is not cloneable, it is not created by jsx.createElement' );
 
-    const { component, props: oldProps } = element[ SYMBOL_CLONE ] as CloneableType<P>;
+    const { Component, props: oldProps } = element[ SYMBOL_CLONE ] as CloneableType<P>;
     const newProps = { ...oldProps, ...props };
     if ( children.length > 0 )
       Object.assign( props, { children } );
 
-    return wrapCloneElement( createElement<P>( component as any, newProps ), component, newProps );
+    return wrapCloneElement( createElement<P>( Component as any, newProps ), Component, newProps );
   }
   else if ( Array.isArray( element ) )
     return element.map( e => cloneElement( e, props ) );

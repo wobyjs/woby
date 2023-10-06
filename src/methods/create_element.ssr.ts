@@ -17,7 +17,7 @@ import { untrack } from 'oby';
 const createElement = <P = {}>(component: Component<P> | keyof JSX.IntrinsicElements | string, props?: P | null, _key?: string, _isStatic?: boolean, _source?: { fileName: string, lineNumber: number, columnNumber: number; }, _self?: any): Element => {
     //   const { children: __children, key, ref, ...rest } = (props || {}) as Props; //TSC
     //   let children = (_children.length === 1) ? _children[0] : (_children.length === 0) ? __children : _children;
-    const { ...rest } = props;
+    const { ...rest } = props ?? {};
 
     if (isFunction(component)) {
 

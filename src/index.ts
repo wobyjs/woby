@@ -2,7 +2,7 @@
 /* EXPORT */
 
 export * from './singleton';
-export * from './jsx/jsx';
+// export * from './jsx/jsx';
 export * from './components';
 export * from './jsx/runtime';
 export * from './hooks';
@@ -21,10 +21,12 @@ export type {ArrayMaybe, Callback, Child, ChildWithMetadata, Classes, ComponentF
     ComponentNode, Component, ComponentsMap, /* Constructor, */ ConstructorWith, ContextData, ContextProvider, 
     Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData,
     DirectiveOptions, Disposer, Element, EventListener, Falsy, FN, FragmentUndefined, FragmentNode, FragmentFragment,
-    FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, LazyComponent, LazyFetcher, LazyResult,
+    FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, MemoOptions, LazyComponent, LazyFetcher, LazyResult,
     /* Observable, ObservableReadonly, */ ObservableMaybe, /* ObservableOptions, PromiseMaybe, */ Props, Ref,
     ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource,
     /* StoreOptions, */ SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths,
     TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy,
     CSSProperties
 } from './types';
+
+export * as JSX from './types'

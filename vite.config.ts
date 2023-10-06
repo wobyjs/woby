@@ -6,8 +6,8 @@ const config = defineConfig({
     build: {
         minify: false,
         lib: {
-            entry: ["./src/index.ts", "./src/jsx/jsx-runtime.ts", "./src/ssr/ssr-runtime.ts", "./src/via/via-runtime.ts",
-                './src/ssr.ts', './src/via.ts', './src/testing.ts'],
+            entry: ["./src/index.ts", "./src/jsx/runtime.ts",  "./src/ssr/ssr-runtime.ts", "./src/via/via-runtime.ts",
+                './src/ssr.ts',  './src/via.ts', './src/testing.ts'],
             name: "voby",
             formats: ['cjs', 'es'],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
