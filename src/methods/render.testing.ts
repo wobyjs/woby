@@ -2,7 +2,7 @@
 
 import useRoot from '../hooks/use_root';
 import { setChild } from '../utils/setters';
-import type { Child, Disposer } from '../types';
+import type { Child, Disposer, IntrinsicElementsMap } from '../types';
 import $ from './S';
 // import { JSX } from 'src/jsx/types';
 
