@@ -8,6 +8,8 @@ export * from './jsx/runtime';
 export * from './hooks';
 export * from './methods';
 export * from "./constants"
+export * from "./utils"
+
 
 //export type {Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, CSSProperties, Component, JSX.Element} from './types';
 
