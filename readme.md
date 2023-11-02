@@ -1,6 +1,6 @@
 
 <p align="center">
-  <a href="https://voby.dev">
+  <a href="https://woby.dev">
     <img src="./resources/banner/svg/banner-light-rounded.svg" alt="Voby's Banne" width="640px" height="320px">
   </a>
 </p>
@@ -9,15 +9,15 @@
   <a href="https://discord.gg/E6pK7VpnjC">
     <img src="./resources/discord/button.png" alt="Join The Discord Chat" width="175px" height="56.5px">
   </a>
-  <a href="https://codesandbox.io/s/voby-playground-7w2pxg">
+  <a href="https://codesandbox.io/s/woby-playground-7w2pxg">
     <img src="./resources/playground/button.png" alt="Open The Playground" width="175px" height="56.5px">
   </a>
-  <a href="https://opencollective.com/voby">
+  <a href="https://opencollective.com/woby">
     <img src="./resources/collective/button.png" alt="Donate With Open Collective" width="175px" height="56.5px">
   </a>
 </p>
 
-# [Voby](https://voby.dev)
+# Woby, a twin project of [Voby](https://voby.dev)
 
 A high-performance framework with fine-grained observable-based reactivity for building rich applications.
 
@@ -41,18 +41,18 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 
 You can find some demos and benchmarks below, more demos are contained inside the repository.
 
-- Playground: https://codesandbox.io/s/voby-playground-7w2pxg
+- Playground: https://codesandbox.io/s/woby-playground-7w2pxg
 - Benchmark: https://krausest.github.io/js-framework-benchmark/current.html
-- Counter: https://codesandbox.io/s/voby-demo-counter-23fv5
-- Clock: https://codesandbox.io/s/voby-demo-clock-w1e7yb
-- Emoji Counter: https://codesandbox.io/s/voby-demo-emoji-counter-j91iz2
-- HyperScript: https://codesandbox.io/s/voby-demo-hyperscript-h4rf38
-- HTML Template Literal: https://codesandbox.io/s/voby-demo-html-lvfeyo
-- Single-file HTML: https://codesandbox.io/s/voby-demo-html-dueygt?file=/public/index.html
-- Spiral: https://codesandbox.io/s/voby-demo-spiral-ux33p6
-- Store Counter: https://codesandbox.io/s/voby-demo-store-counter-kvoqrw
-- Triangle: https://codesandbox.io/s/voby-demo-triangle-l837v0
-- Boxes: https://codesandbox.io/s/voby-demo-boxes-wx6rqb
+- Counter: https://codesandbox.io/s/woby-demo-counter-23fv5
+- Clock: https://codesandbox.io/s/woby-demo-clock-w1e7yb
+- Emoji Counter: https://codesandbox.io/s/woby-demo-emoji-counter-j91iz2
+- HyperScript: https://codesandbox.io/s/woby-demo-hyperscript-h4rf38
+- HTML Template Literal: https://codesandbox.io/s/woby-demo-html-lvfeyo
+- Single-file HTML: https://codesandbox.io/s/woby-demo-html-dueygt?file=/public/index.html
+- Spiral: https://codesandbox.io/s/woby-demo-spiral-ux33p6
+- Store Counter: https://codesandbox.io/s/woby-demo-store-counter-kvoqrw
+- Triangle: https://codesandbox.io/s/woby-demo-triangle-l837v0
+- Boxes: https://codesandbox.io/s/woby-demo-boxes-wx6rqb
 
 ## APIs
 
@@ -115,7 +115,7 @@ function $ <T> ( value: T, options?: ObservableOptions<T> ): Observable<T>;
 Usage:
 
 ```tsx
-import {$} from 'voby';
+import {$} from 'woby';
 
 // Create an observable without an initial value
 
@@ -169,7 +169,7 @@ function $$ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
 Usage:
 
 ```tsx
-import {$$} from 'voby';
+import {$$} from 'woby';
 
 // Getting the value out of an observable
 
@@ -207,7 +207,7 @@ function batch <T> ( value: T ): T;
 Usage:
 
 ```tsx
-import {batch} from 'voby';
+import {batch} from 'woby';
 
 batch // => Same as require ( 'oby' ).batch
 ```
@@ -233,7 +233,7 @@ function createContext <T> ( defaultValue?: T ): Context<T>;
 Usage:
 
 ```tsx
-import {createContext, useContext} from 'voby';
+import {createContext, useContext} from 'woby';
 
 const App = () => {
   const Context = createContext ( 123 );
@@ -283,7 +283,7 @@ function createDirective <T extends unknown[] = []> ( name: string, fn: Directiv
 Usage:
 
 ```tsx
-import {createDirective, useEffect} from 'voby';
+import {createDirective, useEffect} from 'woby';
 
 // First of all if you are using TypeScript you should extend the "JSX.Directives" interface, so that TypeScript will know about your new directive
 
@@ -337,7 +337,7 @@ function createElement <P = {}> ( component: JSX.Component<P>, props: P | null, 
 Usage:
 
 ```tsx
-import {createElement} from 'voby';
+import {createElement} from 'woby';
 
 const element = createElement ( 'div', { class: 'foo' }, 'child' ); // => () => HTMLDivElement
 ```
@@ -355,7 +355,7 @@ function h <P = {}> ( component: JSX.Component<P>, props: P | null, ...children:
 Usage:
 
 ```tsx
-import {h} from 'voby';
+import {h} from 'woby';
 
 const element = h ( 'div', { class: 'foo' }, 'child' ); // => () => HTMLDivElement
 ```
@@ -375,7 +375,7 @@ function html ( strings: TemplateStringsArray, ...values: any[] ): JSX.Element;
 Usage:
 
 ```tsx
-import {html, If} from 'voby';
+import {html, If} from 'woby';
 
 const Counter = (): JSX.Element => {
   const value = $(0);
@@ -425,7 +425,7 @@ function isBatching (): boolean;
 Usage:
 
 ```tsx
-import {batch, isBatching} from 'voby';
+import {batch, isBatching} from 'woby';
 
 // Checking if currently batching
 
@@ -453,7 +453,7 @@ function isObservable <T = unknown> ( value: unknown ): value is Observable<T> |
 Usage:
 
 ```tsx
-import {$, isObservable} from 'voby';
+import {$, isObservable} from 'woby';
 
 isObservable ( 123 ); // => false
 isObservable ( $(123) ); // => true
@@ -472,7 +472,7 @@ function isServer (): boolean;
 Usage:
 
 ```tsx
-import {isServer} from 'voby';
+import {isServer} from 'woby';
 
 isServer (); // => true or false
 ```
@@ -490,7 +490,7 @@ function isStore ( value: unknown ): boolean;
 Usage:
 
 ```tsx
-import {store, isStore} from 'voby';
+import {store, isStore} from 'woby';
 
 isStore ( {} ); // => false
 isStore ( store ( {} ) ); // => true
@@ -515,7 +515,7 @@ function lazy <P = {}> ( fetcher: LazyFetcher<P> ): LazyResult<P>;
 Usage:
 
 ```ts
-import {lazy} from 'voby';
+import {lazy} from 'woby';
 
 const LazyComponent = lazy ( () => import ( './component' ) );
 ```
@@ -533,7 +533,7 @@ function render ( child: JSX.Element, parent?: HTMLElement | null ): Disposer;
 Usage:
 
 ```tsx
-import {render} from 'voby';
+import {render} from 'woby';
 
 const App = () => <p>Hello, World!</p>;
 
@@ -559,7 +559,7 @@ function renderToString ( child: JSX.Element ): Promise<string>;
 Usage:
 
 ```tsx
-import {renderToString} from 'voby';
+import {renderToString} from 'woby';
 
 const App = () => <p>Hello, World!</p>;
 
@@ -589,7 +589,7 @@ function resolve <T> ( value: T ): T extends Resolvable ? T : never;
 Usage:
 
 ```tsx
-import {resolve} from 'voby';
+import {resolve} from 'woby';
 
 resolve // => Same as require ( 'oby' ).resolve
 ```
@@ -609,7 +609,7 @@ function store <T> ( value: T, options?: StoreOptions ): T;
 Usage:
 
 ```tsx
-import {store} from 'voby';
+import {store} from 'woby';
 
 store // => Same as require ( 'oby' ).store
 ```
@@ -631,7 +631,7 @@ function template <P = {}> ( fn: (( props: P ) => JSX.Element) ): (( props: P ) 
 Usage:
 
 ```tsx
-import {template} from 'voby';
+import {template} from 'woby';
 
 const Row = template ( ({ id, cls, label, onSelect, onRemove }) => { // Now Row is super fast to instantiate
   return (
@@ -672,7 +672,7 @@ function untrack <T> ( value: T ): T;
 Usage:
 
 ```tsx
-import {untrack} from 'voby';
+import {untrack} from 'woby';
 
 untrack // => Same as require ( 'oby' ).untrack
 ```
@@ -696,7 +696,7 @@ function Dynamic <P = {}> ( props: { component: ObservableMaybe<JSX.Component<P>
 Usage:
 
 ```tsx
-import {Dynamic} from 'voby';
+import {Dynamic} from 'woby';
 
 const App = () => {
   const heading = 'h2';
@@ -721,7 +721,7 @@ function ErrorBoundary ( props: { fallback: JSX.Element | (( props: { error: Err
 Usage:
 
 ```tsx
-import {ErrorBoundary} from 'voby';
+import {ErrorBoundary} from 'woby';
 
 const Fallback = ({ reset, error }: { reset: () => void, error: Error }) => {
   return (
@@ -760,7 +760,7 @@ function For <T> ( props: { values: FunctionMaybe<readonly T[]>, fallback?: JSX.
 Usage:
 
 ```tsx
-import {For} from 'voby';
+import {For} from 'woby';
 
 const App = () => {
   const numbers = [1, 2, 3, 4, 5];
@@ -795,7 +795,7 @@ function ForIndex <T> ( props: { values: FunctionMaybe<readonly T[]>, fallback?:
 Usage:
 
 ```tsx
-import {ForIndex} from 'voby';
+import {ForIndex} from 'woby';
 
 const App = () => {
   const numbers = [1, 2, 3, 4, 5];
@@ -832,7 +832,7 @@ function ForValue <T> ( props: { values: FunctionMaybe<readonly T[]>, fallback?:
 Usage:
 
 ```tsx
-import {ForValue} from 'voby';
+import {ForValue} from 'woby';
 
 const App = () => {
   const numbers = [1, 2, 3, 4, 5];
@@ -859,7 +859,7 @@ function Fragment ( props: { children: JSX.Element }): JSX.Element;
 Usage:
 
 ```tsx
-import {Fragment} from 'voby';
+import {Fragment} from 'woby';
 
 const App = () => {
   return (
@@ -888,7 +888,7 @@ function If <T> ( props: { when: FunctionMaybe<T>, fallback?: JSX.Element, child
 Usage:
 
 ```tsx
-import {If} from 'voby';
+import {If} from 'woby';
 
 const App = () => {
   const visible = $(false);
@@ -923,7 +923,7 @@ function Portal ( props: { when: boolean, mount?: JSX.Element, wrapper?: JSX.Ele
 Usage:
 
 ```tsx
-import Portal from 'voby';
+import Portal from 'woby';
 
 const Modal = () => {
   // Some modal component maybe...
@@ -957,7 +957,7 @@ function Suspense ( props: { when?: FunctionMaybe<unknown>, fallback?: JSX.Eleme
 Usage:
 
 ```tsx
-import {Suspense} from 'voby';
+import {Suspense} from 'woby';
 
 const App = () => {
   const Content = () => {
@@ -995,7 +995,7 @@ Switch.Default = function ( props: { children: JSX.Element } ): (() => JSX.Eleme
 Usage:
 
 ```tsx
-import {Switch} from 'voby';
+import {Switch} from 'woby';
 
 const App = () => {
   const value = $(0);
@@ -1036,7 +1036,7 @@ function Ternary ( props: { when: FunctionMaybe<unknown>, children: [JSX.Element
 Usage:
 
 ```tsx
-import {Ternary} from 'voby';
+import {Ternary} from 'woby';
 
 const App = () => {
   const visible = $(false);
@@ -1074,7 +1074,7 @@ function useAbortController ( signals?: ArrayMaybe<AbortSignal> ): AbortControll
 Usage:
 
 ```tsx
-import {useAbortController} from 'voby';
+import {useAbortController} from 'woby';
 
 const controller = useAbortController ();
 ```
@@ -1092,7 +1092,7 @@ function useAbortSignal ( signals?: ArrayMaybe<AbortSignal> ): AbortSignal;
 Usage:
 
 ```tsx
-import {useAbortSignal} from 'voby';
+import {useAbortSignal} from 'woby';
 
 const signal = useAbortSignal ();
 ```
@@ -1110,7 +1110,7 @@ function useAnimationFrame ( callback: ObservableMaybe<FrameRequestCallback> ): 
 Usage:
 
 ```tsx
-import {useAnimationFrame} from 'voby';
+import {useAnimationFrame} from 'woby';
 
 useAnimationFrame ( () => console.log ( 'called' ) );
 ```
@@ -1128,7 +1128,7 @@ function useAnimationLoop ( callback: ObservableMaybe<FrameRequestCallback> ): D
 Usage:
 
 ```tsx
-import {useAnimationLoop} from 'voby';
+import {useAnimationLoop} from 'woby';
 
 useAnimationLoop ( () => console.log ( 'called' ) );
 ```
@@ -1148,7 +1148,7 @@ function useBoolean ( value: FunctionMaybe<unknown> ): FunctionMaybe<boolean>;
 Usage:
 
 ```tsx
-import {useBoolean} from 'voby';
+import {useBoolean} from 'woby';
 
 useBoolean // => Same as require ( 'oby' ).boolean
 ```
@@ -1168,7 +1168,7 @@ function useCleanup ( fn: () => void ): void;
 Usage:
 
 ```tsx
-import {useCleanup} from 'voby';
+import {useCleanup} from 'woby';
 
 useCleanup // => Same as require ( 'oby' ).cleanup
 ```
@@ -1186,7 +1186,7 @@ function useContext <T> ( context: Context<T> ): T | undefined;
 Usage:
 
 ```tsx
-import {createContext, useContext} from 'voby';
+import {createContext, useContext} from 'woby';
 
 const App = () => {
   const ctx = createContext ( 123 );
@@ -1210,7 +1210,7 @@ function useDisposed (): ObservableReadonly<boolean>;
 Usage:
 
 ```tsx
-import {useDisposed} from 'voby';
+import {useDisposed} from 'woby';
 
 useDisposed // => Same as require ( 'oby' ).disposed
 ```
@@ -1230,7 +1230,7 @@ function useEffect ( fn: () => (() => void) | void ): (() => void);
 Usage:
 
 ```tsx
-import {useEffect} from 'voby';
+import {useEffect} from 'woby';
 
 useEffect // => Same as require ( 'oby' ).effect
 ```
@@ -1250,7 +1250,7 @@ function useError ( fn: ( error: Error ) => void ): void;
 Usage:
 
 ```tsx
-import {useError} from 'voby';
+import {useError} from 'woby';
 
 useError // => Same as require ( 'oby' ).error
 ```
@@ -1268,7 +1268,7 @@ function useEventListener ( target: FunctionMaybe<EventTarget>, event: FunctionM
 Usage:
 
 ```tsx
-import {useEventListener} from 'voby';
+import {useEventListener} from 'woby';
 
 useEventListener ( document, 'click', console.log );
 ```
@@ -1288,7 +1288,7 @@ function useFetch ( request: FunctionMaybe<RequestInfo>, init?: FunctionMaybe<Re
 Usage:
 
 ```tsx
-import {useFetch} from 'voby';
+import {useFetch} from 'woby';
 
 const App = () => {
   const state = useFetch ( 'https://my.api' );
@@ -1313,7 +1313,7 @@ function useIdleCallback ( callback: ObservableMaybe<IdleRequestCallback>, optio
 Usage:
 
 ```tsx
-import {useIdleCallback} from 'voby';
+import {useIdleCallback} from 'woby';
 
 useIdleCallback ( () => console.log ( 'called' ) );
 ```
@@ -1331,7 +1331,7 @@ function useIdleLoop ( callback: ObservableMaybe<IdleRequestCallback>, options?:
 Usage:
 
 ```tsx
-import {useIdleLoop} from 'voby';
+import {useIdleLoop} from 'woby';
 
 useIdleLoop ( () => console.log ( 'called' ) );
 ```
@@ -1349,7 +1349,7 @@ function useInterval ( callback: ObservableMaybe<Callback>, ms?: FunctionMaybe<n
 Usage:
 
 ```tsx
-import {useInterval} from 'voby';
+import {useInterval} from 'woby';
 
 useInterval ( () => console.log ( 'called' ), 1000 );
 ```
@@ -1371,7 +1371,7 @@ function useMemo <T> ( fn: () => T, options?: ObservableOptions<T | undefined> )
 Usage:
 
 ```tsx
-import {useMemo} from 'voby';
+import {useMemo} from 'woby';
 
 useMemo // => Same as require ( 'oby' ).memo
 ```
@@ -1389,7 +1389,7 @@ function useMicrotask ( fn: () => void ): void;
 Usage:
 
 ```tsx
-import {useMicrotask} from 'voby';
+import {useMicrotask} from 'woby';
 
 useMicrotask ( () => console.log ( 'called' ) );
 ```
@@ -1409,7 +1409,7 @@ function usePromise <T> ( promise: FunctionMaybe<Promise<T>> ): ObservableReadon
 Usage:
 
 ```tsx
-import {usePromise} from 'voby';
+import {usePromise} from 'woby';
 
 const App = () => {
   const request = fetch ( 'https://my.api' ).then ( res => res.json ( 0 ) );
@@ -1439,7 +1439,7 @@ function useReaction ( fn: () => (() => void) | void ): (() => void);
 Usage:
 
 ```tsx
-import {useReaction} from 'voby';
+import {useReaction} from 'woby';
 
 useReaction // => Same as require ( 'oby' ).reaction
 ```
@@ -1459,7 +1459,7 @@ function useReadonly <T> ( observable: Observable<T> | ObservableReadonly<T> ): 
 Usage:
 
 ```tsx
-import {useReadonly} from 'voby';
+import {useReadonly} from 'woby';
 
 useReadonly // => Same as require ( 'oby' ).readonly
 ```
@@ -1476,12 +1476,12 @@ This is potentially a more convenient version of `$$`, made especially for handl
 
 Interface:
 
-> The precise interface for this function is insane, you can find it here: https://github.com/fabiospampinato/voby/blob/master/src/hooks/use_resolved.ts
+> The precise interface for this function is insane, you can find it here: https://github.com/fabiospampinato/woby/blob/master/src/hooks/use_resolved.ts
 
 Usage:
 
 ```tsx
-import {$, useResolved} from 'voby';
+import {$, useResolved} from 'woby';
 
 useResolved ( 123 ); // => 123
 
@@ -1519,7 +1519,7 @@ function useResource <T> ( fetcher: (() => ObservableMaybe<PromiseMaybe<T>>) ): 
 Usage:
 
 ```tsx
-import {useResource} from 'voby';
+import {useResource} from 'woby';
 
 const fetcher = () => fetch ( 'https://my.api' );
 
@@ -1541,7 +1541,7 @@ function useRoot <T> ( fn: ( dispose: () => void ) => T ): T;
 Usage:
 
 ```tsx
-import {useRoot} from 'voby';
+import {useRoot} from 'woby';
 
 useRoot // => Same as require ( 'oby' ).root
 ```
@@ -1563,7 +1563,7 @@ function useSelector <T> ( source: () => T | ObservableReadonly<T> ): SelectorFu
 Usage:
 
 ```tsx
-import {useSelector} from 'voby';
+import {useSelector} from 'woby';
 
 useSelector // => Same as require ( 'oby' ).selector
 ```
@@ -1581,7 +1581,7 @@ function useTimeout ( callback: ObservableMaybe<Callback>, ms?: FunctionMaybe<nu
 Usage:
 
 ```tsx
-import {useTimeout} from 'voby';
+import {useTimeout} from 'woby';
 
 useTimeout ( () => console.log ( 'called' ), 1000 );
 ```
@@ -1604,8 +1604,8 @@ type Context<T = unknown> = {
 Usage:
 
 ```ts
-import {useContext} from 'voby';
-import type {Context} from 'voby';
+import {useContext} from 'woby';
+import type {Context} from 'woby';
 
 // Create an alternative useContext that throws if the context is not available
 
@@ -1633,8 +1633,8 @@ type Directive<Arguments extends unknown[] = []> = {
 Usage:
 
 ```ts
-import {$$, useEffect} from 'voby';
-import type {Directive, FunctionMaybe} from 'voby';
+import {$$, useEffect} from 'woby';
+import type {Directive, FunctionMaybe} from 'woby';
 
 // Example hook for turning a directive into a hook
 
@@ -1664,7 +1664,7 @@ type DirectiveOptions = {
 Usage:
 
 ```tsx
-import {createDirective} from 'voby';
+import {createDirective} from 'woby';
 
 // Create an regular, non-immediate, directive
 
@@ -1694,7 +1694,7 @@ type FunctionMaybe<T> = (() => T) | T;
 Usage:
 
 ```tsx
-import type {FunctionMaybe} from 'voby';
+import type {FunctionMaybe} from 'woby';
 
 const SomeConditionalComponent = ( when: FunctionMaybe<boolean>, value: string ): JSX.Element => {
   return (
@@ -1722,7 +1722,7 @@ type Observable<T> = {
 Usage:
 
 ```tsx
-import type {Observable} from 'voby';
+import type {Observable} from 'woby';
 
 const fn = ( value: Observable<boolean> ): void => {
   value (); // Getting
@@ -1745,7 +1745,7 @@ type ObservableReadonly<T> = {
 Usage:
 
 ```tsx
-import type {ObservableReadonly} from 'voby';
+import type {ObservableReadonly} from 'woby';
 
 const fn = ( value: ObservableReadonly<boolean> ): void => {
   value (); // Getting
@@ -1768,7 +1768,7 @@ type ObservableMaybe<T> = Observable<T> | ObservableReadonly<T> | T;
 Usage:
 
 ```tsx
-import type {ObservableMaybe} from 'voby';
+import type {ObservableMaybe} from 'woby';
 
 const Button = ({ label }: { label: ObservableMaybe<string> }): JSX.Element => {
   return <button>{label}</button>;
@@ -1790,8 +1790,8 @@ type ObservableOptions<T> = {
 Usage:
 
 ```tsx
-import type {Observable, ObservableOptions} from 'voby';
-import {$} from 'voby';
+import type {Observable, ObservableOptions} from 'woby';
+import {$} from 'woby';
 
 const createTimestamp = ( options?: ObservableOptions ): Observable<number> => {
   return $( Date.now (), options );
@@ -1822,7 +1822,7 @@ type Resource<T> = ObservableReadonly<ResourceStatic<T>> & ResourceFunction<T>;
 Usage:
 
 ```tsx
-import type {ObservableReadonly, Resource} from 'voby';
+import type {ObservableReadonly, Resource} from 'woby';
 
 const resource: Resource<Response> = useResource ( () => fetch ( 'https://my.api' ) );
 
@@ -1856,8 +1856,8 @@ type StoreOptions = {
 Usage:
 
 ```ts
-import type {StoreOptions} from 'voby';
-import {store} from 'voby';
+import type {StoreOptions} from 'woby';
+import {store} from 'woby';
 
 const createStore = <T> ( value: T, options?: StoreOptions ): T => {
   return store ( value, options );
@@ -1873,7 +1873,7 @@ Extra features and details.
 If you'd like to contribute to this repo you should take the following steps to install Voby locally:
 
 ```sh
-git clone https://github.com/vobyjs/voby.git
+git clone https://github.com/vobyjs/woby.git
 cd voby
 npm install
 npm run compile
@@ -1933,13 +1933,13 @@ There are two main actions needed to make Voby work with TypeScript.
     {
       "compilerOptions": {
         "jsx": "react-jsx",
-        "jsxImportSource": "voby"
+        "jsxImportSource": "woby"
       }
     }
    ```
 3. Optionally, if you don't want to use a bundler or if you are using a bundler for which a plugin hasn't been written yet you can just define a "React" variable in scope and just use the JSX transform for React:
    ```ts
-   import * as React from 'voby';
+   import * as React from 'woby';
    ```
 
 ## Thanks

@@ -8,7 +8,7 @@ const config = defineConfig({
         lib: {
             entry: ["./src/index.ts", "./src/jsx/runtime.ts",  "./src/ssr/ssr-runtime.ts", "./src/via/via-runtime.ts",
                 './src/ssr.ts',  './src/via.ts', './src/testing.ts'],
-            name: "voby",
+            name: 'woby',
             formats: ['cjs', 'es'],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
