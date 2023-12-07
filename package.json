@@ -1,13 +1,13 @@
 {
     "name": "woby",
-    "repository": "github:fabiospampinato/woby",
+    "repository": "github:wongchichong/woby",
     "description": "A high-performance framework with fine-grained observable/signal-based reactivity for building rich applications.",
-    "version": "0.46.2",
+    "version": "0.57.1",
     "type": "module",
     "sideEffects": false,
     "main": "./dist/index.cjs.js",
     "module": "./dist/index.es.js",
-    "//browser": "./dist/index.umd.js",
+    "browser": "./dist/index.umd.js",
     "types": "./dist/types/index.d.ts",
     "exports": {
         ".": {
@@ -121,10 +121,9 @@
     ],
     "dependencies": {
         "htm": "^3.1.1",
-        "oby": "workspace:../oby",
-        "pnpm": "^8.8.0",
-        "vhtml": "workspace:../vhtml",
-        "viajs": "workspace:../via"
+        "oby": "^15.1.0",
+        "vhtml": "^2.2.0",
+        "via.js": "^1.0.0"
     },
     "devDependencies": {
         "@types/node": "^18.18.3",
