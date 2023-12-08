@@ -2,7 +2,7 @@
     "name": "woby",
     "repository": "github:wongchichong/woby",
     "description": "A high-performance framework with fine-grained observable/signal-based reactivity for building rich applications.",
-    "version": "0.57.10",
+    "version": "0.57.11",
     "type": "module",
     "sideEffects": false,
     "main": "./dist/index.cjs.js",
@@ -105,7 +105,7 @@
         "prod:uibench": "cd demo/uibench && npm i && npm update && npm run prod",
         "dev": "npm run dev:playground",
         "prod": "npm run prod:playground",
-        "prepublishOnly": "tsex prepare"
+        "//prepublishOnly": "tsex prepare"
     },
     "keywords": [
         "ui",
