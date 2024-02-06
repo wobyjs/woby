@@ -2,7 +2,7 @@
     "name": "woby",
     "repository": "github:wongchichong/woby",
     "description": "A high-performance framework with fine-grained observable/signal-based reactivity for building rich applications.",
-    "version": "0.57.13",
+    "version": "0.57.14",
     "type": "module",
     "sideEffects": false,
     "main": "./dist/index.cjs.js",
@@ -136,7 +136,7 @@
     "files": [
         "dist",
         "*.d.ts",
-        "jsx-runtime.ts",
+        "jsx-runtime.js",
         "ssr.js",
         "via.js",
         "testing.js"
