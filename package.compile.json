@@ -109,6 +109,12 @@
         "fine-grained",
         "updates"
     ],
+    "dependencies1": {
+        "htm": "^3.1.1",
+        "oby": "workspace:../oby",
+        "vhtml": "workspace:../vhtml",
+        "via": "workspace:../via"
+    },
     "dependencies": {
         "htm": "^3.1.1",
         "oby": "workspace:../oby",
