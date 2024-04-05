@@ -4,8 +4,8 @@
 import untrack from '../methods/untrack'
 import wrapElement from '../methods/wrap_element'
 import { createHTMLNode, createSVGNode } from '../utils/creators.via'
-import { isFunction, isNil, isNode, isString, isSVGElement, isVoidChild } from '../utils/lang'
-import { setProps } from '../utils/setters'
+import { isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
+import { setChild, setProps } from '../utils/setters'
 import type { Child, Component, Element, Props } from '../types'
 import { IgnoreSymbols } from 'via.js'
 // import { JSX } from '../jsx/types';
@@ -18,29 +18,32 @@ IgnoreSymbols[IsSvgSymbol] = IsSvgSymbol
 
 // It's important to wrap components, so that they can be executed in the right order, from parent to child, rather than from child to parent in some cases
 
-const createElement = <P = {}>(component: Component<P> | keyof JSX.IntrinsicElements | string, props?: P | null, _key?: string, _isStatic?: boolean, _source?: { fileName: string, lineNumber: number, columnNumber: number }, _self?: any): Element => {
-    // const { children: __children, key, ref, ...rest } = (props || {}) as Props; //TSC
-    // let children = (_children.length === 1) ? _children[0] : (_children.length === 0) ? __children : _children;
-    const { ...rest } = props ?? {}
+const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]): Element => {
+    const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
+    const hasChildren = !isVoidChild(children)
+
+    if (isObject(_props)) {
+
+        if (hasChildren && 'children' in _props) throw new Error('Providing "children" both as a prop and as rest arguments is forbidden')
+
+        if ('key' in _props) throw new Error('Using a prop named "key" is forbidden')
+
+    }
 
     if (isFunction(component)) {
 
-        const props = rest
+        const props = hasChildren ? { ..._props, children } : _props
 
-        // if (!isNil(children)) props.children = children;
-        // if (!isNil(ref)) props.ref = ref;
+        return wrapElement(() => {
 
-        // return wrapElement(() => untrack(() => component.call(component, props as P)))
-        return wrapElement(() => component.call(component, props as P) as any)
+            return untrack(() => component.call(component, props as P)) //TSC
+
+        })
 
     } else if (isString(component)) {
 
-        const props = rest
         const isSVG = isSVGElement(component)
         const createNode = isSVG ? createSVGNode : createHTMLNode
-
-        // if (!isVoidChild(children)) props.children = children;
-        // if (!isNil(ref)) props.ref = ref;
 
         return wrapElement((): Child => {
             const child = createNode(component as any) as any as HTMLElement //TSC
@@ -50,7 +53,17 @@ const createElement = <P = {}>(component: Component<P> | keyof JSX.IntrinsicElem
                 child[IsSvgSymbol] = true // set proxy
             }
 
-            untrack(() => setProps(child as any, props as any))
+            untrack(() => {
+
+                if (_props) {
+                    setProps(child, _props as any)
+                }
+
+                if (hasChildren) {
+                    setChild(child, children)
+                }
+
+            })
 
             return child as any
 

@@ -14,7 +14,7 @@ import { classesToggle } from '../utils/classlist'
 import { createText } from '../utils/creators'
 import diff from '../utils/diff'
 import FragmentUtils from '../utils/fragment'
-import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isProxy, isString, isSVG, isTemplateAccessor } from '../utils/lang'
+import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers.via'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { __ArgsSymbol } from 'via.js'
@@ -107,7 +107,7 @@ const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<nu
 
 const setChildStatic = (parent: HTMLElement, child: Child, dynamic?: boolean) => {
 
-    if (!dynamic && child === undefined) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
+    if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
     if (Array.isArray(child)) {
         const children = (Array.isArray(child) ? child : [child]) as Node[] //TSC
