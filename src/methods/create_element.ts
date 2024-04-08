@@ -18,11 +18,9 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
     const hasChildren = !isVoidChild(children)
     const { ...rest } = _props ?? {}
 
-    if (isObject(_props)) {
+    if (hasChildren && isObject(_props) && 'children' in _props) {
 
-        if (hasChildren && 'children' in _props) throw new Error('Providing "children" both as a prop and as rest arguments is forbidden')
-
-        if ('key' in _props) throw new Error('Using a prop named "key" is forbidden')
+        throw new Error('Providing "children" both as a prop and as rest arguments is forbidden');
 
     }
 
