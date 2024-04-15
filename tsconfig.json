@@ -56,7 +56,7 @@
     // "composite": true,
   },
   "exclude": [
-    "vite.config.ts",
+    "vite.*.*ts",
     "dist",
     "dist1",
     "dist/*",

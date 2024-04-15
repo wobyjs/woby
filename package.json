@@ -71,11 +71,11 @@
         }
     },
     "scripts": {
-        "release": "git add . && git commit -m \"Bump version\" git push && pnpm version patch",
+        "release": "git add . && git commit -m \"Bump version\" && git push && pnpm version patch",
         "clean": "tsex clean",
-        "build": "vite build",
+        "build": "vite build && tsc --declaration --emitDeclarationOnly --declarationMap",
         "watch": "tsc --declaration --watch",
-        "compile": "tsex compile && tsc --declaration --emitDeclarationOnly",
+        "compile": "tsex compile && tsc --declaration --emitDeclarationOnly --declarationMap",
         "compile:watch": "tsex compile --watch",
         "dev:benchmark": "cd demo/benchmark && npm i && npm update && npm run dev",
         "prod:benchmark": "cd demo/benchmark && npm i && npm update && npm run prod",
@@ -126,12 +126,11 @@
         "via.js": "^1.0.0"
     },
     "devDependencies": {
-        "@types/node": "^18.19.28",
+        "@types/node": "^20.12.7",
         "csstype": "^3.1.3",
         "tsex": "^3.2.1",
-        "typescript": "^5.4.3",
-        "vite": "^4.5.2",
-        "vite-plugin-dts": "^2.3.0"
+        "typescript": "^5.4.4",
+        "vite": "^5.2.8"
     },
     "files": [
         "dist",

@@ -61,11 +61,11 @@
     "scripts": {
         "release": "git add . && git commit -m \"Bump version\" git push && pnpm version patch",
         "clean": "tsex clean",
-        "declaration": "tsc --declaration --emitDeclarationOnly",
+        "declaration": "tsc --declaration --emitDeclarationOnly --declarationMap",
         "build:only": "vite build",
         "build": "run-s build:only declaration",
         "watch": "tsc --declaration --watch",
-        "compile": "tsex compile && tsc --declaration --emitDeclarationOnly",
+        "compile": "tsex compile && tsc --declaration --emitDeclarationOnly --declarationMap",
         "compile:watch": "tsex compile --watch",
         "dev:benchmark": "cd demo/benchmark && npm i && npm update && npm run dev",
         "prod:benchmark": "cd demo/benchmark && npm i && npm update && npm run prod",
