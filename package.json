@@ -71,7 +71,10 @@
         }
     },
     "scripts": {
-        "release": "git add . && git commit -m \"Bump version\" && git push && pnpm version patch",
+        "git": "git add . && git commit -m \"Bump version\" && git push",
+        "bump": "pnpm version patch",
+        "npmjs": "pnpm publish",
+        "release": "run-s -c git bump npmjs",
         "clean": "tsex clean",
         "build": "vite build && tsc --declaration --emitDeclarationOnly --declarationMap",
         "watch": "tsc --declaration --watch",
@@ -129,7 +132,7 @@
         "@types/node": "^20.12.7",
         "csstype": "^3.1.3",
         "tsex": "^3.2.1",
-        "typescript": "^5.4.4",
+        "typescript": "^5.4.5",
         "vite": "^5.2.8"
     },
     "files": [
