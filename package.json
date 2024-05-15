@@ -75,9 +75,13 @@
         "bump": "pnpm version patch",
         "npmjs": "pnpm publish",
         "release": "run-s -c git bump npmjs",
+        "declaration": "tsc --declaration --emitDeclarationOnly --declarationMap",
+        "declaration:watch": "tsc --declaration --emitDeclarationOnly  --declarationMap--watch",
+        "build:only": "vite build",
+        "watch:only": "vite build --watch",
+        "watch": "run-s watch:only declaration:watch",
+        "build": "run-s build:only declaration",
         "clean": "tsex clean",
-        "build": "vite build && tsc --declaration --emitDeclarationOnly --declarationMap",
-        "watch": "tsc --declaration --watch",
         "compile": "tsex compile && tsc --declaration --emitDeclarationOnly --declarationMap",
         "compile:watch": "tsex compile --watch",
         "dev:benchmark": "cd demo/benchmark && npm i && npm update && npm run dev",
@@ -126,14 +130,14 @@
         "htm": "^3.1.1",
         "oby": "^15.1.1",
         "vhtml": "^2.2.0",
-        "via.js": "^1.0.0"
+        "via.js": "workspace:../via"
     },
     "devDependencies": {
-        "@types/node": "^20.12.7",
+        "@types/node": "^20.12.12",
         "csstype": "^3.1.3",
         "tsex": "^3.2.1",
         "typescript": "^5.4.5",
-        "vite": "^5.2.8"
+        "vite": "^5.2.11"
     },
     "files": [
         "dist",
