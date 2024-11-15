@@ -23,7 +23,7 @@ import * as J from '../types'
 import { FunctionMaybe, ArrayMaybe, ObservableMaybe } from '../types'
 
 declare global {
-  module JSX {
+  namespace JSX {
     type ArrayMaybe<T> = J.ArrayMaybe<T>
     type Callback = J.Callback
     type Child = J.Child
@@ -105,10 +105,10 @@ declare global {
     type DOMCSSVariables = J.DOMCSSVariables;
     type HTMLAttributeReferrerPolicy = J.HTMLAttributeReferrerPolicy;
     type Children = J.Child;
-    type Class = J.FunctionMaybe<Nullable<string | J.ClassProperties | ( J.FunctionMaybe<null | undefined | boolean | string> | J.Class )[]>>;
+    type Class = J.FunctionMaybe<Nullable<string | J.ClassProperties | (J.FunctionMaybe<null | undefined | boolean | string> | J.Class)[]>>;
     type Refs<T = unknown> = J.Refs<T>;
     type Style = J.FunctionMaybe<Nullable<string | J.StyleProperties>>;
-    type IntrinsicElement<T extends keyof J.IntrinsicElements> = J.IntrinsicElements[ T ];
+    type IntrinsicElement<T extends keyof J.IntrinsicElements> = J.IntrinsicElements[T];
     type ClassProperties = J.ClassProperties
 
     type StyleProperties = J.StyleProperties
@@ -214,7 +214,7 @@ declare global {
     type WbrHTMLAttributes<T extends EventTarget> = J.WbrHTMLAttributes<T>
     type WebViewHTMLAttributes<T extends EventTarget> = J.WebViewHTMLAttributes<T>
     type IntrinsicElementsMap = J.IntrinsicElementsMap
-    type IntrinsicElements = J.IntrinsicElements 
+    type IntrinsicElements = J.IntrinsicElements
   }
 
 }

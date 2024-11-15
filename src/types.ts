@@ -13,13 +13,13 @@ type ArrayMaybe<T = unknown> = T[] | T;
 
 type Callback = () => void;
 
-type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | ( () => Child );
+type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | (() => Child);
 
 type ChildWithMetadata<T = unknown> = (() => Child) & { metadata: T };
 
 type Classes = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | boolean>> | (FunctionMaybe<null | undefined | boolean | string> | Classes)[]>;
 
-type ComponentFunction<P = {}> = ( props: P ) => Child;
+type ComponentFunction<P = {}> = (props: P) => Child;
 
 type ComponentIntrinsicElement = keyof JSX.IntrinsicElements;
 
@@ -29,23 +29,23 @@ type Component<P = {}> = ComponentFunction<P> | ComponentIntrinsicElement | Comp
 
 type ComponentsMap = Record<string, ComponentFunction<any>>;
 
-type Constructor<T = unknown> = { new (): T };
+type Constructor<T = unknown> = { new(): T };
 
-type ConstructorWith<T = unknown, Arguments extends unknown[] = []> = { new ( ...args: Arguments ): T };
+type ConstructorWith<T = unknown, Arguments extends unknown[] = []> = { new(...args: Arguments): T };
 
 type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T };
 
-type ContextProvider<T = unknown> = ( props: { value: T, children: Child } ) => Child;
+type ContextProvider<T = unknown> = (props: { value: T, children: Child }) => Child;
 
 type Context<T = unknown> = { Provider: ContextProvider<T> };
 
 type ContextWithDefault<T = unknown> = Context<T> & { readonly [ContextWithDefaultSymbol]: true };
 
-type DirectiveFunction<Arguments extends unknown[] = []> = ( ref: globalThis.Element, ...args: Arguments ) => void;
+type DirectiveFunction<Arguments extends unknown[] = []> = (ref: globalThis.Element, ...args: Arguments) => void;
 
-type DirectiveProvider = ( props: { children: Child } ) => Child;
+type DirectiveProvider = (props: { children: Child }) => Child;
 
-type DirectiveRef<Arguments extends unknown[] = []> = ( ...args: Arguments ) => (( ref: globalThis.Element ) => void);
+type DirectiveRef<Arguments extends unknown[] = []> = (...args: Arguments) => ((ref: globalThis.Element) => void);
 
 type DirectiveRegister = () => void;
 
@@ -59,19 +59,19 @@ type Disposer = () => void;
 
 type EffectFunction = () => Disposer | void;
 
-type EffectOptions = import ( 'oby' ).EffectOptions;
+type EffectOptions = import('oby').EffectOptions;
 
 type Element = Child //<T = Child> = () => T;
 
 type ExtractArray<T> = Extract<T, unknown[]>;
 
-type EventListener = ( event: Event ) => void;
+type EventListener = (event: Event) => void;
 
 type Falsy<T = unknown> = Extract<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>;
 
-type ForOptions = import ( 'oby' ).ForOptions;
+type ForOptions = import('oby').ForOptions;
 
-type FN<Arguments extends unknown[], Return extends unknown = void> = ( ...args: Arguments ) => Return;
+type FN<Arguments extends unknown[], Return extends unknown = void> = (...args: Arguments) => Return;
 
 type FragmentUndefined = { values: undefined, fragmented?: false, length: 0 };
 
@@ -91,31 +91,31 @@ type FunctionMaybe<T = unknown> = (() => T) | T;
 
 type Indexed<T = unknown> = T extends ObservableReadonly<infer U> ? ObservableReadonly<U> : ObservableReadonly<T>;
 
-type LazyComponent<P = {}> = ( props: P ) => ObservableReadonly<Child>;
+type LazyComponent<P = {}> = (props: P) => ObservableReadonly<Child>;
 
 type LazyFetcher<P = {}> = () => Promise<{ default: ComponentFunction<P> } | ComponentFunction<P>>;
 
 type LazyResult<P = {}> = LazyComponent<P> & ({ preload: () => Promise<void> });
 
-type MemoOptions<T = unknown> = import ( 'oby' ).MemoOptions<T>;
+type MemoOptions<T = unknown> = import('oby').MemoOptions<T>;
 
-type Observable<T = unknown> = import ( 'oby' ).Observable<T>;
+type Observable<T = unknown> = import('oby').Observable<T>;
 
-type ObservableLike<T = unknown> = import ( 'oby' ).ObservableLike<T>;
+type ObservableLike<T = unknown> = import('oby').ObservableLike<T>;
 
-type ObservableReadonly<T = unknown> = import ( 'oby' ).ObservableReadonly<T>;
+type ObservableReadonly<T = unknown> = import('oby').ObservableReadonly<T>;
 
-type ObservableReadonlyLike<T = unknown> = import ( 'oby' ).ObservableReadonlyLike<T>;
+type ObservableReadonlyLike<T = unknown> = import('oby').ObservableReadonlyLike<T>;
 
 type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | T;
 
-type ObservableOptions<T = unknown> = import ( 'oby' ).ObservableOptions<T>;
+type ObservableOptions<T = unknown> = import('oby').ObservableOptions<T>;
 
 type PromiseMaybe<T = unknown> = Promise<T> | T;
 
 type Props = Record<string, any>;
 
-type Ref<T = unknown> = ( value: T ) => void;
+type Ref<T = unknown> = (value: T) => void;
 
 type ResourceStaticPending<T = unknown> = { pending: true, error?: never, value?: never, latest?: T };
 
@@ -125,21 +125,21 @@ type ResourceStaticResolved<T = unknown> = { pending: false, error?: never, valu
 
 type ResourceStatic<T = unknown> = ResourceStaticPending<T> | ResourceStaticRejected | ResourceStaticResolved<T>;
 
-type ResourceFunction<T = unknown> = { pending (): boolean, error (): Error | undefined, value (): T | undefined, latest (): T | undefined };
+type ResourceFunction<T = unknown> = { pending(): boolean, error(): Error | undefined, value(): T | undefined, latest(): T | undefined };
 
 type Resource<T = unknown> = ObservableReadonly<ResourceStatic<T>> & ResourceFunction<T>;
 
-type StoreOptions = import( 'oby' ).StoreOptions;
+type StoreOptions = import('oby').StoreOptions;
 
 type Styles = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>> | (FunctionMaybe<null | undefined | number | string> | Styles)[]>;
 
-type SuspenseCollectorData = { active: Observable<boolean>, register: ( suspense: SuspenseData ) => void, unregister: ( suspense: SuspenseData ) => void };
+type SuspenseCollectorData = { active: Observable<boolean>, register: (suspense: SuspenseData) => void, unregister: (suspense: SuspenseData) => void };
 
-type SuspenseData = { active: Observable<boolean>, increment: ( nr?: number ) => void, decrement: ( nr?: number ) => void };
+type SuspenseData = { active: Observable<boolean>, increment: (nr?: number) => void, decrement: (nr?: number) => void };
 
 type TemplateActionPath = number[];
 
-type TemplateActionProxy = ( target: Node, method: string, key?: string, targetNode?: Node ) => void;
+type TemplateActionProxy = (target: Node, method: string, key?: string, targetNode?: Node) => void;
 
 type TemplateActionWithNodes = [Node, string, string, string?, Node?];
 
@@ -171,21 +171,21 @@ export type CSSProperties = {
   [K in keyof CSS.Properties<string | number>]: FunctionMaybe<CSS.Properties<string | number>[K]>
 };
 
-export type {ArrayMaybe, Callback, Child, ChildWithMetadata, Classes, ComponentFunction, ComponentIntrinsicElement, ComponentNode, Component, ComponentsMap, Constructor, ConstructorWith, ContextData, ContextProvider, Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData, DirectiveOptions, Disposer, EffectFunction, EffectOptions, Element, ExtractArray, EventListener, Falsy, ForOptions, FN, FragmentUndefined, FragmentNode, FragmentFragment, FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, Indexed, LazyComponent, LazyFetcher, LazyResult, MemoOptions, Observable, ObservableLike, ObservableReadonly, ObservableReadonlyLike, ObservableMaybe, ObservableOptions, PromiseMaybe, Props, Ref, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource, StoreOptions, Styles, SuspenseCollectorData, SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy};
+export type { ArrayMaybe, Callback, Child, ChildWithMetadata, Classes, ComponentFunction, ComponentIntrinsicElement, ComponentNode, Component, ComponentsMap, Constructor, ConstructorWith, ContextData, ContextProvider, Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData, DirectiveOptions, Disposer, EffectFunction, EffectOptions, Element, ExtractArray, EventListener, Falsy, ForOptions, FN, FragmentUndefined, FragmentNode, FragmentFragment, FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, Indexed, LazyComponent, LazyFetcher, LazyResult, MemoOptions, Observable, ObservableLike, ObservableReadonly, ObservableReadonlyLike, ObservableMaybe, ObservableOptions, PromiseMaybe, Props, Ref, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource, StoreOptions, Styles, SuspenseCollectorData, SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy };
 
-  
+
 export type Nullable<T = unknown> = T | undefined | null;
 
 export type AllClassProperties = {
-  [ key: string ]: FunctionMaybe<Nullable<boolean>>;
+  [key: string]: FunctionMaybe<Nullable<boolean>>;
 };
 
 export type DOMCSSProperties = {
-  [ key in keyof Omit<CSSStyleDeclaration, 'item' | 'setProperty' | 'removeProperty' | 'getPropertyValue' | 'getPropertyPriority'> ]?: FunctionMaybe<Nullable<string | number>>
+  [key in keyof Omit<CSSStyleDeclaration, 'item' | 'setProperty' | 'removeProperty' | 'getPropertyValue' | 'getPropertyPriority'>]?: FunctionMaybe<Nullable<string | number>>
 };
 
 export type DOMCSSVariables = {
-  [ key: `--${ string }` ]: FunctionMaybe<Nullable<string | number>>;
+  [key: `--${string}`]: FunctionMaybe<Nullable<string | number>>;
 };
 
 export type HTMLAttributeReferrerPolicy = '' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';
@@ -195,19 +195,19 @@ export type HTMLAttributeReferrerPolicy = '' | 'no-referrer' | 'no-referrer-when
 
 export type Children = Child;
 
-export type Class = FunctionMaybe<Nullable<string | ClassProperties | ( FunctionMaybe<null | undefined | boolean | string> | Class )[]>>;
+export type Class = FunctionMaybe<Nullable<string | ClassProperties | (FunctionMaybe<null | undefined | boolean | string> | Class)[]>>;
 
 export type Refs<T = unknown> = ArrayMaybe<Nullable<Ref<T>>> | Refs<T>[];
 
 export type Style = FunctionMaybe<Nullable<string | StyleProperties | (FunctionMaybe<null | undefined | number | string> | Style)[]>>;
 
-export type IntrinsicElement<T extends keyof IntrinsicElements> = IntrinsicElements[ T ];
+export type IntrinsicElement<T extends keyof IntrinsicElements> = IntrinsicElements[T];
 
 export interface ClassProperties extends AllClassProperties { }
 
 export interface StyleProperties extends DOMCSSProperties, DOMCSSVariables { }
 
-export type TargetedEvent<T extends EventTarget = EventTarget, TypedEvent extends Event = Event> = Omit<TypedEvent, 'currentTarget'> & { readonly currentTarget: T; };
+export type TargetedEvent<T extends EventTarget = EventTarget, TypedEvent extends Event = Event> = Omit<TypedEvent, 'currentTarget'> & { readonly currentTarget: T; readonly target: T; };
 export type TargetedAnimationEvent<T extends EventTarget> = TargetedEvent<T, AnimationEvent>;
 export type TargetedClipboardEvent<T extends EventTarget> = TargetedEvent<T, ClipboardEvent>;
 export type TargetedChangeEvent<T extends EventTarget> = TargetedEvent<T, Event & { target: T; }>;
@@ -224,7 +224,7 @@ export type TargetedTransitionEvent<T extends EventTarget> = TargetedEvent<T, Tr
 export type TargetedUIEvent<T extends EventTarget> = TargetedEvent<T, UIEvent>;
 export type TargetedWheelEvent<T extends EventTarget> = TargetedEvent<T, WheelEvent>;
 
-export type EventHandler<Event extends TargetedEvent> = { (/* this: never,  */event: Event ): void; };
+export type EventHandler<Event extends TargetedEvent> = { (/* this: never,  */event: Event): void; };
 export type AnimationEventHandler<T extends EventTarget> = EventHandler<TargetedAnimationEvent<T>>;
 export type ClipboardEventHandler<T extends EventTarget> = EventHandler<TargetedClipboardEvent<T>>;
 export type ChangeEventHandler<T extends EventTarget> = EventHandler<TargetedChangeEvent<T>>;
@@ -310,7 +310,7 @@ export interface Directives {
 }
 
 export type DirectiveAttributes = {
-  [ Directive in keyof Directives as `use:${ Directive }` ]?: Directives[ Directive ] extends [ infer U ] ? U | [ U ] : Directives[ Directive ]
+  [Directive in keyof Directives as `use:${Directive}`]?: Directives[Directive] extends [infer U] ? U | [U] : Directives[Directive]
 };
 
 export interface EventAttributes<T extends EventTarget> {

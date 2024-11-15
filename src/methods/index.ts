@@ -13,6 +13,7 @@ import hmr from '../methods/hmr';
 import html from '../methods/html';
 import isBatching from '../methods/is_batching';
 import isObservable from '../methods/is_observable';
+import isObservableWritable from '../methods/is_observable_writable';
 import isServer from '../methods/is_server';
 import isStore from '../methods/is_store';
 import lazy from '../methods/lazy';
@@ -28,4 +29,4 @@ export * from '../methods/wrap_clone_element';
 
 /* EXPORT */
 
-export {$, $$, batch, createContext, createDirective, createElement, h, hmr, html, isBatching, isObservable, isServer, isStore, lazy, render, renderToString, resolve, store, template, tick, untrack, cloneElement}
+export { $, $$, batch, createContext, createDirective, createElement, h, hmr, html, isBatching, isObservable, isObservableWritable, isServer, isStore, lazy, render, renderToString, resolve, store, template, tick, untrack, cloneElement }
