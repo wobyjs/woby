@@ -727,13 +727,13 @@ const Fallback = ({ reset, error }: { reset: () => void, error: Error }) => {
   return (
     <>
       <p>Error: {error.message}</p>
-      <button onClick={error}>Recover</button>
+      <button onClick={reset}>Recover</button>
     </>
   );
 };
 
 const SomeComponentThatThrows = () => {
-  throw 'whatever';
+  throw new Error('whatever');
 };
 
 const App = () => {

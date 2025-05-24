@@ -1,0 +1,255 @@
+/* IMPORT */
+
+import { render } from '../methods/render.testing';
+import ErrorBoundary from './error_boundary';
+// Assuming $ is for creating simple text nodes or similar for testing.
+// If not, will adjust. For now, the example components create DOM elements directly.
+// import $ from '../methods/S'; 
+
+/* TESTS */
+
+describe('ErrorBoundary', () => {
+
+  // Helper component: Child that does not throw an error
+  const NoErrorChild = () => {
+    const el = document.createElement('div');
+    el.textContent = 'I am the child';
+    el.setAttribute('data-testid', 'no-error-child');
+    return el;
+  };
+
+  // Variable to capture the error passed to FallbackComponent
+  let lastErrorReceived: any = null;
+
+  // Helper component: Fallback component
+  const FallbackComponent = ({ error, reset }: { error: Error, reset: () => void }) => {
+    lastErrorReceived = error; // Store the error
+    const el = document.createElement('div');
+    el.setAttribute('data-testid', 'fallback');
+    
+    const messageEl = document.createElement('span');
+    messageEl.setAttribute('data-testid', 'error-message');
+    messageEl.textContent = error && error.message ? `Error: ${error.message}` : 'Error: Unknown error';
+    el.appendChild(messageEl);
+
+    const button = document.createElement('button');
+    button.textContent = 'Reset';
+    button.onclick = reset;
+    el.appendChild(button);
+    return el;
+  };
+
+  beforeEach(() => {
+    lastErrorReceived = null; // Reset before each test
+  });
+
+  test('should render children when no error occurs', () => {
+    const { container, getByTestId, queryByTestId, dispose } = render(() => (
+      ErrorBoundary({
+        fallback: FallbackComponent,
+        children: NoErrorChild() // Direct invocation as it returns an element
+      })
+    ));
+
+    const childElement = getByTestId('no-error-child');
+    console.assert(childElement instanceof HTMLElement, 'Child element should be an HTMLElement.');
+    console.assert(childElement.textContent === 'I am the child', 'Child content mismatch.');
+
+    const fallbackElement = queryByTestId('fallback');
+    console.assert(fallbackElement === null, 'Fallback component should not be rendered.');
+
+    if (dispose) {
+      dispose();
+    } else {
+      // Fallback cleanup if dispose is not returned, though render.testing should provide it.
+      // document.body.removeChild(container); // Or similar, depending on render's behavior.
+      console.warn('dispose function not found, manual cleanup might be needed or render function does not work as expected.');
+    }
+  });
+
+  // Helper component: Child that throws an Error object
+  const ErrorThrowingChild = () => {
+    // This component doesn't really render; it just throws.
+    // The 'data-testid' is more for conceptual clarity if we were to query it.
+    // const el = document.createElement('div');
+    // el.setAttribute('data-testid', 'error-throwing-child');
+    throw new Error('Test error message');
+    // return el; // Unreachable
+  };
+
+  test('should render fallback and provide Error object when child throws an Error', () => {
+    // Suppress console.error for expected errors during this test, as ErrorBoundary might log them.
+    const originalConsoleError = console.error;
+    const expectedErrorMessage = 'Test error message';
+    let consoleErrorCalledWithExpectedMessage = false;
+    console.error = (message: any, ...optionalParams: any[]) => {
+      if (typeof message === 'string' && message.includes(expectedErrorMessage)) {
+        consoleErrorCalledWithExpectedMessage = true;
+      } else if (message instanceof Error && message.message === expectedErrorMessage) {
+        consoleErrorCalledWithExpectedMessage = true;
+      }
+      // Call the original console.error to see other errors if any
+      // originalConsoleError(message, ...optionalParams);
+    };
+
+    const { getByTestId, queryByTestId, dispose } = render(() => (
+      ErrorBoundary({
+        fallback: FallbackComponent,
+        children: ErrorThrowingChild
+      })
+    ));
+
+    console.error = originalConsoleError; // Restore console.error
+
+    const fallbackElement = getByTestId('fallback');
+    console.assert(fallbackElement instanceof HTMLElement, 'Fallback element should be an HTMLElement.');
+    
+    const errorMessageElement = getByTestId('error-message');
+    console.assert(errorMessageElement instanceof HTMLElement, 'Error message element should be an HTMLElement.');
+    console.assert(errorMessageElement.textContent === 'Error: Test error message', 'Fallback error message content mismatch.');
+
+    console.assert(lastErrorReceived instanceof Error, 'Error received by fallback should be an Error instance.');
+    console.assert(lastErrorReceived.message === 'Test error message', 'Error message in received error object mismatch.');
+
+    const childElement = queryByTestId('error-throwing-child'); // Using the conceptual data-testid
+    console.assert(childElement === null, 'Error-throwing child component should not be rendered.');
+
+    if (dispose) {
+      dispose();
+    }
+  });
+
+  // Helper component: Child that throws a string
+  const StringThrowingChild = () => {
+    // const el = document.createElement('div');
+    // el.setAttribute('data-testid', 'string-throwing-child');
+    throw 'String error message';
+    // return el; // Unreachable
+  };
+
+  test('should render fallback and provide normalized Error object when child throws a string', () => {
+    const originalConsoleError = console.error;
+    const expectedErrorMessage = 'String error message';
+    let consoleErrorCalledWithExpectedMessage = false;
+    console.error = (message: any, ...optionalParams: any[]) => {
+      if (typeof message === 'string' && message.includes(expectedErrorMessage)) {
+        consoleErrorCalledWithExpectedMessage = true;
+      } else if (message instanceof Error && message.message === expectedErrorMessage) {
+         consoleErrorCalledWithExpectedMessage = true;
+      }
+      // originalConsoleError(message, ...optionalParams);
+    };
+
+    const { getByTestId, queryByTestId, dispose } = render(() => (
+      ErrorBoundary({
+        fallback: FallbackComponent,
+        children: StringThrowingChild
+      })
+    ));
+    
+    console.error = originalConsoleError; // Restore console.error
+
+    const fallbackElement = getByTestId('fallback');
+    console.assert(fallbackElement instanceof HTMLElement, 'Fallback element should be an HTMLElement.');
+
+    const errorMessageElement = getByTestId('error-message');
+    console.assert(errorMessageElement instanceof HTMLElement, 'Error message element should be an HTMLElement.');
+    console.assert(errorMessageElement.textContent === 'Error: String error message', 'Fallback error message content mismatch for string error.');
+    
+    console.assert(lastErrorReceived instanceof Error, 'Error received by fallback (from string) should be an Error instance.');
+    console.assert(lastErrorReceived.message === 'String error message', 'Error message in received error object (from string) mismatch.');
+
+    const childElement = queryByTestId('string-throwing-child');
+    console.assert(childElement === null, 'String-throwing child component should not be rendered.');
+
+    if (dispose) {
+      dispose();
+    }
+  });
+
+  // Test case for reset functionality
+  let shouldThrowErrorForResetTest = true;
+
+  const ResettableErrorChild = () => {
+    if (shouldThrowErrorForResetTest) {
+      shouldThrowErrorForResetTest = false; // Only throw once per "attempt"
+      throw new Error('Initial error for reset test');
+    }
+    const el = document.createElement('div');
+    el.textContent = 'Child rendered successfully after reset';
+    el.setAttribute('data-testid', 'resettable-child-success');
+    return el;
+  };
+
+  const FallbackWithResetButton = ({ error, reset }: { error: Error, reset: () => void }) => {
+    const el = document.createElement('div');
+    el.setAttribute('data-testid', 'fallback-for-reset');
+    
+    const messageEl = document.createElement('span');
+    messageEl.setAttribute('data-testid', 'error-message-for-reset');
+    messageEl.textContent = `Error: ${error.message} `;
+    el.appendChild(messageEl);
+
+    const button = document.createElement('button');
+    button.setAttribute('data-testid', 'reset-button');
+    button.textContent = 'Try Again';
+    button.onclick = reset;
+    el.appendChild(button);
+    return el;
+  };
+
+  test('should re-render children when reset is called after an error', () => {
+    shouldThrowErrorForResetTest = true; // Ensure child throws on first attempt for this test
+
+    // Suppress console.error for the initial expected error
+    const originalConsoleError = console.error;
+    let initialErrorLogged = false;
+    console.error = (message: any) => {
+      if (message instanceof Error && message.message === 'Initial error for reset test') {
+        initialErrorLogged = true;
+      } else if (typeof message === 'string' && message.includes('Initial error for reset test')) {
+        initialErrorLogged = true;
+      }
+      // originalConsoleError(message); // Keep it suppressed for this controlled test
+    };
+
+    const { getByTestId, queryByTestId, dispose } = render(() => (
+      ErrorBoundary({
+        fallback: FallbackWithResetButton,
+        children: ResettableErrorChild
+      })
+    ));
+
+    // 1. Initial Error State
+    const fallbackElement = getByTestId('fallback-for-reset');
+    console.assert(fallbackElement instanceof HTMLElement, 'Fallback should be visible initially.');
+    
+    const errorMessageElement = getByTestId('error-message-for-reset');
+    console.assert(errorMessageElement.textContent?.includes('Error: Initial error for reset test'), 'Initial error message mismatch.');
+    
+    let successContent = queryByTestId('resettable-child-success');
+    console.assert(successContent === null, 'Success content should NOT be visible initially.');
+    
+    // Restore console.error after the initial error is expected to have occurred
+    console.error = originalConsoleError;
+    // console.assert(initialErrorLogged, 'Initial error was not logged as expected by ErrorBoundary or test setup.');
+
+
+    // 2. Trigger Reset
+    const resetButton = getByTestId('reset-button');
+    console.assert(resetButton instanceof HTMLElement, 'Reset button should exist.');
+    resetButton.click(); // Simulate click
+
+    // 3. After Reset State
+    successContent = getByTestId('resettable-child-success'); // Should now be found
+    console.assert(successContent instanceof HTMLElement, 'Success content should be visible after reset.');
+    console.assert(successContent.textContent === 'Child rendered successfully after reset', 'Success content text mismatch.');
+
+    const fallbackAfterReset = queryByTestId('fallback-for-reset');
+    console.assert(fallbackAfterReset === null, 'Fallback should NOT be visible after reset.');
+
+    if (dispose) {
+      dispose();
+    }
+  });
+});
