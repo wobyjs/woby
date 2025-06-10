@@ -1,23 +1,26 @@
 
 /* IMPORT */
 
-import useScheduler from '../hooks/use_scheduler';
-import $$ from '../methods/SS';
-import type {Disposer, FunctionMaybe, ObservableMaybe} from '../types';
+import useScheduler from '../hooks/use_scheduler'
+import $$ from '../methods/SS'
+import type { Disposer, FunctionMaybe, ObservableMaybe } from '../types'
 
 /* MAIN */
 
-const useIdleLoop = ( callback: ObservableMaybe<IdleRequestCallback>, options?: FunctionMaybe<IdleRequestOptions> ): Disposer => {
+const useIdleLoop = (callback: ObservableMaybe<IdleRequestCallback>, options?: FunctionMaybe<IdleRequestOptions>): Disposer => {
 
-  return useScheduler ({
+  const stack = new Error()
+
+  return useScheduler({
     callback,
     loop: true,
     cancel: cancelIdleCallback,
-    schedule: callback => requestIdleCallback ( callback, $$(options) )
-  });
+    schedule: callback => requestIdleCallback(callback, $$(options)),
+    stack
+  })
 
-};
+}
 
 /* EXPORT */
 
-export default useIdleLoop;
+export default useIdleLoop

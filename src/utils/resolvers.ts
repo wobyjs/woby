@@ -1,124 +1,130 @@
 
 /* IMPORT */
 
-import {SYMBOL_UNCACHED} from '../constants';
-import isObservable from '../methods/is_observable';
-import useRenderEffect from '../hooks/use_render_effect';
-import $$ from '../methods/SS';
-import {createText} from '../utils/creators';
-import {isArray, isFunction, isFunctionReactive, isString} from '../utils/lang';
-import type {Classes, ObservableMaybe, Styles} from '../types';
+import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE } from '../constants'
+import isObservable from '../methods/is_observable'
+import useRenderEffect from '../hooks/use_render_effect'
+import $$ from '../methods/SS'
+import { createText } from '../utils/creators'
+import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
+import type { Classes, ObservableMaybe, Styles } from '../types'
 
 /* MAIN */
 
-const resolveChild = <T> ( value: ObservableMaybe<T>, setter: (( value: T | T[], dynamic: boolean ) => void), _dynamic: boolean = false ): void => {
+const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Error) => void), _dynamic: boolean = false, stack: Error): void => {
 
-  if ( isFunction ( value ) ) {
+  if (isFunction(value)) {
 
-    if ( !isFunctionReactive ( value ) ) {
+    if (!isFunctionReactive(value)) {
 
-      resolveChild ( value (), setter, _dynamic );
+      if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
+        (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
+
+      resolveChild(value(), setter, _dynamic, stack)
 
     } else {
 
-      useRenderEffect ( () => {
+      useRenderEffect((stack) => {
 
-        resolveChild ( value (), setter, true );
+        if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
+          (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
-      });
+        resolveChild(value(), setter, true, stack)
+
+      }, stack)
 
     }
 
-  } else if ( isArray ( value ) ) {
+  } else if (isArray(value)) {
 
-    const [values, hasObservables] = resolveArraysAndStatics ( value );
+    const [values, hasObservables] = resolveArraysAndStatics(value)
 
-    values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED]; // Preserving this special symbol
+    values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED] // Preserving this special symbol
 
-    setter ( values, hasObservables || _dynamic );
+    setter(values, hasObservables || _dynamic, stack)
 
   } else {
 
-    setter ( value, _dynamic );
+    setter(value, _dynamic, stack)
 
   }
 
-};
+}
 
-const resolveClass = ( classes: Classes, resolved: Record<string, true> = {} ): Record<string, true> => {
+const resolveClass = (classes: Classes, resolved: Record<string, true> = {}): Record<string, true> => {
 
-  if ( isString ( classes ) ) {
+  if (isString(classes)) {
 
-    classes.split ( /\s+/g ).filter ( Boolean ).filter ( cls => {
+    classes.split(/\s+/g).filter(Boolean).filter(cls => {
 
-      resolved[cls] = true;
+      resolved[cls] = true
 
-    });
+    })
 
-  } else if ( isFunction ( classes ) ) {
+  } else if (isFunction(classes)) {
 
-    resolveClass ( classes (), resolved );
+    resolveClass(classes(), resolved)
 
-  } else if ( isArray ( classes ) ) {
+  } else if (isArray(classes)) {
 
-    classes.forEach ( cls => {
+    classes.forEach(cls => {
 
-      resolveClass ( cls as Classes, resolved ); //TSC
+      resolveClass(cls as Classes, resolved) //TSC
 
-    });
+    })
 
-  } else if ( classes ) {
+  } else if (classes) {
 
-    for ( const key in classes ) {
+    for (const key in classes) {
 
-      const value = classes[key];
-      const isActive = !!$$(value);
+      const value = classes[key]
+      const isActive = !!$$(value)
 
-      if ( !isActive ) continue;
+      if (!isActive) continue
 
-      resolved[key] = true;
+      resolved[key] = true
 
     }
 
   }
 
-  return resolved;
+  return resolved
 
-};
+}
 
-const resolveStyle = ( styles: Styles, resolved: Record<string, null | undefined | number | string> | string = {} ): Record<string, null | undefined | number | string> | string => {
+const resolveStyle = (styles: Styles, resolved: Record<string, null | undefined | number | string> | string = {}): Record<string, null | undefined | number | string> | string => {
 
-  if ( isString ( styles ) ) { //TODO: split into the individual styles, to be able to merge them with other styles
+  if (isString(styles)) { //TODO: split into the individual styles, to be able to merge them with other styles
 
-    return styles;
+    return styles
 
-  } else if ( isFunction ( styles ) ) {
+  } else if (isFunction(styles)) {
 
-    return resolveStyle ( styles (), resolved );
+    return resolveStyle(styles(), resolved)
 
-  } else if ( isArray ( styles ) ) {
+  } else if (isArray(styles)) {
 
-    styles.forEach ( style => {
+    styles.forEach(style => {
 
-      resolveStyle ( style as Styles, resolved ); //TSC
+      resolveStyle(style as Styles, resolved) //TSC
 
-    });
+    })
 
-  } else if ( styles ) {
+  } else if (styles) {
 
-    for ( const key in styles ) {
+    for (const key in styles) {
 
-      const value = styles[key];
+      const value = styles[key]
 
-      resolved[key] = $$(value);
+      resolved[key] = $$(value)
 
     }
 
   }
 
-  return resolved;
+  return resolved
 
-};
+}
 
 const resolveArraysAndStatics = (() => {
 
@@ -127,55 +133,55 @@ const resolveArraysAndStatics = (() => {
   // 2. It resolves statics, it's important to resolve them soon enough or they will be re-created multiple times (!)
   // 3. It checks if we found any Observables along the way, avoiding looping over the array another time in the future
 
-  const DUMMY_RESOLVED = [];
+  const DUMMY_RESOLVED = []
 
-  const resolveArraysAndStaticsInner = ( values: any[], resolved: any[], hasObservables: boolean ): [any[], boolean] => {
+  const resolveArraysAndStaticsInner = (values: any[], resolved: any[], hasObservables: boolean): [any[], boolean] => {
 
-    for ( let i = 0, l = values.length; i < l; i++ ) {
+    for (let i = 0, l = values.length; i < l; i++) {
 
-      const value = values[i];
-      const type = typeof value;
+      const value = values[i]
+      const type = typeof value
 
-      if ( type === 'string' || type === 'number' || type === 'bigint' ) { // Static
+      if (type === 'string' || type === 'number' || type === 'bigint') { // Static
 
-        if ( resolved === DUMMY_RESOLVED ) resolved = values.slice ( 0, i );
+        if (resolved === DUMMY_RESOLVED) resolved = values.slice(0, i)
 
-        resolved.push ( createText ( value ) );
+        resolved.push(createText(value))
 
-      } else if ( type === 'object' && isArray ( value ) ) { // Array
+      } else if (type === 'object' && isArray(value)) { // Array
 
-        if ( resolved === DUMMY_RESOLVED ) resolved = values.slice ( 0, i );
+        if (resolved === DUMMY_RESOLVED) resolved = values.slice(0, i)
 
-        hasObservables = resolveArraysAndStaticsInner ( value, resolved, hasObservables )[1];
+        hasObservables = resolveArraysAndStaticsInner(value, resolved, hasObservables)[1]
 
-      } else if ( type === 'function' && isObservable ( value ) ) { // Observable
+      } else if (type === 'function' && isObservable(value)) { // Observable
 
-        if ( resolved !== DUMMY_RESOLVED ) resolved.push ( value );
+        if (resolved !== DUMMY_RESOLVED) resolved.push(value)
 
-        hasObservables = true;
+        hasObservables = true
 
       } else { // Something else
 
-        if ( resolved !== DUMMY_RESOLVED ) resolved.push ( value );
+        if (resolved !== DUMMY_RESOLVED) resolved.push(value)
 
       }
 
     }
 
-    if ( resolved === DUMMY_RESOLVED ) resolved = values;
+    if (resolved === DUMMY_RESOLVED) resolved = values
 
-    return [resolved, hasObservables];
+    return [resolved, hasObservables]
 
-  };
+  }
 
-  return ( values: any[] ): [any[], boolean] => {
+  return (values: any[]): [any[], boolean] => {
 
-    return resolveArraysAndStaticsInner ( values, DUMMY_RESOLVED, false );
+    return resolveArraysAndStaticsInner(values, DUMMY_RESOLVED, false)
 
-  };
+  }
 
-})();
+})()
 
 /* EXPORT */
 
-export {resolveChild, resolveClass, resolveArraysAndStatics, resolveStyle};
+export { resolveChild, resolveClass, resolveArraysAndStatics, resolveStyle }

@@ -1,13 +1,14 @@
 /* IMPORT */
 
-import useRoot from '../hooks/use_root';
-import { setChild } from '../utils/setters';
-import type { Child, Disposer, IntrinsicElementsMap } from '../types';
-import $ from './S';
+import useRoot from '../hooks/use_root'
+import { setChild } from '../utils/setters'
+import type { Child, Disposer, IntrinsicElementsMap } from '../types'
+import $ from './S'
+import FragmentUtils from '../utils/fragment'
 // import { JSX } from 'src/jsx/types';
 
 export const render = (child: JSX.Child) => {
-    const fragment = document.createElement('div');
+    const fragment = document.createElement('div')
     const renderDiv = document.createElement("div")
     // const buildTable = (div)=>{
     //     var table = document.createElement("table")
@@ -20,41 +21,41 @@ export const render = (child: JSX.Child) => {
     //     div.append(table)
 
     // }
-    fragment.textContent = '';
+    fragment.textContent = ''
 
-    let disposer;
-    let unmount = useRoot(dispose => {
-        setChild(fragment as any, child);
+    let disposer
+    let unmount = useRoot((stack, dispose) => {
+        setChild(fragment as any, child, FragmentUtils.make(), stack)
         // fragment.appendChild(child);
 
         renderDiv.append(fragment)
-        console.log('f', fragment.outerHTML);
-        console.log('c', (fragment.children[0] as any).outerHTML);
+        console.log('f', fragment.outerHTML)
+        console.log('c', (fragment.children[0] as any).outerHTML)
 
         return disposer = (): void => {
-            dispose();
-            fragment.textContent = '';
+            dispose(stack)
+            fragment.textContent = ''
             fragment.remove()
 
             console.log('dispose')
-        };
-    });
+        }
+    })
     document.body.append(renderDiv)
 
-    const getByRole = <K extends keyof IntrinsicElementsMap>(tag: K) => fragment.querySelector(tag) as any as IntrinsicElementsMap[K];
+    const getByRole = <K extends keyof IntrinsicElementsMap>(tag: K) => fragment.querySelector(tag) as any as IntrinsicElementsMap[K]
     const getByTestId = <T extends HTMLElement = HTMLElement>(id: string) => {
-        if(fragment.querySelector(`[data-testid="${id}"]`) as T){
-            return fragment.querySelector(`[data-testid="${id}"]`) as T;
+        if (fragment.querySelector(`[data-testid="${id}"]`) as T) {
+            return fragment.querySelector(`[data-testid="${id}"]`) as T
         }
-        else{
-            throw new Error("Element test ID not found ");
+        else {
+            throw new Error("Element test ID not found ")
         }
     }
 
     const getByText = <T extends HTMLElement = HTMLElement>(text: string | RegExp) => {
         function allDescendants(node) {
             for (var i = 0; i < node.children.length; i++) {
-                var child = node.children[i];
+                var child = node.children[i]
                 if (typeof text === "string") {
                     if (child.textContent == text) {
                         return child as T
@@ -65,7 +66,7 @@ export const render = (child: JSX.Child) => {
                         return child as T
                     }
                 }
-                const returnValue = allDescendants(child);
+                const returnValue = allDescendants(child)
                 if (returnValue) {
                     return returnValue
                 }
@@ -74,10 +75,10 @@ export const render = (child: JSX.Child) => {
         }
         const returnValue = allDescendants(fragment)
         if (!returnValue) {
-            throw new Error("Element not found");
+            throw new Error("Element not found")
         }
     }
-    return { fragment, unmount, getByRole, getByTestId, getByText };
+    return { fragment, unmount, getByRole, getByTestId, getByText }
 };
 
 

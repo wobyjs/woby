@@ -1,58 +1,58 @@
 
 /* IMPORT */
 
-import useEffect from '../hooks/use_effect';
-import useSuspended from '../hooks/use_suspended';
-import $$ from '../methods/SS';
-import untrack from '../methods/untrack';
-import type {Disposer, FN, FunctionMaybe, ObservableMaybe} from '../types';
+import useEffect from '../hooks/use_effect'
+import useSuspended from '../hooks/use_suspended'
+import $$ from '../methods/SS'
+import untrack from '../methods/untrack'
+import type { Disposer, FN, FunctionMaybe, ObservableMaybe } from '../types'
 
 /* MAIN */
 
-const useScheduler = <T, U> ({ loop, once, callback, cancel, schedule }: { loop?: FunctionMaybe<boolean>, once?: boolean, callback: ObservableMaybe<FN<[U]>>, cancel: FN<[T]>, schedule: (( callback: FN<[U]> ) => T) }) : Disposer => {
+const useScheduler = <T, U>({ loop, once, callback, cancel, schedule, stack }: { loop?: FunctionMaybe<boolean>, once?: boolean, callback: ObservableMaybe<FN<[U]>>, cancel: FN<[T]>, schedule: ((callback: FN<[U]>) => T), stack: Error }): Disposer => {
 
-  let executed = false;
-  let suspended = useSuspended ();
-  let tickId: T;
+  let executed = false
+  let suspended = useSuspended(stack)
+  let tickId: T
 
-  const work = ( value: U ): void => {
+  const work = (value: U): void => {
 
-    executed = true;
+    executed = true
 
-    if ( $$(loop) ) tick ();
+    if ($$(loop)) tick()
 
-    $$(callback, false)( value );
+    $$(callback, false)(value)
 
-  };
+  }
 
   const tick = (): void => {
 
-    tickId = untrack ( () => schedule ( work ) );
+    tickId = untrack(() => schedule(work))
 
-  };
+  }
 
   const dispose = (): void => {
 
-    untrack ( () => cancel ( tickId ) );
+    untrack(() => cancel(tickId))
 
-  };
+  }
 
-  useEffect ( () => {
+  useEffect(() => {
 
-    if ( once && executed ) return;
+    if (once && executed) return
 
-    if ( suspended () ) return;
+    if (suspended()) return
 
-    tick ();
+    tick()
 
-    return dispose;
+    return dispose
 
-  }, { suspense: false } );
+  }, { suspense: false, stack: stack })
 
-  return dispose;
+  return dispose
 
-};
+}
 
 /* EXPORT */
 
-export default useScheduler;
+export default useScheduler

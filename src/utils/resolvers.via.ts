@@ -1,7 +1,7 @@
 
 /* IMPORT */
 
-import { SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_UNTRACKED_UNWRAPPED } from '../constants'
+import { SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNCACHED, SYMBOL_UNTRACKED_UNWRAPPED } from '../constants'
 import isObservable from '../methods/is_observable'
 import useRenderEffect from '../hooks/use_render_effect'
 import $$ from '../methods/SS'
@@ -15,8 +15,7 @@ IgnoreSymbols[HTMLValue] = HTMLValue
 
 
 /* MAIN */
-console.log('resolveChild')
-const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], dynamic: boolean) => void), _dynamic: boolean = false): T | T[] => {
+const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], dynamic: boolean, stack: Error) => void), _dynamic?: boolean, stack?: Error): T | T[] => {
     const updateElement = (/** null placeholder */e: Text, f: boolean, v: any, pv: HTMLElement[] /** in proxy */) => {
         e.textContent = ''
 
@@ -101,18 +100,23 @@ const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], d
 
         if (SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value || value[SYMBOL_OBSERVABLE_READABLE]?.parent?.disposed) {
 
-            resolveChild(value(), setter, _dynamic)
+            (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
+
+            resolveChild(value(), setter, _dynamic, stack)
 
         } else {
             const e = createText('') //('div') as any as HTMLDivElement
             let f = true  //first time no parent
             let v: any[]
-            useRenderEffect(() => {
-                const pv = v
-                v = resolveChild(value()) as any
+            useRenderEffect((stack) => {
+                const pv = v;
+
+                (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
+
+                v = resolveChild(value(), null, false, stack) as any
                 v = updateElement(e, f, v, pv)
                 f = false
-            })
+            }, stack)
             return v as any // [e, ...[v].flat(Infinity)] as any
         }
     } else if (isArray(value)) {
@@ -126,13 +130,13 @@ const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], d
             let v: any[]
             useRenderEffect(() => {
                 const pv = v
-                v = values.map(v => resolveChild(v)).filter(v => typeof v !== 'undefined') //, true)
+                v = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined') //, true)
                 v = updateElement(e, f, v, pv)
                 f = false
-            })
+            }, stack)
             return v //[...v] as any
         } else {
-            const vs: any[] = values.map(v => resolveChild(v)).filter(v => typeof v !== 'undefined')
+            const vs: any[] = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined')
             return vs
         }
     }

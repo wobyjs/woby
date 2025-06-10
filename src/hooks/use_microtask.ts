@@ -1,30 +1,30 @@
 
 /* IMPORT */
 
-import useCheapDisposed from '../hooks/use_cheap_disposed';
-import {with as _with} from '../oby';
-import type {Callback} from '../types';
+import useCheapDisposed from '../hooks/use_cheap_disposed'
+import { with as _with } from '../oby'
+import type { Callback } from '../types'
 
 /* MAIN */
 
 //TODO: Maybe port this to oby
 //TODO: Maybe special-case this to use one shared mirotask per microtask
 
-const useMicrotask = ( fn: Callback ): void => {
+const useMicrotask = (fn: Callback, stack: Error): void => {
 
-  const disposed = useCheapDisposed ();
-  const runWithOwner = _with ();
+  const disposed = useCheapDisposed()
+  const runWithOwner = _with()
 
-  queueMicrotask ( () => {
+  queueMicrotask(() => {
 
-    if ( disposed () ) return;
+    if (disposed()) return
 
-    runWithOwner ( fn );
+    runWithOwner(fn, stack)
 
-  });
+  })
 
-};
+}
 
 /* EXPORT */
 
-export default useMicrotask;
+export default useMicrotask

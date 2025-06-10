@@ -16,6 +16,8 @@ export * from "./utils"
 // export type {IComputation, IEffect, IMemo, IObservable, IObserver, IReaction, IRoot, ISuperRoot, ISuspense} from 'oby';
 // export type {BatchFunction, CallbackFunction, CleanupFunction, DisposeFunction, EffectFunction, ErrorFunction, EqualsFunction, ListenerFunction, MapFunction, MapIndexFunction, MapValueFunction, MemoFunction, ObservedFunction, ObservedDisposableFunction, ReactionFunction, SelectorFunction, SuspenseFunction, TryCatchFunction, UntrackFunction, UpdateFunction, WithFunction} from 'oby';
 export type { Observable, ObservableReadonly, ObservableOptions } from 'oby';
+export { DEBUGGER } from 'oby';
+
 import { SYMBOL_OBSERVABLE } from 'oby';
 
 // export type {Owner} from 'oby';

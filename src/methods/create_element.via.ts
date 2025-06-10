@@ -8,6 +8,7 @@ import { isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } fro
 import { setChild, setProps } from '../utils/setters'
 import type { Child, Component, Element, Props } from '../types'
 import { IgnoreSymbols } from 'via.js'
+import FragmentUtils from '../utils/fragment.via'
 // import { JSX } from '../jsx/types';
 
 /* MAIN */
@@ -51,14 +52,16 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
                 child[IsSvgSymbol] = true // set proxy
             }
 
+            const stack = new Error()
+
             untrack(() => {
 
                 if (_props) {
-                    setProps(child, _props as any)
+                    setProps(child, _props as any, stack)
                 }
 
                 if (hasChildren) {
-                    setChild(child, children)
+                    setChild(child, children, FragmentUtils.make(), stack)
                 }
 
             })

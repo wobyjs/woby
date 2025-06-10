@@ -4,6 +4,7 @@
 import useRoot from '../hooks/use_root'
 import { setChild } from '../utils/setters'
 import type { Child, Disposer } from '../types'
+import FragmentUtils from '../utils/fragment'
 
 /* MAIN */
 
@@ -13,13 +14,13 @@ const render = (child: Child, parent?: Element | null): Disposer => {
 
     parent.textContent = ''
 
-    return useRoot(dispose => {
+    return useRoot((stack, dispose) => {
 
-        setChild(parent, child)
+        setChild(parent, child, FragmentUtils.make(), stack)
 
         return (): void => {
 
-            dispose()
+            dispose(stack)
 
             parent.textContent = ''
 

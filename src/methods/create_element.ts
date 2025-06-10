@@ -7,6 +7,7 @@ import { createHTMLNode, createSVGNode } from '../utils/creators'
 import { isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
+import FragmentUtils from '../utils/fragment'
 
 /* MAIN */
 
@@ -20,7 +21,7 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
 
     if (hasChildren && isObject(_props) && 'children' in _props) {
 
-        throw new Error('Providing "children" both as a prop and as rest arguments is forbidden');
+        throw new Error('Providing "children" both as a prop and as rest arguments is forbidden')
 
     }
 
@@ -45,14 +46,16 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
 
             if (isSVG) child['isSVG'] = true
 
+            const stack = new Error()
+
             untrack(() => {
 
                 if (_props) {
-                    setProps(child, _props as any)
+                    setProps(child, _props as any, stack)
                 }
 
                 if (hasChildren) {
-                    setChild(child, children)
+                    setChild(child, children, FragmentUtils.make(), stack)
                 }
 
             })

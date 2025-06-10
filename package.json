@@ -11,44 +11,44 @@
     "types": "./dist/types/index.d.ts",
     "exports": {
         ".": {
+            "types": "./dist/types/index.d.ts",
             "require": "./dist/index.cjs.js",
-            "import": "./dist/index.es.js",
-            "types": "./dist/types/index.d.ts"
+            "import": "./dist/index.es.js"
         },
         "./via": {
+            "types": "./dist/types/via.d.ts",
             "require": "./dist/via.cjs.js",
-            "import": "./dist/via.es.js",
-            "types": "./dist/types/via.d.ts"
+            "import": "./dist/via.es.js"
         },
         "./ssr": {
+            "types": "./dist/types/ssr.d.ts",
             "require": "./dist/ssr.cjs.js",
-            "import": "./dist/ssr.es.js",
-            "types": "./dist/types/ssr.d.ts"
+            "import": "./dist/ssr.es.js"
         },
         "./testing": {
+            "types": "./dist/types/testing.d.ts",
             "require": "./dist/testing.cjs.js",
-            "import": "./dist/testing.es.js",
-            "types": "./dist/types/testing.d.ts"
+            "import": "./dist/testing.es.js"
         },
         "./jsx-runtime": {
+            "types": "./dist/types/jsx-runtime.d.ts",
             "require": "./dist/jsx-runtime.cjs.js",
-            "import": "./dist/jsx-runtime.es.js",
-            "types": "./dist/types/jsx-runtime.d.ts"
+            "import": "./dist/jsx-runtime.es.js"
         },
         "./jsx-dev-runtime": {
+            "types": "./dist/types/runtime.d.ts",
             "require": "./dist/jsx-runtime.cjs.js",
-            "import": "./dist/jsx-runtime.es.js",
-            "types": "./dist/types/runtime.d.ts"
+            "import": "./dist/jsx-runtime.es.js"
         },
         "./via/jsx-runtime": {
+            "types": "./dist/via/via-runtime.d.ts",
             "require": "./dist/via-runtime.cjs.js",
-            "import": "./dist/via-runtime.es.js",
-            "types": "./dist/via/via-runtime.d.ts"
+            "import": "./dist/via-runtime.es.js"
         },
         "./ssr/jsx-runtime": {
+            "types": "./dist/ssr/jsx-runtime/index.d.ts",
             "require": "./dist/ssr-runtime.cjs.js",
-            "import": "./dist/ssr-runtime.es.js",
-            "types": "./dist/ssr/jsx-runtime/index.d.ts"
+            "import": "./dist/ssr-runtime.es.js"
         }
     },
     "//typesVersions": {
@@ -80,7 +80,7 @@
         "build:only": "vite build",
         "watch:only": "vite build --watch",
         "watch": "run-s watch:only declaration:watch",
-        "build": "run-s build:only declaration",
+        "build": "run-s clean build:only declaration",
         "clean": "tsex clean",
         "compile": "tsex compile && tsc --declaration --emitDeclarationOnly --declarationMap",
         "compile:watch": "tsex compile --watch",

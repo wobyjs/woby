@@ -45,17 +45,18 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
         // const props = rest
         const isSVG = isSVGElement(component)
         const createNode = isSVG ? createSVGNode : createHTMLNode
+        const stack = new Error()
 
         return wrapElement((): Child => {
             // if (isSVG) child['isSVG'] = true
             const p = { children: null }
             untrack(() => {
                 if (_props) {
-                    setProps(p as any, _props as any)
+                    setProps(p as any, _props as any, stack)
                 }
 
                 if (hasChildren) {
-                    setProps(p as any, children)
+                    setProps(p as any, children, stack)
                 }
             })
             const { children, ...pp } = p

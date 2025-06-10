@@ -1,15 +1,15 @@
 
 /* IMPORT */
 
-import useCleanup from '../hooks/use_cleanup';
-import useMemo from '../hooks/use_memo';
-import useResolved from '../hooks/use_resolved';
-import useRoot from '../hooks/use_root';
-import useSuspense from '../hooks/use_suspense';
-import resolve from '../methods/resolve';
-import $ from '../methods/S';
-import { with as _with } from 'oby';
-import type { Child, Disposer, FunctionMaybe, Observable, ObservableReadonly } from '../types';
+import useCleanup from '../hooks/use_cleanup'
+import useMemo from '../hooks/use_memo'
+import useResolved from '../hooks/use_resolved'
+import useRoot from '../hooks/use_root'
+import useSuspense from '../hooks/use_suspense'
+import resolve from '../methods/resolve'
+import $ from '../methods/S'
+import { with as _with } from 'oby'
+import type { Child, Disposer, FunctionMaybe, Observable, ObservableReadonly } from '../types'
 
 /* TYPES */
 
@@ -20,85 +20,85 @@ type Item = {
   suspended?: Observable<boolean>,
   dispose?: Disposer,
   reset?: Disposer
-};
+}
 
 /* HELPERS */
 
-const cache: Record<string, Item> = {};
-const runWithSuperRoot = _with();
+const cache: Record<string, Item> = {}
+const runWithSuperRoot = _with()
 
-let lockId = 1;
+let lockId = 1
 
 /* MAIN */
 
 //TODO: Support hot-swapping owner and context, to make the context JustWork™
 
-const KeepAlive = ( { id, ttl, children }: { id: FunctionMaybe<string>, ttl?: FunctionMaybe<number>, children: Child } ): ObservableReadonly<Child> => {
+const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, ttl?: FunctionMaybe<number>, children: Child }): ObservableReadonly<Child> => {
 
-  return useMemo( () => {
+  return useMemo((stack) => {
 
-    return useResolved( [ id, ttl ], ( id, ttl ) => {
+    return useResolved([id, ttl], (id, ttl) => {
 
-      const lock = lockId++;
-      const item = cache[ id ] ||= { id, lock };
+      const lock = lockId++
+      const item = cache[id] ||= { id, lock }
 
-      item.lock = lock;
-      item.reset?.();
-      item.suspended ||= $( false );
-      item.suspended( false );
+      item.lock = lock
+      item.reset?.(stack)
+      item.suspended ||= $(false)
+      item.suspended(false)
 
-      if ( !item.dispose || !item.result ) {
+      if (!item.dispose || !item.result) {
 
-        runWithSuperRoot( () => {
+        runWithSuperRoot(() => {
 
-          useRoot( dispose => {
+          useRoot((stack, dispose) => {
 
             item.dispose = () => {
 
-              delete cache[ id ];
+              delete cache[id]
 
-              dispose();
+              dispose(stack)
 
-            };
+            }
 
-            useSuspense( item.suspended, () => {
+            useSuspense(item.suspended, () => {
 
-              item.result = resolve( children );
+              item.result = resolve(children)
 
-            } );
+            }, stack)
 
-          } );
+          })
 
-        } );
+        }, stack)
 
       }
 
-      useCleanup( () => {
+      useCleanup(() => {
 
-        const hasLock = () => lock === item.lock;
+        const hasLock = () => lock === item.lock
 
-        if ( !hasLock() ) return;
+        if (!hasLock()) return
 
-        item.suspended?.( true );
+        item.suspended?.(true)
 
-        if ( !ttl || ttl <= 0 || ttl >= Infinity ) return;
+        if (!ttl || ttl <= 0 || ttl >= Infinity) return
 
-        const dispose = () => hasLock() && item.dispose?.();
-        const timeoutId = setTimeout( dispose, ttl );
-        const reset = () => clearTimeout( timeoutId );
+        const dispose = () => hasLock() && item.dispose?.(stack)
+        const timeoutId = setTimeout(dispose, ttl)
+        const reset = () => clearTimeout(timeoutId)
 
-        item.reset = reset;
+        item.reset = reset
 
-      } );
+      })
 
-      return item.result;
+      return item.result
 
-    } );
+    })
 
-  } );
+  })
 
-};
+}
 
 /* EXPORT */
 
-export default KeepAlive;
+export default KeepAlive

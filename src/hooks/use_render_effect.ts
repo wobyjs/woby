@@ -1,25 +1,26 @@
 
 /* IMPORT */
 
-import useEffect from '../hooks/use_effect';
-import type {Disposer, EffectFunction, EffectOptions} from '../types';
+import useEffect from '../hooks/use_effect'
+import type { Disposer, EffectFunction, EffectOptions } from '../types'
 
 /* HELPERS */
 
 const options: EffectOptions = {
-  sync: 'init'
-};
+  sync: 'init',
+  stack: undefined
+}
 
 /* MAIN */
 
 // This function exists for convenience, and to avoid creating unnecessary options objects
 
-const useRenderEffect = ( fn: EffectFunction ): Disposer => {
+const useRenderEffect = (fn: EffectFunction, stack: Error): Disposer => {
 
-  return useEffect ( fn, options );
+  return useEffect(fn, { ...options, stack })
 
-};
+}
 
 /* EXPORT */
 
-export default useRenderEffect;
+export default useRenderEffect

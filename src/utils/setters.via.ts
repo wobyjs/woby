@@ -79,7 +79,7 @@ const setAttributeStatic = (() => {
 
 })()
 
-const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>): void => {
+const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Error): void => {
 
     if (isFunction(value)) {
 
@@ -89,7 +89,7 @@ const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<nu
 
                 setAttributeStatic(element, key, value())
 
-            })
+            }, stack)
 
         } else {
 
@@ -105,31 +105,31 @@ const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<nu
 
 }
 
-const setChildStatic = (parent: HTMLElement, child: Child, dynamic?: boolean) => {
+const setChildStatic = (parent: HTMLElement, child: Child, dynamic: boolean, stack: Error) => {
 
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
     if (Array.isArray(child)) {
         const children = (Array.isArray(child) ? child : [child]) as Node[] //TSC
 
-        const cs: any[] = children.map(c => resolveChild(c)).flat(Infinity)
+        const cs: any[] = children.map(c => resolveChild(c, null, false, stack)).flat(Infinity)
         parent.replaceChildren(...cs)
     }
     else {
-        const c = resolveChild(child)
+        const c = resolveChild(child, null, false, stack)
         // debugHTML(parent, "setChildStatic")
         //@ts-ignore
         parent.replaceChildren(...[c].flat(Infinity) as any)
     }
 }
 
-const setChild = (parent: HTMLElement, child: Child) => {
-    setChildStatic(parent, child)
+const setChild = (parent: HTMLElement, child: Child, stack: Error) => {
+    setChildStatic(parent, child, false, stack)
 }
 
 const setClassStatic = classesToggle
 
-const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>): void => {
+const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>, stack: Error): void => {
 
     if (isFunction(value)) {
 
@@ -139,7 +139,7 @@ const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null |
 
                 setClassStatic(element, key, value())
 
-            })
+            }, stack)
 
         } else {
 
@@ -171,7 +171,7 @@ const setClassBooleanStatic = (element: HTMLElement, value: boolean, key: null |
 
 }
 
-const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>): void => {
+const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>, stack: Error): void => {
 
     if (isFunction(key)) {
 
@@ -187,7 +187,7 @@ const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMayb
 
                 keyPrev = keyNext
 
-            })
+            }, stack)
 
         } else {
 
@@ -202,7 +202,7 @@ const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMayb
 
 }
 
-const setClassesStatic = (element: HTMLElement, object: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, objectPrev?: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>): void => {
+const setClassesStatic = (element: HTMLElement, object: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, objectPrev: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, stack: Error): void => {
 
     if (isString(object)) {
 
@@ -244,7 +244,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
                     if (!objectPrev[i]) continue
 
-                    setClassBoolean(element, false, objectPrev[i])
+                    setClassBoolean(element, false, objectPrev[i], stack)
 
                 }
 
@@ -256,7 +256,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
                     if (object && key in (object as any)) continue
 
-                    setClass(element, key, false)
+                    setClass(element, key, false, stack)
 
                 }
 
@@ -272,7 +272,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
                     const fn = untrack(() => isFunction(object[i]) ? object[i] : (object[SYMBOL_STORE_OBSERVABLE] as Function)(String(i))) as (() => string | boolean | null | undefined) //TSC
 
-                    setClassBoolean(element, true, fn)
+                    setClassBoolean(element, true, fn, stack)
 
                 }
 
@@ -283,7 +283,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
                     if (!object[i]) continue
 
-                    setClassBoolean(element, true, object[i])
+                    setClassBoolean(element, true, object[i], stack)
 
                 }
 
@@ -297,7 +297,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
                     const fn = untrack(() => isFunction(object[key]) ? object[key] : (object as any)[SYMBOL_STORE_OBSERVABLE](key)) as (() => boolean | null | undefined) //TSC
 
-                    setClass(element, key, fn)
+                    setClass(element, key, fn, stack)
 
                 }
 
@@ -305,7 +305,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
                 for (const key in object as any) {
 
-                    setClass(element, key, object[key])
+                    setClass(element, key, object[key], stack)
 
                 }
 
@@ -317,7 +317,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
 }
 
-const setClasses = (element: HTMLElement, object: Classes): void => {
+const setClasses = (element: HTMLElement, object: Classes, stack: Error): void => {
 
     /* RECURSIVE IMPLEMENTATION */
 
@@ -329,15 +329,15 @@ const setClasses = (element: HTMLElement, object: Classes): void => {
 
             const objectNext = resolveClass(object)
 
-            setClassesStatic(element, objectNext, objectPrev)
+            setClassesStatic(element, objectNext, objectPrev, stack)
 
             objectPrev = objectNext
 
-        })
+        }, stack)
 
     } else {
 
-        setClassesStatic(element, object)
+        setClassesStatic(element, object, null, stack)
 
     }
 
@@ -353,13 +353,15 @@ const setDirective = <T extends unknown[]>(element: HTMLElement, directive: stri
 
     const call = () => data.fn(element, ...castArray(args) as any) //TSC
 
+    const stack = new Error()
+
     if (data.immediate) {
 
         call()
 
     } else {
 
-        useMicrotask(call)
+        useMicrotask(call, stack)
 
     }
 
@@ -497,7 +499,7 @@ const setEventStatic = (() => {
 
 const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>): void => {
 
-    setEventStatic(element, event, value)
+    setEventStatic(element, event, value as any)
 
 }
 
@@ -507,13 +509,13 @@ const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | 
 
 }
 
-const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>): void => {
+const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Error): void => {
 
     useRenderEffect(() => {
 
         setHTMLStatic(element, $$($$(value).__html))
 
-    })
+    }, stack)
 
 }
 
@@ -559,7 +561,7 @@ const setPropertyStatic = (element: HTMLElement, key: string, value: null | unde
 
 }
 
-const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>): void => {
+const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Error): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -569,7 +571,7 @@ const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<nul
 
                 setPropertyStatic(element, key, value())
 
-            })
+            }, stack)
 
         } else {
 
@@ -593,7 +595,9 @@ const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null | undefi
 
     if (!values.length) return
 
-    useMicrotask(() => untrack(() => values.forEach(value => value?.(element))))
+    const stack = new Error()
+
+    useMicrotask(() => untrack(() => values.forEach(value => value?.(element))), stack)
 
 }
 
@@ -633,7 +637,7 @@ const setStyleStatic = (() => {
 
 })()
 
-const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>): void => {
+const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>, stack: Error): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -643,7 +647,7 @@ const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null |
 
                 setStyleStatic(element, key, value())
 
-            })
+            }, stack)
 
         } else {
 
@@ -659,7 +663,7 @@ const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null |
 
 }
 
-const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev?: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>): void => {
+const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, stack: Error): void => {
 
     if (isString(object)) {
 
@@ -699,7 +703,7 @@ const setStylesStatic = (element: HTMLElement, object: null | undefined | string
 
                 const fn = untrack(() => isFunction(object[key]) ? object[key] : (object as any)[SYMBOL_STORE_OBSERVABLE](key)) as (() => number | string | null | undefined) //TSC
 
-                setStyle(element, key, fn)
+                setStyle(element, key, fn, stack)
 
             }
 
@@ -707,7 +711,7 @@ const setStylesStatic = (element: HTMLElement, object: null | undefined | string
             //@ts-ignore
             for (const key in object) {
 
-                setStyle(element, key, object[key])
+                setStyle(element, key, object[key], stack)
 
             }
 
@@ -718,7 +722,7 @@ const setStylesStatic = (element: HTMLElement, object: null | undefined | string
 }
 
 
-const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>): void => {
+const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Error): void => {
 
     if (isFunction(object) || isArray(object)) {
 
@@ -730,11 +734,11 @@ const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined 
 
                 const objectNext = resolveStyle(object)
 
-                setStylesStatic(element, objectNext, objectPrev)
+                setStylesStatic(element, objectNext, objectPrev, stack)
 
                 objectPrev = objectNext
 
-            })
+            }, stack)
 
         } else {
 
@@ -744,17 +748,17 @@ const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined 
 
                 const objectNext = resolveStyle(object)
 
-                setStylesStatic(element, objectNext, objectPrev)
+                setStylesStatic(element, objectNext, objectPrev, stack)
 
                 objectPrev = objectNext
 
-            })
+            }, stack)
 
         }
 
     } else {
 
-        setStylesStatic(element, $$(object))
+        setStylesStatic(element, $$(object), null, stack)
 
     }
 
@@ -814,20 +818,20 @@ const setTemplateAccessor = async (element: HTMLElement, key: string, value: Tem
     }
 }
 
-const setProp = <T>(element: HTMLElement, key: string, value: T): void => {
+const setProp = <T>(element: HTMLElement, key: string, value: T, stack: Error): void => {
     if (isTemplateAccessor(value))
         setTemplateAccessor(element, key, value)
 
     else if (key === 'children')
-        setChild(element, value as any)
+        setChild(element, value as any, stack)
     else if (key === 'ref')
         setRef(element, value as any)
     else if (key === 'style')
-        setStyles(element, value as any)
+        setStyles(element, value as any, stack)
     else if (key === 'class' || key === 'className')
-        setClasses(element, value as any)
+        setClasses(element, value as any, stack)
     else if (key === 'dangerouslySetInnerHTML')
-        setHTML(element, value as any)
+        setHTML(element, value as any, stack)
     else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110)  // /^on/
         setEvent(element, key.toLowerCase(), value as any)
     // $.root(() => element.addEventListener(key.substring(2).toLowerCase(), value as any))
@@ -836,21 +840,21 @@ const setProp = <T>(element: HTMLElement, key: string, value: T): void => {
     else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' /* || key === 'className' */) {
         // Forbidden props
     } else {//if (key in element && !isSVG(element))
-        setProperty(element, key, value as any)
+        setProperty(element, key, value as any, stack)
         // else
-        setAttribute(element, key, value as any)
+        setAttribute(element, key, value as any, stack)
     }
 }
 
-const setProps = (element: HTMLElement, object: Record<string, unknown>): void => {
+const setProps = (element: HTMLElement, object: Record<string, unknown>, stack: Error): void => {
     const { children, ...pp } = object
 
     //set children 1st, in case value refer to children
     // if (typeof children !== 'undefined')
-    setProp(element, 'children', children)
+    setProp(element, 'children', children, stack)
 
     for (const key in pp)
-        setProp(element, key, object[key])
+        setProp(element, key, object[key], stack)
 }
 
 /* EXPORT */

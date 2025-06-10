@@ -12,13 +12,13 @@ const render = (child: Child, parent?: Element | null): Disposer => {
 
     parent.textContent = ''
 
-    return useRoot(dispose => {
+    return useRoot((stack, dispose) => {
 
-        setChild(parent, child)
+        setChild(parent, child, stack)
 
         return (): void => {
 
-            dispose()
+            dispose(stack)
 
             parent.textContent = ''
 

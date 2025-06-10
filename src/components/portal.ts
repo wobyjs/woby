@@ -19,6 +19,8 @@ const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when
 
     const condition = useBoolean(when)
 
+    const stack = new Error()
+
     useRenderEffect(() => {
 
         if (!$$(condition)) return
@@ -35,7 +37,7 @@ const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when
 
         }
 
-    })
+    }, stack)
 
     useRenderEffect(() => {
 
@@ -43,7 +45,7 @@ const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when
 
         return render(children, portal)
 
-    })
+    }, stack)
 
     return assign(() => $$(condition) || children, { metadata: { portal } })
 
