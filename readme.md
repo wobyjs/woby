@@ -1360,12 +1360,14 @@ This hook is the crucial other ingredient that we need, other than observables t
 
 This hook registers a function to be called when any of its dependencies change, and the return of that function is wrapped in a read-only observable and returned.
 
+The function receives an optional `stack` parameter (an Error object) that provides a debugging stack trace to help pinpoint the source of reactive dependencies. To enable this feature, set `DEBUGGERER.debug = true`.
+
 [Read upstream documentation](https://github.com/fabiospampinato/oby#memo).
 
 Interface:
 
 ```ts
-function useMemo <T> ( fn: () => T, options?: ObservableOptions<T | undefined> ): ObservableReadonly<T>;
+function useMemo <T> ( fn: (stack?: Error) => T, options?: ObservableOptions<T | undefined> ): ObservableReadonly<T>;
 ```
 
 Usage:
@@ -1373,7 +1375,11 @@ Usage:
 ```tsx
 import {useMemo} from 'woby';
 
-useMemo // => Same as require ( 'oby' ).memo
+// With stack parameter for debugging
+useMemo((stack) => {
+  if (stack) console.log(stack.stack); // Logs stack trace to pinpoint reactive dependencies
+  return computeExpensiveValue(a, b);
+});
 ```
 
 #### `useMicrotask`
