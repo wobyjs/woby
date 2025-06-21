@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {observable} from '../oby';
+import { observable } from '../soby'
 
 /* EXPORT */
 
-export default observable;
+export default observable

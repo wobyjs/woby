@@ -9,7 +9,7 @@ import { isArray, isFunction, isString, isProxy, fixBigInt, toArray } from '../u
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { createText, createComment, createHTMLNode } from '../utils/creators'
 import { IgnoreSymbols } from 'via.js'
-import { Stack } from '../oby'
+import { Stack } from '../soby'
 
 const HTMLValue = Symbol('HtmlValue')
 IgnoreSymbols[HTMLValue] = HTMLValue

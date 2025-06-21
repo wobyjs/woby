@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {readonly} from '../oby';
+import { readonly } from '../soby'
 
 /* EXPORT */
 
-export default readonly;
+export default readonly

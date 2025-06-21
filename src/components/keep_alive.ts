@@ -8,7 +8,7 @@ import useRoot from '../hooks/use_root'
 import useSuspense from '../hooks/use_suspense'
 import resolve from '../methods/resolve'
 import $ from '../methods/S'
-import { with as _with } from 'oby'
+import { with as _with } from 'soby'
 import type { Child, Disposer, FunctionMaybe, Observable, ObservableReadonly } from '../types'
 
 /* TYPES */

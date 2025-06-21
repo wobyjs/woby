@@ -59,7 +59,7 @@ type Disposer = (stack?: Error) => void
 
 type EffectFunction = (stack?: Error) => Disposer | void
 
-type EffectOptions = import('oby').EffectOptions
+type EffectOptions = import('soby').EffectOptions
 
 type Element = Child //<T = Child> = () => T;
 
@@ -69,7 +69,7 @@ type EventListener = (event: Event) => void
 
 type Falsy<T = unknown> = Extract<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>
 
-type ForOptions = import('oby').ForOptions
+type ForOptions = import('soby').ForOptions
 
 type FN<Arguments extends unknown[], Return extends unknown = void> = (...args: Arguments) => Return
 
@@ -97,19 +97,19 @@ type LazyFetcher<P = {}> = () => Promise<{ default: ComponentFunction<P> } | Com
 
 type LazyResult<P = {}> = LazyComponent<P> & ({ preload: () => Promise<void> })
 
-type MemoOptions<T = unknown> = import('oby').MemoOptions<T>
+type MemoOptions<T = unknown> = import('soby').MemoOptions<T>
 
-type Observable<T = unknown> = import('oby').Observable<T>
+type Observable<T = unknown> = import('soby').Observable<T>
 
-type ObservableLike<T = unknown> = import('oby').ObservableLike<T>
+type ObservableLike<T = unknown> = import('soby').ObservableLike<T>
 
-type ObservableReadonly<T = unknown> = import('oby').ObservableReadonly<T>
+type ObservableReadonly<T = unknown> = import('soby').ObservableReadonly<T>
 
-type ObservableReadonlyLike<T = unknown> = import('oby').ObservableReadonlyLike<T>
+type ObservableReadonlyLike<T = unknown> = import('soby').ObservableReadonlyLike<T>
 
 type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | T
 
-type ObservableOptions<T = unknown> = import('oby').ObservableOptions<T>
+type ObservableOptions<T = unknown> = import('soby').ObservableOptions<T>
 
 type PromiseMaybe<T = unknown> = Promise<T> | T
 
@@ -129,7 +129,7 @@ type ResourceFunction<T = unknown> = { pending(): boolean, error(): Error | unde
 
 type Resource<T = unknown> = ObservableReadonly<ResourceStatic<T>> & ResourceFunction<T>
 
-type StoreOptions = import('oby').StoreOptions
+type StoreOptions = import('soby').StoreOptions
 
 type Styles = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>> | (FunctionMaybe<null | undefined | number | string> | Styles)[]>
 

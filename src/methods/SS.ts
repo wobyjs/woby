@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {get} from '../oby';
+import { get } from '../soby'
 
 /* EXPORT */
 
-export default get;
+export default get

@@ -6,7 +6,7 @@ import useSuspended from '../hooks/use_suspended'
 import $$ from '../methods/SS'
 import untrack from '../methods/untrack'
 import type { Disposer, FN, FunctionMaybe, ObservableMaybe } from '../types'
-import { Stack } from '../oby'
+import { Stack } from '../soby'
 
 /* MAIN */
 

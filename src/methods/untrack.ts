@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {untrack} from '../oby';
+import { untrack } from '../soby'
 
 /* EXPORT */
 
-export default untrack;
+export default untrack

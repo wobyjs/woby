@@ -1,7 +1,7 @@
 
 /* IMPORT */
 
-import { for as _for } from '../oby'
+import { for as _for } from '../soby'
 import type { Child, FunctionMaybe, Indexed, ObservableReadonly } from '../types'
 
 /* MAIN */

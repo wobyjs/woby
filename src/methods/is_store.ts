@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {isStore} from '../oby';
+import { isStore } from '../soby'
 
 /* EXPORT */
 
-export default isStore;
+export default isStore

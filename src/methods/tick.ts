@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {tick} from '../oby';
+import { tick } from '../soby'
 
 /* EXPORT */
 
-export default tick;
+export default tick

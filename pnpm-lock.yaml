@@ -11,7 +11,7 @@ importers:
       htm:
         specifier: ^3.1.1
         version: 3.1.1
-      oby:
+      soby:
         specifier: ^15.1.1
         version: 15.1.2
       vhtml:
@@ -308,7 +308,7 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  oby@15.1.2:
+  soby@15.1.2:
     resolution: {integrity: sha512-6QD9iEoPzV+pMDdcg3RtFWhgDX8pS5hZouVHvgXGDy3Q9RxFfnI3CYv9i62keeuX+qk6iN2z5E9FD3q3OckZ6A==}
 
   picocolors@1.0.1:
@@ -589,7 +589,7 @@ snapshots:
 
   nanoid@3.3.7: {}
 
-  oby@15.1.2: {}
+  soby@15.1.2: {}
 
   picocolors@1.0.1: {}
 

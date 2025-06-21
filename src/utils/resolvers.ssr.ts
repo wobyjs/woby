@@ -8,8 +8,8 @@ import $$ from '../methods/SS'
 import { createText } from '../utils/creators.ssr'
 import { isArray, isFunction, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
-import { SYMBOL_OBSERVABLE_WRITABLE } from 'oby'
-import { Stack } from '../oby'
+import { SYMBOL_OBSERVABLE_WRITABLE } from 'soby'
+import { Stack } from '../soby'
 
 /* MAIN */
 

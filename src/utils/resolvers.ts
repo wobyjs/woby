@@ -8,7 +8,7 @@ import $$ from '../methods/SS'
 import { createText } from '../utils/creators'
 import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
-import { Stack } from '../oby'
+import { Stack } from '../soby'
 
 /* MAIN */
 

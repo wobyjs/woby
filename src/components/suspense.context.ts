@@ -5,7 +5,7 @@ import { SYMBOL_SUSPENSE, SYMBOL_SUSPENSE_COLLECTOR } from '../constants'
 import useCleanup from '../hooks/use_cleanup'
 import useMemo from '../hooks/use_memo'
 import $ from '../methods/S'
-import { context, resolve } from '../oby'
+import { context, resolve } from '../soby'
 import type { SuspenseCollectorData, SuspenseData } from '../types'
 
 /* MAIN */

@@ -86,9 +86,9 @@ You can find some demos and benchmarks below, more demos are contained inside th
 
 ## Usage
 
-This framework is simply a view layer built on top of the Observable library [`oby`](https://github.com/fabiospampinato/oby), knowing how that works is necessary to understand how this works.
+This framework is simply a view layer built on top of the Observable library [`soby`](https://github.com/fabiospampinato/soby), knowing how that works is necessary to understand how this works.
 
-This framework basically re-exports everything that `oby` exports, sometimes with a slightly different interface, adjusted for usage as components or hooks, plus some additional functions.
+This framework basically re-exports everything that `soby` exports, sometimes with a slightly different interface, adjusted for usage as components or hooks, plus some additional functions.
 
 The following is going to be a very shallow documentation of the API. As I mentioned this probably isn't production-grade software, it may become that in the future though, are you interested?
 
@@ -98,11 +98,11 @@ The following top-level functions are provided.
 
 #### `$`
 
-This function is just the default export of `oby`, it can be used to wrap a value in an observable.
+This function is just the default export of `soby`, it can be used to wrap a value in an observable.
 
-No additional methods are attached to this function. Everything that `oby` attaches to it is instead exported as components and hooks.
+No additional methods are attached to this function. Everything that `soby` attaches to it is instead exported as components and hooks.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#core).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#core).
 
 Interface:
 
@@ -158,7 +158,7 @@ o ( () => noop );
 
 This function unwraps a potentially observable value.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#get).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#get).
 
 Interface:
 
@@ -195,7 +195,7 @@ $$ ( 123 ); // => 123
 
 This function holds onto updates within its scope and flushes them out once it exits.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#batch).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#batch).
 
 Interface:
 
@@ -209,7 +209,7 @@ Usage:
 ```tsx
 import {batch} from 'woby';
 
-batch // => Same as require ( 'oby' ).batch
+batch // => Same as require ( 'soby' ).batch
 ```
 
 #### `createContext`
@@ -572,7 +572,7 @@ This function basically resolves any reactivity inside the passed argument, basi
 
 You may never need to use this function yourself, but it's necessary internally at times to make sure that a child value is properly tracked by its parent computation.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#resolve).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#resolve).
 
 Interface:
 
@@ -591,14 +591,14 @@ Usage:
 ```tsx
 import {resolve} from 'woby';
 
-resolve // => Same as require ( 'oby' ).resolve
+resolve // => Same as require ( 'soby' ).resolve
 ```
 
 #### `store`
 
 This function returns a deeply reactive version of the passed object, where property accesses and writes are automatically interpreted as Observables reads and writes for you.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#store).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#store).
 
 Interface:
 
@@ -611,7 +611,7 @@ Usage:
 ```tsx
 import {store} from 'woby';
 
-store // => Same as require ( 'oby' ).store
+store // => Same as require ( 'soby' ).store
 ```
 
 #### `template`
@@ -660,7 +660,7 @@ const Table = () => {
 
 This function executes the provided function without creating dependencies on observables retrieved inside it.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#untrack).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#untrack).
 
 Interface:
 
@@ -674,7 +674,7 @@ Usage:
 ```tsx
 import {untrack} from 'woby';
 
-untrack // => Same as require ( 'oby' ).untrack
+untrack // => Same as require ( 'soby' ).untrack
 ```
 
 ### Components
@@ -1057,7 +1057,7 @@ const App = () => {
 
 The following hooks are provided.
 
-Many of these are just functions that `oby` provides, re-exported as `use*` functions, the rest are largely just alternatives to web built-ins that can also accept observables as arguments and can dispose of themselves automatically when the parent computation is disposed.
+Many of these are just functions that `soby` provides, re-exported as `use*` functions, the rest are largely just alternatives to web built-ins that can also accept observables as arguments and can dispose of themselves automatically when the parent computation is disposed.
 
 Hooks are just regular functions, if their name starts with `use` then we call them hooks just because.
 
@@ -1137,7 +1137,7 @@ useAnimationLoop ( () => console.log ( 'called' ) );
 
 This hook is like the reactive equivalent of the `!!` operator, it returns you a boolean, or a function to a boolean, depending on the input that you give it.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#boolean).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#boolean).
 
 Interface:
 
@@ -1150,14 +1150,14 @@ Usage:
 ```tsx
 import {useBoolean} from 'woby';
 
-useBoolean // => Same as require ( 'oby' ).boolean
+useBoolean // => Same as require ( 'soby' ).boolean
 ```
 
 #### `useCleanup`
 
 This hook registers a function to be called when the parent computation is disposed.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#cleanup).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#cleanup).
 
 Interface:
 
@@ -1170,7 +1170,7 @@ Usage:
 ```tsx
 import {useCleanup} from 'woby';
 
-useCleanup // => Same as require ( 'oby' ).cleanup
+useCleanup // => Same as require ( 'soby' ).cleanup
 ```
 
 #### `useContext`
@@ -1199,7 +1199,7 @@ const App = () => {
 
 This hook returns a boolean read-only observable that is set to `true` when the parent computation gets disposed of.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#disposed).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#disposed).
 
 Interface:
 
@@ -1212,14 +1212,14 @@ Usage:
 ```tsx
 import {useDisposed} from 'woby';
 
-useDisposed // => Same as require ( 'oby' ).disposed
+useDisposed // => Same as require ( 'soby' ).disposed
 ```
 
 #### `useEffect`
 
 This hook registers a function to be called when any of its dependencies change. If a function is returned it's automatically registered as a cleanup function.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#effect).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#effect).
 
 Interface:
 
@@ -1232,14 +1232,14 @@ Usage:
 ```tsx
 import {useEffect} from 'woby';
 
-useEffect // => Same as require ( 'oby' ).effect
+useEffect // => Same as require ( 'soby' ).effect
 ```
 
 #### `useError`
 
 This hook registers a function to be called when the parent computation throws.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#error).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#error).
 
 Interface:
 
@@ -1252,7 +1252,7 @@ Usage:
 ```tsx
 import {useError} from 'woby';
 
-useError // => Same as require ( 'oby' ).error
+useError // => Same as require ( 'soby' ).error
 ```
 
 #### `useEventListener`
@@ -1362,7 +1362,7 @@ This hook registers a function to be called when any of its dependencies change,
 
 The function receives an optional `stack` parameter (an Stack object) that provides a debugging stack trace to help pinpoint the source of reactive dependencies. To enable this feature, set `DEBUGGERER.debug = true`.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#memo).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#memo).
 
 Interface:
 
@@ -1434,7 +1434,7 @@ This hook works just like `useEffect`, expect that it's not affected by `Suspens
 
 This is an advanced hook mostly useful internally, you may never need to use this, `useEffect` and `useMemo` should suffice.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#reaction).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#reaction).
 
 Interface:
 
@@ -1447,14 +1447,14 @@ Usage:
 ```tsx
 import {useReaction} from 'woby';
 
-useReaction // => Same as require ( 'oby' ).reaction
+useReaction // => Same as require ( 'soby' ).reaction
 ```
 
 #### `useReadonly`
 
 This hook creates a read-only observable out of another observable.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#readonly).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#readonly).
 
 Interface:
 
@@ -1467,7 +1467,7 @@ Usage:
 ```tsx
 import {useReadonly} from 'woby';
 
-useReadonly // => Same as require ( 'oby' ).readonly
+useReadonly // => Same as require ( 'soby' ).readonly
 ```
 
 #### `useResolved`
@@ -1536,7 +1536,7 @@ const resource = useResource ( fetcher );
 
 This hook creates a new computation root, detached from any parent computation.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#root).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#root).
 
 Interface:
 
@@ -1549,14 +1549,14 @@ Usage:
 ```tsx
 import {useRoot} from 'woby';
 
-useRoot // => Same as require ( 'oby' ).root
+useRoot // => Same as require ( 'soby' ).root
 ```
 
 #### `useSelector`
 
 This hook massively optimizes `isSelected` kind of workloads.
 
-[Read upstream documentation](https://github.com/fabiospampinato/oby#selector).
+[Read upstream documentation](https://github.com/fabiospampinato/soby#selector).
 
 Interface:
 
@@ -1571,7 +1571,7 @@ Usage:
 ```tsx
 import {useSelector} from 'woby';
 
-useSelector // => Same as require ( 'oby' ).selector
+useSelector // => Same as require ( 'soby' ).selector
 ```
 
 #### `useTimeout`

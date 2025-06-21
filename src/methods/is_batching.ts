@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {isBatching} from '../oby';
+import { isBatching } from '../soby'
 
 /* EXPORT */
 
-export default isBatching;
+export default isBatching

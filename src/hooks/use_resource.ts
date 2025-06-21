@@ -12,7 +12,7 @@ import type { ObservableMaybe, PromiseMaybe, ResourceStaticPending, ResourceStat
 
 /* MAIN */
 
-//TODO: Maybe port this to oby, as "from"
+//TODO: Maybe port this to soby, as "from"
 //TODO: Option for returning the resource as a store, where also the returned value gets wrapped in a store
 //FIXME: SSR demo: toggling back and forth between /home and /loader is buggy, /loader gets loaded with no data, which is wrong
 

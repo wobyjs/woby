@@ -6,7 +6,7 @@ import useMemo from '../hooks/use_memo'
 import useSuspense from '../hooks/use_suspense'
 import resolve from '../methods/resolve'
 import $$ from '../methods/SS'
-import { suspense as _suspense, ternary } from '../oby'
+import { suspense as _suspense, ternary } from '../soby'
 import type { Child, FunctionMaybe, ObservableReadonly } from '../types'
 
 /* MAIN */

@@ -3,7 +3,7 @@
 
 import useEffect from '../hooks/use_effect'
 import type { Disposer, EffectFunction, EffectOptions } from '../types'
-import { Stack } from '../oby'
+import { Stack } from '../soby'
 
 /* HELPERS */
 

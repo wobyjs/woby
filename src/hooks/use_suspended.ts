@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {suspended} from '../oby';
+import { suspended } from '../soby'
 
 /* EXPORT */
 
-export default suspended;
+export default suspended

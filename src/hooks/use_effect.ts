@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {effect} from '../oby';
+import { effect } from '../soby'
 
 /* EXPORT */
 
-export default effect;
+export default effect

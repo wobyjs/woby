@@ -1,8 +1,8 @@
 
 /* IMPORT */
 
-import {suspense} from '../oby';
+import { suspense } from '../soby'
 
 /* EXPORT */
 
-export default suspense;
+export default suspense
