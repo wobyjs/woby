@@ -7,7 +7,7 @@ import { createHTMLNode, createSVGNode } from '../utils/creators'
 import { isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
-import FragmentUtils from '../utils/fragment'
+import { FragmentUtils } from '../utils/fragment'
 
 /* MAIN */
 

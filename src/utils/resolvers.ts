@@ -8,10 +8,11 @@ import $$ from '../methods/SS'
 import { createText } from '../utils/creators'
 import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
+import { Stack } from '../oby'
 
 /* MAIN */
 
-const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Error) => void), _dynamic: boolean = false, stack: Error): void => {
+const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
 
   if (isFunction(value)) {
 

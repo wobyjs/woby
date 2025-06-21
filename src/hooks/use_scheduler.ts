@@ -6,10 +6,11 @@ import useSuspended from '../hooks/use_suspended'
 import $$ from '../methods/SS'
 import untrack from '../methods/untrack'
 import type { Disposer, FN, FunctionMaybe, ObservableMaybe } from '../types'
+import { Stack } from '../oby'
 
 /* MAIN */
 
-const useScheduler = <T, U>({ loop, once, callback, cancel, schedule, stack }: { loop?: FunctionMaybe<boolean>, once?: boolean, callback: ObservableMaybe<FN<[U]>>, cancel: FN<[T]>, schedule: ((callback: FN<[U]>) => T), stack: Error }): Disposer => {
+const useScheduler = <T, U>({ loop, once, callback, cancel, schedule, stack }: { loop?: FunctionMaybe<boolean>, once?: boolean, callback: ObservableMaybe<FN<[U]>>, cancel: FN<[T]>, schedule: ((callback: FN<[U]>) => T), stack: Stack }): Disposer => {
 
   let executed = false
   let suspended = useSuspended(stack)

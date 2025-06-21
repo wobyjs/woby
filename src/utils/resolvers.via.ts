@@ -9,13 +9,14 @@ import { isArray, isFunction, isString, isProxy, fixBigInt, toArray } from '../u
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { createText, createComment, createHTMLNode } from '../utils/creators'
 import { IgnoreSymbols } from 'via.js'
+import { Stack } from '../oby'
 
 const HTMLValue = Symbol('HtmlValue')
 IgnoreSymbols[HTMLValue] = HTMLValue
 
 
 /* MAIN */
-const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], dynamic: boolean, stack: Error) => void), _dynamic?: boolean, stack?: Error): T | T[] => {
+const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic?: boolean, stack?: Error): T | T[] => {
     const updateElement = (/** null placeholder */e: Text, f: boolean, v: any, pv: HTMLElement[] /** in proxy */) => {
         e.textContent = ''
 

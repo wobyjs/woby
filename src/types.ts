@@ -11,7 +11,7 @@ declare const ContextWithDefaultSymbol: unique symbol
 
 type ArrayMaybe<T = unknown> = T[] | T
 
-type Callback = (stack: Error) => void
+type Callback = (stack?: Error) => void
 
 type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | (() => Child)
 
@@ -55,9 +55,9 @@ type DirectiveData<Arguments extends unknown[] = []> = { fn: DirectiveFunction<A
 
 type DirectiveOptions = { immediate?: boolean }
 
-type Disposer = (stack: Error) => void
+type Disposer = (stack?: Error) => void
 
-type EffectFunction = (stack: Error) => Disposer | void
+type EffectFunction = (stack?: Error) => Disposer | void
 
 type EffectOptions = import('oby').EffectOptions
 

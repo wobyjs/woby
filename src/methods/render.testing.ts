@@ -4,7 +4,7 @@ import useRoot from '../hooks/use_root'
 import { setChild } from '../utils/setters'
 import type { Child, Disposer, IntrinsicElementsMap } from '../types'
 import $ from './S'
-import FragmentUtils from '../utils/fragment'
+import { FragmentUtils } from '../utils/fragment'
 // import { JSX } from 'src/jsx/types';
 
 export const render = (child: JSX.Child) => {

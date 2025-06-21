@@ -1,12 +1,12 @@
 
 /* EXPORT */
 
-export * from './singleton';
+export * from './singleton'
 // export * from './jsx/jsx';
-export * from './components';
-export * from './jsx/runtime';
-export * from './hooks';
-export * from './methods';
+export * from './components'
+export * from './jsx/runtime'
+export * from './hooks'
+export * from './methods'
 export * from "./constants"
 export * from "./utils"
 
@@ -14,14 +14,14 @@ export * from "./utils"
 //export type {Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, CSSProperties, Component, JSX.Element} from './types';
 
 // export type {IComputation, IEffect, IMemo, IObservable, IObserver, IReaction, IRoot, ISuperRoot, ISuspense} from 'oby';
-// export type {BatchFunction, CallbackFunction, CleanupFunction, DisposeFunction, EffectFunction, ErrorFunction, EqualsFunction, ListenerFunction, MapFunction, MapIndexFunction, MapValueFunction, MemoFunction, ObservedFunction, ObservedDisposableFunction, ReactionFunction, SelectorFunction, SuspenseFunction, TryCatchFunction, UntrackFunction, UpdateFunction, WithFunction} from 'oby';
-export type { Observable, ObservableReadonly, ObservableOptions } from 'oby';
-export { DEBUGGER } from 'oby';
+export type { BatchFunction, CallbackFunction, CleanupFunction, DisposeFunction, EffectFunction, ErrorFunction, EqualsFunction, /* ListenerFunction, */ MapFunction, /* MapIndexFunction, */ MapValueFunction, MemoFunction, /* ObservedFunction, ObservedDisposableFunction, ReactionFunction, */ SelectorFunction, SuspenseFunction, TryCatchFunction, UntrackFunction, UpdateFunction, WithFunction } from './oby'
+export type { Observable, ObservableReadonly, ObservableOptions } from 'oby'
+export { DEBUGGER, Stack, callStack } from 'oby'
 
-import { SYMBOL_OBSERVABLE } from 'oby';
+import { SYMBOL_OBSERVABLE } from 'oby'
 
 // export type {Owner} from 'oby';
-export type { StoreOptions } from 'oby';
+export type { StoreOptions } from 'oby'
 // export type {ArrayMaybe, Callable, CallableFunction, Constructor, Contexts, Frozen, FunctionMaybe, Indexed, LazyArray, LazySet, LazyValue, Mapped, PromiseMaybe, Readable, Resolvable, Resolved, Signal, Writable} from 'oby';
 
 export type {
@@ -35,8 +35,7 @@ export type {
     /* StoreOptions, */ SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths,
     TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy,
     CSSProperties
-} from './types';
+} from './types'
 
 export const ObservableSymbol = SYMBOL_OBSERVABLE
-
 export * as JSX from './types'

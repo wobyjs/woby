@@ -13,12 +13,13 @@ import { SYMBOL_STORE_OBSERVABLE } from 'oby'
 import { classesToggle } from '../utils/classlist'
 import { createText } from '../utils/creators'
 import diff from '../utils/diff'
-import FragmentUtils from '../utils/fragment'
+import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers.via'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { __ArgsSymbol } from 'via.js'
 import { IsSvgSymbol } from '../methods/create_element.via'
+import { Stack } from '../oby'
 
 
 // import createElement from '../methods/create_element.via'
@@ -79,7 +80,7 @@ const setAttributeStatic = (() => {
 
 })()
 
-const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Error): void => {
+const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
 
     if (isFunction(value)) {
 
@@ -105,7 +106,7 @@ const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<nu
 
 }
 
-const setChildStatic = (parent: HTMLElement, child: Child, dynamic: boolean, stack: Error) => {
+const setChildStatic = (parent: HTMLElement, child: Child, dynamic: boolean, stack: Stack) => {
 
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
@@ -123,13 +124,13 @@ const setChildStatic = (parent: HTMLElement, child: Child, dynamic: boolean, sta
     }
 }
 
-const setChild = (parent: HTMLElement, child: Child, stack: Error) => {
+const setChild = (parent: HTMLElement, child: Child, stack: Stack) => {
     setChildStatic(parent, child, false, stack)
 }
 
 const setClassStatic = classesToggle
 
-const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>, stack: Error): void => {
+const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>, stack: Stack): void => {
 
     if (isFunction(value)) {
 
@@ -171,7 +172,7 @@ const setClassBooleanStatic = (element: HTMLElement, value: boolean, key: null |
 
 }
 
-const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>, stack: Error): void => {
+const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>, stack: Stack): void => {
 
     if (isFunction(key)) {
 
@@ -202,7 +203,7 @@ const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMayb
 
 }
 
-const setClassesStatic = (element: HTMLElement, object: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, objectPrev: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, stack: Error): void => {
+const setClassesStatic = (element: HTMLElement, object: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, objectPrev: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, stack: Stack): void => {
 
     if (isString(object)) {
 
@@ -317,7 +318,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
 }
 
-const setClasses = (element: HTMLElement, object: Classes, stack: Error): void => {
+const setClasses = (element: HTMLElement, object: Classes, stack: Stack): void => {
 
     /* RECURSIVE IMPLEMENTATION */
 
@@ -509,7 +510,7 @@ const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | 
 
 }
 
-const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Error): void => {
+const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
 
     useRenderEffect(() => {
 
@@ -561,7 +562,7 @@ const setPropertyStatic = (element: HTMLElement, key: string, value: null | unde
 
 }
 
-const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Error): void => {
+const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -637,7 +638,7 @@ const setStyleStatic = (() => {
 
 })()
 
-const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>, stack: Error): void => {
+const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>, stack: Stack): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -663,7 +664,7 @@ const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null |
 
 }
 
-const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, stack: Error): void => {
+const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, stack: Stack): void => {
 
     if (isString(object)) {
 
@@ -722,7 +723,7 @@ const setStylesStatic = (element: HTMLElement, object: null | undefined | string
 }
 
 
-const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Error): void => {
+const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Stack): void => {
 
     if (isFunction(object) || isArray(object)) {
 
@@ -818,7 +819,7 @@ const setTemplateAccessor = async (element: HTMLElement, key: string, value: Tem
     }
 }
 
-const setProp = <T>(element: HTMLElement, key: string, value: T, stack: Error): void => {
+const setProp = <T>(element: HTMLElement, key: string, value: T, stack: Stack): void => {
     if (isTemplateAccessor(value))
         setTemplateAccessor(element, key, value)
 
@@ -846,7 +847,7 @@ const setProp = <T>(element: HTMLElement, key: string, value: T, stack: Error): 
     }
 }
 
-const setProps = (element: HTMLElement, object: Record<string, unknown>, stack: Error): void => {
+const setProps = (element: HTMLElement, object: Record<string, unknown>, stack: Stack): void => {
     const { children, ...pp } = object
 
     //set children 1st, in case value refer to children

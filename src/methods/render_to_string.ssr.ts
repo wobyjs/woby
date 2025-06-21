@@ -1,7 +1,7 @@
 
 /* IMPORT */
 
-import FragmentUtils from '../utils/fragment'
+import { FragmentUtils } from '../utils/fragment'
 import type { Child } from '../types'
 import { setChild } from '../utils/setters.ssr'
 
