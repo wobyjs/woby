@@ -36,7 +36,7 @@
             "import": "./dist/jsx-runtime.es.js"
         },
         "./jsx-dev-runtime": {
-            "types": "./dist/types/runtime.d.ts",
+            "types": "./dist/types/jsx-runtime.d.ts",
             "require": "./dist/jsx-runtime.cjs.js",
             "import": "./dist/jsx-runtime.es.js"
         },
