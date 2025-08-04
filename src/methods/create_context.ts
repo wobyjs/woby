@@ -24,11 +24,11 @@ function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> 
 
   }
 
-  const Context = { Provider }
+  const Context = { Provider, symbol }
 
   CONTEXTS_DATA.set(Context as any, { symbol, defaultValue })
 
-  return Context as any
+  return Context
 
 }
 

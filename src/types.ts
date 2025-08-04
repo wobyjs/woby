@@ -37,9 +37,9 @@ type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T }
 
 type ContextProvider<T = unknown> = (props: { value: T, children: Child }) => Child
 
-type Context<T = unknown> = { Provider: ContextProvider<T> }
+type Context<T = unknown> = { Provider: ContextProvider<T>, symbol: Symbol }
 
-type ContextWithDefault<T = unknown> = Context<T> & { readonly [ContextWithDefaultSymbol]: true }
+type ContextWithDefault<T = unknown> = Context<T> & { readonly [ContextWithDefaultSymbol]: true, symbol: Symbol }
 
 type DirectiveFunction<Arguments extends unknown[] = []> = (ref: globalThis.Element, ...args: Arguments) => void
 
