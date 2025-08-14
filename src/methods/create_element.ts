@@ -4,10 +4,12 @@
 import untrack from '../methods/untrack'
 import wrapElement from '../methods/wrap_element'
 import { createHTMLNode, createSVGNode } from '../utils/creators'
-import { isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
+import { isClass, isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
+import { customElement } from './custom_element'
+
 
 /* MAIN */
 
@@ -31,7 +33,7 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
 
         return wrapElement(() => {
 
-            return untrack(() => component.call(component, props as P)) //TSC
+            return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
 
         })
 
@@ -41,8 +43,11 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
         const createNode = isSVG ? createSVGNode : createHTMLNode
 
         return wrapElement((): Child => {
-
+            const ce = customElements.get(component) as ReturnType<typeof customElement>
             const child = createNode(component) as HTMLElement //TSC
+
+            if (!!ce)
+                (child as InstanceType<ReturnType<typeof customElement>>).props = { ..._props }
 
             if (isSVG) child['isSVG'] = true
 
@@ -54,8 +59,8 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
                     setProps(child, _props as any, stack)
                 }
 
-                if (hasChildren) {
-                    setChild(child, children, FragmentUtils.make(), stack)
+                if (hasChildren || ce?.__children__) {
+                    setChild(child, !!ce ? createElement(ce.__children__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
                 }
 
             })

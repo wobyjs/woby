@@ -252,6 +252,7 @@ export interface ElementChildrenAttribute {
 }
 
 export interface IntrinsicAttributes {
+  isCustom?: boolean
 }
 
 export interface AriaAttributes {

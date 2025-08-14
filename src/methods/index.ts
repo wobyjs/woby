@@ -27,6 +27,7 @@ import untrack from '../methods/untrack'
 export * from './merge_style'
 export * from './wrap_clone_element'
 export * from './wrap_element'
+export * from './custom_element'
 
 /* EXPORT */
 
