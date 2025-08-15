@@ -1,7 +1,10 @@
 import { isObservable } from "soby"
 import { $$ } from "."
 
-export const customElement = <P,>(tagName: string, attributes: keyof P[], children: JSX.Component<P>) => {
+
+export type ElementAttributes<T extends (...args: any) => any> = JSX.HTMLAttributes<HTMLElement> & Parameters<T>[0]
+
+export const customElement = <P>(tagName: string, attributes: (keyof (P & JSX.HTMLAttributes<HTMLElement>))[], children: JSX.Component<P>) => {
     const C = class extends HTMLElement {
         static __children__ = children;
         static observedAttributes: string[] = attributes as any
