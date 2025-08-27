@@ -25,6 +25,19 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **Observable-based**: observables are at the core of our reactivity system. The way it works is very different from a React-like system, it may be more challenging to learn, but it's well worth the effort.
 - **Work in progress**: I'm allergic to third-party dependencies, I'd like something with an API that resonates with me, and I wanted to deeply understand how the more solid [Solid](https://www.solidjs.com), which you should also check out, works.
 
+## 📚 Documentation
+
+**[📖 Complete Documentation Wiki](./docs/README.md)** - Comprehensive guides, tutorials, and API reference
+
+### Quick Links
+- **[Installation Guide](./docs/Installation.md)** - Get started with Woby
+- **[Quick Start Tutorial](./docs/Quick-Start.md)** - Build your first app
+- **[API Reference](./docs/Core-Methods.md)** - Complete API documentation
+- **[Examples Gallery](./docs/Examples.md)** - Practical examples and patterns
+- **[Best Practices](./docs/Best-Practices.md)** - Recommended patterns and practices
+- **[Woby vs React](./docs/Woby-vs-React.md)** - API differences and migration guide
+- **[FAQ](./docs/FAQ.md)** - Common questions and answers
+
 ## Demos
 
 You can find some demos and benchmarks below, more demos are contained inside the repository.
@@ -83,7 +96,7 @@ Here's a complete counter example that demonstrates Woby's reactive capabilities
 
 **Source:** [woby-demo](https://github.com/wongchichong/woby-demo) ⭐
 
-```tsx
+``tsx
 import { $, $$, useMemo, render, Observable, customElement, ElementAttributes } from 'woby'
 
 const Counter = ({ increment, decrement, value, ...props }: { 
@@ -133,7 +146,7 @@ render(<App />, document.getElementById('app'))
 ```
 
 **Output:**
-```html
+```
 <counter-element value="0" class="border-2 border-black border-solid bg-amber-400">
   <div class="border-2 border-black border-solid bg-amber-400">
     <h1>Counter</h1>
