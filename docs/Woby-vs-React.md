@@ -11,6 +11,7 @@ This document highlights the key differences between Woby and React APIs, focusi
   - [useEffect](#useeffect)
   - [useCallback](#usecallback)
   - [forwardRef](#forwardref)
+- [Dependency Management](#dependency-management)
 - [Summary of Key Differences](#summary-of-key-differences)
 
 ## Core Philosophy Differences
@@ -47,7 +48,15 @@ function MyComponent() {
 import { $, $$ } from 'woby';
 import type { Ref } from 'woby';
 
-// Observable-based approach (Woby preferred)
+// Method 1: Traditional ref callback (similar to React)
+const inputRefCallback: Ref<HTMLInputElement> = (element) => {
+  // element is the actual DOM node
+  if (element) {
+    element.focus();
+  }
+};
+
+// Method 2: Observable-based approach (Woby preferred)
 const inputRef = $<HTMLInputElement>();
 const focusInput = () => {
   $$(inputRef)?.focus();
@@ -156,11 +165,20 @@ function ParentComponent() {
 ```tsx
 // Woby doesn't have a direct useCallback equivalent
 // Instead, it uses automatic dependency tracking:
+
+// Method 1: Simple function (no memoization needed)
+const handleClick = (e) => {
+  console.log('Button clicked');
+};
+
+// Method 2: If memoization is truly needed
 import { useMemo } from 'woby';
 
-const handleClick = (e) => {
+const handleClick = useMemo(() => {
+  return (e) => {
     console.log('Button clicked');
-  }
+  };
+});
 
 function ParentComponent() {
   return <ChildComponent onClick={handleClick} />;
@@ -169,6 +187,7 @@ function ParentComponent() {
 
 **Key Differences:**
 - Woby doesn't need `useCallback` because it has automatic dependency tracking
+- `useMemo` can serve a similar purpose when you need to memoize functions
 - Less API surface area to learn
 
 ### forwardRef
@@ -225,6 +244,131 @@ const FancyButtonWithObservableRef = ({ children }: { children: any }) => {
 - Woby doesn't need a special `forwardRef` function
 - Refs are passed as regular props
 - Observable-based refs provide more flexibility
+
+## Dependency Management
+
+One of the most significant differences between React and Woby is how dependencies are managed in reactive code.
+
+### React Dependency Arrays
+
+In React, you must explicitly specify dependencies in arrays for hooks like `useEffect`, `useMemo`, and `useCallback`:
+
+```jsx
+import { useEffect, useMemo, useCallback, useState } from 'react';
+
+function MyComponent({ userId, theme }) {
+  const [data, setData] = useState(null);
+  
+  // useEffect with dependency array
+  useEffect(() => {
+    fetchData(userId).then(setData);
+  }, [userId]); // Must specify userId as dependency
+  
+  // useMemo with dependency array
+  const processedData = useMemo(() => {
+    return process(data, theme);
+  }, [data, theme]); // Must specify all dependencies
+  
+  // useCallback with dependency array
+  const handleClick = useCallback(() => {
+    console.log('User ID:', userId);
+  }, [userId]); // Must specify userId as dependency
+  
+  return <div>{/* ... */}</div>;
+}
+```
+
+### Woby Automatic Tracking
+
+In Woby, dependencies are automatically tracked when you access observables using `$$()`:
+
+```tsx
+import { $, $$, useEffect, useMemo } from 'woby';
+
+function MyComponent({ userId, theme }) {
+  const data = $<any>(null);
+  
+  // useEffect with automatic dependency tracking
+  useEffect(() => {
+    fetchData($$(userId)).then(data); // $$() tracks userId automatically
+  }); // No dependency array needed
+  
+  // useMemo with automatic dependency tracking
+  const processedData = useMemo(() => {
+    return process($$(data), $$(theme)); // $$() tracks both data and theme
+  }); // No dependency array needed
+  
+  // No useCallback needed - functions are automatically optimized
+  const handleClick = () => {
+    console.log('User ID:', $$(userId)); // $$() tracks userId automatically
+  };
+  
+  return <div>{/* ... */}</div>;
+}
+```
+
+### Declaring Reactive Dependencies with `$()`
+
+In Woby, you must declare your reactive variables using `$()` to make them trackable:
+
+```tsx
+import { $, $$, useEffect, useMemo } from 'woby';
+
+// ❌ Not reactive - plain variables don't trigger updates
+let count = 0;
+let name = 'John';
+
+// ✅ Reactive - variables declared with $() are trackable
+const count = $(0);
+const name = $('John');
+
+// Effects automatically track dependencies when accessed with $$()
+useEffect(() => {
+  console.log(`Count: ${$$(count)}, Name: ${$$(name)}`);
+  // This effect will re-run whenever count or name changes
+});
+
+// Memoized computations automatically track dependencies
+const doubledCount = useMemo(() => {
+  return $$(count) * 2; // Tracks count
+});
+
+// Event handlers can access current values
+const handleClick = () => {
+  count($$(count) + 1); // Increment the observable
+};
+```
+
+**Key Points:**
+- Variables must be declared with `$()` to be reactive and trackable
+- Access values with `$$()` in reactive contexts for automatic dependency tracking
+- Plain variables won't trigger reactivity even if changed
+
+## Key Points About Dependency Management
+
+1. **Automatic Tracking**: In Woby, whenever you use `$$()` to unwrap an observable inside a reactive context (like `useEffect` or `useMemo`), that observable is automatically tracked as a dependency.
+
+2. **No Manual Arrays**: You never need to manually maintain dependency arrays in Woby, eliminating a common source of bugs in React applications.
+
+3. **Reactive Context**: The tracking only happens within reactive contexts (functions passed to `useEffect`, `useMemo`, etc.). Outside these contexts, `$$()` simply unwraps the value without tracking.
+
+4. **Performance**: Woby's approach is often more performant because it only tracks actual dependencies that are accessed, rather than requiring developers to manually specify them.
+
+5. **Migration Pattern**: When migrating from React to Woby, replace each dependency in arrays with `$$()` calls in the function body, and ensure dependencies are declared with `$()`:
+
+   ```jsx
+   // React
+   const [userId, setUserId] = useState(123);
+   useEffect(() => {
+     console.log(userId);
+   }, [userId]);
+   
+   // Woby
+   const userId = $(123); // Declare with $() for reactivity
+   useEffect(() => {
+     console.log($$(userId)); // Access with $$() for tracking
+   });
+   ```
 
 ## Summary of Key Differences
 

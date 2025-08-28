@@ -231,6 +231,33 @@ const value = $$(maybeObservable) // Works for both observables and plain values
 - `$$()` is more explicit about intent to unwrap a value
 - Prevents errors when dealing with uncertain types
 
+### Declaring Reactive Variables with `$()`
+
+To participate in Woby's reactivity system, variables must be declared using `$()`:
+
+```typescript
+import { $, $$, useEffect, useMemo } from 'woby'
+
+// ❌ Not reactive - plain variables don't trigger updates
+let count = 0;
+let name = 'John';
+
+// ✅ Reactive - variables declared with $() are trackable
+const count = $(0);
+const name = $('John');
+
+// Effects automatically track dependencies when accessed with $$()
+useEffect(() => {
+  console.log(`Count: ${$$(count)}, Name: ${$$(name)}`);
+  // This effect will re-run whenever count or name changes
+});
+
+// Memoized computations automatically track dependencies
+const doubledCount = useMemo(() => {
+  return $$(count) * 2; // Tracks count
+});
+```
+
 ### Avoid Setting Observables to Undefined
 
 Be careful when calling observables without parameters as this sets them to `undefined`:

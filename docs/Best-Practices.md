@@ -8,6 +8,7 @@ This guide covers recommended patterns and best practices for writing efficient 
 - [Ref Management](#ref-management)
 - [Component Patterns](#component-patterns)
 - [Performance Optimization](#performance-optimization)
+- [Dependency Management](#dependency-management)
 
 ## Observable Handling
 
@@ -50,7 +51,7 @@ import { $, $$ } from 'woby'
 const count = $(0)
 
 // ❌ Avoid - This sets count to undefined
-count() // Might means to count(undefined) for programmer
+count() // Equivalent to count(undefined)
 
 // ✅ Correct - Only set values explicitly
 count(5) // Set to 5
@@ -140,7 +141,7 @@ const Component = ({ a, b }) => {
   
   // ✅ Woby pattern - automatic dependency tracking
   const expensiveValue = useMemo(() => {
-    return computeExpensiveValue(a, b)
+    return computeExpensiveValue($$(a), $$(b))
   })
   
   // This will automatically recompute when a or b changes
@@ -173,6 +174,116 @@ const Component = () => {
       </For>
     </ul>
   )
+}
+```
+
+## Dependency Management
+
+### Automatic Dependency Tracking with `$$()`
+
+One of Woby's key advantages is its automatic dependency tracking system. Instead of manually maintaining dependency arrays like in React, Woby automatically tracks which observables your reactive functions depend on:
+
+```typescript
+import { $, $$, useEffect, useMemo } from 'woby'
+
+// ❌ React approach with manual dependency arrays
+// useEffect(() => {
+//   console.log(userId, theme);
+// }, [userId, theme]);
+
+// ✅ Woby approach with automatic tracking
+const userId = $(123)
+const theme = $('dark')
+
+useEffect(() => {
+  console.log($$(userId), $$(theme)) // Automatically tracks userId and theme
+})
+
+// The effect will re-run whenever userId or theme changes
+```
+
+### Declaring Reactive Variables with `$()`
+
+To make variables reactive and trackable in Woby, you must declare them using `$()`:
+
+```typescript
+import { $, $$, useEffect, useMemo } from 'woby'
+
+// ❌ Not reactive - plain variables don't trigger updates
+let count = 0;
+let name = 'John';
+
+// ✅ Reactive - variables declared with $() are trackable
+const count = $(0);
+const name = $('John');
+
+// Effects automatically track dependencies when accessed with $$()
+useEffect(() => {
+  console.log(`Count: ${$$(count)}, Name: ${$$(name)}`);
+  // This effect will re-run whenever count or name changes
+});
+
+// Memoized computations automatically track dependencies
+const doubledCount = useMemo(() => {
+  return $$(count) * 2; // Tracks count
+});
+
+// Event handlers can access and update current values
+const increment = () => {
+  count($$(count) + 1); // Increment the observable
+};
+```
+
+**Key Points:**
+- Variables must be declared with `$()` to participate in reactivity
+- Access values with `$$()` in reactive contexts for automatic dependency tracking
+- Plain JavaScript variables won't trigger reactive updates even if changed
+
+### Migration from React Patterns
+
+When migrating from React, convert dependency arrays to `$$()` calls and ensure state variables are declared with `$()`:
+
+```typescript
+// React
+// const [userId, setUserId] = useState(123);
+// const [theme, setTheme] = useState('dark');
+// useEffect(() => {
+//   fetchData(userId, theme);
+// }, [userId, theme]);
+
+// Woby
+const userId = $(123);  // Declare with $() for reactivity
+const theme = $('dark'); // Declare with $() for reactivity
+
+useEffect(() => {
+  fetchData($$(userId), $$(theme)); // Access with $$() for tracking
+  // This will automatically re-run when userId or theme changes
+});
+```
+
+### When to Use `$$()`
+
+Use `$$()` whenever you need to access the value of an observable within a reactive context:
+
+```typescript
+import { $, $$, useEffect, useMemo } from 'woby'
+
+const count = $(0)
+const multiplier = $(2)
+
+// ✅ In reactive contexts, use $$() for automatic tracking
+useEffect(() => {
+  console.log(`Count is: ${$$(count)}`)
+})
+
+const doubled = useMemo(() => {
+  return $$(count) * $$(multiplier)
+})
+
+// ✅ In regular functions, you can use direct invocation or $$()
+const regularFunction = () => {
+  return count() * multiplier() // This works too
+  // Or: return $$(count) * $$(multiplier)
 }
 ```
 
