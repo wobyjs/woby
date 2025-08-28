@@ -20,6 +20,9 @@ importers:
       via.js:
         specifier: workspace:../via
         version: link:../via
+      woby:
+        specifier: 'link:'
+        version: 'link:'
     devDependencies:
       '@types/node':
         specifier: ^22.8.1
