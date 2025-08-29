@@ -1,394 +1,400 @@
 # Core Methods
 
-This page documents all the core methods available in Woby. These are the fundamental building blocks for creating reactive applications.
+This document covers the essential methods and functions provided by Woby for building reactive applications.
 
 ## Table of Contents
 
-- [Observable Creation](#observable-creation)
-- [Rendering](#rendering)
-- [Reactivity Control](#reactivity-control)
-- [Context](#context)
-- [Utilities](#utilities)
+- [Observable Creation ($)](#observable-creation-)
+- [Observable Unwrapping ($$)](#observable-unwrapping-)
+- [Effect Management](#effect-management)
+- [Memoization](#memoization)
+- [Batching](#batching)
+- [Untracking](#untracking)
+- [Component Rendering](#component-rendering)
 
-## Observable Creation
+## Observable Creation ($)
 
-### $
+The `$()` function creates reactive observables that can track dependencies and notify subscribers of changes.
 
-Creates an observable value that can be tracked and updated reactively.
-
-**Signature:**
-```typescript
-function $ <T> (): Observable<T | undefined>
-function $ <T> ( value: undefined, options?: ObservableOptions<T | undefined> ): Observable<T | undefined>
-function $ <T> ( value: T, options?: ObservableOptions<T> ): Observable<T>
-```
-
-**Usage:**
 ```typescript
 import { $ } from 'woby'
 
-// Create empty observable
-const count = $<number>()
+// Create a primitive observable
+const count = $(0)
 
-// Create with initial value
-const name = $('John')
+// Create a computed observable
+const doubled = $(() => $$(count) * 2)
 
-// Create with custom equality function
+// Create an observable with custom equality function
 const user = $({ id: 1, name: 'John' }, {
   equals: (a, b) => a.id === b.id
 })
+```
 
-// Get value
-console.log(name()) // 'John'
+## Observable Unwrapping ($$)
 
-// Set value
+The `$$()` function safely unwraps observables, providing a consistent way to access values whether they're observables or plain values.
+
+```typescript
+import { $, $$ } from 'woby'
+
+// Unwrap a primitive observable
+const count = $(0)
+console.log($$(count)) // 0
+
+// Unwrap a computed observable
+const doubled = $(() => $$(count) * 2)
+console.log($$(doubled)) // 0
+
+// Safely unwrap uncertain values
+const maybeObservable = getValue() // Could be observable or plain value
+const value = $$(maybeObservable) // Works for both cases
+```
+
+## Effect Management
+
+Effects automatically track dependencies and re-run when those dependencies change.
+
+``typescript
+import { $, $$, useEffect } from 'woby'
+
+const count = $(0)
+const name = $('John')
+
+// Effect automatically tracks count and name
+useEffect(() => {
+  console.log(`Count: ${$$(count)}, Name: ${$$(name)}`)
+})
+
+// Effect re-runs when either observable changes
+count(1) // Logs: "Count: 1, Name: John"
+name('Jane') // Logs: "Count: 1, Name: Jane"
+```
+
+## Memoization
+
+Memoized computations automatically recompute when their dependencies change.
+
+``typescript
+import { $, $$, useMemo } from 'woby'
+
+const firstName = $('John')
+const lastName = $('Doe')
+
+// Computed observable that updates when dependencies change
+const fullName = useMemo(() => {
+  return `${$$(firstName)} ${$$(lastName)}`
+})
+
+console.log($$(fullName)) // "John Doe"
+firstName('Jane')
+console.log($$(fullName)) // "Jane Doe"
+```
+
+## Batching
+
+Batch multiple updates to trigger only a single re-render.
+
+```typescript
+import { $, $$, batch } from 'woby'
+
+const count = $(0)
+const name = $('John')
+
+// Without batching - triggers two updates
+count(1)
 name('Jane')
 
-// Update with function
-count(prev => (prev || 0) + 1)
+// With batching - triggers one update
+batch(() => {
+  count(2)
+  name('Bob')
+})
 ```
 
-**Options:**
-- `equals`: Custom equality function to determine when to notify subscribers
-- `equals: false`: Always notify on setter calls
+## Untracking
 
-### store
+Temporarily read observables without creating dependencies.
 
-Creates a reactive store for complex state management.
+```
+import { $, $$, untrack } from 'woby'
 
-**Signature:**
-```typescript
-function store<T>(value: T, options?: StoreOptions): Store<T>
+const count = $(0)
+const other = $(0)
+
+const computed = $(() => {
+  const c = $$(count) // Creates a dependency
+  const o = untrack(() => $$(other)) // Does not create a dependency
+  return c + o
+})
+
+count(1) // Triggers update
+other(1) // Does not trigger update
 ```
 
-**Usage:**
+## Component Rendering
+
+Render components to the DOM.
+
 ```typescript
-import { store } from 'woby'
+import { $, render } from 'woby'
+
+const App = () => {
+  const count = $(0)
+  
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={() => count(c => $$(c) + 1)}>+</button>
+    </div>
+  )
+}
+
+render(<App />, document.getElementById('app'))
+```
+
+**Reactive Content Patterns:**
+
+In Woby, there are several ways to create reactive content in your components:
+
+1. **Direct Observable Passing (Recommended for simple cases):**
+```typescript
+const Component = () => {
+  const userName = $('John')
+  
+  // ✅ Direct observable - automatically reactive and preferred for single child elements
+  return <div>{userName}</div>
+}
+```
+
+2. **Function Expressions (For complex expressions):**
+```typescript
+const Component = () => {
+  const userName = $('John')
+  const show = $(true)
+  
+  // ✅ Function expression - automatically reactive
+  return <div>Hello {() => $$(userName)}</div>
+  
+  // ✅ Complex expressions with multiple observables
+  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
+}
+```
+
+3. **Memoized Expressions (When needed for expensive computations):**
+```typescript
+const Component = () => {
+  const userName = $('John')
+  
+  // ✅ Memoized expression - reactive but often unnecessary
+  return <div>Hello {useMemo(() => $$(userName))}</div>
+  
+  // Note: For simple expressions like this, useMemo is unnecessary
+  // since () => $$(userName) is automatically tracked
+}
+```
+
+**Common Mistake - Non-Reactive Content:**
+
+```typescript
+const Component = () => {
+  const userName = $('John')
+  
+  // ❌ Not reactive - only executes once
+  return <div>Hello {$$(userName)}</div>
+}
+```
+
+In the non-reactive example above, `$$()` is called during component creation (which only happens once), so the content never updates even when `userName` changes.
+
+**Reactive Attributes:**
+
+For attributes, you can directly pass observables for automatic reactivity:
+
+```typescript
+const Component = () => {
+  const valid = $(true)
+  const show = $(true)
+  
+  // ✅ Direct observable - automatically reactive
+  return <input disabled={valid} />
+  
+  // ✅ Function expression - reactive
+  return <input disabled={() => $$(valid) ? true : undefined} />
+  
+  // ✅ Complex reactive class expressions
+  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
+}
+```
+
+**Key Points:**
+- Direct observable passing (`{userName}`) is the preferred pattern for simple cases with only one child
+- Function expressions (`{() => $$(userName)}`) are automatically tracked and suitable for complex expressions
+- `useMemo` is unnecessary for simple expressions since `() =>` is automatically tracked
+- Avoid `{$$()}` patterns as they only execute once and are not reactive
+
+## Stores
+
+Create reactive stores for complex nested state.
+
+``typescript
+import { store, $$ } from 'woby'
 
 const userStore = store({
-  name: 'John',
-  age: 30,
-  settings: {
+  personal: {
+    name: 'John',
+    age: 30
+  },
+  preferences: {
     theme: 'dark'
   }
 })
 
-// Read nested values
-console.log(userStore.name()) // 'John'
-console.log(userStore.settings.theme()) // 'dark'
+// Access nested properties
+console.log($$(userStore.personal.name)) // 'John'
+console.log($$(userStore.preferences.theme)) // 'dark'
 
-// Update nested values
-userStore.settings.theme('light')
-userStore.age(31)
+// Update nested properties
+userStore.personal.name('Jane')
+userStore.preferences.theme('light')
 ```
 
-## Rendering
+## Conditional Rendering
 
-### render
+Use built-in components for conditional rendering.
 
-Renders a component tree into a DOM element.
-
-**Signature:**
 ```typescript
-function render(element: JSX.Element, container: Element): () => void
-```
+import { $, If, Switch, Match } from 'woby'
 
-**Usage:**
-```typescript
-import { render } from 'woby'
+const showContent = $(true)
+const status = $('loading')
 
-const App = () => <div>Hello World</div>
-
-// Render and get cleanup function
-const cleanup = render(<App />, document.getElementById('app'))
-
-// Later, clean up
-cleanup()
-```
-
-### renderToString
-
-Renders a component tree to an HTML string (for SSR).
-
-**Signature:**
-```typescript
-function renderToString(element: JSX.Element): string
-```
-
-**Usage:**
-```typescript
-import { renderToString } from 'woby'
-
-const App = () => <div>Hello World</div>
-
-const html = renderToString(<App />)
-console.log(html) // '<div>Hello World</div>'
-```
-
-## Reactivity Control
-
-### batch
-
-Batches multiple updates to prevent unnecessary re-renders.
-
-**Signature:**
-```typescript
-function batch<T>(fn: () => T): T
-```
-
-**Usage:**
-```typescript
-import { batch } from 'woby'
-
-const name = $('John')
-const age = $(30)
-
-// Without batch: triggers 2 updates
-name('Jane')
-age(31)
-
-// With batch: triggers 1 update
-batch(() => {
-  name('Jane')
-  age(31)
-})
-```
-
-### untrack
-
-Runs a function without tracking its observable dependencies.
-
-**Signature:**
-```typescript
-function untrack<T>(fn: () => T): T
-```
-
-**Usage:**
-```typescript
-import { untrack } from 'woby'
-
-const count = $(0)
-const double = $(() => {
-  const current = count()
-  
-  // This won't create a dependency on count
-  const untracked = untrack(() => count())
-  
-  return current * 2
-})
-```
-
-### isBatching
-
-Checks if code is currently running inside a batch.
-
-**Signature:**
-```typescript
-function isBatching(): boolean
-```
-
-**Usage:**
-```typescript
-import { isBatching } from 'woby'
-
-console.log(isBatching()) // false
-
-batch(() => {
-  console.log(isBatching()) // true
-})
-```
-
-## Context
-
-### createContext
-
-Creates a context for passing data through the component tree.
-
-**Signature:**
-```typescript
-function createContext<T>(defaultValue?: T): Context<T>
-```
-
-**Usage:**
-```typescript
-import { createContext } from 'woby'
-
-interface User {
-  name: string
-  role: string
-}
-
-const UserContext = createContext<User>()
-
-// Provide context value
-const App = () => (
-  <UserContext.Provider value={{ name: 'John', role: 'admin' }}>
-    <UserProfile />
-  </UserContext.Provider>
+const Component = () => (
+  <div>
+    <If when={showContent}>
+      <p>This content is conditionally shown</p>
+    </If>
+    
+    <Switch>
+      <Match when={() => $$(status) === 'loading'}>
+        <p>Loading...</p>
+      </Match>
+      <Match when={() => $$(status) === 'success'}>
+        <p>Success!</p>
+      </Match>
+      <Match when={() => $$(status) === 'error'}>
+        <p>Error occurred</p>
+      </Match>
+    </Switch>
+  </div>
 )
 ```
 
-## Utilities
+## List Rendering
 
-### lazy
+Efficiently render lists with the `For` component.
 
-Creates a lazily-loaded component.
-
-**Signature:**
 ```typescript
-function lazy<T>(loader: () => Promise<{ default: T }>): T
-```
+import { $, For } from 'woby'
 
-**Usage:**
-```typescript
-import { lazy, Suspense } from 'woby'
+const items = $([
+  { id: 1, name: 'Item 1' },
+  { id: 2, name: 'Item 2' },
+  { id: 3, name: 'Item 3' }
+])
 
-const LazyComponent = lazy(() => import('./HeavyComponent'))
-
-const App = () => (
-  <Suspense fallback={<div>Loading...</div>}>
-    <LazyComponent />
-  </Suspense>
+const Component = () => (
+  <ul>
+    <For values={items}>
+      {(item) => (
+        <li key={item.id}>{item.name}</li>
+      )}
+    </For>
+  </ul>
 )
 ```
 
-### resolve
+## Event Handling
 
-Resolves a potentially observable value.
+Handle DOM events with reactive callbacks.
 
-**Signature:**
-```typescript
-function resolve<T>(value: ObservableMaybe<T>): T
-```
-
-**Usage:**
-```typescript
-import { resolve } from 'woby'
-
-const getValue = (input: string | Observable<string>) => {
-  const resolved = resolve(input)
-  return resolved.toUpperCase()
-}
-
-getValue('hello') // 'HELLO'
-getValue($('hello')) // 'HELLO'
-```
-
-### isObservable
-
-Checks if a value is an observable.
-
-**Signature:**
-```typescript
-function isObservable(value: unknown): value is Observable<unknown>
-```
-
-**Usage:**
-```typescript
-import { isObservable } from 'woby'
-
-const name = $('John')
-const regular = 'Jane'
-
-console.log(isObservable(name)) // true
-console.log(isObservable(regular)) // false
-```
-
-### isStore
-
-Checks if a value is a store.
-
-**Signature:**
-```typescript
-function isStore(value: unknown): value is Store<unknown>
-```
-
-**Usage:**
-```typescript
-import { isStore } from 'woby'
-
-const user = store({ name: 'John' })
-const obs = $('value')
-
-console.log(isStore(user)) // true
-console.log(isStore(obs)) // false
-```
-
-### isServer
-
-Checks if code is running on the server (for SSR).
-
-**Signature:**
-```typescript
-function isServer(): boolean
-```
-
-**Usage:**
-```typescript
-import { isServer } from 'woby'
+``typescript
+import { $, $$ } from 'woby'
 
 const Component = () => {
-  if (isServer()) {
-    return <div>Server-side content</div>
+  const count = $(0)
+  
+  const handleClick = () => {
+    count(c => $$(c) + 1)
   }
   
-  return <div>Client-side content</div>
+  const handleInputChange = (e) => {
+    count(parseInt(e.target.value) || 0)
+  }
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={handleClick}>+</button>
+      <input 
+        type="number" 
+        value={count}
+        onInput={handleInputChange}
+      />
+    </div>
+  )
 }
 ```
 
-## Type Utilities
+## Resource Management
 
-### `Observable<T>`
-
-Type for observable values.
+Handle asynchronous data with resource utilities.
 
 ```typescript
-type Observable<T> = {
-  (): T
-  (value: T): T
-  (updater: (prev: T) => T): T
+import { useResource, $$ } from 'woby'
+
+const DataComponent = () => {
+  const data = useResource(async () => {
+    const response = await fetch('/api/data')
+    return response.json()
+  })
+  
+  return (
+    <div>
+      <If when={() => $$(data.loading)}>
+        <p>Loading...</p>
+      </If>
+      
+      <If when={() => $$(data.error)}>
+        <p>Error: {$$(data.error).message}</p>
+      </If>
+      
+      <If when={data}>
+        <pre>{JSON.stringify($$(data), null, 2)}</pre>
+      </If>
+    </div>
+  )
 }
 ```
 
-### `ObservableMaybe<T>`
+## Cleanup
 
-Type for values that may or may not be observable.
-
-```typescript
-type ObservableMaybe<T> = T | Observable<T>
-```
-
-### `FunctionMaybe<T>`
-
-Type for values that may be functions.
+Register cleanup functions for components.
 
 ```typescript
-type FunctionMaybe<T> = T | (() => T)
+import { useCleanup } from 'woby'
+
+const Component = () => {
+  const interval = setInterval(() => {
+    console.log('tick')
+  }, 1000)
+  
+  useCleanup(() => {
+    clearInterval(interval)
+  })
+  
+  return <div>Component with cleanup</div>
+}
 ```
 
-## Advanced Usage
-
-### Custom Equality
-
-```typescript
-const user = $({ id: 1, name: 'John' }, {
-  equals: (a, b) => a.id === b.id && a.name === b.name
-})
-```
-
-### Always Update
-
-```typescript
-const timestamp = $(Date.now(), { equals: false })
-// Always triggers updates even with same value
-```
-
-### Derived Observables
-
-```typescript
-const firstName = $('John')
-const lastName = $('Doe')
-const fullName = $(() => `${firstName()} ${lastName()}`)
-```
-
-For more examples and advanced patterns, see our [Examples](./Examples.md) page.
+These core methods form the foundation of Woby's reactivity system, enabling fine-grained updates and efficient rendering.

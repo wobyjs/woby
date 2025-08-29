@@ -50,7 +50,7 @@ const Clock = () => {
   
   return (
     <div style={{ fontSize: '2rem', fontFamily: 'monospace' }}>
-      {time().toLocaleTimeString()}
+      {() => time().toLocaleTimeString()}
     </div>
   )
 }
@@ -199,7 +199,7 @@ const useToggle = (initial = false) => {
 Complex state with store:
 
 ```typescript
-import { store, For, useMemo } from 'woby'
+import { store } from 'woby'
 
 interface CartItem {
   id: number
@@ -208,8 +208,9 @@ interface CartItem {
   quantity: number
 }
 
-const cartStore = store({
-  items: [] as CartItem[]
+const cart = store({
+  items: [] as CartItem[],
+  discount: 0
 })
 
 const useCart = () => {
@@ -254,20 +255,25 @@ const Cart = () => {
 
 ## Advanced Examples
 
-### Data Fetching
+### Data Fetching with useResource
 
-Using resources for async data:
+Asynchronous data handling:
 
 ```typescript
-import { $, useResource, For, Switch, Match } from 'woby'
+import { $, useResource } from 'woby'
 
-const UserPosts = () => {
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+const UserProfile = () => {
   const userId = $(1)
   
-  const posts = useResource(async () => {
-    const response = await fetch(
-      `https://jsonplaceholder.typicode.com/posts?userId=${userId()}`
-    )
+  const user = useResource<User>(async () => {
+    const response = await fetch(`/api/users/${userId()}`)
+    if (!response.ok) throw new Error('Failed to fetch user')
     return response.json()
   })
   
@@ -302,12 +308,12 @@ const UserPosts = () => {
 }
 ```
 
-### Animation
+### Form Handling with Validation
 
-Using animation hooks:
+Comprehensive form management:
 
 ```typescript
-import { $, useAnimationLoop } from 'woby'
+import { $, $$, useEffect } from 'woby'
 
 const AnimatedBox = () => {
   const rotation = $(0)
@@ -355,10 +361,40 @@ const focusInput = () => {
 
 const Component = () => {
   return (
-    <div>
-      <input ref={inputRef} />
-      <button onClick={focusInput}>Focus Input</button>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>Name:</label>
+        <input 
+          value={form.name}
+          onInput={(e) => form.name(e.target.value)}
+        />
+        {errors.name() && <span class="error">{errors.name()}</span>}
+      </div>
+      
+      <div>
+        <label>Email:</label>
+        <input 
+          type="email"
+          value={form.email}
+          onInput={(e) => form.email(e.target.value)}
+        />
+        {errors.email() && <span class="error">{errors.email()}</span>}
+      </div>
+      
+      <div>
+        <label>Password:</label>
+        <input 
+          type="password"
+          value={form.password}
+          onInput={(e) => form.password(e.target.value)}
+        />
+        {errors.password() && <span class="error">{errors.password()}</span>}
+      </div>
+      
+      <button type="submit" disabled={isSubmitting()}>
+        {isSubmitting() ? 'Submitting...' : 'Submit'}
+      </button>
+    </form>
   )
 }
 ```

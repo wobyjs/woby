@@ -28,7 +28,7 @@ import { $, useMemo } from 'woby'
 
 const Component = () => {
   const count = $(0)
-  const doubled = useMemo(() => count() * 2)
+  const doubled = useMemo(() => $$(count) * 2)
   
   return (
     <div>
@@ -45,14 +45,14 @@ const Component = () => {
 In Woby, event handlers are automatically optimized by the framework's dependency tracking system, eliminating the need for manual memoization:
 
 ```typescript
-// ❌ Over-engineered - Trying to replicate React patterns
+// ❌ Over-engineered - Attempting to replicate React patterns
 const handleClick = useMemo(() => {
   return (e) => {
     console.log('Button clicked')
   }
 })
 
-// ✅ Simple and clean - Woby's automatic tracking handles optimization
+// ✅ Clean and efficient - Woby's automatic tracking handles optimization
 const handleClick = (e) => {
   console.log('Button clicked')
 }
@@ -84,7 +84,7 @@ const Component = () => {
       <button onClick={toggle}>Toggle</button>
       <button onClick={show}>Show</button>
       <button onClick={hide}>Hide</button>
-      {isVisible() && <p>I'm visible!</p>}
+      {() =< $$(isVisible) && <p>I'm visible!</p>}
     </div>
   )
 }
@@ -133,7 +133,7 @@ const Component = () => {
   const count = $(0)
   
   useEffect(() => {
-    console.log('Count changed:', count())
+    console.log('Count changed:', $$(count))
     
     // Optional cleanup function
     return () => {
@@ -148,6 +148,136 @@ const Component = () => {
     </div>
   )
 }
+```
+
+React behavior (for comparison):
+```typescript
+import { useEffect } from 'react'
+
+function Component() {
+  useEffect(() => {
+    console.log('Component mounted or updated')
+    
+    return () => {
+      console.log('Component will unmount')
+    }
+  }, []) // Dependency array controls when effect runs
+  
+  return <div>Hello World</div>
+}
+```
+
+Woby behavior:
+```typescript
+import { useEffect } from 'woby'
+
+function Component() {
+  useEffect(() => {
+    console.log('Component mounted or updated')
+    
+    return () => {
+      console.log('Component will unmount')
+    }
+  }) // No dependency array needed
+  
+  return <div>Hello World</div>
+}
+```
+
+**Automatic Dependency Tracking:**
+Unlike React's useEffect which requires a dependency array, Woby's useEffect automatically tracks which observables are accessed within its callback:
+
+```typescript
+import { $, $$, useEffect } from 'woby'
+
+const userId = $(123)
+const theme = $('dark')
+
+// Woby automatically tracks userId and theme
+useEffect(() => {
+  console.log(`User: ${$$(userId)}, Theme: ${$$(theme)}`)
+  // This effect will re-run whenever userId or theme changes
+})
+
+// No dependency array needed - Woby handles tracking automatically
+```
+
+**Reactive Content in Components:**
+
+In Woby, components execute once but reactive content updates automatically. There are several patterns for creating reactive content:
+
+```typescript
+const ReactiveContentComponent = () => {
+  const userName = $('John')
+  const show = $(true)
+  const valid = $(true)
+  
+  // ✅ Direct observable passing - simplest and most common (only 1 child)
+  return <div>{userName}</div>
+  
+  // ✅ Function expressions - for more complex reactive expressions
+  return <div>Hello {() => $$(userName)}</div>
+  
+  // ✅ Memoized expressions - for expensive computations (often unnecessary)
+  return <div>Hello {useMemo(() => $$(userName))}</div>
+  
+  // ✅ Reactive attributes
+  return <input disabled={valid} /> // Direct observable - reactive
+  
+  // ✅ Complex reactive class expressions
+  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
+}
+```
+
+**Important Notes:**
+- Components execute once on mount, not on every render like React
+- Reactive content updates automatically when observables change
+- Direct observable passing (`{userName}`) is preferred for simple cases with only one child
+- Function expressions (`{() => $$(userName)}`) are automatically tracked
+- `useMemo` is unnecessary for simple expressions since `() =>` is automatically tracked
+- Avoid `{$$()}` patterns as they only execute once and are not reactive
+
+**Effect Organization:**
+Separate unrelated concerns into individual effects for better performance:
+
+```typescript
+import { $, $$, useEffect } from 'woby'
+
+const name = $('John')
+const count = $(0)
+
+// ✅ Recommended - Separate effects for different concerns
+useEffect(() => {
+  console.log('Name changed:', $$(name))
+})
+
+useEffect(() => {
+  console.log('Count changed:', $$(count))
+})
+
+// ❌ Not recommended - Single effect with unrelated dependencies
+// useEffect(() => {
+//   console.log('Name:', $$(name))
+//   console.log('Count:', $$(count))
+// })
+```
+
+**Optimization with Early Returns:**
+Use early returns to skip unnecessary work:
+
+```typescript
+import { $, $$, useEffect } from 'woby'
+
+const name = $('John')
+const previousName = $('John')
+
+useEffect(() => {
+  // Skip if name hasn't changed meaningfully
+  if ($$(previousName) === $$(name)) return
+  
+  previousName($$(name))
+  performExpensiveOperation($$(name))
+})
 ```
 
 ### useReaction
@@ -170,7 +300,7 @@ const Component = () => {
   const name = $('John')
   
   useReaction(
-    () => name(),
+    () => $$(name),
     (newName, oldName) => {
       console.log(`Name changed from ${oldName} to ${newName}`)
     }
@@ -233,15 +363,15 @@ const UserProfile = () => {
   const userId = $(1)
   
   const user = useResource(async () => {
-    const response = await fetch(`/api/users/${userId()}`)
+    const response = await fetch(`/api/users/${$$(userId)}`)
     return response.json()
   })
   
   return (
     <div>
-      {user.loading() && <p>Loading...</p>}
-      {user.error() && <p>Error: {user.error().message}</p>}
-      {user() && <p>Hello, {user().name}!</p>}
+      {$$(user.loading) && <p>Loading...</p>}
+      {$$(user.error) && <p>Error: {$$(user.error).message}</p>}
+      {$$(user) && <p>Hello, {$$(user).name}!</p>}
     </div>
   )
 }
@@ -268,11 +398,11 @@ const PostList = () => {
   
   return (
     <div>
-      {posts.loading() && <div>Loading posts...</div>}
-      {posts.error() && <div>Failed to load posts</div>}
-      {posts() && (
+      {$$(posts.loading) && <div>Loading posts...</div>}
+      {$$(posts.error) && <div>Failed to load posts</div>}
+      {$$(posts) && (
         <ul>
-          {posts().map(post => (
+          {$$(posts).map(post => (
             <li key={post.id}>{post.title}</li>
           ))}
         </ul>
@@ -308,8 +438,8 @@ const Component = () => {
   return (
     <div>
       <button onClick={loadData}>Load Data</button>
-      {result.loading() && <p>Loading...</p>}
-      {result() && <p>Data: {result()}</p>}
+      {$$(result.loading) && <p>Loading...</p>}
+      {$$(result) && <p>Data: {$$(result)}</p>}
     </div>
   )
 }
@@ -367,7 +497,7 @@ const Clock = () => {
     time(new Date())
   }, 1000)
   
-  return <div>Current time: {time().toLocaleTimeString()}</div>
+  return <div>Current time: {() => $$(time).toLocaleTimeString()}</div>
 }
 ```
 
@@ -388,11 +518,11 @@ const AnimatedComponent = () => {
   const position = $(0)
   
   useAnimationFrame(() => {
-    position(p => p + 1)
+    position(p => $$(p) + 1)
   })
   
   return (
-    <div style={{ transform: `translateX(${position()}px)` }}>
+    <div style={{ transform: `translateX(${$$(position)}px)` }}>
       Moving element
     </div>
   )
@@ -421,7 +551,7 @@ const AnimationDemo = () => {
   
   return (
     <div style={{ 
-      transform: `rotate(${rotation()}rad)`,
+      transform: `rotate(${$$(rotation)}rad)`,
       transition: 'none'
     }}>
       🎨
@@ -451,7 +581,7 @@ const ThemedComponent = () => {
   const theme = useContext(ThemeContext)
   
   return (
-    <div class={`theme-${theme()}`}>
+    <div class={`theme-${$$(theme)}`}>
       Current theme: {theme}
     </div>
   )
@@ -476,7 +606,7 @@ const Component = () => {
   
   useEffect(() => {
     const timer = setInterval(() => {
-      if (!disposed()) {
+      if (!$$(disposed)) {
         console.log('Component is still alive')
       }
     }, 1000)
@@ -504,7 +634,7 @@ import { $, useRoot } from 'woby'
 const Component = () => {
   const result = useRoot(() => {
     const count = $(0)
-    const doubled = $(() => count() * 2)
+    const doubled = $(() => $$(count) * 2)
     
     return { count, doubled }
   })
@@ -543,13 +673,13 @@ const Component = () => {
   
   useEventListener(window, 'keydown', (e) => {
     if (e.key === ' ') {
-      count(c => c + 1)
+      count(c => $$(c) + 1)
     }
   })
   
   return (
     <div>
-      <p>Count: {count}</p>
+      <p>Count: {() => $$(count)}</p>
       <p>Press spacebar to increment</p>
     </div>
   )
@@ -617,7 +747,7 @@ const Component = ({ useSpecialFeature }: { useSpecialFeature: boolean }) => {
   
   if (useSpecialFeature) {
     useInterval(() => {
-      count(c => c + 1)
+      count(c => $$(c) + 1)
     }, 1000)
   }
   
@@ -672,7 +802,7 @@ function useAuth() {
 function usePermissions() {
   const { user } = useAuth()
   const permissions = useMemo(() => {
-    return user()?.permissions || []
+    return $$(user)?.permissions || []
   })
   
   return { permissions }

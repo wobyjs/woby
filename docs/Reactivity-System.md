@@ -1,6 +1,6 @@
 # Reactivity System
 
-Woby's reactivity system is built on observables and provides fine-grained reactive updates. Understanding this system is key to building efficient Woby applications.
+Woby's reactivity system is built upon observables and provides fine-grained reactive updates. A comprehensive understanding of this system is essential for developing efficient Woby applications.
 
 ## Table of Contents
 
@@ -10,6 +10,7 @@ Woby's reactivity system is built on observables and provides fine-grained react
 - [Batching](#batching)
 - [Advanced Patterns](#advanced-patterns)
 - [Best Practices](#best-practices)
+- [Effect Management](#effect-management)
 
 ## Observables Basics
 
@@ -24,11 +25,11 @@ import { $ } from 'woby'
 const count = $(0)
 
 // Read the value
-console.log(count()) // 0
+console.log($$(count)) // 0
 
 // Set a new value
 count(1)
-console.log(count()) // 1
+console.log($$(count)) // 1
 
 // Update with a function
 count(prev => prev + 1)
@@ -51,11 +52,11 @@ const firstName = $('John')
 const lastName = $('Doe')
 
 // Automatically updates when firstName or lastName changes
-const fullName = $(() => `${firstName()} ${lastName()}`)
+const fullName = $(() => `${$$(firstName)} ${$$(lastName)}`)
 
-console.log(fullName()) // "John Doe"
+console.log($$(fullName)) // "John Doe"
 firstName('Jane')
-console.log(fullName()) // "Jane Doe"
+console.log($$(fullName)) // "Jane Doe"
 ```
 
 **Custom Equality:**
@@ -82,8 +83,8 @@ const quadrupled = $(0)
 
 // This creates a dependency chain
 const updateChain = () => {
-  doubled(count() * 2)      // Depends on count
-  quadrupled(doubled() * 2) // Depends on doubled
+  doubled($$(count) * 2)      // Depends on count
+  quadrupled($$(doubled) * 2) // Depends on doubled
 }
 
 // Any change to count will update the entire chain
@@ -102,12 +103,17 @@ const Component = () => {
   // This component will re-render when either count or message changes
   return (
     <div>
-      <p>{message()}: {count()}</p>
-      <button onClick={() => count(c => c + 1)}>+</button>
+      <p>{message}: {count}</p>
+      <button onClick={() => count(c => $$(c) + 1)}>+</button>
     </div>
   )
 }
 ```
+
+**Key Points:**
+- Direct observable passing (`{message}`) is the preferred pattern for simple cases with only one child
+- Function expressions (`{() => $$(message)}`) are automatically tracked and suitable for complex expressions
+- For attributes, you can directly pass observables for automatic reactivity (`disabled={valid}`)
 
 ### Manual Dependency Control
 
@@ -119,10 +125,10 @@ const count = $(0)
 const other = $(0)
 
 const computed = $(() => {
-  const c = count() // This creates a dependency
+  const c = $$(count) // This creates a dependency
   
   // This doesn't create a dependency
-  const o = untrack(() => other())
+  const o = untrack(() => $$(other))
   
   return c + o
 })
@@ -138,10 +144,10 @@ const name = $('John')
 const details = $('Developer')
 
 const display = $(() => {
-  const n = name() // Always depends on name
+  const n = $$(name) // Always depends on name
   
-  if (showDetails()) {
-    return `${n} - ${details()}` // Conditionally depends on details
+  if ($$(showDetails)) {
+    return `${n} - ${$$(details)}` // Conditionally depends on details
   }
   
   return n
@@ -176,8 +182,8 @@ const userStore = store({
 
 ```typescript
 // Read values
-console.log(userStore.personal.name()) // 'John'
-console.log(userStore.preferences.theme()) // 'dark'
+console.log($$(userStore.personal.name)) // 'John'
+console.log($$(userStore.preferences.theme)) // 'dark'
 
 // Update values
 userStore.personal.name('Jane')
@@ -195,7 +201,7 @@ userStore.personal({
 ```typescript
 // Add items
 userStore.todos([
-  ...userStore.todos(),
+  ...$$(userStore.todos),
   { id: 2, text: 'Build app', done: false }
 ])
 ```
@@ -211,7 +217,7 @@ import { $, $$ } from 'woby'
 
 // ❌ Avoid - Direct invocation
 const count = $(0)
-console.log(count()) // Works, but not recommended
+console.log($$(count)) // Works, but not recommended
 
 // ✅ Prefer - Using $$ for unwrapping
 const count = $(0)
@@ -219,7 +225,7 @@ console.log($$(count)) // Recommended approach
 
 // ❌ Dangerous - Direct invocation can be ambiguous
 const maybeObservable = getValue() // Could be observable or plain value
-const value = maybeObservable() // If it's not observable, this will cause an error
+const value = $$(maybeObservable) // If it's not observable, this will cause an error
 
 // ✅ Safe - Using $$ handles both cases
 const maybeObservable = getValue()
@@ -281,9 +287,9 @@ console.log($$(count)) // Read the value
 
 Woby automatically batches updates in event handlers and async operations:
 
-```typescript
+``typescript
 const count = $(0)
-const doubled = $(() => count() * 2)
+const doubled = $(() => $$(count) * 2)
 
 const handleClick = () => {
   count(1) // These updates are automatically batched
@@ -338,16 +344,16 @@ const items = $([
 const filter = $('all')
 
 const filteredItems = $(() => {
-  const f = filter()
-  if (f === 'all') return items()
-  return items().filter(item => item.category === f)
+  const f = $$(filter)
+  if (f === 'all') return $$(items)
+  return $$(items).filter(item => item.category === f)
 })
 
 const totalPrice = $(() => {
-  return filteredItems().reduce((sum, item) => sum + item.price, 0)
+  return $$(filteredItems).reduce((sum, item) => sum + item.price, 0)
 })
 
-const itemCount = $(() => filteredItems().length)
+const itemCount = $(() => $$(filteredItems).length)
 ```
 
 ### Reactive Patterns
@@ -362,13 +368,13 @@ const Component1 = () => {
   
   // React to events
   $(() => {
-    const event = eventBus()
+    const event = $$(eventBus)
     if (event?.type === 'notification') {
       message(event.data.message)
     }
   })
   
-  return <div>{message}</div>
+  return <div>{message}</div> {/* Direct observable usage - reactive */}
 }
 
 // Emit events
@@ -405,15 +411,15 @@ const fetchData = async () => {
 
 const Component = () => (
   <div>
-    <button onClick={fetchData} disabled={() => state() === 'loading'}>
-      {state() === 'loading' ? 'Loading...' : 'Fetch Data'}
+    <button onClick={fetchData} disabled={() => $$(state) === 'loading'}>
+      {() => $$(state) === 'loading' ? 'Loading...' : 'Fetch Data'}
     </button>
     
-    <If when={() => state() === 'success'}>
-      <pre>{() => JSON.stringify(data(), null, 2)}</pre>
+    <If when={() => $$(state) === 'success'}>
+      <pre>{() => JSON.stringify($$(data), null, 2)}</pre>
     </If>
     
-    <If when={() => state() === 'error'}>
+    <If when={() => $$(state) === 'error'}>
       <div>Error: {error}</div>
     </If>
   </div>
@@ -467,9 +473,9 @@ const Component = () => {
   const data = $([/* large dataset */])
   
   // Only recomputes when data changes
-  const processedData = useMemo(() => expensiveComputation(data()))
+  const processedData = useMemo(() => expensiveComputation($$(data)))
   
-  return <div>{processedData().length} items processed</div>
+  return <div>{() => $$(processedData).length} items processed</div>
 }
 ```
 
@@ -490,3 +496,112 @@ listStore.items[5].name('Updated name') // Only updates this specific item
 ```
 
 For more performance optimization techniques, see our [Performance Guide](./Performance.md).
+
+## Effect Management
+
+### Automatic Dependency Tracking in Effects
+
+Woby's [useEffect](file://d:\Developments\tslib\woby\src\hooks\use_effect.ts#L28-L32) hook automatically tracks which observables are accessed within its callback function. This eliminates the need for manual dependency arrays required in React:
+
+```typescript
+import { $, $$, useEffect } from 'woby'
+
+const userId = $(123)
+const theme = $('dark')
+
+// Woby automatically tracks userId and theme
+useEffect(() => {
+  console.log(`User ID: ${$$(userId)}, Theme: ${$$(theme)}`)
+})
+
+// The effect will automatically re-run when either observable changes
+userId(456) // Effect re-runs with new userId
+theme('light') // Effect re-runs with new theme
+```
+
+### Component Mounting vs Effect Re-execution
+
+Unlike React where components re-execute completely on prop changes, Woby components execute only once when mounted, while effects re-run based on observable changes:
+
+React behavior (for comparison):
+```typescript
+function ReactComponent({ userName }) {
+  console.log("Component re-running") // Runs on every render
+  
+  useEffect(() => {
+    console.log(userName) // Runs when userName changes (based on dependency array)
+  }, [userName])
+}
+```
+
+Woby behavior:
+```typescript
+const WobyComponent = ({ userName }) => {
+  console.log("Component mounting") // Runs only once
+  
+  useEffect(() => {
+    console.log($$(userName)) // Runs when userName observable changes
+  })
+  
+  return <div>Hello {() => $$(userName)}</div>
+}
+```
+
+### Optimizing Effects with Early Returns
+
+Use early returns to prevent unnecessary work in effects:
+
+```typescript
+import { $, $$, useEffect } from 'woby'
+
+const name = $('John')
+const previousName = $('John')
+
+useEffect(() => {
+  // Skip effect if name hasn't meaningfully changed
+  if ($$(previousName) === $$(name)) return
+  
+  previousName($$(name)) // Update tracking observable
+  performExpensiveOperation($$(name))
+})
+```
+
+### Separating Unrelated Concerns
+
+Organize unrelated reactive logic into separate effects for better performance:
+
+```typescript
+import { $, $$, useEffect } from 'woby'
+
+const userProfile = store({ name: 'John', age: 30 })
+const appTheme = $('dark')
+const networkStatus = $('online')
+
+// Separate effects for unrelated concerns
+useEffect(() => {
+  // Only tracks userProfile.name
+  document.title = `Welcome ${$$(userProfile.name)}`
+})
+
+useEffect(() => {
+  // Only tracks appTheme
+  document.body.className = `theme-${$$(appTheme)}`
+})
+
+useEffect(() => {
+  // Only tracks networkStatus
+  showNotification(`Network status: ${$$(networkStatus)}`)
+})
+```
+
+### Comparison with React's Approach
+
+| Aspect | React | Woby |
+|--------|-------|------|
+| Component Execution | Re-runs on every render | Runs once on mount |
+| Dependency Tracking | Manual dependency arrays | Automatic observable tracking |
+| Effect Re-execution | Based on dependency array comparison | Based on observable access |
+| Performance | Virtual DOM diffing | Direct DOM updates |
+| Code Complexity | Requires careful dependency management | Automatic dependency tracking |
+
+This automatic dependency tracking system is one of Woby's key advantages, making reactive programming more intuitive and less error-prone compared to manual dependency management in other frameworks.

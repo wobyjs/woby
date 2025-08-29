@@ -1,20 +1,20 @@
 # Woby Wiki
 
-Welcome to the Woby framework documentation wiki! This wiki provides comprehensive guides, tutorials, and reference materials for building applications with Woby.
+Welcome to the Woby framework documentation wiki! This comprehensive resource provides guides, tutorials, and reference materials for building applications with Woby.
 
 ## 📚 Table of Contents
 
 ### Getting Started
 - [Installation](./Installation.md) - How to install and set up Woby
-- [Quick Start](./Quick-Start.md) - Build your first Woby app in minutes
+- [Quick Start](./Quick-Start.md) - Build your first Woby application in minutes
 - [Project Structure](./Project-Structure.md) - Understanding Woby project organization
-- [Examples](./Examples.md) - Complete examples and demos
+- [Examples](./Examples.md) - Complete examples and demonstrations
 - [Demo Applications](./Demo-Applications.md) - Interactive demo collection with live examples
 
 ### Core Concepts  
 - [Reactivity System](./Reactivity-System.md) - Understanding observables and signals
-- [Components](./Components.md) - Creating and using components
-- [JSX and Templates](./JSX-and-Templates.md) - Different ways to write UI
+- [Components](./Components.md) - Creating and utilizing components
+- [JSX and Templates](./JSX-and-Templates.md) - Different approaches to writing UI
 - [State Management](./State-Management.md) - Managing application state
 
 ### API Reference
@@ -58,7 +58,7 @@ Welcome to the Woby framework documentation wiki! This wiki provides comprehensi
 
 ## 📖 About This Wiki
 
-This wiki is maintained alongside the Woby framework to provide up-to-date documentation and guides. If you find any issues or want to contribute improvements, please see our [Contributing Guide](./Contributing.md).
+This wiki is maintained alongside the Woby framework to provide current documentation and guides. If you identify any issues or wish to contribute improvements, please consult our [Contributing Guide](./Contributing.md).
 
 ---
 

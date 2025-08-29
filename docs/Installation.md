@@ -1,6 +1,6 @@
 # Installation
 
-This guide will help you get Woby installed and running in your project.
+This guide will assist you in installing and configuring Woby for your project.
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ Create an `index.html` file:
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Woby App</title>
+    <title>My Woby Application</title>
 </head>
 <body>
     <div id="app"></div>
@@ -63,7 +63,7 @@ Create a `tsconfig.json`:
 ```
 
 ### 3. JSX Setup
-For JSX support, configure your bundler to use Woby's JSX runtime:
+For JSX support, configure your bundler to utilize Woby's JSX runtime:
 
 #### Vite Configuration
 ```typescript
@@ -126,24 +126,24 @@ render(<Counter />, document.getElementById('app')!)
 
 ## Verification
 
-To verify your installation is working:
+To verify your installation is functioning correctly:
 
 1. Create the files above
-2. Run your dev server (e.g., `vite dev`)
-3. Open your browser to see the counter app
+2. Run your development server (e.g., `vite dev`)
+3. Open your browser to observe the counter application
 
 ## Next Steps
 
-- [Quick Start Guide](./Quick-Start.md) - Build your first real app
+- [Quick Start Guide](./Quick-Start.md) - Build your first real application
 - [Core Concepts](./Reactivity-System.md) - Learn about observables
 - [Examples](./Examples.md) - See more complex examples
 
 ## Common Issues
 
 ### TypeScript Errors
-Make sure your `tsconfig.json` includes the correct JSX configuration and that `woby` types are properly resolved.
+Ensure your `tsconfig.json` includes the correct JSX configuration and that `woby` types are properly resolved.
 
 ### Build Errors
-Ensure your bundler is configured to handle JSX with Woby's runtime. See the bundler-specific configurations above.
+Verify your bundler is configured to handle JSX with Woby's runtime. Refer to the bundler-specific configurations above.
 
-For more troubleshooting help, see our [Troubleshooting Guide](./Troubleshooting.md).
+For additional troubleshooting assistance, consult our [Troubleshooting Guide](./Troubleshooting.md).

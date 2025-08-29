@@ -1,6 +1,6 @@
 # FAQ
 
-Frequently asked questions about Woby framework.
+Frequently asked questions about the Woby framework.
 
 ## General Questions
 
@@ -10,7 +10,7 @@ Woby is a high-performance reactive framework with fine-grained observable-based
 
 ### How is Woby different from React?
 
-- **No Virtual DOM**: Direct DOM manipulation for better performance
+- **No Virtual DOM**: Direct DOM manipulation for enhanced performance
 - **No hooks rules**: Functions can be called conditionally, nested, or outside components
 - **Fine-grained updates**: Only changed parts re-render, not entire components
 - **Observable-based**: Uses observables/signals instead of state and props
@@ -31,7 +31,7 @@ Woby is actively developed and used in production applications. However, as with
 
 ### How do I handle forms in Woby?
 
-Use observables for form state:
+Use observables for form state management:
 
 ```typescript
 const LoginForm = () => {
@@ -82,7 +82,7 @@ const useGlobalState = () => useContext(AppContext)
 
 ### How do I handle async operations?
 
-Use resources for async data fetching:
+Use resources for asynchronous data fetching:
 
 ```typescript
 import { useResource } from 'woby'
@@ -95,9 +95,10 @@ const DataComponent = () => {
   
   return (
     <div>
-      {data.loading() && <div>Loading...</div>}
-      {data.error() && <div>Error: {data.error().message}</div>}
-      {data() && <div>Data: {JSON.stringify(data())}</div>}
+      //without arrow function, the following line become runs without reactive
+      {() => $$(data.loading) && <div>Loading...</div>}
+      {() => $$(data.error) && <div>Error: {$$(data.error).message}</div>}
+      {() => $$(data) && <div>Data: {JSON.stringify($$(data))}</div>}
     </div>
   )
 }
@@ -118,7 +119,7 @@ batch(() => {
 })
 ```
 
-3. **Use the right iteration component**:
+3. **Use the appropriate iteration component**:
 - `For` for complex objects
 - `ForValue` for primitives
 - `ForIndex` for fixed-size lists
@@ -145,7 +146,7 @@ const Component = () => {
 
 ### How do I handle routing?
 
-Woby doesn't include a built-in router, but you can use:
+Woby does not include a built-in router, but you can implement:
 
 1. **Simple hash-based routing**:
 ```typescript
@@ -199,60 +200,39 @@ Verify that you are:
 
 ### Handling "Cannot read property of undefined" Errors
 
-This usually happens when:
-1. Trying to access a property on an observable that might be undefined
-2. Not checking if data is loaded before accessing it
+This typically occurs when:
+1. Accessing properties on undefined observables
+2. Not properly initializing observables
+3. Incorrectly unwrapping observables
 
 Solution:
 ```typescript
-// Wrong
-<div>{user().name}</div>
+// ❌ Incorrect
+const user = $()
+console.log(user().name) // Error if user() is undefined
 
-// Right
-<div>{user() && user().name}</div>
-// Or
-<If when={user}>
-  <div>{() => user().name}</div>
-</If>
+// ✅ Correct
+const user = $({ name: '' })
+console.log(user().name) // Safe access
+
+// ✅ With optional chaining
+console.log(user()?.name) // Safe access with optional chaining
 ```
 
-### Performance is slow with large lists
+### Performance Considerations
 
-1. Use the appropriate iteration component
-2. Consider virtualization for very large lists
-3. Use `untrack` to prevent unnecessary dependencies
-4. Optimize your equality functions
+For optimal performance:
+1. Minimize unnecessary observable updates
+2. Use `untrack` when reading observables without creating dependencies
+3. Leverage `batch` for multiple synchronous updates
+4. Use `useMemo` for expensive computations
 
-### TypeScript errors with JSX
+### Debugging Reactive Updates
 
-Make sure your `tsconfig.json` is configured correctly:
-
-```json
-{
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "woby"
-  }
-}
-```
-
-## Best Practices
-
-### When to use observables vs stores?
-
-- **Observables**: Simple values, primitive types, single pieces of state
-- **Stores**: Complex objects, nested data, when you need fine-grained reactivity on properties
-
-### How to structure large applications?
-
-1. **Use contexts** for global state
-2. **Create custom hooks** for reusable logic
-3. **Break down components** into smaller, focused pieces
-4. **Use stores** for domain-specific state
-
-### How to handle errors?
-
-Use error boundaries for component errors:
+To debug reactive updates:
+1. Use `console.log` inside effects to trace when they run
+2. Utilize browser dev tools to inspect observable values
+3. Add logging to track observable changes:
 
 ```typescript
 <ErrorBoundary

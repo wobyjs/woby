@@ -12,7 +12,7 @@ We'll create a simple todo app that demonstrates Woby's core features:
 
 ## Step 1: Create Your App
 
-First, make sure you have [Woby installed](./Installation.md), then create your main app file:
+First, ensure you have [Woby installed](./Installation.md), then create your main application file:
 
 ```typescript
 // src/App.tsx
@@ -31,7 +31,7 @@ const TodoApp = () => {
 
   // Actions
   const addTodo = () => {
-    const text = input().trim()
+    const text = $$(input).trim()
     if (text) {
       todos(prev => [...prev, {
         id: Date.now(),
@@ -45,13 +45,13 @@ const TodoApp = () => {
   const toggleTodo = (id: number) => {
     todos(prev => prev.map(todo => 
       todo.id === id 
-        ? { ...todo, completed: !todo.completed }
+        ? { ...todo, completed: !$$(todo.completed) }
         : todo
     ))
   }
 
   const removeTodo = (id: number) => {
-    todos(prev => prev.filter(todo => todo.id !== id))
+    todos(prev => $$(prev).filter(todo => todo.id !== id))
   }
 
   return (
@@ -94,20 +94,20 @@ const TodoApp = () => {
 
       {/* Stats */}
       <div class="stats">
-        Total: {() => todos().length} | 
-        Completed: {() => todos().filter(t => t.completed).length}
+        Total: {() => $$(todos).length} | 
+        Completed: {() => $$(todos).filter(t => t.completed).length}
       </div>
     </div>
   )
 }
 
-// Render the app
+// Render the application
 render(<TodoApp />, document.getElementById('app')!)
 ```
 
 ## Step 2: Add Some Styling
 
-Create a CSS file to make it look nice:
+Create a CSS file to enhance the visual presentation:
 
 ```css
 /* src/styles.css */
@@ -201,17 +201,20 @@ Create a CSS file to make it look nice:
 ## Key Concepts Demonstrated
 
 ### 1. **Observables ($)**
+
 ```typescript
 const todos = $<Todo[]>([])  // Creates reactive state
 const input = $('')          // String observable
 ```
 
 ### 2. **Reactive Updates**
+
 ```typescript
 todos(prev => [...prev, newTodo])  // State updates trigger re-renders
 ```
 
 ### 3. **Dynamic Rendering**
+
 ```typescript
 <For values={todos}>
   {(todo) => <li>...</li>}
@@ -219,6 +222,7 @@ todos(prev => [...prev, newTodo])  // State updates trigger re-renders
 ```
 
 ### 4. **Event Handling**
+
 ```typescript
 <button onClick={addTodo}>Add</button>
 <input onInput={(e) => input(e.target.value)} />
@@ -242,7 +246,7 @@ Notice how everything stays in sync without any manual work - that's Woby's reac
 
 ## Next Steps
 
-Now that you've built your first Woby app, explore these topics:
+Now that you've built your first Woby application, explore these topics:
 
 - [Reactivity System](./Reactivity-System.md) - Deep dive into observables
 - [Components](./Components.md) - Learn about component patterns
@@ -251,4 +255,4 @@ Now that you've built your first Woby app, explore these topics:
 
 ## Complete Example
 
-You can find this complete todo app and many others in our [examples gallery](./Examples.md) or check out the [live demos](https://github.com/wongchichong/woby-demo).
+You can find this complete todo application and many others in our [examples gallery](./Examples.md) or check out the [live demos](https://github.com/wongchichong/woby-demo).
