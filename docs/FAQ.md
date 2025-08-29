@@ -190,14 +190,14 @@ test('counter increments', () => {
 
 ## Common Issues
 
-### My component isn't re-rendering
+### Ensuring Component Re-rendering
 
-Make sure you're:
+Verify that you are:
 1. Calling the observable as a function: `count()` not `count`
 2. Using the observable in a reactive context (component or effect)
 3. Actually updating the observable: `count(newValue)`
 
-### I'm getting "Cannot read property of undefined"
+### Handling "Cannot read property of undefined" Errors
 
 This usually happens when:
 1. Trying to access a property on an observable that might be undefined

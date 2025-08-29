@@ -42,7 +42,7 @@ const Component = () => {
 
 **Best Practices:**
 
-In Woby, you typically don't need to memoize event handlers because the framework's automatic dependency tracking handles optimization for you:
+In Woby, event handlers are automatically optimized by the framework's dependency tracking system, eliminating the need for manual memoization:
 
 ```typescript
 // ❌ Over-engineered - Trying to replicate React patterns

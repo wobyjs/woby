@@ -163,8 +163,8 @@ function ParentComponent() {
 
 **Woby:**
 ```tsx
-// Woby doesn't have a direct useCallback equivalent
-// Instead, it uses automatic dependency tracking:
+// Woby provides automatic dependency tracking
+// This eliminates the need for a direct useCallback equivalent:
 
 // Method 1: Simple function (no memoization needed)
 const handleClick = (e) => {
@@ -186,7 +186,7 @@ function ParentComponent() {
 ```
 
 **Key Differences:**
-- Woby doesn't need `useCallback` because it has automatic dependency tracking
+- Woby provides automatic dependency tracking, offering a streamlined approach without requiring explicit `useCallback`
 - `useMemo` can serve a similar purpose when you need to memoize functions
 - Less API surface area to learn
 
@@ -241,7 +241,7 @@ const FancyButtonWithObservableRef = ({ children }: { children: any }) => {
 ```
 
 **Key Differences:**
-- Woby doesn't need a special `forwardRef` function
+- Woby simplifies ref handling without requiring a special `forwardRef` function
 - Refs are passed as regular props
 - Observable-based refs provide more flexibility
 
@@ -348,7 +348,7 @@ const handleClick = () => {
 
 1. **Automatic Tracking**: In Woby, whenever you use `$$()` to unwrap an observable inside a reactive context (like `useEffect` or `useMemo`), that observable is automatically tracked as a dependency.
 
-2. **No Manual Arrays**: You never need to manually maintain dependency arrays in Woby, eliminating a common source of bugs in React applications.
+2. **Automatic Management**: Woby automatically manages dependency arrays, reducing potential sources of bugs compared to React applications.
 
 3. **Reactive Context**: The tracking only happens within reactive contexts (functions passed to `useEffect`, `useMemo`, etc.). Outside these contexts, `$$()` simply unwraps the value without tracking.
 
@@ -372,16 +372,16 @@ const handleClick = () => {
 
 ## Summary of Key Differences
 
-1. **No Dependency Arrays**: Woby's automatic dependency tracking eliminates the need for dependency arrays in `useMemo` and `useEffect`.
+1. **Automatic Dependency Tracking**: Woby's automatic dependency tracking provides a streamlined approach to managing dependencies in `useMemo` and `useEffect`.
 
 2. **Simpler Ref Handling**: Woby uses direct function refs and observable-based refs instead of ref objects with `.current`.
 
-3. **No useCallback**: Woby's automatic tracking makes `useCallback` unnecessary.
+3. **Streamlined Function Handling**: Woby's automatic tracking provides a simplified approach to function optimization without requiring explicit `useCallback`.
 
-4. **No forwardRef**: Refs are passed as regular props in Woby.
+4. **Simplified Ref Handling**: Refs are passed as regular props in Woby, providing a more straightforward approach.
 
 5. **Automatic Optimization**: Woby's observable-based system automatically optimizes re-renders based on actual data dependencies rather than manual dependency management.
 
 6. **Flexible Hooks**: Woby hooks can be called conditionally, nested, or outside components, unlike React's strict rules.
 
-These differences make Woby's API simpler and less error-prone while maintaining high performance through fine-grained reactivity. The framework's design philosophy prioritizes developer experience and performance by eliminating common sources of bugs and boilerplate code found in traditional frameworks.
+These differences make Woby's API streamlined and robust while maintaining high performance through fine-grained reactivity. The framework's design philosophy prioritizes developer experience and performance by reducing common sources of bugs and boilerplate code found in traditional frameworks.

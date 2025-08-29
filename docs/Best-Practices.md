@@ -43,7 +43,7 @@ const value = $$(maybeObservable) // Works for both observables and plain values
 
 ### Avoid Setting Observables to Undefined
 
-Be careful when calling observables without parameters as this sets them to `undefined`:
+When calling observables, explicitly set values to ensure predictable behavior:
 
 ```typescript
 import { $, $$ } from 'woby'
@@ -100,7 +100,7 @@ const Component = () => {
 
 ### Simplified Event Handlers
 
-In Woby, you often don't need to memoize event handlers because of automatic dependency tracking:
+In Woby, event handlers are automatically optimized through the dependency tracking system, reducing the need for manual memoization:
 
 ```typescript
 import { useMemo } from 'woby'

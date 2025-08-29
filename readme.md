@@ -5,9 +5,9 @@
   </a>
 </p>
 
-# Woby, a twin project of [Voby](https://github.com/vobyjs/voby)
+# Woby
 
-A high-performance framework with fine-grained observable-based reactivity for building rich applications.
+A high-performance framework with fine-grained observable-based reactivity for building rich applications. Woby is built upon the [Voby](https://github.com/vobyjs/voby) reactive core, providing an enhanced API for component-based development.
 
 ## Features
 
@@ -15,15 +15,15 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 
 - **No VDOM**: there's no VDOM overhead, the framework deals with raw DOM nodes directly.
 - **No stale closures**: functions are always executed afresh, no need to worry about previous potential executions of the current function, ever.
-- **No rules of hooks**: hooks are just regular functions, which you can nest indefinitely, call conditionally, use outside components, whatever you want.
+- **No rules of hooks**: hooks are regular functions that can be nested indefinitely, called conditionally, and used outside components, providing maximum flexibility for developers.
 - **No dependencies arrays**: the framework is able to detect what depends on what else automatically, no need to specify dependencies manually.
 - **No props diffing**: updates are fine grained, there's no props diffing, whenever an attribute/property/class/handler/etc. should be updated it's updated directly and immediately.
-- **No key prop**: you can just map over arrays, or use the `For` component with an array of unique values, no need to specify keys explicitly.
-- **No Babel**: there's no need to use Babel with this framework, it works with plain old JS (plus JSX if you are into that). As a consequence we have 0 transform function bugs, because we don't have a transform function.
-- **No magic**: what you see is what you get, your code is not transformed to actually do something different than what you write, there are no surprises.
-- **No server support**: for the time being this framework is focused on local-first rich applications, ~no server-related features are implemented: no hydration, no server components, no SSR, no streaming etc.
-- **Observable-based**: observables are at the core of our reactivity system. The way it works is very different from a React-like system, it may be more challenging to learn, but it's well worth the effort.
-- **Work in progress**: I'm allergic to third-party dependencies, I'd like something with an API that resonates with me, and I wanted to deeply understand how the more solid [Solid](https://www.solidjs.com), which you should also check out, works.
+- **No key prop**: developers can map over arrays directly or use the `For` component with an array of unique values, eliminating the need to specify keys explicitly.
+- **No Babel**: this framework works with plain JavaScript (plus JSX support), eliminating the need for Babel transforms. As a result, there are zero transform function bugs since no code transformation is required.
+- **No magic**: Woby follows a transparent approach where your code behaves exactly as written, with no hidden transformations or unexpected behavior.
+- **Client-focused**: this framework is currently focused on client-side rich applications. Server-related features such as hydration, server components, SSR, and streaming are not implemented at this time.
+- **Observable-based**: observables are at the core of the reactivity system. While the approach differs significantly from React-like systems and may require an initial learning investment, it provides substantial benefits in terms of performance and developer experience.
+- **Minimal dependencies**: Woby is designed with a focus on minimal third-party dependencies, providing a streamlined API for developers who prefer a lightweight solution. The framework draws inspiration from [Solid](https://www.solidjs.com) while offering its own unique approach to reactive programming.
 
 ## 📚 Documentation
 
@@ -86,9 +86,9 @@ You can find some demos and benchmarks below, more demos are contained inside th
 |                                    |                           | [`useTimeout`](#usetimeout)       |                                    |                          |
 ## Usage
 
-This framework is simply a view layer built on top of the Observable library [`soby`](https://github.com/wongchichong/soby), knowing how that works is necessary to understand how this works.
+Woby serves as a view layer built on top of the Observable library [`soby`](https://github.com/wongchichong/soby). Understanding how soby works is essential for effectively using Woby.
 
-This framework basically re-exports everything that `soby` exports, sometimes with a slightly different interface, adjusted for usage as components or hooks, plus some additional functions.
+Woby re-exports all soby functionality with interfaces adjusted for component and hook usage, along with additional framework-specific functions.
 
 ### Counter Example
 
@@ -612,11 +612,11 @@ dispose (); // Unmounted and all reactivity inside it stopped
 
 #### `renderToString`
 
-This works just like `render`, but it returns a Promise to the HTML representation of the rendered component.
+This function operates similarly to `render`, but returns a Promise that resolves to the HTML representation of the rendered component.
 
-This is currently implemented in a way that works only inside a browser-like environement, so you'll need to use [JSDOM](https://github.com/jsdom/jsdom) or similar for this to work server-side, but it can work server-side too potentially.
+The current implementation works within browser-like environments. For server-side usage, [JSDOM](https://github.com/jsdom/jsdom) or similar solutions are required.
 
-This function automatically waits for all `Suspense` boundaries to resolve before returning.
+This function automatically waits for all `Suspense` boundaries to resolve before returning the HTML.
 
 Interface:
 
@@ -636,9 +636,9 @@ const html = await renderToString ( <App /> );
 
 #### `resolve`
 
-This function basically resolves any reactivity inside the passed argument, basically replacing every function it finds with a memo to the value of that function.
+This function resolves all reactivity within the provided argument, replacing each function with a memo that captures the function's value.
 
-You may never need to use this function yourself, but it's necessary internally at times to make sure that a child value is properly tracked by its parent computation.
+While developers may not need to use this function directly, it is internally necessary to ensure proper tracking of child values by their parent computations.
 
 [Read upstream documentation](https://github.com/wongchichong/soby#resolve).
 
@@ -686,9 +686,9 @@ store // => Same as require ( 'soby' ).store
 
 This function enables constructing elements with [Solid](https://www.solidjs.com)-level performance without using the Babel transform, but also without the convenience of that.
 
-It basically works like [sinuous](https://github.com/luwes/sinuous/tree/master)'s template function, but with a cleaner API, since you don't have to access your props any differently inside the template here.
+This function works similarly to [sinuous](https://github.com/luwes/sinuous/tree/master)'s template function but provides a cleaner API, as props are accessed identically inside and outside the template.
 
-Basically you can use this to wrap a component that doesn't directly create any observables or call any hooks to significanly improve performance when instantiating that component.
+This function can be used to wrap components that do not directly create observables or call hooks, significantly improving performance during component instantiation.
 
 Interface:
 
@@ -1831,7 +1831,7 @@ const fn = ( value: ObservableReadonly<boolean> ): void => {
 
 This type says that something can be the value itself or an observable to that value.
 
-This is super useful if you want to write components and hooks that can accept either plain values or observables to those values.
+This type is particularly useful for creating components and hooks that can accept either plain values or observables, providing flexibility in API design.
 
 Interface:
 
@@ -1874,13 +1874,13 @@ const createTimestamp = ( options?: ObservableOptions ): Observable<number> => {
 
 #### `Resource`
 
-This is the type of object that `useResource`, `usePromise` and `useFetch` will return you.
+This type represents the return value of `useResource`, `usePromise`, and `useFetch` functions.
 
-It's an object that tells if whether the resource is loading or not, whether an error happened or not, if what the eventual resulting value is.
+It represents the state of a resource, indicating whether it is loading, if an error occurred, and what the resulting value will be.
 
-It's a read-only observable that holds the resulting object, but it also comes with helper methods for retrieving specific keys out of the object, which can make some code much cleaner.
+This read-only observable contains the resulting object and provides helper methods for accessing specific properties, enabling cleaner code patterns.
 
-Helper methods are memoized automatically for you.
+Helper methods are automatically memoized for optimal performance.
 
 Interface:
 
@@ -1967,32 +1967,32 @@ npm run dev:benchmark
 
 #### `JSX`
 
-JSX is supported out of the box, as a rule of thumb it's very similar to how React's JSX works, but with some differences.
+JSX is supported out of the box and is similar to React JSX with some key differences.
 
-- The value provided to an attribute can always be either just the plain value itself, an observable to that value, or a function to that value. If an observable or a function is provided then that attribute will update itself in a fine-grained manner.
+- Attributes can accept plain values, observables, or functions. When observables or functions are provided, attributes update in a fine-grained manner.
 - There's no "key" attribute because it's unnecessary.
-- Only refs in the function form are supported, so you are incentivized to simply use observables for them too.
+- Only function-form refs are supported, encouraging the use of observables for ref management.
 - The "ref" attribute can also accept an array of functions to call, for convenience.
-- You can simply just use "class" instead of "className".
-- The "class" attribute can also accept an object of classes or an array of classes, for convenience.
+- The "class" attribute can be used instead of "className".
+- The "class" attribute also accepts objects or arrays of classes for enhanced flexibility.
 - SVGs are supported out of the box and will also be updated in a fine-grained manner.
-- The "innerHTML", "outerHTML" and "textContent" attributes are forbidden, as they are largely just footguns or non-idiomatic.
+- The "innerHTML", "outerHTML", and "textContent" attributes are restricted to prevent anti-patterns and encourage idiomatic usage.
 - A React-like "dangerouslySetInnerHTML" attribute is supported for setting some raw HTML.
 - Numbers set as values for style properties that require a unit to be provided will automatically be suffixed with "px".
 - Using CSS variables in the "style" object is supported out of the box.
 - The following events are delegated, automatically: `beforeinput`, `click`, `dblclick`, `focusin`, `focusout`, `input`, `keydown`, `keyup`, `mousedown`, `mouseup`.
 - Events always bubble according to the natural DOM hierarchy, there's no special bubbling logic for `Portal`.
-- Class components, but with no lifecycle callbacks, are supported too. They got thrown away with the bath water by other frameworks, but organizing internal methods in a class and assigning that class to refs automatically is actually a really nice feature.
+- Class components without lifecycle callbacks are also supported. While other frameworks have moved away from class components entirely, organizing internal methods within classes and automatically assigning them to refs provides a useful organizational pattern.
 
 #### `TypeScript`
 
-There are two main actions needed to make Woby work with TypeScript.
+To use Woby with TypeScript, two main configurations are required:
 
-1. Woby is an ESM-only framework, so you _might_ need to mark your package as ESM too in order to use it, you can do that by putting the following in your `package.json`:
+1. Since Woby is an ESM-only framework, mark your package as ESM by adding the following to your `package.json`:
    ```
    "type": "module"
    ```
-2. You should instruct TypeScript to load the correct JSX types by putting the following in your `tsconfig.json`:
+2. Configure TypeScript to load the correct JSX types by adding the following to your `tsconfig.json`:
    ```json
     {
       "compilerOptions": {
@@ -2001,17 +2001,18 @@ There are two main actions needed to make Woby work with TypeScript.
       }
     }
    ```
-3. Optionally, if you don't want to use a bundler or if you are using a bundler for which a plugin hasn't been written yet you can just define a "React" variable in scope and just use the JSX transform for React:
+
+Optionally, if not using a bundler or if a plugin is not available for your bundler, define a "React" variable in scope and use the React JSX transform:
    ```ts
    import * as React from 'woby';
    ```
 
 ## Thanks
 
-- **[S](https://github.com/adamhaile/S)**: for paving the way to this awesome reactive way of writing software.
-- **[sinuous/observable](https://github.com/luwes/sinuous/tree/master/packages/sinuous/observable)**: for making me fall in love with Observables and providing a good implementation that this library was originally based on.
-- **[solid](https://www.solidjs.com)**: for being a great sort of reference implementation, popularizing Signal-based reactivity, and having built a great community.
-- **[trkl](https://github.com/jbreckmckye/trkl)**: for being so inspiringly small.
+- **[S](https://github.com/adamhaile/S)**: for pioneering reactive programming approaches that inspired this framework.
+- **[sinuous/observable](https://github.com/luwes/sinuous/tree/master/packages/sinuous/observable)**: for providing an excellent Observable implementation that served as the foundation for this library.
+- **[solid](https://www.solidjs.com)**: for serving as a reference implementation, popularizing signal-based reactivity, and building a strong community.
+- **[trkl](https://github.com/jbreckmckye/trkl)**: for demonstrating the power of minimal, focused implementations.
 
 ## License
 
