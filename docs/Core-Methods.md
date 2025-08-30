@@ -55,7 +55,7 @@ const value = $$(maybeObservable) // Works for both cases
 
 Effects automatically track dependencies and re-run when those dependencies change.
 
-``typescript
+```typescript
 import { $, $$, useEffect } from 'woby'
 
 const count = $(0)
@@ -75,7 +75,7 @@ name('Jane') // Logs: "Count: 1, Name: Jane"
 
 Memoized computations automatically recompute when their dependencies change.
 
-``typescript
+```typescript
 import { $, $$, useMemo } from 'woby'
 
 const firstName = $('John')
@@ -196,7 +196,7 @@ const Component = () => {
 
 **Common Mistake - Non-Reactive Content:**
 
-```typescript
+``typescript
 const Component = () => {
   const userName = $('John')
   
@@ -237,7 +237,7 @@ const Component = () => {
 
 Create reactive stores for complex nested state.
 
-``typescript
+```typescript
 import { store, $$ } from 'woby'
 
 const userStore = store({
@@ -318,7 +318,7 @@ const Component = () => (
 
 Handle DOM events with reactive callbacks.
 
-``typescript
+```typescript
 import { $, $$ } from 'woby'
 
 const Component = () => {

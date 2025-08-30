@@ -67,10 +67,16 @@ function MyComponent() {
 }
 ```
 
+**Type Equivalence:**
+- React's `MutableRefObject<T>` corresponds to Woby's `JSX.Ref<T>`
+- React's `useRef` hook concept corresponds to Woby's ref handling approach
+- Woby refs provide direct access to DOM elements without requiring a `.current` property
+
 **Key Differences:**
 - Woby supports both traditional ref callbacks and observable-based refs
-- Observable-based refs eliminate the need for `.current` property
-- More direct access to DOM nodes with less boilerplate
+- Observable-based refs provide direct access to DOM elements without a `.current` property
+- Woby enables more direct access to DOM nodes with less boilerplate
+- Woby integrates ref handling into the framework's observable system rather than providing a separate `useRef` hook
 
 ### useMemo
 

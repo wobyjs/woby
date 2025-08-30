@@ -124,86 +124,6 @@ const Component = () => {
 }
 ```
 
-### Reactive Content Patterns
-
-In Woby, there are several correct patterns for creating reactive content:
-
-1. **Direct Observable Passing (Recommended):**
-```typescript
-const Component = () => {
-  const userName = $('John')
-  
-  // ✅ Direct observable - automatically reactive and preferred for single child elements
-  return <div>{userName}</div>
-}
-```
-
-2. **Function Expressions:**
-```typescript
-const Component = () => {
-  const userName = $('John')
-  const show = $(true)
-  
-  // ✅ Function expression - automatically reactive
-  return <div>Hello {() => $$(userName)}</div>
-  
-  // ✅ Complex reactive expressions
-  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
-}
-```
-
-3. **Memoized Expressions:**
-```typescript
-const Component = () => {
-  const userName = $('John')
-  
-  // ✅ Memoized expression - reactive but unnecessary for simple cases
-  return <div>Hello {useMemo(() => $$(userName))}</div>
-  
-  // Note: useMemo is unnecessary since `() =>` is automatically tracked
-}
-```
-
-**Common Mistake - Non-Reactive Content:**
-
-```typescript
-const Component = () => {
-  const userName = $('John')
-  
-  // ❌ Not reactive - only executes once during component creation
-  return <div>Hello {$$(userName)}</div>
-}
-```
-
-In the non-reactive example above, `$$()` is called during component creation (which only happens once), so the content never updates even when `userName` changes.
-
-### Reactive Attributes
-
-For attributes, you can directly pass observables for automatic reactivity:
-
-```typescript
-const Component = () => {
-  const valid = $(true)
-  const show = $(true)
-  
-  // ✅ Direct observable - automatically reactive
-  return <input disabled={valid} />
-  
-  // ✅ Function expression - reactive
-  return <input disabled={() => $$(valid) ? true : undefined} />
-  
-  // ✅ Complex reactive class expressions
-  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
-}
-```
-
-**Key Points:**
-- Components execute once, but reactive content updates automatically when observables change
-- Direct observable passing (`{userName}`) is the preferred pattern for simple cases with only one child
-- Function expressions (`{() => $$(userName)}`) are automatically tracked and suitable for complex expressions
-- `useMemo` is unnecessary for simple expressions since `() =>` is automatically tracked
-- Avoid `{$$()}` patterns as they only execute once and are not reactive
-
 ## Performance Optimization
 
 ### Leverage Automatic Dependency Tracking
@@ -476,6 +396,86 @@ const WobyComponent = ({ userName, userId }) => {
   return <div>{userName}</div>
 }
 ```
+
+### Reactive Content Patterns
+
+In Woby, there are several correct patterns for creating reactive content:
+
+1. **Direct Observable Passing (Recommended):**
+```typescript
+const Component = () => {
+  const userName = $('John')
+  
+  // ✅ Direct observable - automatically reactive and preferred
+  return <div>{userName}</div>
+}
+```
+
+2. **Function Expressions:**
+```typescript
+const Component = () => {
+  const userName = $('John')
+  const show = $(true)
+  
+  // ✅ Function expression - automatically reactive
+  return <div>Hello {() => $$(userName)}</div>
+  
+  // ✅ Complex reactive expressions
+  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
+}
+```
+
+3. **Memoized Expressions:**
+```typescript
+const Component = () => {
+  const userName = $('John')
+  
+  // ✅ Memoized expression - reactive but unnecessary for simple cases
+  return <div>Hello {useMemo(() => $$(userName))}</div>
+  
+  // Note: useMemo is unnecessary since `() =>` is automatically tracked
+}
+```
+
+**Common Mistake - Non-Reactive Content:**
+
+```
+const Component = () => {
+  const userName = $('John')
+  
+  // ❌ Not reactive - only executes once during component creation
+  return <div>Hello {$$(userName)}</div>
+}
+```
+
+In the non-reactive example above, `$$()` is called during component creation (which only happens once), so the content never updates even when `userName` changes.
+
+### Reactive Attributes
+
+For attributes, you can directly pass observables for automatic reactivity:
+
+```
+const Component = () => {
+  const valid = $(true)
+  const show = $(true)
+  
+  // ✅ Direct observable - automatically reactive
+  return <input disabled={valid} />
+  
+  // ✅ Function expression - reactive
+  return <input disabled={() => $$(valid) ? true : undefined} />
+  
+  // ✅ Complex reactive class expressions
+  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
+}
+```
+
+**Key Points:**
+- Components execute once, but reactive content updates automatically when observables change
+- Direct observable passing (`{userName}`) is the preferred pattern for simple cases
+- Function expressions (`{() => $$(userName)}`) are automatically tracked and suitable for complex expressions
+- `useMemo` is unnecessary for simple expressions since `() =>` is automatically tracked
+- Avoid `{$$()}` patterns as they only execute once and are not reactive
 
 ### Fine-Grained Updates
 
