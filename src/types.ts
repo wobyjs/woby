@@ -107,7 +107,7 @@ type ObservableReadonly<T = unknown> = import('soby').ObservableReadonly<T>
 
 type ObservableReadonlyLike<T = unknown> = import('soby').ObservableReadonlyLike<T>
 
-type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | ObservableLike<T> | T
+type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | T
 
 type ObservableOptions<T = unknown> = import('soby').ObservableOptions<T>
 
