@@ -1,65 +1,90 @@
-# Woby Wiki
+# Woby Documentation Home
 
-Welcome to the Woby framework documentation wiki! This comprehensive resource provides guides, tutorials, and reference materials for building applications with Woby.
+Welcome to the Woby documentation wiki! This guide covers everything you need to know about the Woby framework - a high-performance framework with fine-grained observable-based reactivity for building rich applications.
 
-## 📚 Table of Contents
+## 📚 Documentation Sections
 
 ### Getting Started
-- [Installation](./Installation.md) - How to install and set up Woby
-- [Quick Start](./Quick-Start.md) - Build your first Woby application in minutes
-- [Project Structure](./Project-Structure.md) - Understanding Woby project organization
-- [Examples](./Examples.md) - Complete examples and demonstrations
-- [Demo Applications](./Demo-Applications.md) - Interactive demo collection with live examples
+- **[Installation Guide](./Installation.md)** - Setup and installation instructions
+- **[Quick Start Tutorial](./Quick-Start.md)** - Build your first Woby application
+- **[Examples Gallery](./Examples.md)** - Practical examples and demos
 
-### Core Concepts  
-- [Reactivity System](./Reactivity-System.md) - Understanding observables and signals
-- [Components](./Components.md) - Creating and utilizing components
-- [JSX and Templates](./JSX-and-Templates.md) - Different approaches to writing UI
-- [State Management](./State-Management.md) - Managing application state
-
-### API Reference
-- [Core Methods](./Core-Methods.md) - Essential framework functions
-- [Hooks](./Hooks.md) - Built-in hooks and utilities
-- [Built-in Components](./Built-in-Components.md) - Framework components
-- [TypeScript Support](./TypeScript-Support.md) - Type definitions and usage
+### Core Concepts
+- **[Reactivity System](./Reactivity-System.md)** - Understanding observables and reactivity
+- **[Core Methods](./Core-Methods.md)** - Essential framework functions ($, batch, render, etc.)
+- **[Hooks](./Hooks.md)** - Built-in hooks and utilities (useEffect, useMemo, etc.)
+- **[Built-in Components](./Built-in-Components.md)** - Framework components (For, If, Switch, etc.)
+- **[Class Management](./Class-Management.md)** - Advanced class handling with reactive support
 
 ### Advanced Topics
-- [Custom Elements](./Custom-Elements.md) - Creating web components
-- [Server-Side Rendering](./Server-Side-Rendering.md) - SSR with Woby
-- [Testing](./Testing.md) - Testing Woby applications
-- [Performance](./Performance.md) - Optimization techniques
+- **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
+- **[Woby vs React](./Woby-vs-React.md)** - API differences and migration guide
+- **[FAQ](./FAQ.md)** - Frequently asked questions
 
-### Migration & Comparison
-- [From React](./Migration-From-React.md) - Migrating from React
-- [From Solid](./Migration-From-Solid.md) - Differences with Solid.js
-- [vs Other Frameworks](./Framework-Comparison.md) - Feature comparison
-
-### Development
-- [Contributing](./Contributing.md) - How to contribute to Woby
-- [Architecture](./Architecture.md) - Internal framework architecture
-- [Build Process](./Build-Process.md) - Development and build setup
-- [Changelog](./Changelog.md) - Version history and changes
-
-### Resources
-- [FAQ](./FAQ.md) - Frequently asked questions
-- [Troubleshooting](./Troubleshooting.md) - Common issues and solutions
-- [Best Practices](./Best-Practices.md) - Recommended patterns
-- [Ecosystem](./Ecosystem.md) - Related projects and tools
-
----
+### Community & Contributing
+- **[Contributing Guide](./Contributing.md)** - How to contribute to Woby
 
 ## 🚀 Quick Links
 
-- **[Get Started Now](./Quick-Start.md)** - Jump right into building with Woby
-- **[Core Methods](./Core-Methods.md)** - Essential API reference
-- **[Examples Gallery](./Examples.md)** - See Woby in action
-- **[Demo Applications](./Demo-Applications.md)** - Interactive demos and live examples
+| Topic | Link |
+|-------|------|
+| **API Reference** | [Core Methods](./Core-Methods.md) • [Hooks](./Hooks.md) |
+| **Components** | [Built-in Components](./Built-in-Components.md) |
+| **Examples** | [Examples Gallery](./Examples.md) |
+| **Class Management** | [Class Management](./Class-Management.md) |
+| **Help** | [FAQ](./FAQ.md) • [Contributing](./Contributing.md) |
+
+## 🎯 Key Features
+
+Woby is built upon the [Voby](https://github.com/vobyjs/voby) reactive core, providing an enhanced API for component-based development:
+
+- **No VDOM**: Direct DOM manipulation for maximum performance
+- **Fine-grained reactivity**: Automatic dependency tracking with observables
+- **No stale closures**: Functions always execute afresh
+- **No rules of hooks**: Hooks can be used anywhere with full flexibility
+- **No dependencies arrays**: Automatic dependency detection
+- **No props diffing**: Direct property updates
+- **No key prop**: Built-in list handling with `For` component
+- **No Babel**: Works with plain JavaScript and JSX
+- **Built-in Class Management**: Advanced class handling similar to `classnames`/`clsx`
+
+## 📖 Learning Path
+
+### 1. **Beginners Start Here**
+- [Installation Guide](./Installation.md)
+- [Quick Start Tutorial](./Quick-Start.md)
+- [Reactivity System](./Reactivity-System.md)
+
+### 2. **Core Concepts**
+- [Core Methods](./Core-Methods.md)
+- [Hooks](./Hooks.md)
+- [Built-in Components](./Built-in-Components.md)
+
+### 3. **Advanced Features**
+- [Class Management](./Class-Management.md)
+- [Examples Gallery](./Examples.md)
+- [Best Practices](./Best-Practices.md)
+
+### 4. **Specialized Topics**
+- [Woby vs React](./Woby-vs-React.md)
+- [FAQ](./FAQ.md)
+
+## 🛠️ External Resources
+
 - **[GitHub Repository](https://github.com/wongchichong/woby)** - Source code and issues
+- **[Demo Applications](https://github.com/wongchichong/woby-demo)** - Live examples
+- **[CodeSandbox Playground](https://codesandbox.io/s/woby-playground-7w2pxg)** - Interactive environment
 
-## 📖 About This Wiki
+## 🤝 Community Support
 
-This wiki is maintained alongside the Woby framework to provide current documentation and guides. If you identify any issues or wish to contribute improvements, please consult our [Contributing Guide](./Contributing.md).
+- **[Discord Chat](https://discord.gg/E6pK7VpnjC)** - Real-time community support
+- **[GitHub Issues](https://github.com/wongchichong/woby/issues)** - Bug reports and feature requests
+- **[Twitter](https://twitter.com/wobyjs)** - Latest updates and announcements
+
+## 📝 Contributing
+
+Woby is an open-source project and contributions are welcome! See the [Contributing Guide](./Contributing.md) for details on how to get involved.
 
 ---
 
-*Woby v0.58.18 - A high-performance framework with fine-grained observable-based reactivity*
+*This documentation is a living document and is regularly updated. For the most current information, always refer to the latest version in the repository.*

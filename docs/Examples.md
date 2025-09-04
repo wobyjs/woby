@@ -8,6 +8,7 @@ This page contains practical Woby examples demonstrating key framework features 
 - [Component Patterns](#component-patterns)
 - [State Management](#state-management)
 - [Advanced Examples](#advanced-examples)
+- [Class Management Patterns](#class-management-patterns)
 
 ## Basic Examples
 
@@ -106,7 +107,11 @@ const TodoApp = () => {
 
       <For values={todos}>
         {(todo) => (
-          <div>
+          <div class={{ 
+            'todo-item': true,
+            'completed': todo.completed,
+            'recent': () => Date.now() - todo.id < 60000 // Added in last minute
+          }}>
             <input
               type="checkbox"
               checked={todo.completed}
@@ -120,6 +125,7 @@ const TodoApp = () => {
           </div>
         )}
       </For>
+
     </div>
   )
 }
@@ -138,31 +144,21 @@ const Modal = ({ isOpen, onClose, title, children }) => (
   <If when={isOpen}>
     <Portal mount={document.body}>
       <div 
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
         onClick={onClose}
       >
         <div 
-          style={{
-            backgroundColor: 'white',
-            padding: '24px',
-            borderRadius: '8px',
-            maxWidth: '500px'
-          }}
+          class="bg-white p-6 rounded-lg max-w-md w-full"
           onClick={e => e.stopPropagation()}
         >
-          <h2>{title}</h2>
+          <h2 class="text-xl font-bold mb-4">{title}</h2>
           {children}
-          <button onClick={onClose}>Close</button>
+          <button 
+            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={onClose}
+          >
+            Close
+          </button>
         </div>
       </div>
     </Portal>
@@ -199,7 +195,7 @@ const useToggle = (initial = false) => {
 Complex state with store:
 
 ```typescript
-import { store } from 'woby'
+import { store, useMemo } from 'woby'
 
 interface CartItem {
   id: number
@@ -208,7 +204,7 @@ interface CartItem {
   quantity: number
 }
 
-const cart = store({
+const cartStore = store({
   items: [] as CartItem[],
   discount: 0
 })
@@ -242,12 +238,15 @@ const Cart = () => {
     <div>
       <For values={() => cartStore.items()}>
         {item => (
-          <div>
-            {item.name} - ${item.price} x {item.quantity}
+          <div class="flex justify-between items-center p-2 border-b">
+            <span>{item.name}</span>
+            <span>${item.price} x {item.quantity}</span>
           </div>
         )}
       </For>
-      <div>Total: ${total().toFixed(2)}</div>
+      <div class="font-bold text-right mt-2">
+        Total: ${total().toFixed(2)}
+      </div>
     </div>
   )
 }
@@ -283,24 +282,23 @@ const UserProfile = () => {
         type="number" 
         value={userId}
         onInput={e => userId(parseInt(e.target.value))}
+        class="border p-2 mr-2"
       />
       
       <Switch>
-        <Match when={() => posts.loading()}>
-          <div>Loading...</div>
+        <Match when={() => user.loading()}>
+          <div class="text-center py-4">Loading...</div>
         </Match>
-        <Match when={() => posts.error()}>
-          <div>Error: {() => posts.error()?.message}</div>
+        <Match when={() => user.error()}>
+          <div class="text-red-500 py-4">
+            Error: {() => user.error()?.message}
+          </div>
         </Match>
-        <Match when={() => posts()}>
-          <For values={() => posts() || []}>
-            {post => (
-              <article>
-                <h3>{post.title}</h3>
-                <p>{post.body}</p>
-              </article>
-            )}
-          </For>
+        <Match when={() => user()}>
+          <div class="bg-gray-100 p-4 rounded">
+            <h3 class="text-lg font-bold">{() => user()?.name}</h3>
+            <p class="text-gray-600">{() => user()?.email}</p>
+          </div>
         </Match>
       </Switch>
     </div>
@@ -315,6 +313,134 @@ Comprehensive form management:
 ```typescript
 import { $, $$, useEffect } from 'woby'
 
+const ContactForm = () => {
+  const form = {
+    name: $(''),
+    email: $(''),
+    message: $('')
+  }
+  
+  const errors = {
+    name: $(''),
+    email: $(''),
+    message: $('')
+  }
+  
+  const isSubmitting = $(false)
+  
+  const validate = () => {
+    let isValid = true
+    
+    if (!$$(form.name).trim()) {
+      errors.name('Name is required')
+      isValid = false
+    } else {
+      errors.name('')
+    }
+    
+    if (!$$(form.email).trim()) {
+      errors.email('Email is required')
+      isValid = false
+    } else if (!/\S+@\S+\.\S+/.test($$(form.email))) {
+      errors.email('Email is invalid')
+      isValid = false
+    } else {
+      errors.email('')
+    }
+    
+    if (!$$(form.message).trim()) {
+      errors.message('Message is required')
+      isValid = false
+    } else {
+      errors.message('')
+    }
+    
+    return isValid
+  }
+  
+  const handleSubmit = (e: Event) => {
+    e.preventDefault()
+    
+    if (validate()) {
+      isSubmitting(true)
+      // Submit form data
+      setTimeout(() => {
+        isSubmitting(false)
+        // Reset form
+        form.name('')
+        form.email('')
+        form.message('')
+      }, 1000)
+    }
+  }
+  
+  return (
+    <form onSubmit={handleSubmit} class="max-w-md mx-auto p-4">
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Name:</label>
+        <input 
+          value={form.name}
+          onInput={(e) => form.name(e.target.value)}
+          class={[
+            'w-full px-3 py-2 border rounded',
+            { 'border-red-500': () => !!errors.name() }
+          ]}
+        />
+        {errors.name() && <span class="text-red-500 text-sm">{errors.name()}</span>}
+      </div>
+      
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Email:</label>
+        <input 
+          type="email"
+          value={form.email}
+          onInput={(e) => form.email(e.target.value)}
+          class={[
+            'w-full px-3 py-2 border rounded',
+            { 'border-red-500': () => !!errors.email() }
+          ]}
+        />
+        {errors.email() && <span class="text-red-500 text-sm">{errors.email()}</span>}
+      </div>
+      
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Message:</label>
+        <textarea
+          value={form.message}
+          onInput={(e) => form.message(e.target.value)}
+          rows={4}
+          class={[
+            'w-full px-3 py-2 border rounded',
+            { 'border-red-500': () => !!errors.message() }
+          ]}
+        />
+        {errors.message() && <span class="text-red-500 text-sm">{errors.message()}</span>}
+      </div>
+      
+      <button 
+        type="submit" 
+        disabled={isSubmitting()}
+        class={[
+          'w-full px-4 py-2 text-white rounded',
+          () => isSubmitting() 
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-blue-500 hover:bg-blue-600'
+        ]}
+      >
+        {isSubmitting() ? 'Submitting...' : 'Submit'}
+      </button>
+    </form>
+  )
+}
+```
+
+### Animation with useAnimationLoop
+
+Creating animated elements:
+
+```typescript
+import { $, useAnimationLoop } from 'woby'
+
 const AnimatedBox = () => {
   const rotation = $(0)
   const scale = $(1)
@@ -325,15 +451,207 @@ const AnimatedBox = () => {
   })
   
   return (
-    <div style={{
-      width: '100px',
-      height: '100px',
-      backgroundColor: 'blue',
-      transform: `rotate(${rotation()}rad) scale(${scale()})`,
-      margin: '50px auto'
+    <div class={[
+      'w-24 h-24 bg-blue-500 mx-auto mt-12',
+      'transform transition-transform duration-75'
+    ]} style={{
+      transform: `rotate(${rotation()}rad) scale(${scale()})`
     }} />
   )
 }
+```
+
+## Class Management Patterns
+
+Woby provides powerful built-in class management that supports complex class expressions with full reactive observable support, similar to popular libraries like `classnames` and `clsx`.
+
+### Array-based Classes
+
+Use arrays to combine multiple classes, including conditional ones:
+
+```
+const Button = ({ variant, size, disabled, children }) => {
+  return (
+    <button class={[
+      'px-4 py-2 rounded font-medium transition-colors',
+      `btn-${variant}`, // Dynamic class
+      `btn-${size}`,    // Dynamic class
+      {
+        'opacity-50 cursor-not-allowed': () => disabled,
+        'hover:opacity-90': () => !disabled,
+        'focus:ring-2 focus:ring-blue-500': true
+      }
+    ]}>
+      {children}
+    </button>
+  )
+}
+```
+
+### Complex Conditional Classes
+
+Handle complex conditional logic with nested expressions:
+
+``typescript
+const StatusIndicator = ({ status, urgent, loading }) => {
+  return (
+    <div class={[
+      'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
+      () => {
+        switch ($$(status)) {
+          case 'success':
+            return 'bg-green-100 text-green-800'
+          case 'warning':
+            return 'bg-yellow-100 text-yellow-800'
+          case 'error':
+            return 'bg-red-100 text-red-800'
+          default:
+            return 'bg-gray-100 text-gray-800'
+        }
+      },
+      {
+        'animate-pulse': () => loading,
+        'border-2 border-red-500': () => urgent && $$(status) === 'error'
+      }
+    ]}>
+      <span class={[
+        'w-2 h-2 rounded-full mr-2',
+        () => {
+          switch ($$(status)) {
+            case 'success':
+              return 'bg-green-500'
+            case 'warning':
+              return 'bg-yellow-500'
+            case 'error':
+              return 'bg-red-500'
+            default:
+              return 'bg-gray-500'
+          }
+        }
+      ]} />
+      {status}
+    </div>
+  )
+}
+```
+
+### Reactive Class Objects
+
+Use objects for simple conditional classes where keys are class names and values are conditions:
+
+```
+const ProgressBar = ({ value, max, animated, striped }) => {
+  const percentage = useMemo(() => (value / max) * 100)
+  
+  return (
+    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+      <div 
+        class={{
+          'h-full rounded-full transition-all duration-300': true,
+          'bg-blue-500': percentage < 70,
+          'bg-yellow-500': percentage >= 70 && percentage < 90,
+          'bg-red-500': percentage >= 90,
+          'animate-stripes': () => striped,
+          'transition-width': () => animated
+        }}
+        style={{ width: `${percentage}%` }}
+      />
+    </div>
+  )
+}
+```
+
+### Function-based Class Expressions
+
+Compute classes dynamically using functions:
+
+``typescript
+const DataCard = ({ data, loading, error }) => {
+  const cardClass = useMemo(() => [
+    'border rounded-lg p-6 shadow-sm',
+    () => {
+      if ($$(loading)) return 'border-gray-200 bg-gray-50'
+      if ($$(error)) return 'border-red-200 bg-red-50'
+      return 'border-gray-200 bg-white hover:shadow-md'
+    },
+    { 'animate-pulse': () => loading }
+  ])
+  
+  return (
+    <div class={cardClass}>
+      <If when={loading}>
+        <div>Loading...</div>
+      </If>
+      <If when={error}>
+        <div class="text-red-500">Error: {error.message}</div>
+      </If>
+      <If when={!loading && !error}>
+        <pre>{JSON.stringify(data, null, 2)}</pre>
+      </If>
+    </div>
+  )
+}
+```
+
+### Integration with Tailwind CSS
+
+Woby works seamlessly with Tailwind CSS for utility-first styling:
+
+```typescript
+const DashboardCard = ({ title, value, change, icon }) => {
+  const isPositive = useMemo(() => $$(change) >= 0)
+  
+  return (
+    <div class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500">{title}</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-1">{value}</p>
+        </div>
+        <div class="p-3 rounded-lg bg-blue-100 text-blue-600">
+          {icon}
+        </div>
+      </div>
+      <div class={[
+        'flex items-center mt-4 text-sm',
+        () => $$(isPositive) ? 'text-green-600' : 'text-red-600'
+      ]}>
+        <span class={[
+          'flex items-center',
+          () => $$(isPositive) ? 'before:content-["▲"]' : 'before:content-["▼"]'
+        ]}>
+          {Math.abs(change)}%
+        </span>
+        <span class="ml-2 text-gray-500">from last month</span>
+      </div>
+    </div>
+  )
+}
+```
+
+### Important: Reactive Elements Must Be Wrapped
+
+All reactive elements in class expressions should be wrapped in `useMemo` or arrow functions `() =>` to ensure proper reactivity:
+
+```
+// ❌ Incorrect - will not update reactively
+const isActive = $(false)
+<div class={{ 'active': isActive }}>Content</div> // This won't work as expected
+
+// ✅ Correct - wrapped in arrow function
+<div class={{ 'active': () => $$(isActive) }}>Content</div>
+
+// ✅ Also correct - observables automatically handled in objects
+<div class={{ 'active': isActive }}>Content</div> // This actually works
+
+// ✅ Complex expression with useMemo
+const dynamicClass = useMemo(() => ({
+  'active': $$(isActive),
+  'disabled': $$(isDisabled),
+  'loading': $$(isLoading)
+}))
+
+<div class={dynamicClass}>Content</div>
 ```
 
 ## Common Patterns
@@ -362,36 +680,55 @@ const focusInput = () => {
 const Component = () => {
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label>Name:</label>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Name:</label>
         <input 
+          ref={inputRef}
           value={form.name}
           onInput={(e) => form.name(e.target.value)}
+          class="w-full px-3 py-2 border border-gray-300 rounded"
         />
-        {errors.name() && <span class="error">{errors.name()}</span>}
+        {errors.name() && <span class="text-red-500 text-sm">{errors.name()}</span>}
       </div>
       
-      <div>
-        <label>Email:</label>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Email:</label>
         <input 
           type="email"
           value={form.email}
           onInput={(e) => form.email(e.target.value)}
+          class={[
+            'w-full px-3 py-2 border rounded',
+            { 'border-red-500': () => !!errors.email() }
+          ]}
         />
-        {errors.email() && <span class="error">{errors.email()}</span>}
+        {errors.email() && <span class="text-red-500 text-sm">{errors.email()}</span>}
       </div>
       
-      <div>
-        <label>Password:</label>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Password:</label>
         <input 
           type="password"
           value={form.password}
           onInput={(e) => form.password(e.target.value)}
+          class={[
+            'w-full px-3 py-2 border rounded',
+            { 'border-red-500': () => !!errors.password() }
+          ]}
         />
-        {errors.password() && <span class="error">{errors.password()}</span>}
+        {errors.password() && <span class="text-red-500 text-sm">{errors.password()}</span>}
       </div>
       
-      <button type="submit" disabled={isSubmitting()}>
+      <button 
+        type="submit" 
+        disabled={isSubmitting()}
+        class={[
+          'w-full px-4 py-2 text-white rounded',
+          () => isSubmitting() 
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-blue-500 hover:bg-blue-600'
+        ]}
+      >
         {isSubmitting() ? 'Submitting...' : 'Submit'}
       </button>
     </form>

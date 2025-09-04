@@ -15,6 +15,7 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 - **[Hooks](./Hooks.md)** - Built-in hooks and utilities
 - **[Built-in Components](./Built-in-Components.md)** - Framework components
 - **[Reactivity System](./Reactivity-System.md)** - Understanding observables
+- **[Class Management](./Class-Management.md)** - Advanced class handling with reactive support
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
 - **[Woby vs React](./Woby-vs-React.md)** - API differences and migration guide
 
@@ -29,6 +30,7 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 | **Get started quickly** | [Quick Start](./Quick-Start.md) |
 | **Learn the basics** | [Reactivity System](./Reactivity-System.md) |
 | **See examples** | [Examples](./Examples.md) |
+| **Manage classes** | [Class Management](./Class-Management.md) |
 | **Find a specific function** | [Core Methods](./Core-Methods.md) or [Hooks](./Hooks.md) |
 | **Learn best practices** | [Best Practices](./Best-Practices.md) |
 | **Compare with React** | [Woby vs React](./Woby-vs-React.md) |
@@ -47,14 +49,15 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 1. Review [Core Methods](./Core-Methods.md) for API reference
 2. Check [Built-in Components](./Built-in-Components.md) for available components
 3. Browse [Hooks](./Hooks.md) for utilities
-4. Learn [Best Practices](./Best-Practices.md) for optimal patterns
-5. See [Woby vs React](./Woby-vs-React.md) for migration guidance
-6. See [Examples](./Examples.md) for advanced patterns
+4. Learn [Class Management](./Class-Management.md) for advanced class handling
+5. Learn [Best Practices](./Best-Practices.md) for optimal patterns
+6. See [Woby vs React](./Woby-vs-React.md) for migration guidance
 
 ### For React Developers
 1. Read [Woby vs React](./Woby-vs-React.md) for key differences
-2. Learn [Best Practices](./Best-Practices.md) for Woby-specific patterns
-3. Explore [Examples](./Examples.md) for practical usage
+2. Learn [Class Management](./Class-Management.md) for advanced class patterns
+3. Learn [Best Practices](./Best-Practices.md) for Woby-specific patterns
+4. Explore [Examples](./Examples.md) for practical usage
 
 ### For Contributors
 1. Read [Contributing](./Contributing.md) guidelines

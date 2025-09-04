@@ -24,6 +24,7 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **Client-focused**: this framework is currently focused on client-side rich applications. Server-related features such as hydration, server components, SSR, and streaming are not implemented at this time.
 - **Observable-based**: observables are at the core of the reactivity system. While the approach differs significantly from React-like systems and may require an initial learning investment, it provides substantial benefits in terms of performance and developer experience.
 - **Minimal dependencies**: Woby is designed with a focus on minimal third-party dependencies, providing a streamlined API for developers who prefer a lightweight solution. The framework draws inspiration from [Solid](https://www.solidjs.com) while offering its own unique approach to reactive programming.
+- **Built-in Class Management**: Woby includes powerful built-in class management that supports complex class expressions similar to `classnames` and `clsx` libraries, with full reactive observable support.
 
 ## 📚 Documentation
 
@@ -34,6 +35,7 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **[Quick Start Tutorial](./docs/Quick-Start.md)** - Build your first app
 - **[API Reference](./docs/Core-Methods.md)** - Complete API documentation
 - **[Examples Gallery](./docs/Examples.md)** - Practical examples and patterns
+- **[Class Management](./docs/Class-Management.md)** - Advanced class handling with reactive support
 - **[Best Practices](./docs/Best-Practices.md)** - Recommended patterns and practices
 - **[Woby vs React](./docs/Woby-vs-React.md)** - API differences and migration guide
 - **[FAQ](./docs/FAQ.md)** - Common questions and answers
@@ -159,6 +161,147 @@ render(<App />, document.getElementById('app'))
 ```
 
 Modifying the value attribute on <counter-element value="0> triggers an immediate update to its associated observable.
+
+### Advanced Class Management
+
+Woby provides powerful built-in class management that supports complex class expressions with full reactive observable support, similar to popular libraries like `classnames` and `clsx`.
+
+#### Class Array Support
+
+Woby supports complex class expressions including arrays, objects, and functions:
+
+``tsx
+// Array of classes
+<div class={['red', 'bold']}>Text</div>
+
+// Nested arrays
+<div class={['red', ['bold', ['italic']]]}>Text</div>
+
+// Mixed types
+<div class={[
+  "red",
+  () => ($$(value) % 2 === 0 ? "bold" : ""),
+  { hidden: true, italic: false },
+  ['hello', ['world']]
+]}>Complex classes</div>
+```
+
+#### Reactive Classes
+
+All class expressions support reactive observables that automatically update when values change:
+
+``tsx
+const isActive = $(false)
+const theme = $('dark')
+
+// Reactive boolean
+<div class={{ active: isActive }}>Toggle me</div>
+
+// Reactive string
+<div class={() => `btn btn-${theme()}`}>Themed button</div>
+
+// Complex reactive expression
+<div class={[
+  'base-class',
+  () => isActive() ? 'active' : 'inactive',
+  { 'loading': loadingState() }
+]}>Dynamic element</div>
+```
+
+#### Class Object Syntax
+
+Woby supports object syntax for conditional classes where keys are class names and values are boolean conditions:
+
+``tsx
+const error = $(false)
+const warning = $(false)
+
+<div class={{
+  'base': true,           // Always applied
+  'error': error,         // Applied when error is truthy
+  'warning': warning,     // Applied when warning is truthy
+  'success': !error && !warning  // Applied when neither error nor warning
+}}>Status element</div>
+```
+
+#### Function-based Classes
+
+Classes can be computed using functions that return class strings or other class expressions:
+
+``tsx
+const count = $(0)
+
+<div class={() => count() > 5 ? 'high-count' : 'low-count'}>
+  Count: {count}
+</div>
+
+// Function returning complex expression
+<div class={() => [
+  'base',
+  count() > 10 ? 'large' : 'small',
+  { 'even': count() % 2 === 0 }
+]}>
+  Dynamic element
+</div>
+```
+
+### Built-in Classnames/CLSX/Tailwind-Merge Support
+
+Woby's class system provides built-in functionality equivalent to popular libraries:
+
+- **Classnames/CLSX-like syntax**: Supports all the same patterns as the popular `classnames` and `clsx` libraries
+- **Tailwind CSS ready**: Works seamlessly with Tailwind CSS class patterns
+- **No external dependencies**: Built-in implementation eliminates the need for external libraries
+- **Reactive by default**: All class expressions automatically update when observables change
+- **Performance optimized**: Efficient implementation that minimizes DOM updates
+
+#### Migration from CLSX
+
+If you're familiar with `clsx`, Woby's class system works similarly:
+
+``tsx
+// Instead of: clsx('foo', true && 'bar', 'baz')
+<div class={['foo', true && 'bar', 'baz']}>Content</div>
+
+// Instead of: clsx({ foo:true, bar:false, baz:isTrue() })
+<div class={{ foo:true, bar:false, baz:isTrue() }}>Content</div>
+
+// Instead of: clsx(['foo', 0, false, 'bar'])
+<div class={['foo', 0, false, 'bar']}>Content</div>
+```
+
+#### Integration with Tailwind Merge
+
+For advanced Tailwind CSS class merging, you can wrap your expressions with a custom merge function:
+
+``tsx
+import { twMerge } from 'tailwind-merge'
+
+const mergedClass = useMemo(() => twMerge(
+  'px-4 py-2 bg-blue-500',
+  isActive() ? 'bg-blue-700' : 'bg-blue-500'
+))
+
+<div class={mergedClass}>Merged classes</div>
+```
+
+All reactive elements in class expressions should be wrapped in `useMemo` or arrow functions `() =>` to ensure proper reactivity:
+
+``tsx
+// Correct - wrapped in useMemo
+const dynamicClass = useMemo(() => ({
+  'active': isActive(),
+  'disabled': isDisabled()
+}))
+
+<div class={dynamicClass}>Content</div>
+
+// Correct - wrapped in arrow function
+<div class={() => isActive() ? 'active' : 'inactive'}>Content</div>
+
+// Correct - observables automatically handled
+<div class={{ 'active': isActive }}>Content</div>
+```
 
 ### Methods
 
@@ -582,7 +725,7 @@ function lazy <P = {}> ( fetcher: LazyFetcher<P> ): LazyResult<P>;
 
 Usage:
 
-```ts
+``ts
 import {lazy} from 'woby';
 
 const LazyComponent = lazy ( () => import ( './component' ) );
