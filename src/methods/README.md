@@ -9,6 +9,7 @@ The `customElement` function allows you to define custom HTML elements that can:
 - Handle nested properties (e.g., `nested-prop-value`)
 - Process style attributes (e.g., `style-color`, `style-font-size`)
 - Work with Woby's observable system for reactive updates
+- Be embedded directly in HTML files without JavaScript initialization
 
 ## API Reference
 
@@ -35,6 +36,9 @@ customElement('counter-element', Counter, 'value', 'style-*')
 
 // Usage in JSX:
 // <counter-element value={$(0)} style-color="red"></counter-element>
+
+// Usage in HTML:
+// <counter-element style-color="red"></counter-element>
 ```
 
 ### `ElementAttributes<T>`
@@ -51,9 +55,13 @@ Type definition for allowed attribute patterns, supporting wildcards and style p
 
 Converts kebab-case strings to camelCase (e.g., 'font-size' → 'fontSize').
 
-### `setObservableValue(observable, value)`
+### `setObservableValue(obj, key, value)`
 
 Sets values on observables with automatic type conversion.
+
+Handles setting values on observables with automatic type conversion.
+Numbers are converted from strings when the observable contains a numeric value.
+If the property is not an observable, it sets the value directly.
 
 ### `setNestedProperty(obj, path, value)`
 
@@ -114,20 +122,27 @@ Here's a complete counter example that demonstrates Woby's reactive capabilities
 import { $, $$, useMemo, render, Observable, customElement, ElementAttributes } from 'woby'
 
 const Counter = ({ increment, decrement, value, ...props }: { 
-  increment: () => number, 
-  decrement: () => number, 
-  value: Observable<number> 
+  increment?: () => number, 
+  decrement?: () => number, 
+  value?: Observable<number> 
 }): JSX.Element => {
+  // Provide defaults for optional props
+  const counterValue = value || $(0)
+  
+  const handleIncrement = increment || (() => counterValue($$(counterValue) + 1))
+  const handleDecrement = decrement || (() => counterValue($$(counterValue) - 1))
+  
   const v = $('abc')
   const m = useMemo(() => {
-    return $$(value) + $$(v)
+    return $$(counterValue) + $$(v)
   })
+  
   return <div {...props}>
     <h1>Counter</h1>
-    <p>{value}</p>
+    <p>{counterValue}</p>
     <p>{m}</p>
-    <button onClick={increment}>+</button>
-    <button onClick={decrement}>-</button>
+    <button onClick={handleIncrement}>+</button>
+    <button onClick={handleDecrement}>-</button>
   </div>
 }
 
@@ -170,7 +185,14 @@ The custom element implementation supports nested properties with dash-separated
 // For an attribute like "nested-prop-value", the system will:
 // 1. Create nested structure in props: props.nested.prop.value
 // 2. Set the value appropriately with observable support
-customElement('my-element', MyComponent, 'nested-*')
+customElement('my-element', MyComponent, 'nested-prop-value')
+```
+
+For components that need to support dynamic nested properties, you can use the `nested-${string}` pattern:
+
+```tsx
+// Support any nested property with the prefix "nested-"
+customElement('my-element', MyComponent, 'nested-${string}')
 ```
 
 ### Style Property Processing
@@ -207,4 +229,17 @@ All properties are integrated with Woby's observable system, providing automatic
 // If the observable contains a numeric value, string values are automatically converted
 const count = $(0) // Will convert "1", "2", etc. to numbers
 const name = $('') // Will keep as string
+```
+
+### Direct HTML Embedding
+
+Custom elements can be embedded directly in HTML files without JavaScript initialization:
+
+```html
+<!-- Works without any JavaScript -->
+<counter-element 
+  style-color="blue" 
+  style-font-size="1.5em" 
+  class="border-2 border-black border-solid bg-amber-400">
+</counter-element>
 ```

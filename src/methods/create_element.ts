@@ -9,6 +9,7 @@ import { setChild, setProps } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { customElement } from './custom_element'
+import { Stack } from 'soby'
 
 
 /* MAIN */
@@ -51,7 +52,7 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
 
             if (isSVG) child['isSVG'] = true
 
-            const stack = new Error()
+            const stack = new Stack()
 
             untrack(() => {
 

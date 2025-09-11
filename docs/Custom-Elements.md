@@ -14,7 +14,7 @@ The function signature has been updated to swap the parameter positions and make
 customElement<P>(
   tagName: string, 
   component: JSX.Component<P>,
-  attributes?: (keyof (P & JSX.HTMLAttributes<HTMLElement>))[]
+  ...attributes: ElementAttributePattern<P>[]
 ): void
 ```
 
@@ -22,7 +22,7 @@ customElement<P>(
 
 - `tagName`: The HTML tag name for the custom element (must contain a hyphen)
 - `component`: The component function to render
-- `attributes`: Array of attribute names to observe for changes (optional, defaults to `['*']`)
+- `attributes`: Rest parameter of attribute patterns to observe (supports wildcards)
 
 ### Wildcard Support
 
@@ -40,20 +40,58 @@ The enhanced `customElement` function now supports nested object properties thro
 - Attribute `user-profile-name` maps to `props.user.profile.name`
 - Attribute `actions-onClick` maps to `props.actions.onClick`
 
+### Direct HTML Embedding
+
+Custom elements can be embedded directly in HTML files without requiring JavaScript initialization. Components with default prop values can work immediately when placed in HTML:
+
+```html
+<!-- Works without any JavaScript -->
+<my-counter value="5" style-color="red"></my-counter>
+```
+
+For this to work effectively, components should provide sensible default values for all props.
+
+You can also use nested properties directly in HTML:
+
+```html
+<!-- Works without any JavaScript -->
+<counter-element 
+  style-color="blue" 
+  style-font-size="1.5em" 
+  nested-nested-text="xyz"
+  class="border-2 border-black border-solid bg-amber-400">
+</counter-element>
+```
+
+To enable direct HTML embedding, make sure to place the custom element before the script tag that loads your JavaScript:
+
+```html
+<body>
+  <counter-element style-color="blue" style-font-size="1.5em" nested-nested-text="xyz"
+      class="border-2 border-black border-solid bg-amber-400">
+  </counter-element>
+  <div id="app"></div>
+  <script type="module" src="./index.tsx"></script>
+</body>
+```
+
 ### Basic Example
 
 ```typescript
 import { $, customElement } from 'woby'
 
-// Simple component
-const SimpleCounter = ({ value }: { value: number }) => {
+// Simple component with default values
+const SimpleCounter = ({ value = 0 }: { value?: number }) => {
   return <div>Count: {value}</div>
 }
 
 // Register as custom element with default wildcard pattern
 customElement('simple-counter', SimpleCounter)
 
-// Usage
+// Usage in JSX
+// <simple-counter value="5"></simple-counter>
+
+// Usage in HTML
 // <simple-counter value="5"></simple-counter>
 ```
 
@@ -81,7 +119,7 @@ const StyledCounter = ({
 }
 
 // Register with specific patterns
-customElement('styled-counter', StyledCounter, ['value', 'style-*'])
+customElement('styled-counter', StyledCounter, 'value', 'style-*')
 
 // Usage
 // <styled-counter 
@@ -120,12 +158,12 @@ const ThemedCounter = ({
 }
 
 // Register with nested attributes
-customElement('themed-counter', ThemedCounter, [
+customElement('themed-counter', ThemedCounter,
   'value',
   'config-theme',
   'config-size',
   'actions-increment'
-])
+)
 
 // Usage
 // <themed-counter 
@@ -161,12 +199,12 @@ const ObservableCounter = ({
   return <div>{displayValue}</div>
 }
 
-customElement('observable-counter', ObservableCounter, [
+customElement('observable-counter', ObservableCounter,
   'value',
   'config-step',
   'config-min',
   'config-max'
-])
+)
 ```
 
 ### TypeScript Support
@@ -180,7 +218,7 @@ const MyComponent = ({ config }: { config: { theme: string } }) => {
   return <div>Theme: {config.theme}</div>
 }
 
-customElement('my-component', MyComponent, ['config-theme'])
+customElement('my-component', MyComponent, 'config-theme')
 
 // TypeScript declaration
 declare module 'woby' {

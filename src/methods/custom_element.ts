@@ -9,6 +9,11 @@
 
 import $$ from "./SS"
 import isObservable from "./is_observable"
+import { SYMBOL_JSX } from '../constants'
+import { setChild } from "../utils/setters"
+import createElement from "./create_element"
+import { FragmentUtils } from "../utils/fragment"
+import { Stack } from "soby"
 
 /**
  * ElementAttributes type helper
@@ -37,6 +42,7 @@ type ElementAttributePattern<P> =
     | '*'
     | `style-${keyof JSX.StyleProperties extends string ? keyof JSX.StyleProperties : never}`
     | `style-*`
+    | `nested-${string}`
 
 /**
  * Converts kebab-case strings to camelCase
@@ -57,16 +63,19 @@ const kebabToCamelCase = (str: string): string => {
  * Handles setting values on observables with automatic type conversion.
  * Numbers are converted from strings when the observable contains a numeric value.
  * 
- * @param observable - The observable to set (can be any value)
- * @param value - The string value to set on the observable
+ * @param obj - The object containing the property to set
+ * @param key - The property key to set
+ * @param value - The string value to set on the property
  */
-const setObservableValue = (observable: any, value: string) => {
-    if (isObservable(observable)) {
-        if (typeof $$(observable) === 'number') {
-            observable(+value)
+const setObservableValue = (obj: any, key: string, value: string) => {
+    if (isObservable(obj[key])) {
+        if (typeof $$(obj[key]) === 'number') {
+            obj[key](+value)
         } else {
-            observable(value)
+            obj[key](value)
         }
+    } else {
+        obj[key] = value
     }
 }
 
@@ -120,13 +129,13 @@ const setNestedProperty = (obj: HTMLElement, path: string, value: any) => {
 
         // Set the final property using the observable value setter
         if (lastKey) {
-            setObservableValue(target[lastKey], value)
+            setObservableValue(target, lastKey, value)
         }
         return
     }
 
     // For simple properties, set them using the observable value setter
-    setObservableValue((obj as any)[path], value)
+    setObservableValue((obj as any), path, value)
 }
 
 /**
@@ -247,7 +256,7 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
         static observedAttributes: string[] = attributes ?? ['*'] as any
 
         /** Component props */
-        public props!: P
+        public props: P = {} as P
 
         /**
          * Called when the element is added to the document
@@ -274,6 +283,10 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
             })
 
             observer.observe(this, { attributes: true, attributeOldValue: true })
+
+            if (!this.props[SYMBOL_JSX])
+                setChild(this, createElement(children, this.props), FragmentUtils.make(), new Stack())
+
         }
 
         /**
@@ -297,11 +310,11 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
 
                 // Also update any observable in the nested path
                 const nestedValue = getNestedProperty(this.props, name)
-                setObservableValue(nestedValue, newValue)
+                setObservableValue(this.props, name, newValue)
             } else {
                 // Handle flat properties (existing behavior)
                 const val = this.props[name]
-                setObservableValue(val, newValue)
+                setObservableValue(this.props, name, newValue)
             }
         }
     }

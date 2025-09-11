@@ -19,6 +19,7 @@ const SYMBOL_TEMPLATE_ACCESSOR = Symbol('Template.Accessor')
 const SYMBOLS_DIRECTIVES: Record<string, symbol> = {}
 
 export const SYMBOL_CLONE = Symbol('CloneElement')
+export const SYMBOL_JSX = Symbol('SYMBOL_JSX')
 
 /* EXPORT */
 

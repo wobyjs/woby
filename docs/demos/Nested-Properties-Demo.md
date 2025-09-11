@@ -70,7 +70,7 @@ const Counter = ({
 }
 
 // Register component as custom web element with nested attributes support
-customElement('nested-counter', [
+customElement('nested-counter', Counter, 
   'value',
   'config-step',
   'config-min',
@@ -78,7 +78,7 @@ customElement('nested-counter', [
   'actions-increment',
   'actions-decrement',
   'class'
-], Counter)
+)
 
 // TypeScript declaration for custom element
 declare module 'woby' {
@@ -117,7 +117,7 @@ render(<App />, document.getElementById('app'))
 ### 1. Nested Property Attributes
 
 ```typescript
-customElement('nested-counter', [
+customElement('nested-counter', Counter, 
   'value',
   'config-step',
   'config-min',
@@ -125,7 +125,7 @@ customElement('nested-counter', [
   'actions-increment',
   'actions-decrement',
   'class'
-], Counter)
+)
 ```
 
 **Key Points:**
@@ -282,12 +282,12 @@ const MyComponent = ({ config }) => (
   </div>
 )
 
-customElement('my-component', [
+customElement('my-component', MyComponent,
   'config-theme',
   'config-size',
   'config-position-x',
   'config-position-y'
-], MyComponent)
+)
 
 // Usage:
 <my-component 
@@ -309,11 +309,11 @@ const ButtonGroup = ({ handlers }) => (
   </div>
 )
 
-customElement('button-group', [
+customElement('button-group', ButtonGroup,
   'handlers-onSave',
   'handlers-onCancel',
   'handlers-onDelete'
-], ButtonGroup)
+)
 
 // Usage:
 <button-group 
@@ -337,12 +337,12 @@ const StyledDiv = ({ style }) => (
   </div>
 )
 
-customElement('styled-div', [
+customElement('styled-div', StyledDiv,
   'style-color',
   'style-backgroundColor',
   'style-padding',
   'style-margin'
-], StyledDiv)
+)
 
 // Usage:
 <styled-div 
