@@ -65,7 +65,7 @@ const Counter = ({
 }
 
 // Register component as custom web element
-customElement('counter-element', ['value', 'class'], Counter)
+customElement('counter-element', Counter, 'value', 'class')
 
 // TypeScript declaration for custom element
 declare module 'woby' {
@@ -191,7 +191,7 @@ const computed = useMemo(() => $$(value) * 2 + $$(v).length)
 ### 5. Custom Element Registration
 
 ```typescript
-customElement('counter-element', ['value', 'class'], Counter)
+customElement('counter-element', Counter, 'value', 'class')
 ```
 
 **Key Points:**
@@ -306,191 +306,8 @@ const Counter = ({ value }) => {
 ### Step 5: Custom Elements
 Register as web component:
 
-```typescript
-customElement('my-counter', ['value'], Counter)
+```
+customElement('my-counter', Counter, 'value')
 
 // Use anywhere
 <my-counter value={count} />
-```
-
-## Performance Characteristics
-
-### Fine-Grained Updates
-Woby's reactivity system updates only what changed:
-
-```typescript
-// When count changes from 5 to 6:
-// ❌ React: Entire Counter component re-renders
-// ✅ Woby: Only the text node "5" → "6" updates
-```
-
-### Automatic Batching
-Multiple updates in the same frame are automatically batched:
-
-```typescript
-// These three updates result in only one DOM update
-increment()
-increment() 
-increment()
-```
-
-### Memory Efficiency
-Observables clean up automatically when components unmount:
-
-```typescript
-// No manual cleanup needed - Woby handles it
-const Counter = () => {
-  const localState = $(0)  // Automatically cleaned up
-  return <div>{localState}</div>
-}
-```
-
-## Common Patterns
-
-### Multiple State Values
-```typescript
-const App = () => {
-  const count = $(0)
-  const step = $(1)
-  const name = $('Counter')
-  
-  const increment = () => count(prev => prev + step())
-  
-  return (
-    <div>
-      <h1>{name}</h1>
-      <p>Count: {count}</p>
-      <p>Step: <input value={step} onInput={e => step(+e.target.value)} /></p>
-      <button onClick={increment}>+{step}</button>
-    </div>
-  )
-}
-```
-
-### Conditional Rendering
-```typescript
-const Counter = ({ value }) => (
-  <div>
-    <p>Count: {value}</p>
-    {value() > 10 && <p>Getting high!</p>}
-    {value() === 0 ? <p>Zero</p> : <p>Non-zero</p>}
-  </div>
-)
-```
-
-### State Persistence
-```typescript
-const Counter = () => {
-  const count = $(parseInt(localStorage.getItem('count') || '0'))
-  
-  // Save to localStorage when count changes
-  useEffect(() => {
-    localStorage.setItem('count', count().toString())
-  })
-  
-  return <div>Count: {count}</div>
-}
-```
-
-### Reset Functionality
-```typescript
-const Counter = () => {
-  const initialValue = 0
-  const count = $(initialValue)
-  
-  const increment = () => count(prev => prev + 1)
-  const decrement = () => count(prev => prev - 1)
-  const reset = () => count(initialValue)
-  
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={increment}>+</button>
-      <button onClick={decrement}>-</button>
-      <button onClick={reset}>Reset</button>
-    </div>
-  )
-}
-```
-
-## Variations and Extensions
-
-### Multi-Counter Application
-```typescript
-const MultiCounter = () => {
-  const counters = $([
-    { id: 1, value: $(0) },
-    { id: 2, value: $(0) },
-    { id: 3, value: $(0) }
-  ])
-  
-  const total = useMemo(() => 
-    counters().reduce((sum, counter) => sum + counter.value(), 0)
-  )
-  
-  return (
-    <div>
-      <h1>Total: {total}</h1>
-      <For values={counters}>
-        {counter => (
-          <Counter 
-            key={counter.id}
-            value={counter.value}
-            onIncrement={() => counter.value(v => v + 1)}
-          />
-        )}
-      </For>
-    </div>
-  )
-}
-```
-
-### Counter with History
-```typescript
-const CounterWithHistory = () => {
-  const count = $(0)
-  const history = $<number[]>([])
-  
-  const updateCount = (newValue: number) => {
-    history(prev => [...prev, count()])
-    count(newValue)
-  }
-  
-  const increment = () => updateCount(count() + 1)
-  const undo = () => {
-    const hist = history()
-    if (hist.length > 0) {
-      count(hist[hist.length - 1])
-      history(prev => prev.slice(0, -1))
-    }
-  }
-  
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={increment}>+</button>
-      <button onClick={undo} disabled={() => history().length === 0}>
-        Undo
-      </button>
-    </div>
-  )
-}
-```
-
-## Next Steps
-
-After mastering the Counter demo:
-
-1. **[Clock Demo](./Clock-Demo.md)** - Learn time-based updates and animations
-2. **[Store Counter Demo](./Store-Counter-Demo.md)** - Explore complex state management
-3. **[Playground Demo](./Playground-Demo.md)** - Interactive exploration of all features
-4. **[Performance Demos](../Demo-Applications.md#performance-demos)** - Understand optimization
-
-## Related Documentation
-
-- [Reactivity System](../Reactivity-System.md) - Deep dive into observables
-- [Core Methods](../Core-Methods.md) - Complete API reference
-- [Hooks](../Hooks.md) - Built-in utilities like `useMemo`
-- [Demo Applications](../Demo-Applications.md) - All available demos
-
-The Counter demo provides the essential foundation for understanding Woby. Master these concepts and patterns, and you'll be ready to build more complex reactive applications.

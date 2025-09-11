@@ -412,16 +412,16 @@ The `customElement` function registers a component as a standard web component t
 ```typescript
 customElement<P>(
   tagName: string, 
-  attributes: (keyof (P & JSX.HTMLAttributes<HTMLElement>))[], 
-  component: JSX.Component<P>
+  component: JSX.Component<P>,
+  ...attributes: ElementAttributePattern<P>[]
 ): void
 ```
 
 ### Parameters
 
 - `tagName`: The HTML tag name for the custom element (must contain a hyphen)
-- `attributes`: Array of attribute names to observe for changes
 - `component`: The component function to render
+- `attributes`: Rest parameter of attribute patterns to observe (supports wildcards)
 
 ### Nested Properties Support
 
@@ -442,7 +442,7 @@ const SimpleCounter = ({ value }: { value: number }) => {
 }
 
 // Register as custom element
-customElement('simple-counter', ['value'], SimpleCounter)
+customElement('simple-counter', SimpleCounter, 'value')
 
 // Usage
 // <simple-counter value="5"></simple-counter>
@@ -477,12 +477,12 @@ const ThemedCounter = ({
 }
 
 // Register with nested attributes
-customElement('themed-counter', [
+customElement('themed-counter', ThemedCounter,
   'value',
   'config-theme',
   'config-size',
   'actions-increment'
-], ThemedCounter)
+)
 
 // Usage
 // <themed-counter 
@@ -498,7 +498,7 @@ customElement('themed-counter', [
 Nested properties work seamlessly with observables:
 
 ```typescript
-import { $, $, customElement, useMemo } from 'woby'
+import { $, customElement, useMemo } from 'woby'
 
 const ObservableCounter = ({ 
   value,
@@ -518,12 +518,12 @@ const ObservableCounter = ({
   return <div>{displayValue}</div>
 }
 
-customElement('observable-counter', [
+customElement('observable-counter', ObservableCounter,
   'value',
   'config-step',
   'config-min',
   'config-max'
-], ObservableCounter)
+)
 ```
 
 ### TypeScript Support
@@ -537,7 +537,7 @@ const MyComponent = ({ config }: { config: { theme: string } }) => {
   return <div>Theme: {config.theme}</div>
 }
 
-customElement('my-component', ['config-theme'], MyComponent)
+customElement('my-component', MyComponent, 'config-theme')
 
 // TypeScript declaration
 declare module 'woby' {

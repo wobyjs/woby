@@ -31,7 +31,7 @@ export type ElementAttributes<T extends (...args: any) => any> =
  * 
  * @template P - Component props type
  */
-export type ElementAttributePattern<P> =
+type ElementAttributePattern<P> =
     | (keyof P extends string ? keyof P : never)
     | (keyof JSX.HTMLAttributes<HTMLElement> extends string ? keyof JSX.HTMLAttributes<HTMLElement> : never)
     | '*'
@@ -216,7 +216,7 @@ const matchesWildcard = (attributeName: string, patterns: string[]): boolean => 
  * @template P - Component props type
  * @param tagName - The HTML tag name for the custom element
  * @param children - The component function that renders the element's content
- * @param attributes - List of attribute names to observe (supports wildcards)
+ * @param attributes - Rest parameter of attribute patterns to observe (supports wildcards)
  * @returns The custom element class
  * 
  * @example

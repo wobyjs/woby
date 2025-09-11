@@ -459,7 +459,7 @@ const Counter = ({ increment, decrement, value, ...props }: {
 }
 
 // Register as custom element
-customElement('counter-element', ['value', 'class'], Counter)
+customElement('counter-element', Counter, 'value', 'class', 'style-*')
 
 declare module 'woby' {
     namespace JSX {

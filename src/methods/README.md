@@ -19,7 +19,7 @@ Creates and registers a custom HTML element.
 **Parameters:**
 - `tagName`: The HTML tag name for the custom element
 - `children`: The component function that renders the element's content
-- `attributes`: List of attribute names to observe (supports wildcards)
+- `attributes`: Rest parameter of attribute patterns to observe (supports wildcards)
 
 **Returns:** The custom element class
 
@@ -104,4 +104,107 @@ const UserProfile = ({ user }: { user: { name: string, email: string } }) => (
 )
 
 customElement('user-profile', UserProfile, 'user-*')
+```
+
+## Complete Working Example
+
+Here's a complete counter example that demonstrates Woby's reactive capabilities with custom elements:
+
+```tsx
+import { $, $$, useMemo, render, Observable, customElement, ElementAttributes } from 'woby'
+
+const Counter = ({ increment, decrement, value, ...props }: { 
+  increment: () => number, 
+  decrement: () => number, 
+  value: Observable<number> 
+}): JSX.Element => {
+  const v = $('abc')
+  const m = useMemo(() => {
+    return $$(value) + $$(v)
+  })
+  return <div {...props}>
+    <h1>Counter</h1>
+    <p>{value}</p>
+    <p>{m}</p>
+    <button onClick={increment}>+</button>
+    <button onClick={decrement}>-</button>
+  </div>
+}
+
+// Register as custom element
+customElement('counter-element', Counter, 'value', 'class', 'style-*')
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'counter-element': ElementAttributes<typeof Counter>
+        }
+    }
+}
+
+const App = () => {
+  const value = $(0)
+  const increment = () => value(prev => prev + 1)
+  const decrement = () => value(prev => prev - 1)
+
+  return <counter-element 
+    value={value} 
+    increment={increment} 
+    decrement={decrement} 
+    class="border-2 border-black border-solid bg-amber-400" 
+    style-color="red"
+    style-font-size="2em"
+  />
+}
+
+render(<App />, document.getElementById('app'))
+```
+
+## Key Features
+
+### Nested Property Handling
+
+The custom element implementation supports nested properties with dash-separated names:
+
+```tsx
+// For an attribute like "nested-prop-value", the system will:
+// 1. Create nested structure in props: props.nested.prop.value
+// 2. Set the value appropriately with observable support
+customElement('my-element', MyComponent, 'nested-*')
+```
+
+### Style Property Processing
+
+Style attributes are automatically converted from kebab-case to camelCase:
+
+```tsx
+// Attributes like "style-font-size" become:
+// element.style.fontSize = value
+customElement('my-element', MyComponent, 'style-*')
+```
+
+### Wildcard Support
+
+The custom element system supports wildcard patterns for attribute observation:
+
+```tsx
+// Observe all attributes
+customElement('my-element', MyComponent, '*')
+
+// Observe all style attributes
+customElement('my-element', MyComponent, 'style-*')
+
+// Observe all nested attributes under a prefix
+customElement('my-element', MyComponent, 'data-*')
+```
+
+### Observable Integration
+
+All properties are integrated with Woby's observable system, providing automatic reactivity:
+
+```tsx
+// When an attribute changes, the corresponding observable is updated
+// If the observable contains a numeric value, string values are automatically converted
+const count = $(0) // Will convert "1", "2", etc. to numbers
+const name = $('') // Will keep as string
 ```
