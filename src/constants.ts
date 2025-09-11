@@ -19,6 +19,10 @@ const SYMBOL_TEMPLATE_ACCESSOR = Symbol('Template.Accessor')
 const SYMBOLS_DIRECTIVES: Record<string, symbol> = {}
 
 export const SYMBOL_CLONE = Symbol('CloneElement')
+
+/** This symbol is indicated that the element is created through jsx/jsxDEV
+ *  not customElement
+ */
 export const SYMBOL_JSX = Symbol('SYMBOL_JSX')
 
 /* EXPORT */

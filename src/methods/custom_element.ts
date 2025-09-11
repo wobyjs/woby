@@ -8,9 +8,10 @@
  */
 
 import $$ from "./SS"
+import $ from "./S"
 import isObservable from "./is_observable"
 import { SYMBOL_JSX } from '../constants'
-import { setChild } from "../utils/setters"
+import { setChild, setAttribute, setProp } from "../utils/setters"
 import createElement from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
 import { Stack } from "soby"
@@ -42,7 +43,6 @@ type ElementAttributePattern<P> =
     | '*'
     | `style-${keyof JSX.StyleProperties extends string ? keyof JSX.StyleProperties : never}`
     | `style-*`
-    | `nested-${string}`
 
 /**
  * Converts kebab-case strings to camelCase
@@ -60,23 +60,18 @@ const kebabToCamelCase = (str: string): string => {
 /**
  * Sets observable values with appropriate type conversion
  * 
- * Handles setting values on observables with automatic type conversion.
- * Numbers are converted from strings when the observable contains a numeric value.
+ * Handles setting values on observables without automatic type conversion.
+ * All casting must be done manually in the component function since HTML attributes are strings only.
  * 
  * @param obj - The object containing the property to set
  * @param key - The property key to set
  * @param value - The string value to set on the property
  */
 const setObservableValue = (obj: any, key: string, value: string) => {
-    if (isObservable(obj[key])) {
-        if (typeof $$(obj[key]) === 'number') {
-            obj[key](+value)
-        } else {
-            obj[key](value)
-        }
-    } else {
+    if (isObservable(obj[key]))
+        obj[key](value)
+    else
         obj[key] = value
-    }
 }
 
 /**
@@ -264,9 +259,19 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
          * Sets up attribute observation and initializes the element.
          */
         connectedCallback() {
-            const keys = Object.keys(this.props).filter(attrName => !matchesWildcard(attrName, C.observedAttributes))
+            const { observedAttributes } = C
+            const rKeys = Object.keys(this.props).filter(attrName => !matchesWildcard(attrName, observedAttributes))
+            const aKeys = observedAttributes.filter(attrName => !attrName.includes('*'))
 
-            keys.forEach(k => this.removeAttribute(k))
+            rKeys.forEach(k => this.removeAttribute(k))
+
+            if (!this.props[SYMBOL_JSX]) {
+                // prepare observable attributes mentioned in observedAttributes, maybe or not in props
+                aKeys.forEach(k => this.props[k] = $('a')) //props types is difficult
+                aKeys.forEach(k => !this.hasAttribute(k) && setAttribute(this, k, this.props[k], new Stack()))
+            }
+
+            // aKeys.forEach(k => !this.hasAttribute(k) && this.setAttribute(k, $(0)))
 
             for (const attr of this.attributes as any)
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
