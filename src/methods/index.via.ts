@@ -1,28 +1,29 @@
 
 /* IMPORT */
 
-import $ from '../methods/S';
-import $$ from '../methods/SS';
-import batch from '../methods/batch';
-import createContext from '../methods/create_context';
-import createDirective from '../methods/create_directive';
-import createElement from '../methods/create_element.via';
-import h from '../methods/h.via';
-import hmr from '../methods/hmr';
-import html from '../methods/html.via';
-import isBatching from '../methods/is_batching';
-import isObservable from '../methods/is_observable';
-import isStore from '../methods/is_store';
-import lazy from '../methods/lazy.via';
-import render from '../methods/render.via';
-import renderToString from '../methods/render_to_string';
-import resolve from '../methods/resolve';
-import store from '../methods/store';
-import template from '../methods/template.via';
-import tick from '../methods/tick';
-import untrack from '../methods/untrack';
-export * from '../methods/merge_style';
-export * from '../methods/wrap_clone_element';
+import $ from './S'
+import $$ from './SS'
+import batch from './batch'
+import createContext from './create_context'
+import createDirective from './create_directive'
+import createElement from './create_element.via'
+import cloneElement from './clone_element.via'
+import h from './h.via'
+import hmr from './hmr'
+import html from './html.via'
+import isBatching from './is_batching'
+import isObservable from './is_observable'
+import isStore from './is_store'
+import lazy from './lazy.via'
+import render from './render.via'
+import renderToString from './render_to_string'
+import resolve from './resolve'
+import store from './store'
+import template from './template.via'
+import tick from './tick'
+import untrack from './untrack'
+export * from './merge_style'
+export * from './wrap_clone_element'
 /* EXPORT */
 
-export {$, $$, batch, createContext, createDirective, createElement, h, hmr, html, isBatching, isObservable, isStore, lazy, render, renderToString, resolve, store, template, tick, untrack }
+export { $, $$, batch, createContext, createDirective, createElement, cloneElement, h, hmr, html, isBatching, isObservable, isStore, lazy, render, renderToString, resolve, store, template, tick, untrack }

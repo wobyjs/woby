@@ -1,27 +1,26 @@
 
 /* IMPORT */
 
-import untrack from '../methods/untrack'
+// import untrack from '../methods/untrack'
 import wrapElement from '../methods/wrap_element'
-import { createHTMLNode, createSVGNode } from '../utils/creators.via'
+import { createHTMLNode, createSVGNode } from '../utils/creators.ssr'
 import { isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
-import { setChild, setProps } from '../utils/setters.via'
-import type { Child, Component, Element, Props } from '../types'
-import { IgnoreSymbols } from 'via.js'
-import { FragmentUtils } from '../utils/fragment'
+import { setChild, setProps } from '../utils/setters.ssr'
+import type { Child, Component, Element } from '../types'
+
+import { untrack } from 'soby'
 // import { JSX } from '../jsx/types';
 
 /* MAIN */
 
-export const IsSvgSymbol = Symbol('isSvg')
-
-IgnoreSymbols[IsSvgSymbol] = IsSvgSymbol
-
 // It's important to wrap components, so that they can be executed in the right order, from parent to child, rather than from child to parent in some cases
 
 const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]): Element => {
+
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)
+
+    // const { ...rest } = props ?? {}
 
     if (hasChildren && isObject(_props) && 'children' in _props) {
 
@@ -30,6 +29,8 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
     }
 
     if (isFunction(component)) {
+
+        // return wrapElement(() => component.call(component, _props as P) as any)
 
         const props = hasChildren ? { ..._props, children } : _props
 
@@ -41,33 +42,28 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
 
     } else if (isString(component)) {
 
+        // const props = rest
         const isSVG = isSVGElement(component)
         const createNode = isSVG ? createSVGNode : createHTMLNode
+        const stack = new Error()
 
         return wrapElement((): Child => {
-            const child = createNode(component as any) as any as HTMLElement //TSC
-
-            if (isSVG) {
-                child['isSVG'] = true     // set via
-                child[IsSvgSymbol] = true // set proxy
-            }
-
-            const stack = new Error()
-
+            // if (isSVG) child['isSVG'] = true
+            const p = { children: null }
             untrack(() => {
-
                 if (_props) {
-                    setProps(child, _props as any, stack)
+                    setProps(p as any, _props as any, stack)
                 }
 
                 if (hasChildren) {
-                    setChild(child, children, /* FragmentUtils.make(), */ stack)
+                    setProps(p as any, children, stack)
                 }
-
             })
+            const { children, ...pp } = p
 
-            return child as any
-
+            const flatChildren = [children].flat(Infinity) as any[]
+            // Convert to array and spread properly
+            return createNode(component, pp, ...(flatChildren as any))
         })
 
     } else if (isNode(component)) {

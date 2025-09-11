@@ -268,6 +268,6 @@ Most React libraries won't work directly since Woby uses a different paradigm. L
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/wongchichong/woby/issues)
 - **Discussions**: [Community discussions](https://github.com/wongchichong/woby/discussions)
-- **Examples**: [woby-demo repository](https://github.com/wongchichong/woby-demo)
+- **Examples**: [woby-demo repository](https://github.com/wongchichong/demo)
 
 Still have questions? Feel free to [open a discussion](https://github.com/wongchichong/woby/discussions) on GitHub!

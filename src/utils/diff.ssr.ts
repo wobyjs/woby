@@ -16,7 +16,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { createComment } from "./creators"
+import { createComment } from "./creators.ssr"
 
 /* MAIN */
 

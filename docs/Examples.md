@@ -35,7 +35,7 @@ const Counter = () => {
 render(<Counter />, document.getElementById('app'))
 ```
 
-**[Live Demo](https://codesandbox.io/s/woby-demo-counter-23fv5)**
+**[Live Demo](https://codesandbox.io/s/demo-counter-23fv5)**
 
 ### Digital Clock
 
@@ -57,7 +57,7 @@ const Clock = () => {
 }
 ```
 
-**[Live Demo](https://codesandbox.io/s/woby-demo-clock-w1e7yb)**
+**[Live Demo](https://codesandbox.io/s/demo-clock-w1e7yb)**
 
 ### Todo List
 
@@ -756,10 +756,10 @@ const handleClick = (e) => {
 
 ## Live Demos
 
-- **[Playground](https://codesandbox.io/s/woby-playground-7w2pxg)** - Interactive environment
-- **[Counter](https://codesandbox.io/s/woby-demo-counter-23fv5)** - Basic counter
-- **[Clock](https://codesandbox.io/s/woby-demo-clock-w1e7yb)** - Real-time clock
-- **[Boxes](https://codesandbox.io/s/woby-demo-boxes-wx6rqb)** - Animated boxes
-- **[Triangle](https://codesandbox.io/s/woby-demo-triangle-l837v0)** - Performance test
+- **[Playground](https://codesandbox.io/s/playground-7w2pxg)** - Interactive environment
+- **[Counter](https://codesandbox.io/s/demo-counter-23fv5)** - Basic counter
+- **[Clock](https://codesandbox.io/s/demo-clock-w1e7yb)** - Real-time clock
+- **[Boxes](https://codesandbox.io/s/demo-boxes-wx6rqb)** - Animated boxes
+- **[Triangle](https://codesandbox.io/s/demo-triangle-l837v0)** - Performance test
 
-**[View More Examples](https://github.com/wongchichong/woby-demo)**
+**[View More Examples](https://github.com/wongchichong/demo)**

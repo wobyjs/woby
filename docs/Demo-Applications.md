@@ -6,14 +6,14 @@ Comprehensive documentation for all Woby demo applications. These demos showcase
 
 The Woby demo collection includes applications ranging from basic learning examples to complex performance benchmarks. Each demo is designed to teach specific concepts and demonstrate best practices.
 
-**Repository**: [woby-demo](https://github.com/wongchichong/woby-demo)
+**Repository**: [woby-demo](https://github.com/wongchichong/demo)
 
 ## 🚀 Getting Started with Demos
 
 ### Quick Setup
 ```bash
 # Clone the demo repository
-git clone https://github.com/wongchichong/woby-demo.git
+git clone https://github.com/wongchichong/demo.git
 cd woby-demo
 
 # Install dependencies
@@ -46,7 +46,7 @@ Perfect for understanding core Woby concepts:
 #### [Counter Demo](./demos/Counter-Demo.md)
 - **Concepts**: Basic reactivity, event handling, custom elements
 - **Run**: `pnpm dev:counter`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-counter-23fv5)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-counter-23fv5)
 
 Basic reactive counter demonstrating:
 ```typescript
@@ -66,7 +66,7 @@ const Counter = () => {
 #### [Clock Demo](./demos/Clock-Demo.md) 
 - **Concepts**: Animation loops, time-based updates, SVG rendering
 - **Run**: `pnpm dev:clock`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-clock-w1e7yb)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-clock-w1e7yb)
 
 Real-time animated SVG clock showing smooth animations:
 ```typescript
@@ -86,7 +86,7 @@ const Clock = () => {
 #### [Store Counter Demo](./demos/Store-Counter-Demo.md)
 - **Concepts**: Complex state management, nested reactivity
 - **Run**: `pnpm dev:store_counter`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-store-counter-kvoqrw)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-store-counter-kvoqrw)
 
 State management with stores:
 ```typescript
@@ -104,14 +104,14 @@ appStore.counter.value(prev => prev + appStore.counter.step())
 #### [Playground Demo](./demos/Playground-Demo.md)
 - **Concepts**: All framework features, testing environment
 - **Run**: `pnpm dev:playground`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-playground-7w2pxg)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/playground-7w2pxg)
 
 Comprehensive testing environment with all Woby features and extensive test suite.
 
 #### [Emoji Counter Demo](./demos/Emoji-Counter-Demo.md)
 - **Concepts**: User interaction, visual feedback, fun UX
 - **Run**: `pnpm dev:emoji_counter`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-emoji-counter-j91iz2)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-emoji-counter-j91iz2)
 
 Interactive emoji-based counter with selection and visual feedback.
 
@@ -127,14 +127,14 @@ Performance benchmarking suite comparing Woby with other frameworks.
 #### [Triangle Demo](./demos/Triangle-Demo.md)
 - **Concepts**: Recursive rendering, performance optimization
 - **Run**: `pnpm dev:triangle`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-triangle-l837v0)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-triangle-l837v0)
 
 Sierpinski triangle benchmark testing recursive component performance.
 
 #### [Boxes Demo](./demos/Boxes-Demo.md)
 - **Concepts**: Animation performance, many elements
 - **Run**: `pnpm dev:boxes`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-boxes-wx6rqb)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-boxes-wx6rqb)
 
 Animated boxes demonstrating smooth performance with many moving elements.
 
@@ -149,7 +149,7 @@ Comprehensive UI performance benchmark with various interaction patterns.
 #### [HTML Demo](./demos/HTML-Demo.md)
 - **Concepts**: Template literals, alternative syntax
 - **Run**: `pnpm dev:html`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-html-lvfeyo)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-html-lvfeyo)
 
 Using HTML template literals instead of JSX:
 ```typescript
@@ -169,7 +169,7 @@ const Component = () => {
 #### [HyperScript Demo](./demos/HyperScript-Demo.md)
 - **Concepts**: Functional component creation, alternative APIs
 - **Run**: `pnpm dev:hyperscript`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-hyperscript-h4rf38)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-hyperscript-h4rf38)
 
 Using HyperScript for component creation:
 ```typescript
@@ -187,7 +187,7 @@ const Component = () => {
 #### [Spiral Demo](./demos/Spiral-Demo.md)
 - **Concepts**: Mathematical animations, complex calculations
 - **Run**: `pnpm dev:spiral`
-- **Live**: [CodeSandbox](https://codesandbox.io/s/woby-demo-spiral-ux33p6)
+- **Live**: [CodeSandbox](https://codesandbox.io/s/demo-spiral-ux33p6)
 
 Animated mathematical spiral demonstrating smooth animations and calculations.
 
@@ -384,14 +384,14 @@ Many demos include visual verification:
 4. **Test thoroughly** across different browsers
 5. **Submit pull request** with detailed description
 
-For detailed guidelines, see [Contributing to Woby Demo](https://github.com/wongchichong/woby-demo/blob/main/docs/Contributing.md).
+For detailed guidelines, see [Contributing to Woby Demo](https://github.com/wongchichong/demo/blob/main/docs/Contributing.md).
 
 ## 🔗 Additional Resources
 
 ### Live Demos
-- [Playground](https://codesandbox.io/s/woby-playground-7w2pxg) - Interactive environment
-- [Counter](https://codesandbox.io/s/woby-demo-counter-23fv5) - Basic example
-- [Clock](https://codesandbox.io/s/woby-demo-clock-w1e7yb) - Animated clock
+- [Playground](https://codesandbox.io/s/playground-7w2pxg) - Interactive environment
+- [Counter](https://codesandbox.io/s/demo-counter-23fv5) - Basic example
+- [Clock](https://codesandbox.io/s/demo-clock-w1e7yb) - Animated clock
 - [All Demos Collection](https://codesandbox.io/@woby) - Complete collection
 
 ### Documentation
@@ -401,7 +401,7 @@ For detailed guidelines, see [Contributing to Woby Demo](https://github.com/wong
 
 ### Community
 - [GitHub Repository](https://github.com/wongchichong/woby) - Main framework
-- [Demo Repository](https://github.com/wongchichong/woby-demo) - Demo collection
+- [Demo Repository](https://github.com/wongchichong/demo) - Demo collection
 - [Discussions](https://github.com/wongchichong/woby/discussions) - Community discussions
 
 ---

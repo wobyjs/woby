@@ -67,8 +67,8 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 ## 🔗 External Resources
 
 - **[GitHub Repository](https://github.com/wongchichong/woby)** - Source code and issues
-- **[Demo Applications](https://github.com/wongchichong/woby-demo)** - Live examples
-- **[CodeSandbox Playground](https://codesandbox.io/s/woby-playground-7w2pxg)** - Interactive environment
+- **[Demo Applications](https://github.com/wongchichong/demo)** - Live examples
+- **[CodeSandbox Playground](https://codesandbox.io/s/playground-7w2pxg)** - Interactive environment
 
 ## 📝 Contributing to Documentation
 

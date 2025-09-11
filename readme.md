@@ -1,7 +1,6 @@
-
 <p align="center">
   <a href="https://github.com/wongchichong/woby">
-    <img src="./resources/banner/png/banner-light-rounded.png" alt="Woby's Banne" width="640px" height="320px">
+    <img src="./resources/banner/png/banner-light-rounded.png" alt="Woby's Banner" width="640px" height="320px">
   </a>
 </p>
 
@@ -44,18 +43,358 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 
 You can find some demos and benchmarks below, more demos are contained inside the repository.
 
-- Playground: https://codesandbox.io/s/woby-playground-7w2pxg
+- Playground: https://codesandbox.io/s/playground-7w2pxg
 - Benchmark: https://krausest.github.io/js-framework-benchmark/current.html
-- Counter: https://codesandbox.io/s/woby-demo-counter-23fv5
-- Clock: https://codesandbox.io/s/woby-demo-clock-w1e7yb
-- Emoji Counter: https://codesandbox.io/s/woby-demo-emoji-counter-j91iz2
-- HyperScript: https://codesandbox.io/s/woby-demo-hyperscript-h4rf38
-- HTML Template Literal: https://codesandbox.io/s/woby-demo-html-lvfeyo
-- Single-file HTML: https://codesandbox.io/s/woby-demo-html-dueygt?file=/public/index.html
-- Spiral: https://codesandbox.io/s/woby-demo-spiral-ux33p6
-- Store Counter: https://codesandbox.io/s/woby-demo-store-counter-kvoqrw
-- Triangle: https://codesandbox.io/s/woby-demo-triangle-l837v0
-- Boxes: https://codesandbox.io/s/woby-demo-boxes-wx6rqb
+- Counter: https://codesandbox.io/s/demo-counter-23fv5
+- Clock: https://codesandbox.io/s/demo-clock-w1e7yb
+- Emoji Counter: https://codesandbox.io/s/demo-emoji-counter-j91iz2
+- HyperScript: https://codesandbox.io/s/demo-hyperscript-h4rf38
+- HTML Template Literal: https://codesandbox.io/s/demo-html-lvfeyo
+- Single-file HTML: https://codesandbox.io/s/demo-html-dueygt?file=/public/index.html
+- Spiral: https://codesandbox.io/s/demo-spiral-ux33p6
+- Store Counter: https://codesandbox.io/s/demo-store-counter-kvoqrw
+- Triangle: https://codesandbox.io/s/demo-triangle-l837v0
+- Boxes: https://codesandbox.io/s/demo-boxes-wx6rqb
+
+## AI Assistant Instructions
+
+### For AI Coding Assistants
+
+When using AI coding assistants to help with Woby development, please provide these explicit instructions to ensure proper understanding of Woby patterns:
+
+1.  **Framework Specific Instructions**: "Use Woby patterns, NOT React patterns. Woby uses observables with `$()` and `$$()` functions, not React hooks like useState, useEffect with dependency arrays, or useCallback."
+
+2.  **Observable-Based Reactivity**: "In Woby, declare reactive variables with `$()`, and access their values with `$$()` in reactive contexts. Woby automatically tracks dependencies when you use `$$()`."
+
+3.  **No Dependency Arrays**: "Woby hooks like `useEffect` and `useMemo` do not require dependency arrays. Dependencies are automatically tracked when accessed with `$$()`."
+
+4.  **Reactive Patterns**: "Direct observable passing (`{userName}`) is preferred for simple reactive content. For complex expressions, use function expressions (`{() => $$(userName)}`) which are automatically tracked."
+
+### Common Anti-Patterns to Avoid
+
+```tsx
+// ❌ Anti-pattern: React-style useState
+const [count, setCount] = useState(0)
+
+// ✅ Woby pattern
+const count = $(0)
+
+// ❌ Anti-pattern: React useEffect with dependency array
+useEffect(() => {
+  console.log(count)
+}, [count])
+
+// ✅ Woby pattern
+useEffect(() => {
+  console.log($$(count))
+})
+
+// ❌ Anti-pattern: Non-reactive content
+<div>Hello {$$(userName)}</div>
+
+// ✅ Woby pattern
+<div>Hello {userName}</div>
+
+// ❌ Anti-pattern: React-style array mapping
+{todos.map(todo => <div>{todo.text}</div>)}
+
+// ✅ Woby pattern
+<For values={todos}>{(todo) => <div>{todo.text}</div>}</For>
+```
+
+### React to Woby Translation Guide
+
+| React Pattern | Woby Equivalent | Notes |
+|---------------|-----------------|-------|
+| `useState(0)` | `const count = $(0)` | Declare with `$()` |
+| `useEffect(fn, [dep])` | `useEffect(() => { fn($$(dep)) })` | No dependency array, use `$$()` |
+| `useMemo(fn, [deps])` | `useMemo(() => fn($$(dep1), $$(dep2)))` | No dependency array |
+| `useCallback(fn, [deps])` | `const fn = () => {}` | Often unnecessary |
+| `array.map(item => <div>{item}</div>)` | `<For values={array}>{(item) => <div>{item}</div>}</For>` | Use `For` component |
+| `{condition && <div>Content</div>}` | `{() => $$(condition) && <div>Content</div>}` | Use `use () => for reactivate` condition |
+| `ref={ref}` with `useRef()` | `ref={observableRef}` | Use observable refs, no .current |
+
+## Key Differences from React
+
+1.  **Reactivity System**: Woby uses fine-grained observables instead of React's virtual DOM and reconciliation
+2.  **No Dependency Arrays**: Woby automatically tracks dependencies with `$$()` instead of requiring manual dependency arrays
+3.  **Flexible Hooks**: Woby hooks can be called conditionally, nested, or outside components
+4.  **Built-in Control Flow**: Woby provides `If`, `Switch`, `For` components instead of JavaScript conditionals and array methods
+5.  **Direct DOM Updates**: Woby updates the DOM directly without a virtual DOM layer
+
+## Troubleshooting Common Issues
+
+### Observable Not Updating
+
+Ensure you're declaring reactive variables with `$()` and accessing them with `$$()` in reactive contexts:
+
+```tsx
+// ❌ Not reactive - won't update
+let count = 0
+
+// ✅ Reactive - will update
+const count = $(0)
+
+// ❌ Not reactive - only executes once
+<div>{$$(count)}</div>
+
+// ✅ Reactive - updates automatically
+<div>{count}</div>
+<div>{() => $$(count)}</div>
+```
+
+### Effects Not Running
+
+Make sure you're accessing observables with `$$()` inside the effect:
+
+```tsx
+const name = $('John')
+const count = $(0)
+
+// ❌ Effect won't re-run when name or count changes
+useEffect(() => {
+  console.log('Effect ran')
+})
+
+// ✅ Effect will re-run when name or count changes
+useEffect(() => {
+  console.log(`Name: ${$$(name)}, Count: ${$$(count)}`)
+})
+```
+
+### Class Expressions Not Updating
+
+Ensure reactive elements in class expressions are wrapped in functions:
+
+```tsx
+const isActive = $(false)
+
+// ❌ Not reactive
+<div class={{ active: $$(isActive) }}>Content</div>
+
+// ✅ Reactive
+<div class={{ active: isActive }}>Content</div>
+<div class={() => $$(isActive) ? 'active' : ''}>Content</div>
+```
+
+## Complete Working Example
+
+Here's a complete Todo app showcasing Woby patterns:
+
+```tsx
+import { $, $$, For, If, render, useMemo } from 'woby'
+
+interface Todo {
+  id: number
+  text: string
+  completed: boolean
+}
+
+const TodoApp = () => {
+  // Observable state
+  const todos = $<Todo[]>([])
+  const input = $('')
+  const filter = $('all') // all, active, completed
+
+  // Actions
+  const addTodo = () => {
+    const text = $$(input).trim()
+    if (text) {
+      todos(prev => [...prev, {
+        id: Date.now(),
+        text,
+        completed: false
+      }])
+      input('')
+    }
+  }
+
+  const toggleTodo = (id: number) => {
+    todos(prev => prev.map(todo => 
+      todo.id === id 
+        ? { ...todo, completed: !$$(todo.completed) }
+        : todo
+    ))
+  }
+
+  const removeTodo = (id: number) => {
+    todos(prev => $$(prev).filter(todo => todo.id !== id))
+  }
+
+  const setFilter = (newFilter: string) => {
+    filter(newFilter)
+  }
+
+  // Computed values
+  const filteredTodos = useMemo(() => {
+    const currentFilter = $$(filter)
+    const currentTodos = $$(todos)
+    
+    if (currentFilter === 'active') {
+      return currentTodos.filter(todo => !todo.completed)
+    } else if (currentFilter === 'completed') {
+      return currentTodos.filter(todo => todo.completed)
+    }
+    return currentTodos
+  })
+
+  const activeCount = useMemo(() => {
+    return $$(todos).filter(todo => !todo.completed).length
+  })
+
+  return (
+    <div class="todo-app max-w-md mx-auto p-4">
+      <h1 class="text-2xl font-bold mb-4 text-center">My Todo App</h1>
+      
+      {/* Add new todo */}
+      <div class="flex gap-2 mb-4">
+        <input
+          type="text"
+          value={input}
+          onInput={(e) => input(e.target.value)}
+          placeholder="Add a new todo..."
+          onKeyPress={(e) => e.key === 'Enter' && addTodo()}
+          class="flex-1 p-2 border border-gray-300 rounded"
+        />
+        <button 
+          onClick={addTodo}
+          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Add
+        </button>
+      </div>
+
+      {/* Filter buttons */}
+      <div class="flex justify-center gap-2 mb-4">
+        {['all', 'active', 'completed'].map((filterName) => (
+          <button
+            key={filterName}
+            onClick={() => setFilter(filterName)}
+            class={[
+              'px-3 py-1 rounded',
+              () => $$(filter) === filterName 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-gray-200 hover:bg-gray-300'
+            ]}
+          >
+            {filterName.charAt(0).toUpperCase() + filterName.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Todo list */}
+      <ul class="list-none p-0">
+        <For values={filteredTodos}>
+          {(todo) => (
+            <li class={[
+              'flex items-center p-2 border-b border-gray-200 gap-2',
+              { 
+                'line-through text-gray-500': todo.completed,
+                'bg-yellow-50': () => todo.id % 2 === 0  // Alternate row styling
+              }
+            ]}>
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => toggleTodo(todo.id)}
+                class="w-4 h-4"
+              />
+              <span class="flex-1">{todo.text}</span>
+              <button 
+                class="w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 text-xs"
+                onClick={() => removeTodo(todo.id)}
+              >
+                ✕
+              </button>
+            </li>
+          )}
+        </For>
+      </ul>
+
+      {/* Stats */}
+      <div class="mt-4 p-2 bg-gray-100 rounded text-sm">
+        Total: {() => $$(todos).length} | 
+        Active: {activeCount} |
+        Completed: {() => $$(todos).filter(t => t.completed).length}
+      </div>
+    </div>
+  )
+}
+
+// Render the application
+render(<TodoApp />, document.getElementById('app')!)
+```
+
+## React Compatibility Guide
+
+### useState → Observable
+
+```tsx
+// React
+const [count, setCount] = useState(0)
+
+// Woby
+const count = $(0)
+// To update: count(1) or count(prev => prev + 1)
+```
+
+### useEffect → useEffect (but different)
+
+```tsx
+// React
+useEffect(() => {
+  console.log(count)
+}, [count])
+
+// Woby
+useEffect(() => {
+  console.log($$(count))
+})
+// No dependency array needed!
+```
+
+### useMemo → useMemo (but different)
+
+```tsx
+// React
+const doubled = useMemo(() => count * 2, [count])
+
+// Woby
+const doubled = useMemo(() => $$(count) * 2)
+// No dependency array needed!
+```
+
+### Conditional Rendering
+
+```tsx
+// React
+{isLoggedIn && <div>Welcome!</div>}
+
+// Woby
+<If when={isLoggedIn}>
+  <div>Welcome!</div>
+</If>
+```
+
+### List Rendering
+
+```tsx
+// React
+{todos.map(todo => <div key={todo.id}>{todo.text}</div>)}
+
+// Woby
+<For values={todos}>
+  {(todo) => <div>{todo.text}</div>}
+</For>
+```
+
+## Performance Tips
+
+1.  **Use Direct Observable Passing**: For simple reactive content, pass observables directly rather than using `$$()` in functions
+2.  **Group Related Effects**: Separate unrelated concerns into individual effects for better performance
+3.  **Use Early Returns**: Skip unnecessary work in effects when dependencies haven't changed meaningfully
+4.  **Choose the Right List Component**: Use `For` for objects, `ForValue` for primitives, `ForIndex` for fixed-size lists
+5.  **Avoid Unnecessary useMemo**: Simple expressions with `() =>` are automatically tracked and often don't need `useMemo`
 
 ## APIs
 
@@ -71,7 +410,7 @@ You can find some demos and benchmarks below, more demos are contained inside th
 | [`html`](#html)                    | [`Portal`](#portal)       | [`useDisposed`](#usedisposed)     | [`ObservableOptions`](#observableoptions) |                          |
 | [`isBatching`](#isbatching)       | [`Suspense`](#suspense)   | [`useEffect`](#useeffect)         | [`Resource`](#resource)           |                          |
 | [`isObservable`](#isobservable)   | [`Switch`](#switch)       | [`useError`](#useerror)           | [`StoreOptions`](#storeoptions)   |                          |
-| [`isServer`](#isserver)           | [`Ternary`](#ternary)     | [`useEventListener`](#useeventlistener) |                                |                          |
+| [`isServer`](#isserver)           | [`Tary`](#ternary)     | [`useEventListener`](#useeventlistener) |                                |                          |
 | [`isStore`](#isstore)             |                           | [`useFetch`](#usefetch)           |                                    |                          |
 | [`lazy`](#lazy)                   |                           | [`useIdleCallback`](#useidlecallback) |                                |                          |
 | [`render`](#render)               |                           | [`useIdleLoop`](#useidleloop)     |                                    |                          |
@@ -80,12 +419,12 @@ You can find some demos and benchmarks below, more demos are contained inside th
 | [`store`](#store)                 |                           | [`useMicrotask`](#usemicrotask)   |                                    |                          |
 | [`template`](#template)           |                           | [`usePromise`](#usepromise)       |                                    |                          |
 | [`untrack`](#untrack)             |                           | [`useReaction`](#usereaction)     |                                    |                          |
-|                                    |                           | [`useReadonly`](#usereadonly)     |                                    |                          |
-|                                    |                           | [`useResolved`](#useresolved)     |                                    |                          |
-|                                    |                           | [`useResource`](#useresource)     |                                    |                          |
-|                                    |                           | [`useRoot`](#useroot)             |                                    |                          |
-|                                    |                           | [`useSelector`](#useselector)     |                                    |                          |
-|                                    |                           | [`useTimeout`](#usetimeout)       |                                    |                          |
+                                    |                           | [`useReadonly`](#usereadonly)     |                                    |                          |
+                                    |                           | [`useResolved`](#useresolved)     |                                    |                          |
+                                    |                           | [`useResource`](#useresource)     |                                    |                          |
+                                    |                           | [`useRoot`](#useroot)             |                                    |                          |
+                                    |                           | [`useSelector`](#useselector)     |                                    |                          |
+                                    |                           | [`useTimeout`](#usetimeout)       |                                    |                          |
 ## Usage
 
 Woby serves as a view layer built on top of the Observable library [`soby`](https://github.com/wongchichong/soby). Understanding how soby works is essential for effectively using Woby.
@@ -96,9 +435,9 @@ Woby re-exports all soby functionality with interfaces adjusted for component an
 
 Here's a complete counter example that demonstrates Woby's reactive capabilities:
 
-**Source:** [woby-demo](https://github.com/wongchichong/woby-demo) ⭐
+**Source:** [woby-demo](https://github.com/wongchichong/demo) ⭐
 
-``tsx
+```tsx
 import { $, $$, useMemo, render, Observable, customElement, ElementAttributes } from 'woby'
 
 const Counter = ({ increment, decrement, value, ...props }: { 
@@ -160,7 +499,7 @@ render(<App />, document.getElementById('app'))
 </counter-element>
 ```
 
-Modifying the value attribute on <counter-element value="0> triggers an immediate update to its associated observable.
+Modifying the value attribute on <counter-element value="0"> triggers an immediate update to its associated observable.
 
 ### Advanced Class Management
 
@@ -170,7 +509,7 @@ Woby provides powerful built-in class management that supports complex class exp
 
 Woby supports complex class expressions including arrays, objects, and functions:
 
-``tsx
+```tsx
 // Array of classes
 <div class={['red', 'bold']}>Text</div>
 
@@ -190,7 +529,7 @@ Woby supports complex class expressions including arrays, objects, and functions
 
 All class expressions support reactive observables that automatically update when values change:
 
-``tsx
+```tsx
 const isActive = $(false)
 const theme = $('dark')
 
@@ -212,7 +551,7 @@ const theme = $('dark')
 
 Woby supports object syntax for conditional classes where keys are class names and values are boolean conditions:
 
-``tsx
+```tsx
 const error = $(false)
 const warning = $(false)
 
@@ -228,7 +567,7 @@ const warning = $(false)
 
 Classes can be computed using functions that return class strings or other class expressions:
 
-``tsx
+```tsx
 const count = $(0)
 
 <div class={() => count() > 5 ? 'high-count' : 'low-count'}>
@@ -259,7 +598,7 @@ Woby's class system provides built-in functionality equivalent to popular librar
 
 If you're familiar with `clsx`, Woby's class system works similarly:
 
-``tsx
+```tsx
 // Instead of: clsx('foo', true && 'bar', 'baz')
 <div class={['foo', true && 'bar', 'baz']}>Content</div>
 
@@ -274,7 +613,7 @@ If you're familiar with `clsx`, Woby's class system works similarly:
 
 For advanced Tailwind CSS class merging, you can wrap your expressions with a custom merge function:
 
-``tsx
+```tsx
 import { twMerge } from 'tailwind-merge'
 
 const mergedClass = useMemo(() => twMerge(
@@ -287,7 +626,7 @@ const mergedClass = useMemo(() => twMerge(
 
 All reactive elements in class expressions should be wrapped in `useMemo` or arrow functions `() =>` to ensure proper reactivity:
 
-``tsx
+```tsx
 // Correct - wrapped in useMemo
 const dynamicClass = useMemo(() => ({
   'active': isActive(),
@@ -307,7 +646,7 @@ const dynamicClass = useMemo(() => ({
 
 The following top-level functions are provided.
 
-#### `
+#### `$`
 
 This function is just the default export of `soby`, it can be used to wrap a value in an observable.
 
@@ -365,7 +704,7 @@ const noop = () => {};
 o ( () => noop );
 ```
 
-#### `$`
+#### `$$`
 
 This function unwraps a potentially observable value.
 
@@ -374,32 +713,32 @@ This function unwraps a potentially observable value.
 Interface:
 
 ```ts
-function $ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
+function $$ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
 ```
 
 Usage:
 
 ```tsx
-import {$} from 'woby';
+import {$$} from 'woby';
 
 // Getting the value out of an observable
 
 const o = $(123);
 
-$ ( o ); // => 123
+$$ ( o ); // => 123
 
 // Getting the value out of a function
 
-$ ( () => 123 ); // => 123
+$$ ( () => 123 ); // => 123
 
 // Getting the value out of an observable but not out of a function
 
-$ ( o, false ); // => 123
-$ ( () => 123, false ); // => () => 123
+$$ ( o, false ); // => 123
+$$ ( () => 123, false ); // => () => 123
 
 // Getting the value out of a non-observable and non-function
 
-$ ( 123 ); // => 123
+$$ ( 123 ); // => 123
 ```
 
 #### `batch`
@@ -580,8 +919,7 @@ This function provides an alternative way to use the framework, without writing 
 Interface:
 
 ```ts
-function html ( strings: TemplateStringsArray, ...values: any[] ): JSX.Element;
-```
+function html ( strings: TemplateStringsArray, ...values: any[] ): JSX.Element;```
 
 Usage:
 
@@ -725,7 +1063,7 @@ function lazy <P = {}> ( fetcher: LazyFetcher<P> ): LazyResult<P>;
 
 Usage:
 
-``ts
+```ts
 import {lazy} from 'woby';
 
 const LazyComponent = lazy ( () => import ( './component' ) );
@@ -1054,8 +1392,7 @@ const App = () => {
       }}
     </ForValue>
   );
-};
-```
+};```
 
 #### `Fragment`
 
@@ -1508,8 +1845,7 @@ const App = () => {
     if ( state.error ) return <p>{state.error.message}</p>;
     return <p>Status: {state.value.status}</p>
   });
-};
-```
+};```
 
 #### `useIdleCallback`
 
@@ -2131,19 +2467,60 @@ JSX is supported out of the box and is similar to React JSX with some key differ
 
 To use Woby with TypeScript, two main configurations are required:
 
-1. Since Woby is an ESM-only framework, mark your package as ESM by adding the following to your `package.json`:
-   ```
-   "type": "module"
-   ```
-2. Configure TypeScript to load the correct JSX types by adding the following to your `tsconfig.json`:
-   ```json
-    {
-      "compilerOptions": {
+1.  Since Woby is an ESM-only framework, mark your package as ESM by adding the following to your `package.json`:
+    ```
+    "type": "module"
+    ```
+2.  Configure TypeScript to load the correct JSX types by adding the following to your `tsconfig.json`:
+    ```json
+     {
+       "compilerOptions": {
+         "jsx": "react-jsx",
+         "jsxImportSource": "woby"
+       }
+     }
+    ```
+
+For a complete TypeScript configuration example, you can use the following `tsconfig.json`:
+
+```json
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "lib": [
+            "ES2020",
+            "DOM"
+        ],
+        "allowJs": true,
+        "outDir": "./dist",
+        "rootDir": "./",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
         "jsx": "react-jsx",
-        "jsxImportSource": "woby"
-      }
-    }
-   ```
+        "jsxImportSource": "woby",
+        "allowSyntheticDefaultImports": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "removeComments": false,
+        "noImplicitAny": false,
+        "strictNullChecks": false,
+        "baseUrl": "."
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
+```
 
 Optionally, if not using a bundler or if a plugin is not available for your bundler, define a "React" variable in scope and use the React JSX transform:
    ```ts
@@ -2159,5 +2536,4 @@ Optionally, if not using a bundler or if a plugin is not available for your bund
 
 ## License
 
-MIT 
-
+MIT

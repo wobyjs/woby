@@ -11,11 +11,11 @@ import untrack from '../methods/untrack'
 import { context, with as _with } from 'soby'
 import { SYMBOL_STORE_OBSERVABLE } from 'soby'
 import { classesToggle } from '../utils/classlist'
-import { createText, createComment } from '../utils/creators'
-import diff from '../utils/diff'
+import { createText, createComment } from '../utils/creators.ssr'
+import diff from '../utils/diff.ssr'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
-import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
+import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers.ssr'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
 
@@ -106,7 +106,7 @@ const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, ch
 
 }
 
-const setChildReplacementText = (child: string, childPrev: Node): Node => {
+const setChildReplacementText = (child: string, childPrev: any): any => {
 
     if (childPrev.nodeType === 3) {
 
@@ -160,7 +160,7 @@ const setChildReplacement = (child: Child, childPrev: Node, stack: Stack): void 
 
 }
 
-const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, stack: Stack): void => {
+const setChildStatic = (parent: any, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, stack: Stack): void => {
 
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
@@ -177,7 +177,7 @@ const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: b
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 
-            const textNode = createText(child)
+            const textNode = createText(String(child))
 
             if (!fragmentOnly) {
 
@@ -189,9 +189,9 @@ const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: b
 
             return
 
-        } else if (type === 'object' && child !== null && typeof (child as Node).nodeType === 'number') { //TSC
+        } else if (type === 'object' && child !== null && typeof (child as any).nodeType === 'number') { //TSC
 
-            const node = child as Node
+            const node = child as any
 
             if (!fragmentOnly) {
 
@@ -225,7 +225,7 @@ const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: b
 
     const fragmentNext = FragmentUtils.make()
 
-    const children = (Array.isArray(child) ? child : [child]) as Node[] //TSC
+    const children = (Array.isArray(child) ? child : [child]) as any[] //TSC
 
     for (let i = 0, l = children.length; i < l; i++) {
 
@@ -234,9 +234,9 @@ const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: b
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 
-            FragmentUtils.pushNode(fragmentNext, createText(child))
+            FragmentUtils.pushNode(fragmentNext, createText(String(child)))
 
-        } else if (type === 'object' && child !== null && typeof child.nodeType === 'number') {
+        } else if (type === 'object' && child !== null && typeof (child as any).nodeType === 'number') {
 
             FragmentUtils.pushNode(fragmentNext, child)
 
@@ -265,13 +265,13 @@ const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: b
     let next = FragmentUtils.getChildren(fragmentNext)
     let nextLength = fragmentNext.length
 
-    if (nextLength === 0 && prevLength === 1 && prevFirst.nodeType === 8) { // It's a placeholder already, no need to replace it
+    if (nextLength === 0 && prevLength === 1 && (prevFirst as any).nodeType === 8) { // It's a placeholder already, no need to replace it
 
         return
 
     }
 
-    if (!fragmentOnly && (nextLength === 0 || (prevLength === 1 && prevFirst.nodeType === 8) || children[SYMBOL_UNCACHED])) { // Fast path for removing all children and/or replacing the placeholder
+    if (!fragmentOnly && (nextLength === 0 || (prevLength === 1 && (prevFirst as any).nodeType === 8) || (children as any)[SYMBOL_UNCACHED])) { // Fast path for removing all children and/or replacing the placeholder
 
         const { childNodes } = parent
 

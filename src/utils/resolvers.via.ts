@@ -7,7 +7,7 @@ import useRenderEffect from '../hooks/use_render_effect'
 import $$ from '../methods/SS'
 import { isArray, isFunction, isString, isProxy, fixBigInt, toArray } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
-import { createText, createComment, createHTMLNode } from '../utils/creators'
+import { createText, createComment, createHTMLNode } from '../utils/creators.via'
 import { IgnoreSymbols } from 'via.js'
 import { Stack } from '../soby'
 

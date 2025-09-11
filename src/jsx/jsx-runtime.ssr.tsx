@@ -5,7 +5,7 @@ import '../types'
 // import createElement from '../methods/create_element.ssr';
 // import { wrapCloneElement } from '../methods/wrap_clone_element';
 import type { Child, Component, Element } from '../types'
-import { Fragment, SYMBOL_CLONE, createElement, wrapCloneElement } from '../ssr'
+import { SYMBOL_CLONE, createElement, wrapCloneElement } from '../ssr'
 // import $ from 'soby'
 
 /* MAIN */
@@ -39,4 +39,4 @@ export const getMeta = (target: Element) => target[SYMBOL_CLONE]
 // }
 /* EXPORT */
 
-export { jsx, jsx as jsxs, jsxDEV, Fragment, }
+export { jsx, jsx as jsxs, jsxDEV, }

@@ -5,12 +5,13 @@ This document covers the essential methods and functions provided by Woby for bu
 ## Table of Contents
 
 - [Observable Creation ($)](#observable-creation-)
-- [Observable Unwrapping ($$)](#observable-unwrapping-)
+- [Observable Unwrapping ($)](#observable-unwrapping-)
 - [Effect Management](#effect-management)
 - [Memoization](#memoization)
 - [Batching](#batching)
 - [Untracking](#untracking)
 - [Component Rendering](#component-rendering)
+- [Custom Elements (customElement)](#custom-elements-customelement)
 
 ## Observable Creation ($)
 
@@ -23,7 +24,7 @@ import { $ } from 'woby'
 const count = $(0)
 
 // Create a computed observable
-const doubled = $(() => $$(count) * 2)
+const doubled = $(() => $(count) * 2)
 
 // Create an observable with custom equality function
 const user = $({ id: 1, name: 'John' }, {
@@ -31,24 +32,24 @@ const user = $({ id: 1, name: 'John' }, {
 })
 ```
 
-## Observable Unwrapping ($$)
+## Observable Unwrapping ($)
 
-The `$$()` function safely unwraps observables, providing a consistent way to access values whether they're observables or plain values.
+The `$()` function safely unwraps observables, providing a consistent way to access values whether they're observables or plain values.
 
 ```typescript
-import { $, $$ } from 'woby'
+import { $, $ } from 'woby'
 
 // Unwrap a primitive observable
 const count = $(0)
-console.log($$(count)) // 0
+console.log($(count)) // 0
 
 // Unwrap a computed observable
-const doubled = $(() => $$(count) * 2)
-console.log($$(doubled)) // 0
+const doubled = $(() => $(count) * 2)
+console.log($(doubled)) // 0
 
 // Safely unwrap uncertain values
 const maybeObservable = getValue() // Could be observable or plain value
-const value = $$(maybeObservable) // Works for both cases
+const value = $(maybeObservable) // Works for both cases
 ```
 
 ## Effect Management
@@ -56,14 +57,14 @@ const value = $$(maybeObservable) // Works for both cases
 Effects automatically track dependencies and re-run when those dependencies change.
 
 ```typescript
-import { $, $$, useEffect } from 'woby'
+import { $, $, useEffect } from 'woby'
 
 const count = $(0)
 const name = $('John')
 
 // Effect automatically tracks count and name
 useEffect(() => {
-  console.log(`Count: ${$$(count)}, Name: ${$$(name)}`)
+  console.log(`Count: ${$(count)}, Name: ${$(name)}`)
 })
 
 // Effect re-runs when either observable changes
@@ -76,19 +77,19 @@ name('Jane') // Logs: "Count: 1, Name: Jane"
 Memoized computations automatically recompute when their dependencies change.
 
 ```typescript
-import { $, $$, useMemo } from 'woby'
+import { $, $, useMemo } from 'woby'
 
 const firstName = $('John')
 const lastName = $('Doe')
 
 // Computed observable that updates when dependencies change
 const fullName = useMemo(() => {
-  return `${$$(firstName)} ${$$(lastName)}`
+  return `${$(firstName)} ${$(lastName)}`
 })
 
-console.log($$(fullName)) // "John Doe"
+console.log($(fullName)) // "John Doe"
 firstName('Jane')
-console.log($$(fullName)) // "Jane Doe"
+console.log($(fullName)) // "Jane Doe"
 ```
 
 ## Batching
@@ -96,7 +97,7 @@ console.log($$(fullName)) // "Jane Doe"
 Batch multiple updates to trigger only a single re-render.
 
 ```typescript
-import { $, $$, batch } from 'woby'
+import { $, $, batch } from 'woby'
 
 const count = $(0)
 const name = $('John')
@@ -117,14 +118,14 @@ batch(() => {
 Temporarily read observables without creating dependencies.
 
 ```
-import { $, $$, untrack } from 'woby'
+import { $, $, untrack } from 'woby'
 
 const count = $(0)
 const other = $(0)
 
 const computed = $(() => {
-  const c = $$(count) // Creates a dependency
-  const o = untrack(() => $$(other)) // Does not create a dependency
+  const c = $(count) // Creates a dependency
+  const o = untrack(() => $(other)) // Does not create a dependency
   return c + o
 })
 
@@ -145,7 +146,7 @@ const App = () => {
   return (
     <div>
       <h1>Count: {count}</h1>
-      <button onClick={() => count(c => $$(c) + 1)}>+</button>
+      <button onClick={() => count(c => $(c) + 1)}>+</button>
     </div>
   )
 }
@@ -174,10 +175,10 @@ const Component = () => {
   const show = $(true)
   
   // ✅ Function expression - automatically reactive
-  return <div>Hello {() => $$(userName)}</div>
+  return <div>Hello {() => $(userName)}</div>
   
   // ✅ Complex expressions with multiple observables
-  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
+  return <div class={['w-full', () => $(show) ? '' : 'hidden']}>Content</div>
 }
 ```
 
@@ -187,10 +188,10 @@ const Component = () => {
   const userName = $('John')
   
   // ✅ Memoized expression - reactive but often unnecessary
-  return <div>Hello {useMemo(() => $$(userName))}</div>
+  return <div>Hello {useMemo(() => $(userName))}</div>
   
   // Note: For simple expressions like this, useMemo is unnecessary
-  // since () => $$(userName) is automatically tracked
+  // since () => $(userName) is automatically tracked
 }
 ```
 
@@ -201,11 +202,11 @@ const Component = () => {
   const userName = $('John')
   
   // ❌ Not reactive - only executes once
-  return <div>Hello {$$(userName)}</div>
+  return <div>Hello {$(userName)}</div>
 }
 ```
 
-In the non-reactive example above, `$$()` is called during component creation (which only happens once), so the content never updates even when `userName` changes.
+In the non-reactive example above, `$()` is called during component creation (which only happens once), so the content never updates even when `userName` changes.
 
 **Reactive Attributes:**
 
@@ -220,25 +221,25 @@ const Component = () => {
   return <input disabled={valid} />
   
   // ✅ Function expression - reactive
-  return <input disabled={() => $$(valid) ? true : undefined} />
+  return <input disabled={() => $(valid) ? true : undefined} />
   
   // ✅ Complex reactive class expressions
-  return <div class={['w-full', () => $$(show) ? '' : 'hidden']}>Content</div>
+  return <div class={['w-full', () => $(show) ? '' : 'hidden']}>Content</div>
 }
 ```
 
 **Key Points:**
 - Direct observable passing (`{userName}`) is the preferred pattern for simple cases with only one child
-- Function expressions (`{() => $$(userName)}`) are automatically tracked and suitable for complex expressions
+- Function expressions (`{() => $(userName)}`) are automatically tracked and suitable for complex expressions
 - `useMemo` is unnecessary for simple expressions since `() =>` is automatically tracked
-- Avoid `{$$()}` patterns as they only execute once and are not reactive
+- Avoid `{$()}` patterns as they only execute once and are not reactive
 
 ## Stores
 
 Create reactive stores for complex nested state.
 
 ```typescript
-import { store, $$ } from 'woby'
+import { store, $ } from 'woby'
 
 const userStore = store({
   personal: {
@@ -251,8 +252,8 @@ const userStore = store({
 })
 
 // Access nested properties
-console.log($$(userStore.personal.name)) // 'John'
-console.log($$(userStore.preferences.theme)) // 'dark'
+console.log($(userStore.personal.name)) // 'John'
+console.log($(userStore.preferences.theme)) // 'dark'
 
 // Update nested properties
 userStore.personal.name('Jane')
@@ -276,13 +277,13 @@ const Component = () => (
     </If>
     
     <Switch>
-      <Match when={() => $$(status) === 'loading'}>
+      <Match when={() => $(status) === 'loading'}>
         <p>Loading...</p>
       </Match>
-      <Match when={() => $$(status) === 'success'}>
+      <Match when={() => $(status) === 'success'}>
         <p>Success!</p>
       </Match>
-      <Match when={() => $$(status) === 'error'}>
+      <Match when={() => $(status) === 'error'}>
         <p>Error occurred</p>
       </Match>
     </Switch>
@@ -319,13 +320,13 @@ const Component = () => (
 Handle DOM events with reactive callbacks.
 
 ```typescript
-import { $, $$ } from 'woby'
+import { $, $ } from 'woby'
 
 const Component = () => {
   const count = $(0)
   
   const handleClick = () => {
-    count(c => $$(c) + 1)
+    count(c => $(c) + 1)
   }
   
   const handleInputChange = (e) => {
@@ -351,7 +352,7 @@ const Component = () => {
 Handle asynchronous data with resource utilities.
 
 ```typescript
-import { useResource, $$ } from 'woby'
+import { useResource, $ } from 'woby'
 
 const DataComponent = () => {
   const data = useResource(async () => {
@@ -361,16 +362,16 @@ const DataComponent = () => {
   
   return (
     <div>
-      <If when={() => $$(data.loading)}>
+      <If when={() => $(data.loading)}>
         <p>Loading...</p>
       </If>
       
-      <If when={() => $$(data.error)}>
-        <p>Error: {$$(data.error).message}</p>
+      <If when={() => $(data.error)}>
+        <p>Error: {$(data.error).message}</p>
       </If>
       
       <If when={data}>
-        <pre>{JSON.stringify($$(data), null, 2)}</pre>
+        <pre>{JSON.stringify($(data), null, 2)}</pre>
       </If>
     </div>
   )
@@ -395,6 +396,159 @@ const Component = () => {
   
   return <div>Component with cleanup</div>
 }
+
 ```
+
+## Custom Elements (customElement)
+
+Create custom HTML elements that can be used as components with support for nested object properties.
+
+### Overview
+
+The `customElement` function registers a component as a standard web component that can be used directly in HTML or JSX. It now supports nested object properties through dash-separated attribute names, allowing for more organized and structured component APIs.
+
+### Syntax
+
+```typescript
+customElement<P>(
+  tagName: string, 
+  attributes: (keyof (P & JSX.HTMLAttributes<HTMLElement>))[], 
+  component: JSX.Component<P>
+): void
+```
+
+### Parameters
+
+- `tagName`: The HTML tag name for the custom element (must contain a hyphen)
+- `attributes`: Array of attribute names to observe for changes
+- `component`: The component function to render
+
+### Nested Properties Support
+
+The enhanced `customElement` function now supports nested object properties through dash-separated attribute names:
+
+- Attribute `config-theme` maps to `props.config.theme`
+- Attribute `user-profile-name` maps to `props.user.profile.name`
+- Attribute `actions-onClick` maps to `props.actions.onClick`
+
+### Basic Example
+
+```typescript
+import { $, customElement } from 'woby'
+
+// Simple component
+const SimpleCounter = ({ value }: { value: number }) => {
+  return <div>Count: {value}</div>
+}
+
+// Register as custom element
+customElement('simple-counter', ['value'], SimpleCounter)
+
+// Usage
+// <simple-counter value="5"></simple-counter>
+```
+
+### Nested Properties Example
+
+```typescript
+import { $, customElement } from 'woby'
+
+// Component with nested props
+const ThemedCounter = ({ 
+  value,
+  config,
+  actions
+}: { 
+  value: number,
+  config: {
+    theme: string,
+    size: string
+  },
+  actions: {
+    increment: () => void
+  }
+}) => {
+  return (
+    <div class={`counter counter-${config.theme} counter-${config.size}`}>
+      <span>Count: {value}</span>
+      <button onClick={actions.increment}>+</button>
+    </div>
+  )
+}
+
+// Register with nested attributes
+customElement('themed-counter', [
+  'value',
+  'config-theme',
+  'config-size',
+  'actions-increment'
+], ThemedCounter)
+
+// Usage
+// <themed-counter 
+//   value="5" 
+//   config-theme="dark" 
+//   config-size="large"
+//   actions-increment="handleIncrement">
+// </themed-counter>
+```
+
+### Observable Integration
+
+Nested properties work seamlessly with observables:
+
+```typescript
+import { $, $, customElement, useMemo } from 'woby'
+
+const ObservableCounter = ({ 
+  value,
+  config
+}: { 
+  value: Observable<number>,
+  config: {
+    step: Observable<number>,
+    min: number,
+    max: number
+  }
+}) => {
+  const displayValue = useMemo(() => {
+    return `Value: ${$(value)}, Step: ${$(config.step)}`
+  })
+  
+  return <div>{displayValue}</div>
+}
+
+customElement('observable-counter', [
+  'value',
+  'config-step',
+  'config-min',
+  'config-max'
+], ObservableCounter)
+```
+
+### TypeScript Support
+
+For full TypeScript support, declare the custom element in the JSX namespace:
+
+```typescript
+import { customElement, ElementAttributes } from 'woby'
+
+const MyComponent = ({ config }: { config: { theme: string } }) => {
+  return <div>Theme: {config.theme}</div>
+}
+
+customElement('my-component', ['config-theme'], MyComponent)
+
+// TypeScript declaration
+declare module 'woby' {
+  namespace JSX {
+    interface IntrinsicElements {
+      'my-component': ElementAttributes<typeof MyComponent>
+    }
+  }
+}
+```
+
+### Best Practices
 
 These core methods form the foundation of Woby's reactivity system, enabling fine-grained updates and efficient rendering.
