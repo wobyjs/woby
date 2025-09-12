@@ -1,6 +1,7 @@
 
 /* IMPORT */
 
+import { useEffect } from '~/hooks'
 import { CONTEXTS_DATA } from '../constants'
 import resolve from '../methods/resolve'
 import { context } from '../soby'
@@ -17,7 +18,7 @@ function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> 
   const Provider = ({ value, children }: { value: T, children: Child }): Child => {
 
     return context({ [symbol]: value }, () => {
-
+      [children].flat().forEach(c => c instanceof HTMLElement && (c[symbol] = value))
       return resolve(children)
 
     })

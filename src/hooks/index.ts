@@ -27,6 +27,9 @@ import useSuspended from './use_suspended'
 import useTimeout from './use_timeout'
 import useUntracked from './use_untracked'
 
+export * from './use_mounted'
+export * from './use_mounted_context'
+
 /* EXPORT */
 
 export { useAbortController, useAbortSignal, useAnimationFrame, useAnimationLoop, useBoolean, useCleanup, useContext, useDisposed, useEventListener, useEffect, useFetch, useIdleCallback, useIdleLoop, useInterval, useMemo, useMicrotask, usePromise, useReadonly, useResolved, useResource, useRoot, useSelector, useSuspended, useTimeout, useUntracked }

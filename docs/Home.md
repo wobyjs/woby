@@ -15,6 +15,7 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 - **[Hooks](./Hooks.md)** - Built-in hooks and utilities (useEffect, useMemo, etc.)
 - **[Built-in Components](./Built-in-Components.md)** - Framework components (For, If, Switch, etc.)
 - **[Class Management](./Class-Management.md)** - Advanced class handling with reactive support
+- **[Context](./Context.md)** - Context API for sharing data between components
 
 ### Advanced Topics
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
@@ -32,11 +33,12 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 | **Components** | [Built-in Components](./Built-in-Components.md) |
 | **Examples** | [Examples Gallery](./Examples.md) |
 | **Class Management** | [Class Management](./Class-Management.md) |
+| **Context API** | [Context](./Context.md) |
 | **Help** | [FAQ](./FAQ.md) • [Contributing](./Contributing.md) |
 
 ## 🎯 Key Features
 
-Woby is built upon the [Voby](https://github.com/vobyjs/voby) reactive core, providing an enhanced API for component-based development:
+Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, providing an enhanced API for component-based development:
 
 - **No VDOM**: Direct DOM manipulation for maximum performance
 - **Fine-grained reactivity**: Automatic dependency tracking with observables

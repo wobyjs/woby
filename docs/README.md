@@ -16,6 +16,7 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 - **[Built-in Components](./Built-in-Components.md)** - Framework components
 - **[Reactivity System](./Reactivity-System.md)** - Understanding observables
 - **[Class Management](./Class-Management.md)** - Advanced class handling with reactive support
+- **[Context](./Context.md)** - Context API for sharing data between components
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
 - **[Woby vs React](./Woby-vs-React.md)** - API differences and migration guide
 
@@ -31,6 +32,7 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 | **Learn the basics** | [Reactivity System](./Reactivity-System.md) |
 | **See examples** | [Examples](./Examples.md) |
 | **Manage classes** | [Class Management](./Class-Management.md) |
+| **Share data between components** | [Context](./Context.md) |
 | **Find a specific function** | [Core Methods](./Core-Methods.md) or [Hooks](./Hooks.md) |
 | **Learn best practices** | [Best Practices](./Best-Practices.md) |
 | **Compare with React** | [Woby vs React](./Woby-vs-React.md) |

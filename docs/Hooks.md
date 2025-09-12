@@ -10,6 +10,7 @@ Woby provides a comprehensive set of hooks for common patterns and utilities. Al
 - [Timer Hooks](#timer-hooks)
 - [Utility Hooks](#utility-hooks)
 - [DOM Hooks](#dom-hooks)
+- [Context Hooks](#context-hooks)
 
 ## State Hooks
 
@@ -564,7 +565,7 @@ const AnimationDemo = () => {
 
 ### useContext
 
-Consumes a context value.
+Consumes a context value in JSX/TSX components only.
 
 **Signature:**
 ```typescript
@@ -587,6 +588,57 @@ const ThemedComponent = () => {
   )
 }
 ```
+
+**Limitations:**
+- Only works in JSX/TSX components
+- Requires explicit Provider components
+- Does not work with custom elements defined directly in HTML
+
+### useMountedContext
+
+Consumes a context value in both JSX/TSX components and custom elements defined in HTML.
+
+**Signature:**
+```typescript
+function useMountedContext<T, E extends HTMLElement>(Context: ContextWithDefault<E>): { ref: Observable<E>, context: ObservableReadonly<T> }
+function useMountedContext<T, E extends HTMLElement>(Context: ContextWithDefault<E>, ref: Observable<E>): ObservableReadonly<T>
+```
+
+**Usage:**
+```typescript
+import { createContext, useMountedContext } from 'woby'
+
+const CounterContext = createContext<number>(0)
+
+// In JSX/TSX components
+const MyComponent = () => {
+  const { ref, context } = useMountedContext(CounterContext)
+  return <div ref={ref}>Context value: {context}</div>
+}
+```
+
+```html
+<!-- In HTML custom elements -->
+<counter-element>
+  <counter-element><!-- This child can access parent's context --></counter-element>
+</counter-element>
+```
+
+**Key Differences:**
+
+| Feature | useContext | useMountedContext |
+|---------|------------|-------------------|
+| JSX/TSX Support | ✅ | ✅ |
+| Custom Element Support | ❌ | ✅ |
+| Provider Required | ✅ | ❌ (for custom elements) |
+| Ref Integration | ❌ | ✅ |
+| HTML Usage | ❌ | ✅ |
+
+**Best Practices:**
+- Use `useContext` when working exclusively with JSX/TSX components
+- Use `useMountedContext` when you need to support both JSX/TSX and custom elements
+- Always provide a default value when creating contexts
+- Use observables for context values that need to be reactive
 
 ### useDisposed
 

@@ -6,7 +6,8 @@
 
 # Woby
 
-A high-performance framework with fine-grained observable-based reactivity for building rich applications. Woby is built upon the [Voby](https://github.com/vobyjs/voby) reactive core, providing an enhanced API for component-based development.
+
+A high-performance framework with fine-grained observable-based reactivity for building rich applications. Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, providing an enhanced API for component-based development.
 
 ## Features
 
@@ -62,13 +63,13 @@ You can find some demos and benchmarks below, more demos are contained inside th
 
 When using AI coding assistants to help with Woby development, please provide these explicit instructions to ensure proper understanding of Woby patterns:
 
-1.  **Framework Specific Instructions**: "Use Woby patterns, NOT React patterns. Woby uses observables with `$()` and `$$()` functions, not React hooks like useState, useEffect with dependency arrays, or useCallback."
+1.  **Framework Specific Instructions**: "Use Woby patterns, NOT React patterns. Woby uses observables with `$()` and `$()` functions, not React hooks like useState, useEffect with dependency arrays, or useCallback."
 
-2.  **Observable-Based Reactivity**: "In Woby, declare reactive variables with `$()`, and access their values with `$$()` in reactive contexts. Woby automatically tracks dependencies when you use `$$()`."
+2.  **Observable-Based Reactivity**: "In Woby, declare reactive variables with `$()`, and access their values with `$()` in reactive contexts. Woby automatically tracks dependencies when you use `$()`."
 
-3.  **No Dependency Arrays**: "Woby hooks like `useEffect` and `useMemo` do not require dependency arrays. Dependencies are automatically tracked when accessed with `$$()`."
+3.  **No Dependency Arrays**: "Woby hooks like `useEffect` and `useMemo` do not require dependency arrays. Dependencies are automatically tracked when accessed with `$()`."
 
-4.  **Reactive Patterns**: "Direct observable passing (`{userName}`) is preferred for simple reactive content. For complex expressions, use function expressions (`{() => $$(userName)}`) which are automatically tracked."
+4.  **Reactive Patterns**: "Direct observable passing (`{userName}`) is preferred for simple reactive content. For complex expressions, use function expressions (`{() => $(userName)}`) which are automatically tracked."
 
 ### Common Anti-Patterns to Avoid
 
@@ -86,11 +87,11 @@ useEffect(() => {
 
 // ✅ Woby pattern
 useEffect(() => {
-  console.log($$(count))
+  console.log($(count))
 })
 
 // ❌ Anti-pattern: Non-reactive content
-<div>Hello {$$(userName)}</div>
+<div>Hello {$(userName)}</div>
 
 // ✅ Woby pattern
 <div>Hello {userName}</div>
@@ -107,17 +108,17 @@ useEffect(() => {
 | React Pattern | Woby Equivalent | Notes |
 |---------------|-----------------|-------|
 | `useState(0)` | `const count = $(0)` | Declare with `$()` |
-| `useEffect(fn, [dep])` | `useEffect(() => { fn($$(dep)) })` | No dependency array, use `$$()` |
-| `useMemo(fn, [deps])` | `useMemo(() => fn($$(dep1), $$(dep2)))` | No dependency array |
+| `useEffect(fn, [dep])` | `useEffect(() => { fn($(dep)) })` | No dependency array, use `$()` |
+| `useMemo(fn, [deps])` | `useMemo(() => fn($(dep1), $(dep2)))` | No dependency array |
 | `useCallback(fn, [deps])` | `const fn = () => {}` | Often unnecessary |
 | `array.map(item => <div>{item}</div>)` | `<For values={array}>{(item) => <div>{item}</div>}</For>` | Use `For` component |
-| `{condition && <div>Content</div>}` | `{() => $$(condition) && <div>Content</div>}` | Use `use () => for reactivate` condition |
+| `{condition && <div>Content</div>}` | `{() => $(condition) && <div>Content</div>}` | Use `use () => for reactivate` condition |
 | `ref={ref}` with `useRef()` | `ref={observableRef}` | Use observable refs, no .current |
 
 ## Key Differences from React
 
 1.  **Reactivity System**: Woby uses fine-grained observables instead of React's virtual DOM and reconciliation
-2.  **No Dependency Arrays**: Woby automatically tracks dependencies with `$$()` instead of requiring manual dependency arrays
+2.  **No Dependency Arrays**: Woby automatically tracks dependencies with `$()` instead of requiring manual dependency arrays
 3.  **Flexible Hooks**: Woby hooks can be called conditionally, nested, or outside components
 4.  **Built-in Control Flow**: Woby provides `If`, `Switch`, `For` components instead of JavaScript conditionals and array methods
 5.  **Direct DOM Updates**: Woby updates the DOM directly without a virtual DOM layer
@@ -126,7 +127,7 @@ useEffect(() => {
 
 ### Observable Not Updating
 
-Ensure you're declaring reactive variables with `$()` and accessing them with `$$()` in reactive contexts:
+Ensure you're declaring reactive variables with `$()` and accessing them with `$()` in reactive contexts:
 
 ```tsx
 // ❌ Not reactive - won't update
@@ -136,16 +137,16 @@ let count = 0
 const count = $(0)
 
 // ❌ Not reactive - only executes once
-<div>{$$(count)}</div>
+<div>{$(count)}</div>
 
 // ✅ Reactive - updates automatically
 <div>{count}</div>
-<div>{() => $$(count)}</div>
+<div>{() => $(count)}</div>
 ```
 
 ### Effects Not Running
 
-Make sure you're accessing observables with `$$()` inside the effect:
+Make sure you're accessing observables with `$()` inside the effect:
 
 ```tsx
 const name = $('John')
@@ -158,7 +159,7 @@ useEffect(() => {
 
 // ✅ Effect will re-run when name or count changes
 useEffect(() => {
-  console.log(`Name: ${$$(name)}, Count: ${$$(count)}`)
+  console.log(`Name: ${$(name)}, Count: ${$(count)}`)
 })
 ```
 
@@ -170,11 +171,11 @@ Ensure reactive elements in class expressions are wrapped in functions:
 const isActive = $(false)
 
 // ❌ Not reactive
-<div class={{ active: $$(isActive) }}>Content</div>
+<div class={{ active: $(isActive) }}>Content</div>
 
 // ✅ Reactive
 <div class={{ active: isActive }}>Content</div>
-<div class={() => $$(isActive) ? 'active' : ''}>Content</div>
+<div class={() => $(isActive) ? 'active' : ''}>Content</div>
 ```
 
 ## Complete Working Example
@@ -182,7 +183,7 @@ const isActive = $(false)
 Here's a complete Todo app showcasing Woby patterns:
 
 ```tsx
-import { $, $$, For, If, render, useMemo } from 'woby'
+import { $, $, For, If, render, useMemo } from 'woby'
 
 interface Todo {
   id: number
@@ -198,7 +199,7 @@ const TodoApp = () => {
 
   // Actions
   const addTodo = () => {
-    const text = $$(input).trim()
+    const text = $(input).trim()
     if (text) {
       todos(prev => [...prev, {
         id: Date.now(),
@@ -212,13 +213,13 @@ const TodoApp = () => {
   const toggleTodo = (id: number) => {
     todos(prev => prev.map(todo => 
       todo.id === id 
-        ? { ...todo, completed: !$$(todo.completed) }
+        ? { ...todo, completed: !$(todo.completed) }
         : todo
     ))
   }
 
   const removeTodo = (id: number) => {
-    todos(prev => $$(prev).filter(todo => todo.id !== id))
+    todos(prev => $(prev).filter(todo => todo.id !== id))
   }
 
   const setFilter = (newFilter: string) => {
@@ -227,8 +228,8 @@ const TodoApp = () => {
 
   // Computed values
   const filteredTodos = useMemo(() => {
-    const currentFilter = $$(filter)
-    const currentTodos = $$(todos)
+    const currentFilter = $(filter)
+    const currentTodos = $(todos)
     
     if (currentFilter === 'active') {
       return currentTodos.filter(todo => !todo.completed)
@@ -239,7 +240,7 @@ const TodoApp = () => {
   })
 
   const activeCount = useMemo(() => {
-    return $$(todos).filter(todo => !todo.completed).length
+    return $(todos).filter(todo => !todo.completed).length
   })
 
   return (
@@ -272,7 +273,7 @@ const TodoApp = () => {
             onClick={() => setFilter(filterName)}
             class={[
               'px-3 py-1 rounded',
-              () => $$(filter) === filterName 
+              () => $(filter) === filterName 
                 ? 'bg-blue-500 text-white' 
                 : 'bg-gray-200 hover:bg-gray-300'
             ]}
@@ -313,9 +314,9 @@ const TodoApp = () => {
 
       {/* Stats */}
       <div class="mt-4 p-2 bg-gray-100 rounded text-sm">
-        Total: {() => $$(todos).length} | 
+        Total: {() => $(todos).length} | 
         Active: {activeCount} |
-        Completed: {() => $$(todos).filter(t => t.completed).length}
+        Completed: {() => $(todos).filter(t => t.completed).length}
       </div>
     </div>
   )
@@ -348,7 +349,7 @@ useEffect(() => {
 
 // Woby
 useEffect(() => {
-  console.log($$(count))
+  console.log($(count))
 })
 // No dependency array needed!
 ```
@@ -360,7 +361,7 @@ useEffect(() => {
 const doubled = useMemo(() => count * 2, [count])
 
 // Woby
-const doubled = useMemo(() => $$(count) * 2)
+const doubled = useMemo(() => $(count) * 2)
 // No dependency array needed!
 ```
 
@@ -390,7 +391,7 @@ const doubled = useMemo(() => $$(count) * 2)
 
 ## Performance Tips
 
-1.  **Use Direct Observable Passing**: For simple reactive content, pass observables directly rather than using `$$()` in functions
+1.  **Use Direct Observable Passing**: For simple reactive content, pass observables directly rather than using `$()` in functions
 2.  **Group Related Effects**: Separate unrelated concerns into individual effects for better performance
 3.  **Use Early Returns**: Skip unnecessary work in effects when dependencies haven't changed meaningfully
 4.  **Choose the Right List Component**: Use `For` for objects, `ForValue` for primitives, `ForIndex` for fixed-size lists
@@ -400,7 +401,7 @@ const doubled = useMemo(() => $$(count) * 2)
 
 | Core Methods                        | Components                | Hooks                             | Types & Utilities                  | Miscellaneous            |
 |------------------------------------|---------------------------|-----------------------------------|------------------------------------|--------------------------|
-| [`$`](#methods)                    | [`Dynamic`](#dynamic)     | [`useAbortController`](#useabortcontroller) | [`Context`](#context)             | [`Contributing`](#contributing) |
+| [`](#methods)                    | [`Dynamic`](#dynamic)     | [`useAbortController`](#useabortcontroller) | [`Context`](#context)             | [`Contributing`](#contributing) |
 | [`batch`](#batch)                  | [`ErrorBoundary`](#errorboundary) | [`useAbortSignal`](#useabortsignal) | [`Directive`](#directive)         | [`Globals`](#globals)   |
 | [`createContext`](#createcontext) | [`For`](#for)             | [`useAnimationFrame`](#useanimationframe) | [`DirectiveOptions`](#directiveoptions) | [`JSX`](#jsx)           |
 | [`createDirective`](#createdirective) | [`ForIndex`](#forindex) | [`useAnimationLoop`](#useanimationloop) | [`FunctionMaybe`](#functionmaybe) | [`Tree Shaking`](#tree-shaking) |
@@ -438,7 +439,7 @@ Here's a complete counter example that demonstrates Woby's reactive capabilities
 **Source:** [woby-demo](https://github.com/wongchichong/demo) ⭐
 
 ```tsx
-import { $, $$, useMemo, render, Observable, customElement, ElementAttributes } from 'woby'
+import { $, $, useMemo, render, Observable, customElement, ElementAttributes } from 'woby'
 
 const Counter = ({ increment, decrement, value, ...props }: { 
   increment: () => number, 
@@ -447,7 +448,7 @@ const Counter = ({ increment, decrement, value, ...props }: {
 }): JSX.Element => {
   const v = $('abc')
   const m = useMemo(() => {
-    return $$(value) + $$(v)
+    return $(value) + $(v)
   })
   return <div {...props}>
     <h1>Counter</h1>
@@ -519,7 +520,7 @@ Woby supports complex class expressions including arrays, objects, and functions
 // Mixed types
 <div class={[
   "red",
-  () => ($$(value) % 2 === 0 ? "bold" : ""),
+  () => ($(value) % 2 === 0 ? "bold" : ""),
   { hidden: true, italic: false },
   ['hello', ['world']]
 ]}>Complex classes</div>
@@ -646,7 +647,7 @@ const dynamicClass = useMemo(() => ({
 
 The following top-level functions are provided.
 
-#### `$`
+#### `
 
 This function is just the default export of `soby`, it can be used to wrap a value in an observable.
 
@@ -704,7 +705,7 @@ const noop = () => {};
 o ( () => noop );
 ```
 
-#### `$$`
+#### `
 
 This function unwraps a potentially observable value.
 
@@ -713,32 +714,32 @@ This function unwraps a potentially observable value.
 Interface:
 
 ```ts
-function $$ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
+function $ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
 ```
 
 Usage:
 
 ```tsx
-import {$$} from 'woby';
+import {$} from 'woby';
 
 // Getting the value out of an observable
 
 const o = $(123);
 
-$$ ( o ); // => 123
+$ ( o ); // => 123
 
 // Getting the value out of a function
 
-$$ ( () => 123 ); // => 123
+$ ( () => 123 ); // => 123
 
 // Getting the value out of an observable but not out of a function
 
-$$ ( o, false ); // => 123
-$$ ( () => 123, false ); // => () => 123
+$ ( o, false ); // => 123
+$ ( () => 123, false ); // => () => 123
 
 // Getting the value out of a non-observable and non-function
 
-$$ ( 123 ); // => 123
+$ ( 123 ); // => 123
 ```
 
 #### `batch`
@@ -2025,7 +2026,7 @@ If no callback is used then it returns the unwrapped value, otherwise it returns
 
 This is useful for handling reactive and non reactive values the same way. Usually if the value is a function, or always for convenience, you'd want to wrap the `useResolved` call in a `useMemo`, to maintain reactivity.
 
-This is potentially a more convenient version of `$`, made especially for handling nicely arguments passed that your hooks receive that may or may not be observables.
+This is potentially a more convenient version of `, made especially for handling nicely arguments passed that your hooks receive that may or may not be observables.
 
 Interface:
 
@@ -2426,7 +2427,7 @@ Extra features and details.
 If you'd like to contribute to this repo you should take the following steps to install Woby locally:
 
 ```sh
-git clone https://github.com/vobyjs/woby.git
+git clone https://github.com/wobyjs/woby.git
 cd woby
 npm install
 npm run compile

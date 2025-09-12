@@ -23,7 +23,7 @@ export const SYMBOL_CLONE = Symbol('CloneElement')
 /** This symbol is indicated that the element is created through jsx/jsxDEV
  *  not customElement
  */
-export const SYMBOL_JSX = Symbol('SYMBOL_JSX')
+export const SYMBOL_JSX = Symbol('Jsx')
 
 /* EXPORT */
 

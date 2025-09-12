@@ -11,6 +11,7 @@ This document covers the essential methods and functions provided by Woby for bu
 - [Batching](#batching)
 - [Untracking](#untracking)
 - [Component Rendering](#component-rendering)
+- [Context Creation (createContext)](#context-creation-createcontext)
 - [Custom Elements (customElement)](#custom-elements-customelement)
 
 ## Observable Creation ($)
@@ -399,6 +400,110 @@ const Component = () => {
 
 ```
 
+## Context Creation (createContext)
+
+Create context objects for sharing data between components.
+
+### Overview
+
+The `createContext` function creates a context object that can be used to share data between components without having to pass props down manually at every level.
+
+### Syntax
+
+``typescript
+function createContext<T>(defaultValue: T): ContextWithDefault<T>
+function createContext<T>(defaultValue?: T): Context<T>
+```
+
+### Parameters
+
+- `defaultValue`: The default value for the context (optional)
+
+### Basic Example
+
+```typescript
+import { createContext, useContext } from 'woby'
+
+// Create a context with a default value
+const ThemeContext = createContext<'light' | 'dark'>('light')
+
+// Create a context without a default value
+const UserContext = createContext<User | null>(null)
+```
+
+### Provider Pattern
+
+To provide a context value to child components, use the Provider component:
+
+```typescript
+import { createContext, useContext } from 'woby'
+
+const CounterContext = createContext<Observable<number>>($(0))
+
+const ParentComponent = () => {
+  const count = $(0)
+  
+  return (
+    <CounterContext.Provider value={count}>
+      <ChildComponent />
+    </CounterContext.Provider>
+  )
+}
+
+const ChildComponent = () => {
+  const count = useContext(CounterContext)
+  
+  return <div>Count: {count}</div>
+}
+```
+
+### Context with useMountedContext
+
+For custom elements and more flexible context usage, use `useMountedContext`:
+
+```typescript
+import { createContext, useMountedContext } from 'woby'
+
+const CounterContext = createContext<Observable<number>>($(0))
+
+const CounterComponent = () => {
+  const { ref, context } = useMountedContext(CounterContext)
+  
+  return (
+    <div ref={ref}>
+      <p>Count: {context}</p>
+      <button onClick={() => context(c => c + 1)}>+</button>
+    </div>
+  )
+}
+```
+
+### TypeScript Support
+
+For full TypeScript support, define the context type explicitly:
+
+```typescript
+import { createContext } from 'woby'
+
+interface ThemeContextType {
+  theme: 'light' | 'dark'
+  toggleTheme: () => void
+}
+
+const ThemeContext = createContext<ThemeContextType>({
+  theme: 'light',
+  toggleTheme: () => {}
+})
+```
+
+### Best Practices
+
+1. **Use descriptive names** for context objects
+2. **Provide sensible defaults** when possible
+3. **Keep context values lightweight** - avoid passing large objects
+4. **Use observables** for reactive context values
+5. **Consider using useMountedContext** for better custom element support
+
 ## Custom Elements (customElement)
 
 Create custom HTML elements that can be used as components with support for nested object properties.
@@ -409,7 +514,7 @@ The `customElement` function registers a component as a standard web component t
 
 ### Syntax
 
-```typescript
+``typescript
 customElement<P>(
   tagName: string, 
   component: JSX.Component<P>,
@@ -433,7 +538,7 @@ The enhanced `customElement` function now supports nested object properties thro
 
 ### Basic Example
 
-```typescript
+``typescript
 import { $, customElement } from 'woby'
 
 // Simple component
@@ -450,7 +555,7 @@ customElement('simple-counter', SimpleCounter, 'value')
 
 ### Nested Properties Example
 
-```typescript
+``typescript
 import { $, customElement } from 'woby'
 
 // Component with nested props
@@ -497,7 +602,7 @@ customElement('themed-counter', ThemedCounter,
 
 Nested properties work seamlessly with observables:
 
-```typescript
+``typescript
 import { $, customElement, useMemo } from 'woby'
 
 const ObservableCounter = ({ 
@@ -530,7 +635,7 @@ customElement('observable-counter', ObservableCounter,
 
 For full TypeScript support, declare the custom element in the JSX namespace:
 
-```typescript
+``typescript
 import { customElement, ElementAttributes } from 'woby'
 
 const MyComponent = ({ config }: { config: { theme: string } }) => {

@@ -8,6 +8,22 @@ The `customElement` function registers a component as a standard web component t
 
 The function signature has been updated to swap the parameter positions and make the attributes parameter optional with a default value of `['*']`.
 
+### Context Integration
+
+Custom elements automatically propagate context values from parent to child elements, enabling `useMountedContext` to work seamlessly with HTML-defined custom elements.
+
+When a custom element is used as a child of another custom element, the parent's context is automatically made available to the child through the `useMountedContext` hook:
+
+```html
+<!-- Parent custom element provides context -->
+<counter-element value="5">
+  <!-- Child custom element can access parent's context -->
+  <counter-element></counter-element>
+</counter-element>
+```
+
+This works without requiring explicit Provider components, making context sharing in HTML much simpler than with traditional React context.
+
 ### Syntax
 
 ```typescript

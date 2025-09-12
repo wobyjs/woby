@@ -15,6 +15,7 @@ import { setChild, setAttribute, setProp } from "../utils/setters"
 import createElement from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
 import { Stack } from "soby"
+import useEffect from "../hooks/use_effect"
 
 /**
  * ElementAttributes type helper
@@ -289,8 +290,25 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
 
             observer.observe(this, { attributes: true, attributeOldValue: true })
 
-            if (!this.props[SYMBOL_JSX])
+            if (!this.props[SYMBOL_JSX]) {
+                // Capture existing child elements to pass as children prop
+                const existingChildren = this.childNodes.length > 0 ?
+                    Array.from(this.childNodes).map(node => {
+                        // Remove the node from this element and return it
+                        this.removeChild(node)
+                        return node
+                    }) :
+                    undefined
+
+                // Add existing children to props if they exist
+                if (existingChildren && existingChildren.length > 0) {
+                    (this.props as any).children = existingChildren.length === 1 ?
+                        existingChildren[0] :
+                        existingChildren
+                }
+
                 setChild(this, createElement(children, this.props), FragmentUtils.make(), new Stack())
+            }
 
         }
 

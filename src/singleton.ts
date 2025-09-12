@@ -7,15 +7,15 @@ import isServer from './methods/is_server';
 
 if (!isServer()) {
 
-    const isLoaded = !!globalThis.VOBY;
+    const isLoaded = !!globalThis.WOBY;
 
     if (isLoaded) {
 
-        throw new Error('Voby has already been loaded');
+        throw new Error('Woby has already been loaded');
 
     } else {
 
-        globalThis.VOBY = true;
+        globalThis.WOBY = true;
 
     }
 
