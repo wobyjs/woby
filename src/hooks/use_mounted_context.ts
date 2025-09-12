@@ -17,7 +17,7 @@ import $ from '../methods/S'
 import $$ from '../methods/SS'
 import useMemo from './use_memo'
 import useContext from './use_context'
-import { Context, ContextWithDefault, ObservableReadonly } from '~/types'
+import { Context, ContextWithDefault, ObservableReadonly } from '../types'
 
 /**
  * useMountedContext Hook

@@ -1,7 +1,6 @@
 
 /* IMPORT */
 
-import { useEffect } from '~/hooks'
 import { CONTEXTS_DATA } from '../constants'
 import resolve from '../methods/resolve'
 import { context } from '../soby'
