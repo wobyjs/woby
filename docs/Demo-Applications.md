@@ -6,15 +6,15 @@ Comprehensive documentation for all Woby demo applications. These demos showcase
 
 The Woby demo collection includes applications ranging from basic learning examples to complex performance benchmarks. Each demo is designed to teach specific concepts and demonstrate best practices.
 
-**Repository**: [woby-demo](https://github.com/wongchichong/demo)
+**Repository**: [@woby/demo](https://github.com/wobyjs/demo)
 
 ## 🚀 Getting Started with Demos
 
 ### Quick Setup
 ```bash
 # Clone the demo repository
-git clone https://github.com/wongchichong/demo.git
-cd woby-demo
+git clone https://github.com/wobyjs/demo.git
+cd demo
 
 # Install dependencies
 pnpm install
@@ -384,7 +384,7 @@ Many demos include visual verification:
 4. **Test thoroughly** across different browsers
 5. **Submit pull request** with detailed description
 
-For detailed guidelines, see [Contributing to Woby Demo](https://github.com/wongchichong/demo/blob/main/docs/Contributing.md).
+For detailed guidelines, see [Contributing to Woby Demo](https://github.com/wobyjs/demo/blob/main/docs/Contributing.md).
 
 ## 🔗 Additional Resources
 
@@ -400,9 +400,9 @@ For detailed guidelines, see [Contributing to Woby Demo](https://github.com/wong
 - [Examples Gallery](./Examples.md) - Code examples and patterns
 
 ### Community
-- [GitHub Repository](https://github.com/wongchichong/woby) - Main framework
-- [Demo Repository](https://github.com/wongchichong/demo) - Demo collection
-- [Discussions](https://github.com/wongchichong/woby/discussions) - Community discussions
+- [GitHub Repository](https://github.com/wobyjs/woby) - Main framework
+- [Demo Repository](https://github.com/wobyjs/demo) - Demo collection
+- [Discussions](https://github.com/wobyjs/woby/discussions) - Community discussions
 
 ---
 

@@ -261,13 +261,13 @@ See our [Migration from Solid](./Migration-From-Solid.md) guide.
 
 Most React libraries won't work directly since Woby uses a different paradigm. Look for:
 1. Framework-agnostic libraries
-2. Woby-specific alternatives
+2. @woby/specific alternatives
 3. Vanilla JavaScript libraries
 
 ## Getting Help
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/wongchichong/woby/issues)
-- **Discussions**: [Community discussions](https://github.com/wongchichong/woby/discussions)
-- **Examples**: [woby-demo repository](https://github.com/wongchichong/demo)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/wobyjs/woby/issues)
+- **Discussions**: [Community discussions](https://github.com/wobyjs/woby/discussions)
+- **Examples**: [@woby/demo repository](https://github.com/wobyjs/demo)
 
-Still have questions? Feel free to [open a discussion](https://github.com/wongchichong/woby/discussions) on GitHub!
+Still have questions? Feel free to [open a discussion](https://github.com/wobyjs/woby/discussions) on GitHub!

@@ -510,4 +510,4 @@ Now that you've built your first Woby application, explore these topics:
 
 ## Complete Example
 
-You can find this complete todo application and many others in our [examples gallery](./Examples.md) or check out the [live demos](https://github.com/wongchichong/demo).
+You can find this complete todo application and many others in our [examples gallery](./Examples.md) or check out the [live demos](https://github.com/wobyjs/demo).

@@ -762,4 +762,4 @@ const handleClick = (e) => {
 - **[Boxes](https://codesandbox.io/s/demo-boxes-wx6rqb)** - Animated boxes
 - **[Triangle](https://codesandbox.io/s/demo-triangle-l837v0)** - Performance test
 
-**[View More Examples](https://github.com/wongchichong/demo)**
+**[View More Examples](https://github.com/wobyjs/demo)**

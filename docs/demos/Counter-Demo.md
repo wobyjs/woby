@@ -1,6 +1,6 @@
 # Counter Demo
 
-**Repository**: [woby-demo](https://github.com/wongchichong/demo)  
+**Repository**: [@woby/demo](https://github.com/wobyjs/demo)  
 **Location**: `demo/counter/`  
 **Run**: `pnpm dev:counter`  
 **Live Demo**: [CodeSandbox](https://codesandbox.io/s/demo-counter-23fv5)

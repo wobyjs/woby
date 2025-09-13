@@ -18,7 +18,7 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 - **[Class Management](./Class-Management.md)** - Advanced class handling with reactive support
 - **[Context](./Context.md)** - Context API for sharing data between components
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
-- **[Woby vs React](./Woby-vs-React.md)** - API differences and migration guide
+- **[Woby vs React](./@woby/vs-React.md)** - API differences and migration guide
 
 ### Help & Community
 - **[FAQ](./FAQ.md)** - Frequently asked questions
@@ -35,7 +35,7 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 | **Share data between components** | [Context](./Context.md) |
 | **Find a specific function** | [Core Methods](./Core-Methods.md) or [Hooks](./Hooks.md) |
 | **Learn best practices** | [Best Practices](./Best-Practices.md) |
-| **Compare with React** | [Woby vs React](./Woby-vs-React.md) |
+| **Compare with React** | [Woby vs React](./@woby/vs-React.md) |
 | **Get help** | [FAQ](./FAQ.md) |
 | **Contribute** | [Contributing](./Contributing.md) |
 
@@ -53,12 +53,12 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 3. Browse [Hooks](./Hooks.md) for utilities
 4. Learn [Class Management](./Class-Management.md) for advanced class handling
 5. Learn [Best Practices](./Best-Practices.md) for optimal patterns
-6. See [Woby vs React](./Woby-vs-React.md) for migration guidance
+6. See [Woby vs React](./@woby/vs-React.md) for migration guidance
 
 ### For React Developers
-1. Read [Woby vs React](./Woby-vs-React.md) for key differences
+1. Read [Woby vs React](./@woby/vs-React.md) for key differences
 2. Learn [Class Management](./Class-Management.md) for advanced class patterns
-3. Learn [Best Practices](./Best-Practices.md) for Woby-specific patterns
+3. Learn [Best Practices](./Best-Practices.md) for @woby/specific patterns
 4. Explore [Examples](./Examples.md) for practical usage
 
 ### For Contributors
@@ -68,8 +68,8 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 
 ## 🔗 External Resources
 
-- **[GitHub Repository](https://github.com/wongchichong/woby)** - Source code and issues
-- **[Demo Applications](https://github.com/wongchichong/demo)** - Live examples
+- **[GitHub Repository](https://github.com/wobyjs/woby)** - Source code and issues
+- **[Demo Applications](https://github.com/wobyjs/demo)** - Live examples
 - **[CodeSandbox Playground](https://codesandbox.io/s/playground-7w2pxg)** - Interactive environment
 
 ## 📝 Contributing to Documentation
@@ -91,4 +91,4 @@ The documentation is written in Markdown and located in this `/docs` folder. To 
 
 ---
 
-*For the latest updates and community discussions, visit the [GitHub repository](https://github.com/wongchichong/woby).*
+*For the latest updates and community discussions, visit the [GitHub repository](https://github.com/wobyjs/woby).*

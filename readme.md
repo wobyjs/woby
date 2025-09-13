@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/wongchichong/woby">
+  <a href="https://github.com/wobyjs/woby">
     <img src="./resources/banner/png/banner-light-rounded.png" alt="Woby's Banner" width="640px" height="320px">
   </a>
 </p>
@@ -37,7 +37,7 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **[Examples Gallery](./docs/Examples.md)** - Practical examples and patterns
 - **[Class Management](./docs/Class-Management.md)** - Advanced class handling with reactive support
 - **[Best Practices](./docs/Best-Practices.md)** - Recommended patterns and practices
-- **[Woby vs React](./docs/Woby-vs-React.md)** - API differences and migration guide
+- **[Woby vs React](./docs/@woby/vs-React.md)** - API differences and migration guide
 - **[FAQ](./docs/FAQ.md)** - Common questions and answers
 
 ## Demos
@@ -428,7 +428,7 @@ const doubled = useMemo(() => $(count) * 2)
                                     |                           | [`useTimeout`](#usetimeout)       |                                    |                          |
 ## Usage
 
-Woby serves as a view layer built on top of the Observable library [`soby`](https://github.com/wongchichong/soby). Understanding how soby works is essential for effectively using Woby.
+Woby serves as a view layer built on top of the Observable library [`soby`](https://github.com/wobyjs/soby). Understanding how soby works is essential for effectively using Woby.
 
 Woby re-exports all soby functionality with interfaces adjusted for component and hook usage, along with additional framework-specific functions.
 
@@ -436,7 +436,7 @@ Woby re-exports all soby functionality with interfaces adjusted for component an
 
 Here's a complete counter example that demonstrates Woby's reactive capabilities:
 
-**Source:** [woby-demo](https://github.com/wongchichong/demo) ⭐
+**Source:** [@woby/demo](https://github.com/wobyjs/demo) ⭐
 
 ```tsx
 import { $, $, useMemo, render, Observable, customElement, ElementAttributes } from 'woby'
@@ -653,7 +653,7 @@ This function is just the default export of `soby`, it can be used to wrap a val
 
 No additional methods are attached to this function. Everything that `soby` attaches to it is instead exported as components and hooks.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#core).
+[Read upstream documentation](https://github.com/wobyjs/soby#core).
 
 Interface:
 
@@ -709,7 +709,7 @@ o ( () => noop );
 
 This function unwraps a potentially observable value.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#get).
+[Read upstream documentation](https://github.com/wobyjs/soby#get).
 
 Interface:
 
@@ -746,7 +746,7 @@ $ ( 123 ); // => 123
 
 This function holds onto updates within its scope and flushes them out once it exits.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#batch).
+[Read upstream documentation](https://github.com/wobyjs/soby#batch).
 
 Interface:
 
@@ -1122,7 +1122,7 @@ This function resolves all reactivity within the provided argument, replacing ea
 
 While developers may not need to use this function directly, it is internally necessary to ensure proper tracking of child values by their parent computations.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#resolve).
+[Read upstream documentation](https://github.com/wobyjs/soby#resolve).
 
 Interface:
 
@@ -1148,7 +1148,7 @@ resolve // => Same as require ( 'soby' ).resolve
 
 This function returns a deeply reactive version of the passed object, where property accesses and writes are automatically interpreted as Observables reads and writes for you.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#store).
+[Read upstream documentation](https://github.com/wobyjs/soby#store).
 
 Interface:
 
@@ -1210,7 +1210,7 @@ const Table = () => {
 
 This function executes the provided function without creating dependencies on observables retrieved inside it.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#untrack).
+[Read upstream documentation](https://github.com/wobyjs/soby#untrack).
 
 Interface:
 
@@ -1686,7 +1686,7 @@ useAnimationLoop ( () => console.log ( 'called' ) );
 
 This hook is like the reactive equivalent of the `!!` operator, it returns you a boolean, or a function to a boolean, depending on the input that you give it.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#boolean).
+[Read upstream documentation](https://github.com/wobyjs/soby#boolean).
 
 Interface:
 
@@ -1706,7 +1706,7 @@ useBoolean // => Same as require ( 'soby' ).boolean
 
 This hook registers a function to be called when the parent computation is disposed.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#cleanup).
+[Read upstream documentation](https://github.com/wobyjs/soby#cleanup).
 
 Interface:
 
@@ -1748,7 +1748,7 @@ const App = () => {
 
 This hook returns a boolean read-only observable that is set to `true` when the parent computation gets disposed of.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#disposed).
+[Read upstream documentation](https://github.com/wobyjs/soby#disposed).
 
 Interface:
 
@@ -1768,7 +1768,7 @@ useDisposed // => Same as require ( 'soby' ).disposed
 
 This hook registers a function to be called when any of its dependencies change. If a function is returned it's automatically registered as a cleanup function.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#effect).
+[Read upstream documentation](https://github.com/wobyjs/soby#effect).
 
 Interface:
 
@@ -1788,7 +1788,7 @@ useEffect // => Same as require ( 'soby' ).effect
 
 This hook registers a function to be called when the parent computation throws.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#error).
+[Read upstream documentation](https://github.com/wobyjs/soby#error).
 
 Interface:
 
@@ -1910,7 +1910,7 @@ This hook registers a function to be called when any of its dependencies change,
 
 The function receives an optional `stack` parameter (an Stack object) that provides a debugging stack trace to help pinpoint the source of reactive dependencies. To enable this feature, set `DEBUGGERER.debug = true`.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#memo).
+[Read upstream documentation](https://github.com/wobyjs/soby#memo).
 
 Interface:
 
@@ -1982,7 +1982,7 @@ This hook works just like `useEffect`, expect that it's not affected by `Suspens
 
 This is an advanced hook mostly useful internally, you may never need to use this, `useEffect` and `useMemo` should suffice.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#reaction).
+[Read upstream documentation](https://github.com/wobyjs/soby#reaction).
 
 Interface:
 
@@ -2002,7 +2002,7 @@ useReaction // => Same as require ( 'soby' ).reaction
 
 This hook creates a read-only observable out of another observable.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#readonly).
+[Read upstream documentation](https://github.com/wobyjs/soby#readonly).
 
 Interface:
 
@@ -2030,7 +2030,7 @@ This is potentially a more convenient version of `, made especially for handling
 
 Interface:
 
-> The precise interface for this function is insane, you can find it here: https://github.com/wongchichong/woby/blob/master/src/hooks/use_resolved.ts
+> The precise interface for this function is insane, you can find it here: https://github.com/wobyjs/woby/blob/master/src/hooks/use_resolved.ts
 
 Usage:
 
@@ -2084,7 +2084,7 @@ const resource = useResource ( fetcher );
 
 This hook creates a new computation root, detached from any parent computation.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#root).
+[Read upstream documentation](https://github.com/wobyjs/soby#root).
 
 Interface:
 
@@ -2104,7 +2104,7 @@ useRoot // => Same as require ( 'soby' ).root
 
 This hook massively optimizes `isSelected` kind of workloads.
 
-[Read upstream documentation](https://github.com/wongchichong/soby#selector).
+[Read upstream documentation](https://github.com/wobyjs/soby#selector).
 
 Interface:
 

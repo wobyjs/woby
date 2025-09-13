@@ -19,7 +19,7 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 
 ### Advanced Topics
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
-- **[Woby vs React](./Woby-vs-React.md)** - API differences and migration guide
+- **[Woby vs React](./@woby/vs-React.md)** - API differences and migration guide
 - **[FAQ](./FAQ.md)** - Frequently asked questions
 
 ### Community & Contributing
@@ -68,19 +68,19 @@ Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, pro
 - [Best Practices](./Best-Practices.md)
 
 ### 4. **Specialized Topics**
-- [Woby vs React](./Woby-vs-React.md)
+- [Woby vs React](./@woby/vs-React.md)
 - [FAQ](./FAQ.md)
 
 ## 🛠️ External Resources
 
-- **[GitHub Repository](https://github.com/wongchichong/woby)** - Source code and issues
-- **[Demo Applications](https://github.com/wongchichong/demo)** - Live examples
+- **[GitHub Repository](https://github.com/wobyjs/woby)** - Source code and issues
+- **[Demo Applications](https://github.com/wobyjs/demo)** - Live examples
 - **[CodeSandbox Playground](https://codesandbox.io/s/playground-7w2pxg)** - Interactive environment
 
 ## 🤝 Community Support
 
 - **[Discord Chat](https://discord.gg/E6pK7VpnjC)** - Real-time community support
-- **[GitHub Issues](https://github.com/wongchichong/woby/issues)** - Bug reports and feature requests
+- **[GitHub Issues](https://github.com/wobyjs/woby/issues)** - Bug reports and feature requests
 - **[Twitter](https://twitter.com/wobyjs)** - Latest updates and announcements
 
 ## 📝 Contributing

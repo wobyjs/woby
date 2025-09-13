@@ -24,7 +24,7 @@ Thank you for your interest in contributing to Woby! This guide will help you ge
 
 ### Before You Start
 
-1. Check existing [issues](https://github.com/wongchichong/woby/issues) and [discussions](https://github.com/wongchichong/woby/discussions)
+1. Check existing [issues](https://github.com/wobyjs/woby/issues) and [discussions](https://github.com/wobyjs/woby/discussions)
 2. For major changes, create an issue to discuss the approach first
 3. Make sure your contribution aligns with the project's goals
 
@@ -40,7 +40,7 @@ Thank you for your interest in contributing to Woby! This guide will help you ge
 
 ```bash
 # Clone the repository
-git clone https://github.com/wongchichong/woby.git
+git clone https://github.com/wobyjs/woby.git
 cd woby
 
 # Install dependencies
