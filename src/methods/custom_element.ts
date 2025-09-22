@@ -268,7 +268,7 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
 
             if (!this.props[SYMBOL_JSX]) {
                 // prepare observable attributes mentioned in observedAttributes, maybe or not in props
-                aKeys.forEach(k => this.props[k] = $('a')) //props types is difficult
+                aKeys.forEach(k => this.props[k] = $('')) //props types is difficult
                 aKeys.forEach(k => !this.hasAttribute(k) && setAttribute(this, k, this.props[k], new Stack()))
             }
 

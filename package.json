@@ -1,173 +1,186 @@
 {
-    "name": "woby",
-    "repository": "github:wongchichong/woby",
-    "description": "A high-performance framework with fine-grained observable/signal-based reactivity for building rich applications.",
-    "version": "1.58.32",
-    "type": "module",
-    "sideEffects": false,
-    "main": "./dist/index.cjs.js",
-    "module": "./dist/index.es.js",
-    "browser": "./dist/index.umd.js",
-    "types": "./dist/types/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/types/index.d.ts",
-            "require": "./dist/index.cjs.js",
-            "import": "./dist/index.es.js"
-        },
-        "./via": {
-            "types": "./dist/types/via.d.ts",
-            "require": "./dist/via.cjs.js",
-            "import": "./dist/via.es.js"
-        },
-        "./ssr": {
-            "types": "./dist/types/ssr.d.ts",
-            "require": "./dist/ssr.cjs.js",
-            "import": "./dist/ssr.es.js"
-        },
-        "./testing": {
-            "types": "./dist/types/testing.d.ts",
-            "require": "./dist/testing.cjs.js",
-            "import": "./dist/testing.es.js"
-        },
-        "./jsx-runtime": {
-            "types": "./dist/types/jsx-runtime.d.ts",
-            "require": "./dist/runtime.cjs.js",
-            "import": "./dist/runtime.es.js"
-        },
-        "./jsx-dev-runtime": {
-            "types": "./dist/types/jsx-runtime.d.ts",
-            "require": "./dist/runtime.cjs.js",
-            "import": "./dist/runtime.es.js"
-        },
-        "./via/jsx-runtime": {
-            "types": "./dist/via/via-runtime.d.ts",
-            "require": "./dist/via-runtime.cjs.js",
-            "import": "./dist/via-runtime.es.js"
-        },
-        "./ssr/jsx-runtime": {
-            "types": "./dist/types/ssr/jsx-runtime/index.d.ts",
-            "require": "./dist/jsx-runtime-ssr.cjs.js",
-            "import": "./dist/jsx-runtime-ssr.es.js"
-        },
-        "./ssr/jsx-dev-runtime": {
-            "types": "./dist/types/ssr/jsx-runtime/index.d.ts",
-            "require": "./dist/jsx-runtime-ssr.cjs.js",
-            "import": "./dist/jsx-runtime-ssr.es.js"
-        }
+  "name": "woby",
+  "repository": "github:wobyjs/woby",
+  "description": "A high-performance framework with fine-grained observable/signal-based reactivity for building rich applications.",
+  "version": "1.58.32",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
+  "browser": "./dist/index.umd.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.es.js"
     },
-    "typesVersions": {
-        "*": {
-            "jsx-runtime": [
-                "./dist/types/jsx-runtime.d.ts"
-            ],
-            "jsx-dev-runtime": [
-                "./dist/types/jsx-runtime.d.ts"
-            ],
-            "via": [
-                "./dist/index.via.d.ts"
-            ],
-            "via/jsx-runtime": [
-                "./dist/via/via-runtime.d.ts"
-            ],
-            "ssr/jsx-runtime": [
-                "./dist/ssr/jsx-runtime/index.d.ts"
-            ]
-        }
+    "./via": {
+      "types": "./dist/types/via.d.ts",
+      "require": "./dist/via.cjs.js",
+      "import": "./dist/via.es.js"
     },
-    "scripts": {
-        "git": "git add . && git commit -m \"Bump version\" && git push",
-        "bump": "pnpm version patch",
-        "npmjs": "pnpm publish",
-        "release": "run-s -c git bump npmjs",
-        "declaration": "tsc --declaration --emitDeclarationOnly --declarationMap",
-        "declaration:watch": "tsc --declaration --emitDeclarationOnly  --declarationMap--watch",
-        "build:only": "vite build",
-        "watch:only": "vite build --watch",
-        "watch": "run-s watch:only declaration:watch",
-        "build": "run-s clean build:only declaration",
-        "clean": "tsex clean",
-        "compile": "tsex compile && tsc --declaration --emitDeclarationOnly --declarationMap",
-        "compile:watch": "tsex compile --watch",
-        "dev:benchmark": "cd demo/benchmark && npm i && npm update && npm run dev",
-        "prod:benchmark": "cd demo/benchmark && npm i && npm update && npm run prod",
-        "dev:boxes": "cd demo/boxes && npm i && npm update && npm run dev",
-        "prod:boxes": "cd demo/boxes && npm i && npm update && npm run prod",
-        "dev:clock": "cd demo/clock && npm i && npm update && npm run dev",
-        "prod:clock": "cd demo/clock && npm i && npm update && npm run prod",
-        "dev:counter": "cd demo/counter && npm i && npm update && npm run dev",
-        "prod:counter": "cd demo/counter && npm i && npm update && npm run prod",
-        "dev:emoji_counter": "cd demo/emoji_counter && npm i && npm update && npm run dev",
-        "prod:emoji_counter": "cd demo/emoji_counter && npm i && npm update && npm run prod",
-        "dev:html": "cd demo/html && npm i && npm update && npm run dev",
-        "prod:html": "cd demo/html && npm i && npm update && npm run prod",
-        "dev:hyperscript": "cd demo/hyperscript && npm i && npm update && npm run dev",
-        "prod:hyperscript": "cd demo/hyperscript && npm i && npm update && npm run prod",
-        "dev:playground": "cd demo/playground && npm i && npm update && npm run dev",
-        "prod:playground": "cd demo/playground && npm i && npm update && npm run prod",
-        "dev:spiral": "cd demo/spiral && npm i && npm update && npm run dev",
-        "prod:spiral": "cd demo/spiral && npm i && npm update && npm run prod",
-        "dev:standalone": "cd demo/standalone && open index.html",
-        "prod:standalone": "cd demo/standalone && open index.html",
-        "dev:store_counter": "cd demo/store_counter && npm i && npm update && npm run dev",
-        "prod:store_counter": "cd demo/store_counter && npm i && npm update && npm run prod",
-        "dev:triangle": "cd demo/triangle && npm i && npm update && npm run dev",
-        "prod:triangle": "cd demo/triangle && npm i && npm update && npm run prod",
-        "dev:uibench": "cd demo/uibench && npm i && npm update && npm run dev",
-        "prod:uibench": "cd demo/uibench && npm i && npm update && npm run prod",
-        "dev": "npm run dev:playground",
-        "prod": "npm run prod:playground",
-        "//prepublishOnly": "tsex prepare"
+    "./ssr": {
+      "types": "./dist/types/ssr.d.ts",
+      "require": "./dist/ssr.cjs.js",
+      "import": "./dist/ssr.es.js"
     },
-    "keywords": [
-        "ui",
-        "framework",
-        "reactive",
-        "observable",
-        "fast",
-        "performant",
-        "performance",
-        "small",
-        "fine-grained",
-        "updates"
-    ],
-    "dependencies": {
-        "browserify-zlib": "^0.2.0",
-        "crypto-browserify": "^3.12.1",
-        "happy-dom": "^18.0.1",
-        "htm": "^3.1.1",
-        "http-browserify": "^1.7.0",
-        "https-browserify": "^1.0.0",
-        "net": "^1.0.2",
-        "path-browserify": "^1.0.1",
-        "perf_hooks": "^0.0.1",
-        "soby": "workspace:../soby",
-        "stream-browserify": "^3.0.0",
-        "util": "^0.12.5",
-        "via.js": "workspace:../via",
-        "vm-browserify": "^1.1.2"
+    "./testing": {
+      "types": "./dist/types/testing.d.ts",
+      "require": "./dist/testing.cjs.js",
+      "import": "./dist/testing.es.js"
     },
-    "devDependencies": {
-        "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-        "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
-        "@rollup/plugin-node-resolve": "^16.0.1",
-        "@types/node": "^22.8.1",
-        "buffer": "^6.0.3",
-        "csstype": "^3.1.3",
-        "native-url": "^0.3.4",
-        "node-stdlib-browser": "^1.3.1",
-        "tsex": "^4.0.2",
-        "typescript": "^5.6.3",
-        "vite": "^5.4.10",
-        "vite-plugin-node-polyfills": "^0.24.0",
-        "web-streams-polyfill": "^4.2.0"
+    "./jsx-runtime": {
+      "types": "./dist/types/jsx-runtime.d.ts",
+      "require": "./dist/runtime.cjs.js",
+      "import": "./dist/runtime.es.js"
     },
-    "files": [
-        "dist",
-        "*.d.ts",
-        "jsx-runtime.js",
-        "ssr.js",
-        "via.js",
-        "testing.js"
-    ]
+    "./jsx-dev-runtime": {
+      "types": "./dist/types/jsx-runtime.d.ts",
+      "require": "./dist/runtime.cjs.js",
+      "import": "./dist/runtime.es.js"
+    },
+    "./via/jsx-runtime": {
+      "types": "./dist/via/via-runtime.d.ts",
+      "require": "./dist/via-runtime.cjs.js",
+      "import": "./dist/via-runtime.es.js"
+    },
+    "./ssr/jsx-runtime": {
+      "types": "./dist/types/ssr/jsx-runtime/index.d.ts",
+      "require": "./dist/jsx-runtime-ssr.cjs.js",
+      "import": "./dist/jsx-runtime-ssr.es.js"
+    },
+    "./ssr/jsx-dev-runtime": {
+      "types": "./dist/types/ssr/jsx-runtime/index.d.ts",
+      "require": "./dist/jsx-runtime-ssr.cjs.js",
+      "import": "./dist/jsx-runtime-ssr.es.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "jsx-runtime": [
+        "./dist/types/jsx-runtime.d.ts"
+      ],
+      "jsx-dev-runtime": [
+        "./dist/types/jsx-runtime.d.ts"
+      ],
+      "via": [
+        "./dist/index.via.d.ts"
+      ],
+      "via/jsx-runtime": [
+        "./dist/via/via-runtime.d.ts"
+      ],
+      "ssr/jsx-runtime": [
+        "./dist/ssr/jsx-runtime/index.d.ts"
+      ]
+    }
+  },
+  "scripts": {
+    "git": "git-cliff > CHANGELOG.md && git-commit-m",
+    "bump": "pnpm version patch",
+    "npmjs": "pnpm publish",
+    "release": "run-s -c git bump npmjs",
+    "declaration": "tsc --declaration --emitDeclarationOnly --declarationMap",
+    "declaration:watch": "tsc --declaration --emitDeclarationOnly  --declarationMap--watch",
+    "build:only": "vite build",
+    "watch:only": "vite build --watch",
+    "watch": "run-s watch:only declaration:watch",
+    "build": "run-s clean build:only declaration",
+    "clean": "tsex clean",
+    "compile": "tsex compile && tsc --declaration --emitDeclarationOnly --declarationMap",
+    "compile:watch": "tsex compile --watch",
+    "dev:benchmark": "cd demo/benchmark && npm i && npm update && npm run dev",
+    "prod:benchmark": "cd demo/benchmark && npm i && npm update && npm run prod",
+    "dev:boxes": "cd demo/boxes && npm i && npm update && npm run dev",
+    "prod:boxes": "cd demo/boxes && npm i && npm update && npm run prod",
+    "dev:clock": "cd demo/clock && npm i && npm update && npm run dev",
+    "prod:clock": "cd demo/clock && npm i && npm update && npm run prod",
+    "dev:counter": "cd demo/counter && npm i && npm update && npm run dev",
+    "prod:counter": "cd demo/counter && npm i && npm update && npm run prod",
+    "dev:emoji_counter": "cd demo/emoji_counter && npm i && npm update && npm run dev",
+    "prod:emoji_counter": "cd demo/emoji_counter && npm i && npm update && npm run prod",
+    "dev:html": "cd demo/html && npm i && npm update && npm run dev",
+    "prod:html": "cd demo/html && npm i && npm update && npm run prod",
+    "dev:hyperscript": "cd demo/hyperscript && npm i && npm update && npm run dev",
+    "prod:hyperscript": "cd demo/hyperscript && npm i && npm update && npm run prod",
+    "dev:playground": "cd demo/playground && npm i && npm update && npm run dev",
+    "prod:playground": "cd demo/playground && npm i && npm update && npm run prod",
+    "dev:spiral": "cd demo/spiral && npm i && npm update && npm run dev",
+    "prod:spiral": "cd demo/spiral && npm i && npm update && npm run prod",
+    "dev:standalone": "cd demo/standalone && open index.html",
+    "prod:standalone": "cd demo/standalone && open index.html",
+    "dev:store_counter": "cd demo/store_counter && npm i && npm update && npm run dev",
+    "prod:store_counter": "cd demo/store_counter && npm i && npm update && npm run prod",
+    "dev:triangle": "cd demo/triangle && npm i && npm update && npm run dev",
+    "prod:triangle": "cd demo/triangle && npm i && npm update && npm run prod",
+    "dev:uibench": "cd demo/uibench && npm i && npm update && npm run dev",
+    "prod:uibench": "cd demo/uibench && npm i && npm update && npm run prod",
+    "dev": "npm run dev:playground",
+    "prod": "npm run prod:playground",
+    "//prepublishOnly": "tsex prepare",
+    "commit": "cz",
+    "changelog": "git-cliff -o CHANGELOG.md",
+    "changelog1": "auto-changelog --commit-limit false --output CHANGELOG.md",
+    "release:automatic": "semantic-release --extends ../semantic-release.config.js",
+    "commit:help": "echo 'Usage: pnpm run commit' && echo 'This will start the commitizen wizard to create a conventional commit.' && echo 'Follow the prompts to enter commit type, scope, and message.'"
+  },
+  "keywords": [
+    "ui",
+    "framework",
+    "reactive",
+    "observable",
+    "fast",
+    "performant",
+    "performance",
+    "small",
+    "fine-grained",
+    "updates"
+  ],
+  "dependencies": {
+    "browserify-zlib": "^0.2.0",
+    "crypto-browserify": "^3.12.1",
+    "happy-dom": "^18.0.1",
+    "htm": "^3.1.1",
+    "http-browserify": "^1.7.0",
+    "https-browserify": "^1.0.0",
+    "net": "^1.0.2",
+    "path-browserify": "^1.0.1",
+    "perf_hooks": "^0.0.1",
+    "soby": "workspace:../soby",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5",
+    "via.js": "workspace:../via",
+    "vm-browserify": "^1.1.2"
+  },
+  "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@types/node": "^22.8.1",
+    "auto-changelog": "^2.5.0",
+    "buffer": "^6.0.3",
+    "csstype": "^3.1.3",
+    "native-url": "^0.3.4",
+    "node-stdlib-browser": "^1.3.1",
+    "tsex": "^4.0.2",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vite-plugin-node-polyfills": "^0.24.0",
+    "web-streams-polyfill": "^4.2.0"
+  },
+  "files": [
+    "dist",
+    "*.d.ts",
+    "jsx-runtime.js",
+    "ssr.js",
+    "via.js",
+    "testing.js"
+  ],
+  "pnpm": {
+    "overrides": {
+      "woby": "workspace:../woby",
+      "@woby/styled": "workspace:../styled",
+      "@woby/use": "workspace:../use"
+    }
+  }
 }
