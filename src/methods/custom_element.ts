@@ -196,6 +196,10 @@ const matchesWildcard = (attributeName: string, patterns: string[]): boolean => 
 
     // Check for wildcard patterns
     for (const pattern of patterns) {
+        const p = pattern.toLowerCase()
+        if (p === attributeName.toLowerCase()) {
+            return true
+        }
         if (pattern === '*') {
             return true
         }
@@ -253,6 +257,7 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
 
         /** Component props */
         public props: P = {} as P
+        public propDict: Record<string, string>
 
         /**
          * Called when the element is added to the document
@@ -264,6 +269,7 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
             const rKeys = Object.keys(this.props).filter(attrName => !matchesWildcard(attrName, observedAttributes))
             const aKeys = observedAttributes.filter(attrName => !attrName.includes('*'))
 
+
             rKeys.forEach(k => this.removeAttribute(k))
 
             if (!this.props[SYMBOL_JSX]) {
@@ -271,8 +277,6 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
                 aKeys.forEach(k => this.props[k] = $('')) //props types is difficult
                 aKeys.forEach(k => !this.hasAttribute(k) && setAttribute(this, k, this.props[k], new Stack()))
             }
-
-            // aKeys.forEach(k => !this.hasAttribute(k) && this.setAttribute(k, $(0)))
 
             for (const attr of this.attributes as any)
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
@@ -307,7 +311,7 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
                         existingChildren
                 }
 
-                setChild(this, createElement(children, this.props), FragmentUtils.make(), new Stack())
+                setChild(this, createElement(children, this.props), FragmentUtils.make(), new Stack("customElement"))
             }
 
         }
@@ -324,6 +328,14 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
         attributeChangedCallback1(name, oldValue, newValue) {
             if (oldValue === newValue) return
 
+            if (!this.propDict) {
+                this.propDict = {}
+
+                Object.keys(this.props).forEach((k) => {
+                    this.propDict[k.toLowerCase()] = k
+                })
+            }
+
             if (!matchesWildcard(name, C.observedAttributes)) return
 
             // Check if this is a nested property (contains dashes)
@@ -332,12 +344,11 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
                 setNestedProperty(this, name, newValue)
 
                 // Also update any observable in the nested path
-                const nestedValue = getNestedProperty(this.props, name)
-                setObservableValue(this.props, name, newValue)
+                setObservableValue(this.props, this.propDict[name], newValue)
             } else {
                 // Handle flat properties (existing behavior)
                 const val = this.props[name]
-                setObservableValue(this.props, name, newValue)
+                setObservableValue(this.props, this.propDict[name], newValue)
             }
         }
     }
