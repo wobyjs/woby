@@ -79,6 +79,7 @@
         "git": "git-cliff > CHANGELOG.md && git-commit-m",
         "bump": "pnpm version patch",
         "npmjs": "pnpm publish",
+        "commit": "pnpm bump && pnpm push",
         "release": "run-s -c git bump npmjs",
         "declaration": "tsc --declaration --emitDeclarationOnly --declarationMap",
         "declaration:watch": "tsc --declaration --emitDeclarationOnly  --declarationMap--watch",
