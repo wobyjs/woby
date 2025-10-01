@@ -389,6 +389,23 @@ const doubled = useMemo(() => $(count) * 2)
 </For>
 ```
 
+### React to Woby Type Conversions
+
+| React Type | Woby Equivalent | Description |
+|------------|-----------------|-------------|
+| `React.ReactNode` | `JSX.Child` | Represents any renderable content |
+| `React.FC<Props>` | `JSX.ComponentFunction<Props>` | Function component type |
+| `React.ComponentType<Props>` | `JSX.Component<Props>` | Union of function components and intrinsic elements |
+| `React.PropsWithChildren<Props>` | `Props & { children?: JSX.Child }` | Props interface with children |
+| `React.Ref<T>` | `JSX.Ref<T>` | Ref type definition |
+| `React.MutableRefObject<T>` | Direct DOM access or observable refs | Ref object equivalent |
+| `React.Context<T>` | `Woby.Context<T>` | Context object (see createContext) |
+| `React.Dispatch<React.SetStateAction<T>>` | Observable setter pattern | State update function |
+| `React.HTMLProps<T>` | `JSX.HTMLAttributes<T>` | HTML element props |
+| `React.CSSProperties` | `JSX.CSSProperties` | CSS properties object |
+
+For a comprehensive guide on React to Woby type conversions, see our [React to Woby Type Conversion Guide](./docs/React-to-Woby-Type-Conversion.md).
+
 ## Performance Tips
 
 1.  **Use Direct Observable Passing**: For simple reactive content, pass observables directly rather than using `$()` in functions

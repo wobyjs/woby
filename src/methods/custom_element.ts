@@ -353,7 +353,11 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
         }
     }
 
-    customElements.define(tagName, C)
+    const ec = customElements.get(tagName)
+    if (!!ec)
+        console.warn(`Element ${tagName} already exists. (ignore this in dev env), use ec.__children__ to find target component`)
+    else
+        customElements.define(tagName, C)
 
     return C
 }

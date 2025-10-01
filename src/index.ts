@@ -33,7 +33,7 @@ export type {
     ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource,
     /* StoreOptions, */ SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths,
     TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy,
-    CSSProperties
+    CSSProperties, Nullable
 } from './types'
 
 export const ObservableSymbol = SYMBOL_OBSERVABLE
