@@ -3,6 +3,7 @@
 ### 🚀 Features
 
 - *(tooling)* Automate changelog generation and adopt conventional commits
+- *(tooling)* Add commit script and adopt conventional commits
 ## [1.58.33] - 2025-09-22
 
 ### 🚀 Features
