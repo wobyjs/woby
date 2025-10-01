@@ -76,7 +76,7 @@
         }
     },
     "scripts": {
-        "git": "git add . && git commit -m \"Bump version\" && git push",
+        "git": "git-cliff > CHANGELOG.md && git-commit-m",
         "bump": "pnpm version patch",
         "npmjs": "pnpm publish",
         "release": "run-s -c git bump npmjs",
