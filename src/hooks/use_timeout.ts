@@ -1,13 +1,11 @@
 
-/* IMPORT */
 
-import useScheduler from '../hooks/use_scheduler'
-import $$ from '../methods/SS'
+import { useScheduler } from '../hooks/use_scheduler'
+import { $$ } from '../methods/soby'
 import type { Callback, Disposer, FunctionMaybe, ObservableMaybe } from '../types'
 
-/* MAIN */
 
-const useTimeout = (callback: ObservableMaybe<Callback>, ms?: FunctionMaybe<number>): Disposer => {
+export const useTimeout = (callback: ObservableMaybe<Callback>, ms?: FunctionMaybe<number>): Disposer => {
 
   const stack = new Error()
 
@@ -20,7 +18,3 @@ const useTimeout = (callback: ObservableMaybe<Callback>, ms?: FunctionMaybe<numb
   })
 
 }
-
-/* EXPORT */
-
-export default useTimeout

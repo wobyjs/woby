@@ -1,4 +1,3 @@
-/* IMPORT */
 
 import type { FragmentNode, FragmentFragment, Fragment } from '../types'
 
@@ -6,7 +5,6 @@ import type { FragmentNode, FragmentFragment, Fragment } from '../types'
 
 const NOOP_CHILDREN: any[] = []
 
-/* MAIN */
 
 export const FragmentUtils = {
 

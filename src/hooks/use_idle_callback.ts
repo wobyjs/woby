@@ -1,13 +1,11 @@
 
-/* IMPORT */
 
-import useScheduler from '../hooks/use_scheduler'
-import $$ from '../methods/SS'
+import { useScheduler } from '../hooks/use_scheduler'
+import { $$ } from '../methods/soby'
 import type { Disposer, FunctionMaybe, ObservableMaybe } from '../types'
 
-/* MAIN */
 
-const useIdleCallback = (callback: ObservableMaybe<IdleRequestCallback>, options?: FunctionMaybe<IdleRequestOptions>): Disposer => {
+export const useIdleCallback = (callback: ObservableMaybe<IdleRequestCallback>, options?: FunctionMaybe<IdleRequestOptions>): Disposer => {
 
   const stack = new Error()
 
@@ -20,7 +18,3 @@ const useIdleCallback = (callback: ObservableMaybe<IdleRequestCallback>, options
   })
 
 }
-
-/* EXPORT */
-
-export default useIdleCallback

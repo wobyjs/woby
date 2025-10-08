@@ -1,4 +1,1 @@
-
-/* EXPORT */
-
 export * from 'soby'

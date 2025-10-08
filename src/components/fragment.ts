@@ -1,16 +1,7 @@
+import type { Child } from '../types'
 
-/* IMPORT */
+export const Fragment = ({ children, ...props }: { children?: Child }): Child => {
 
-import type { Child } from '../types';
+    return children
 
-/* MAIN */
-
-const Fragment = ({ children, ...props }: { children?: Child; }): Child => {
-
-    return children;
-
-};
-
-/* EXPORT */
-
-export default Fragment;
+}

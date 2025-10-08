@@ -1,39 +1,35 @@
 
-/* IMPORT */
-
-import {isString} from '../utils/lang';
-
-/* MAIN */
+import { isString } from '../utils/lang'
 
 // This function exists to optimize memory usage in some cases, where the classList API won't be touched without sacrificing performance
 
-const classesToggle = ( element: HTMLElement, classes: string, force: null | undefined | boolean ): void => {
+export const classesToggle = (element: HTMLElement, classes: string, force: null | undefined | boolean): void => {
 
-  const {className} = element;
+  const { className } = element
 
   /* OPTIMIZED PATH */
 
-  if ( isString ( className ) ) {
+  if (isString(className)) {
 
-    if ( !className ) { // Optimized addition/deletion
+    if (!className) { // Optimized addition/deletion
 
-      if ( force ) { // Optimized addition
+      if (force) { // Optimized addition
 
-        element.className = classes;
+        element.className = classes
 
-        return;
+        return
 
       } else { // Optimized deletion, nothing to do really
 
-        return;
+        return
 
       }
 
-    } else if ( !force && className === classes ) { // Optimized deletion
+    } else if (!force && className === classes) { // Optimized deletion
 
-      element.className = '';
+      element.className = ''
 
-      return;
+      return
 
     }
 
@@ -41,24 +37,20 @@ const classesToggle = ( element: HTMLElement, classes: string, force: null | und
 
   /* REGULAR PATH */
 
-  if ( classes.includes ( ' ' ) ) {
+  if (classes.includes(' ')) {
 
-    classes.split ( ' ' ).forEach ( cls => {
+    classes.split(' ').forEach(cls => {
 
-      if ( !cls.length ) return;
+      if (!cls.length) return
 
-      element.classList.toggle ( cls, !!force );
+      element.classList.toggle(cls, !!force)
 
-    });
+    })
 
   } else {
 
-    element.classList.toggle ( classes, !!force );
+    element.classList.toggle(classes, !!force)
 
   }
 
-};
-
-/* EXPORT */
-
-export {classesToggle};
+}

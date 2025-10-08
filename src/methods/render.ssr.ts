@@ -1,13 +1,10 @@
-/* IMPORT */
 
-import useRoot from '../hooks/use_root'
 import { setChild } from '../utils/setters.ssr'
-import type { Child, Disposer } from '../types'
+import type { Child } from '../types'
 import { FragmentUtils } from '../utils/fragment.ssr'
 
-/* MAIN */
 
-const render = (child: Child): string => {
+export const render = (child: Child): string => {
     // Create a container for SSR
     const container = { children: '' }
     const stack = new Error()
@@ -27,6 +24,3 @@ const render = (child: Child): string => {
     }
 }
 
-/* EXPORT */
-
-export default render

@@ -17,7 +17,6 @@ This demo showcases the enhanced `customElement` function that now supports nest
 ## Complete Source Code
 
 ```typescript
-/* IMPORT */
 import { 
   $, 
   $, 
@@ -28,7 +27,6 @@ import {
   ElementAttributes 
 } from 'woby'
 
-/* MAIN */
 
 // Counter component with nested props support
 const Counter = ({ 

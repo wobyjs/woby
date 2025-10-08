@@ -1,17 +1,12 @@
-
-/* IMPORT */
-
-import createElement from '../methods/create_element.via'
+import { createElement } from '../methods/create_element.via'
 import { isArray, isObject } from '../utils/lang'
 import type { Child, Component, Element } from '../types'
 
-/* MAIN */
-
 // function h<P = {}>(component: Component<P>, child: Child): Element;
 
-function h<P extends { children?: Child } = {}>(component: Component<P>, child: Child): Element
-function h<P extends { children?: Child } = {}>(component: Component<P>, props?: P | null, ...children: Child[]): Element
-function h<P extends { children?: Child } = {}>(component: Component<P>, props?: Child | P | null, ...children: Child[]): Element {
+export function h<P extends { children?: Child } = {}>(component: Component<P>, child: Child): Element
+export function h<P extends { children?: Child } = {}>(component: Component<P>, props?: P | null, ...children: Child[]): Element
+export function h<P extends { children?: Child } = {}>(component: Component<P>, props?: Child | P | null, ...children: Child[]): Element {
     // function h<P = {}>(component: Component<P>, props?: P | null, key?: string, isStatic?: boolean, source?: { fileName: string; lineNumber: number; columnNumber: number; }, self?: any): Element {
     // function h<P = {}>(component: Component<P>, props?: Child | P | null, key?: string, isStatic?: boolean, source?: { fileName: string; lineNumber: number; columnNumber: number; }, self?: any): Element {
 
@@ -39,7 +34,3 @@ function h<P extends { children?: Child } = {}>(component: Component<P>, props?:
     // }
 
 }
-
-/* EXPORT */
-
-export default h

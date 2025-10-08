@@ -1,10 +1,7 @@
-
-/* IMPORT */
-
 import { SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNCACHED, SYMBOL_UNTRACKED_UNWRAPPED } from '../constants'
-import isObservable from '../methods/is_observable'
-import useRenderEffect from '../hooks/use_render_effect'
-import $$ from '../methods/SS'
+import { isObservable } from '../methods/soby'
+import { useRenderEffect } from '../hooks/use_render_effect'
+import { $$ } from '../methods/soby'
 import { isArray, isFunction, isString, isProxy, fixBigInt, toArray } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { createText, createComment, createHTMLNode } from '../utils/creators.via'
@@ -14,9 +11,7 @@ import { Stack } from '../soby'
 const HTMLValue = Symbol('HtmlValue')
 IgnoreSymbols[HTMLValue] = HTMLValue
 
-
-/* MAIN */
-const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic?: boolean, stack?: Error): T | T[] => {
+export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic?: boolean, stack?: Error): T | T[] => {
     const updateElement = (/** null placeholder */e: Text, f: boolean, v: any, pv: HTMLElement[] /** in proxy */) => {
         e.textContent = ''
 
@@ -146,7 +141,7 @@ const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], d
     }
 }
 
-const resolveClass = (classes: Classes, resolved: Record<string, true> = {}): Record<string, true> => {
+export const resolveClass = (classes: Classes, resolved: Record<string, true> = {}): Record<string, true> => {
 
     if (isString(classes)) {
 
@@ -187,7 +182,7 @@ const resolveClass = (classes: Classes, resolved: Record<string, true> = {}): Re
 
 }
 
-const resolveStyle = (styles: Styles, resolved: Record<string, null | undefined | number | string> | string = {}): Record<string, null | undefined | number | string> | string => {
+export const resolveStyle = (styles: Styles, resolved: Record<string, null | undefined | number | string> | string = {}): Record<string, null | undefined | number | string> | string => {
 
     if (isString(styles)) { //TODO: split into the individual styles, to be able to merge them with other styles
 
@@ -221,7 +216,7 @@ const resolveStyle = (styles: Styles, resolved: Record<string, null | undefined 
 
 }
 
-const resolveArraysAndStatics = (() => {
+export const resolveArraysAndStatics = (() => {
 
     // This function does 3 things:
     // 1. It deeply flattens the array, only if actually needed though (!)
@@ -276,6 +271,3 @@ const resolveArraysAndStatics = (() => {
 
 })()
 
-/* EXPORT */
-
-export { resolveChild, resolveClass, resolveArraysAndStatics, resolveStyle }

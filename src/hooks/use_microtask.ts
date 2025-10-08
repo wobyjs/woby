@@ -1,16 +1,14 @@
 
-/* IMPORT */
 
-import useCheapDisposed from '../hooks/use_cheap_disposed'
+import { useCheapDisposed } from '../hooks/use_cheap_disposed'
 import { with as _with, Stack } from '../soby'
 import type { Callback } from '../types'
 
-/* MAIN */
 
 //TODO: Maybe port this to soby
 //TODO: Maybe special-case this to use one shared mirotask per microtask
 
-const useMicrotask = (fn: Callback, stack: Stack): void => {
+export const useMicrotask = (fn: Callback, stack: Stack): void => {
 
   const disposed = useCheapDisposed()
   const runWithOwner = _with()
@@ -24,7 +22,3 @@ const useMicrotask = (fn: Callback, stack: Stack): void => {
   })
 
 }
-
-/* EXPORT */
-
-export default useMicrotask

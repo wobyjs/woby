@@ -1,5 +1,4 @@
 
-/* IMPORT */
 
 import { switch as _switch } from '../soby'
 import { assign, castArray } from '../utils/lang'
@@ -9,7 +8,7 @@ import type { Child, ChildWithMetadata, FunctionMaybe, ObservableReadonly } from
 
 //TODO: Enforce children of Switch to be of type Switch.Case or Switch.Default
 
-const Switch = <T>({ when, fallback, children }: { when: FunctionMaybe<T>, fallback?: Child, children: Child }): ObservableReadonly<Child> => {
+export const Switch = <T>({ when, fallback, children }: { when: FunctionMaybe<T>, fallback?: Child, children: Child }): ObservableReadonly<Child> => {
 
   const childrenWithValues = castArray(children) as (() => ChildWithMetadata<[T, Child] | [Child]>)[] //TSC
   const values = childrenWithValues.map(child => child().metadata)
@@ -35,7 +34,3 @@ Switch.Default = ({ children }: { children: Child }): ChildWithMetadata<[Child]>
   return assign(() => children, metadata)
 
 }
-
-/* EXPORT */
-
-export default Switch

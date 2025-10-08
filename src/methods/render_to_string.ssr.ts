@@ -1,4 +1,3 @@
-/* IMPORT */
 
 import { FragmentUtils } from '../utils/fragment.ssr'
 import type { Child } from '../types'
@@ -40,4 +39,3 @@ export const renderToString = (child: Child): string => {
     }
 }
 
-export default renderToString

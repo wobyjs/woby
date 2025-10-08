@@ -1,4 +1,3 @@
-
 /* EXPORT */
 
 export * from './singleton'
@@ -6,9 +5,69 @@ export * from './singleton'
 export * from './components'
 export * from './jsx/runtime'
 export * from './hooks'
-export * from './methods'
+// Explicitly export from methods and utils to avoid assign conflict
+export {
+    $,
+    $$,
+    batch,
+    createContext,
+    createDirective,
+    createElement,
+    defaults,
+    assign,
+    make,
+    clone,
+    h,
+    hmr,
+    html,
+    isBatching,
+    isObservable,
+    isObservableWritable,
+    isServer,
+    isStore,
+    lazy,
+    render,
+    renderToString,
+    resolve,
+    store,
+    template,
+    tick,
+    untrack,
+    cloneElement,
+    setRef,
+    customElement,
+} from './methods'
+export type { ElementAttributes } from './methods'
+export {
+    castArray,
+    castError,
+    flatten,
+    indexOf,
+    isArray,
+    isBoolean,
+    isComponent,
+    isError,
+    isFalsy,
+    isFunction,
+    isClass,
+    isFunctionReactive,
+    isNil,
+    isNode,
+    isObject,
+    isPrimitive,
+    isPromise,
+    isString,
+    isSVG,
+    isSVGElement,
+    isTemplateAccessor,
+    isTruthy,
+    isVoidChild,
+    noop,
+    once,
+    fixBigInt,
+    toArray
+} from './utils'
 export * from "./constants"
-export * from "./utils"
 
 //export type {Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, CSSProperties, Component, JSX.Element} from './types';
 
@@ -33,7 +92,7 @@ export type {
     ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource,
     /* StoreOptions, */ SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths,
     TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy,
-    CSSProperties, Nullable
+    CSSProperties, Nullable, Unobservant, Observant,
 } from './types'
 
 export const ObservableSymbol = SYMBOL_OBSERVABLE

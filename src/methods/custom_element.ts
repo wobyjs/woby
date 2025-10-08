@@ -7,15 +7,15 @@
  * @module customElement
  */
 
-import $$ from "./SS"
-import $ from "./S"
-import isObservable from "./is_observable"
-import { SYMBOL_JSX } from '../constants'
-import { setChild, setAttribute, setProp } from "../utils/setters"
-import createElement from "./create_element"
+import { isObservable } from "./soby"
+import { SYMBOL_JSX, SYMBOL_DEFAULT } from '../constants'
+import { setChild, setProp } from "../utils/setters"
+import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
-import { Stack } from "soby"
-import useEffect from "../hooks/use_effect"
+import { Observable, Stack, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
+import type { ObservableOptions } from "soby"
+import { isObject } from "../utils"
+
 
 /**
  * ElementAttributes type helper
@@ -69,10 +69,62 @@ const kebabToCamelCase = (str: string): string => {
  * @param value - The string value to set on the property
  */
 const setObservableValue = (obj: any, key: string, value: string) => {
-    if (isObservable(obj[key]))
-        obj[key](value)
-    else
+    if (isObservable(obj[key])) {
+        // Cast value according to observable options type
+        const observable = obj[key] as Observable<any>
+        const options = (observable[SYMBOL_OBSERVABLE_WRITABLE]).options as ObservableOptions<any> | undefined
+
+        if (options?.type) {
+            switch (options.type) {
+                case 'number':
+                    obj[key](Number(value))
+                    break
+                case 'boolean':
+                    // Handle various boolean representations
+                    const lowerValue = value?.toLowerCase()
+                    obj[key](lowerValue === 'true' || lowerValue === '1' || lowerValue === '')
+                    break
+                case 'bigint':
+                    try {
+                        obj[key](BigInt(value))
+                    } catch (e) {
+                        // If parsing fails, fallback to string
+                        obj[key](value)
+                    }
+                    break
+                case 'object':
+                    try {
+                        obj[key](JSON.parse(value))
+                    } catch (e) {
+                        // If parsing fails, fallback to string
+                        obj[key](value)
+                    }
+                    break
+                case 'function':
+                    // For function types, we can't really convert from string
+                    // This would typically be handled by the component itself
+                    obj[key](value)
+                    break
+                case 'symbol':
+                    // For symbol types, create a symbol from the string
+                    obj[key](Symbol(value))
+                    break
+                case 'undefined':
+                    obj[key](undefined)
+                    break
+                default:
+                    // For constructor types or other custom types, treat as string
+                    // since HTML attributes are always strings and we can't instantiate
+                    // arbitrary constructors from strings
+                    obj[key](value)
+                    break
+            }
+        } else {
+            obj[key](value)
+        }
+    } else {
         obj[key] = value
+    }
 }
 
 /**
@@ -178,43 +230,7 @@ const getNestedProperty = (obj: any, path: string) => {
     return (obj as any)[path]
 }
 
-/**
- * Matches attribute names against wildcard patterns
- * 
- * Checks if an attribute name matches any of the provided patterns, supporting
- * exact matches and wildcard patterns ending with '*'.
- * 
- * @param attributeName - The attribute name to check
- * @param patterns - Array of patterns to match against
- * @returns True if the attribute name matches any pattern, false otherwise
- */
-const matchesWildcard = (attributeName: string, patterns: string[]): boolean => {
-    // Check for exact match first
-    if (patterns.includes(attributeName)) {
-        return true
-    }
-
-    // Check for wildcard patterns
-    for (const pattern of patterns) {
-        const p = pattern.toLowerCase()
-        if (p === attributeName.toLowerCase()) {
-            return true
-        }
-        if (pattern === '*') {
-            return true
-        }
-
-        if (pattern.endsWith('*')) {
-            const prefix = pattern.slice(0, -1)
-            if (attributeName.startsWith(prefix)) {
-                return true
-            }
-        }
-
-    }
-
-    return false
-}
+const isPureFunction = (fn: Function) => typeof fn === 'function' && !isObservable(fn)
 
 /**
  * Creates a custom HTML element with reactive properties
@@ -225,7 +241,6 @@ const matchesWildcard = (attributeName: string, patterns: string[]): boolean => 
  * @template P - Component props type
  * @param tagName - The HTML tag name for the custom element
  * @param children - The component function that renders the element's content
- * @param attributes - Rest parameter of attribute patterns to observe (supports wildcards)
  * @returns The custom element class
  * 
  * @example
@@ -236,13 +251,18 @@ const matchesWildcard = (attributeName: string, patterns: string[]): boolean => 
  *   </div>
  * )
  * 
- * customElement('counter-element', Counter, 'value', 'style-*')
+ * customElement('counter-element', Counter)
  * 
  * // Usage in JSX:
  * // <counter-element value={$(0)} style-color="red"></counter-element>
  * ```
  */
-export const customElement = <P>(tagName: string, children: JSX.Component<P>, ...attributes: ElementAttributePattern<P>[]) => {
+export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, children: JSX.Component<P>) => {
+    const defaultPropsFn = (children as any)[SYMBOL_DEFAULT]
+    if (!defaultPropsFn) {
+        console.error(`Component ${tagName} is missing default props. Please use the 'defaults' helper function to provide default props.`)
+    }
+
     /**
      * Custom Element Class
      * 
@@ -250,14 +270,42 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
      */
     const C = class extends HTMLElement {
         /** Reference to the children component function */
+        //rename it to function component
         static __children__ = children;
 
-        /** List of observed attributes */
-        static observedAttributes: string[] = attributes ?? ['*'] as any
+        //obaserable attributes is deps on props
+        static observedAttributes: string[] = []
 
         /** Component props */
-        public props: P = {} as P
+        public props: P
         public propDict: Record<string, string>
+        childs: Node[] = []
+
+        constructor(props?: P) {
+            super()
+            this.props = !!props ? props : defaultPropsFn() || {} as P
+            C.observedAttributes = Object.keys(this.props)
+
+            if (!this.props[SYMBOL_JSX]) //html creation of my-component, html to down, woby bottom up
+            {
+                this.childs = [...(this.childNodes as any)]
+                this.replaceChildren() //clear the children
+            }
+            setChild(this, () => createElement(children, this.props), FragmentUtils.make(), new Stack("customElement"))
+
+            // Temporary MutationObserver to monitor children removal
+            const tempObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'childList') {
+                        if (mutation.removedNodes.length > 0) {
+                            console.log('Children removed from custom element:', mutation.removedNodes, mutation.target)
+                        }
+                    }
+                })
+            })
+
+            tempObserver.observe(this, { childList: true })
+        }
 
         /**
          * Called when the element is added to the document
@@ -266,18 +314,26 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
          */
         connectedCallback() {
             const { observedAttributes } = C
-            const rKeys = Object.keys(this.props).filter(attrName => !matchesWildcard(attrName, observedAttributes))
-            const aKeys = observedAttributes.filter(attrName => !attrName.includes('*'))
+            const { props } = this
+            const aKeys = observedAttributes.filter(attrName => !isPureFunction(props[attrName]) && !isObject(props[attrName]))
+            const rKeys = observedAttributes.filter(attrName => isPureFunction(props[attrName]))
 
+            // this.attributes not in constructor, so do it here.
+            if (!props[SYMBOL_JSX]) {
+                // props -> attr
+                aKeys.forEach(k => !this.hasAttribute(k) /* && !isObject($$(props[k]))  */ && setProp(this, k, props[k], new Stack()))
+
+                //this.append(...(this.childs as any))
+                if (!!this.childs.length)
+                    this.props.children(this.childs)
+            }
+            else {
+                debugger
+            }
 
             rKeys.forEach(k => this.removeAttribute(k))
 
-            if (!this.props[SYMBOL_JSX]) {
-                // prepare observable attributes mentioned in observedAttributes, maybe or not in props
-                aKeys.forEach(k => this.props[k] = $('')) //props types is difficult
-                aKeys.forEach(k => !this.hasAttribute(k) && setAttribute(this, k, this.props[k], new Stack()))
-            }
-
+            // attr -> props (1st)
             for (const attr of this.attributes as any)
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
 
@@ -287,33 +343,13 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
                         const name = m.attributeName
                         const newValue = this.getAttribute(name)
                         const oldValue = m.oldValue
+                        // attr -> props (on change)
                         this.attributeChangedCallback1(name, oldValue, newValue)
                     }
                 })
             })
 
             observer.observe(this, { attributes: true, attributeOldValue: true })
-
-            if (!this.props[SYMBOL_JSX]) {
-                // Capture existing child elements to pass as children prop
-                const existingChildren = this.childNodes.length > 0 ?
-                    Array.from(this.childNodes).map(node => {
-                        // Remove the node from this element and return it
-                        this.removeChild(node)
-                        return node
-                    }) :
-                    undefined
-
-                // Add existing children to props if they exist
-                if (existingChildren && existingChildren.length > 0) {
-                    (this.props as any).children = existingChildren.length === 1 ?
-                        existingChildren[0] :
-                        existingChildren
-                }
-
-                setChild(this, createElement(children, this.props), FragmentUtils.make(), new Stack("customElement"))
-            }
-
         }
 
         /**
@@ -327,16 +363,17 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
          */
         attributeChangedCallback1(name, oldValue, newValue) {
             if (oldValue === newValue) return
+            const { props } = this
 
             if (!this.propDict) {
                 this.propDict = {}
 
-                Object.keys(this.props).forEach((k) => {
+                Object.keys(props).forEach((k) => {
                     this.propDict[k.toLowerCase()] = k
                 })
             }
 
-            if (!matchesWildcard(name, C.observedAttributes)) return
+            // if (!matchesWildcard(name, C.observedAttributes)) return
 
             // Check if this is a nested property (contains dashes)
             if (name.includes('-')) {
@@ -344,10 +381,10 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
                 setNestedProperty(this, name, newValue)
 
                 // Also update any observable in the nested path
-                setObservableValue(this.props, this.propDict[name], newValue)
+                setObservableValue(props, this.propDict[name], newValue)
             } else {
                 // Handle flat properties (existing behavior)
-                const val = this.props[name]
+                const val = props[name]
                 setObservableValue(this.props, this.propDict[name], newValue)
             }
         }

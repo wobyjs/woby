@@ -1,17 +1,10 @@
-
-/* IMPORT */
-
-import Dynamic from './dynamic'
-import ErrorBoundary from './error_boundary'
-import For from './for'
-import Fragment from './fragment'
-import If from './if'
-import KeepAlive from './keep_alive'
-import Portal from './portal'
-import Suspense from './suspense'
-import Switch from './switch'
-import Ternary from './ternary'
-
-/* EXPORT */
-
-export { Dynamic, ErrorBoundary, For, Fragment, If, KeepAlive, Portal, Suspense, Switch, Ternary }
+export * from './dynamic'
+export * from './error_boundary'
+export * from './for'
+export * from './fragment'
+export * from './if'
+export * from './keep_alive'
+export * from './portal'
+export * from './suspense'
+export * from './switch'
+export * from './ternary'

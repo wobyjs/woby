@@ -1,17 +1,15 @@
 
-/* IMPORT */
 
-import SuspenseContext from '../components/suspense.context'
-import useMemo from '../hooks/use_memo'
-import useSuspense from '../hooks/use_suspense'
-import resolve from '../methods/resolve'
-import $$ from '../methods/SS'
+import { SuspenseContext } from '../components/suspense.context'
+import { useMemo } from '../hooks/soby'
+import { useSuspense } from '../hooks/soby'
+import { resolve } from '../methods/soby'
+import { $$ } from '../methods/soby'
 import { suspense as _suspense, ternary } from '../soby'
 import type { Child, FunctionMaybe, ObservableReadonly } from '../types'
 
-/* MAIN */
 
-const Suspense = ({ when, fallback, children }: { when?: FunctionMaybe<unknown>, fallback?: Child, children?: Child }): ObservableReadonly<Child> => {
+export const Suspense = ({ when, fallback, children }: { when?: FunctionMaybe<unknown>, fallback?: Child, children?: Child }): ObservableReadonly<Child> => {
 
   return SuspenseContext.wrap(suspense => {
 
@@ -26,7 +24,3 @@ const Suspense = ({ when, fallback, children }: { when?: FunctionMaybe<unknown>,
   })
 
 }
-
-/* EXPORT */
-
-export default Suspense

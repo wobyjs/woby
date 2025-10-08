@@ -1,17 +1,13 @@
-
-/* IMPORT */
-
 import { SYMBOL_SUSPENSE_COLLECTOR } from '../constants'
-import useMemo from '../hooks/use_memo'
-import $ from '../methods/S'
+import { useMemo } from '../hooks/soby'
+import { $ } from '../methods/soby'
 import { context, resolve } from 'soby'
 import type { SuspenseCollectorData, SuspenseData } from '../types'
 
-/* MAIN */
 
 // Keeping track of all Suspense instances below it, needed in some cases
 
-const SuspenseCollector = {
+export const SuspenseCollector = {
 
   create: (): SuspenseCollectorData => { //TODO: Optimize this, some parts are unnecessarily slow, we just need a counter of active suspenses here really
 
@@ -45,7 +41,3 @@ const SuspenseCollector = {
   }
 
 }
-
-/* EXPORT */
-
-export default SuspenseCollector

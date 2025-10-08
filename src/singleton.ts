@@ -1,24 +1,22 @@
 
-/* IMPORT */
 
-import isServer from './methods/is_server';
 
-/* MAIN */
+import { isServer } from './methods/is_server'
+
 
 if (!isServer()) {
 
-    const isLoaded = !!globalThis.WOBY;
+    const isLoaded = !!globalThis.WOBY
 
     if (isLoaded) {
 
-        throw new Error('Woby has already been loaded');
+        throw new Error('Woby has already been loaded')
 
     } else {
 
-        globalThis.WOBY = true;
+        globalThis.WOBY = true
 
     }
 
 }
 
-export default { };

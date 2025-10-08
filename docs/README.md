@@ -20,6 +20,9 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
 - **[Woby vs React](./Woby-vs-React.md)** - API differences and migration guide
 - **[React to Woby Type Conversion](./React-to-Woby-Type-Conversion.md)** - Type mapping guide for React developers
+- **[Component Defaults](./Component-Defaults.md)** - Two-way synchronization for custom elements
+- **[Type Synchronization](./Type-Synchronization.md)** - How HTML attributes sync with component props
+- **[Simple Type Synchronization](./Type-Sync-Simple.md)** - Straightforward approach to type sync
 
 ### Help & Community
 - **[FAQ](./FAQ.md)** - Frequently asked questions
@@ -38,6 +41,8 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 | **Learn best practices** | [Best Practices](./Best-Practices.md) |
 | **Compare with React** | [Woby vs React](./Woby-vs-React.md) |
 | **Convert React types** | [React to Woby Type Conversion](./React-to-Woby-Type-Conversion.md) |
+| **Implement custom elements** | [Component Defaults](./Component-Defaults.md) |
+| **Understand type sync** | [Type Synchronization](./Type-Synchronization.md) or [Simple Type Synchronization](./Type-Sync-Simple.md) |
 | **Get help** | [FAQ](./FAQ.md) |
 | **Contribute** | [Contributing](./Contributing.md) |
 

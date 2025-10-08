@@ -1,8 +1,2 @@
 
-/* IMPORT */
-
-import { isObservableWritable } from '../soby'
-
-/* EXPORT */
-
-export default isObservableWritable
+export { isObservableWritable } from '../soby'

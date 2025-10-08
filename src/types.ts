@@ -1,157 +1,157 @@
 
 /* IMPORT */
 import type * as CSS from 'csstype'
+
 // import './jsx/types' //import once to make entire project compilable.
 
 /* EXPORT */
 
 declare const ContextWithDefaultSymbol: unique symbol
 
-/* MAIN */
 
-type ArrayMaybe<T = unknown> = T[] | T
+export type ArrayMaybe<T = unknown> = T[] | T
 
-type Callback = (stack?: Error) => void
+export type Callback = (stack?: Error) => void
 
-type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | (() => Child)
+export type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | (() => Child)
 
-type ChildWithMetadata<T = unknown> = (() => Child) & { metadata: T }
+export type ChildWithMetadata<T = unknown> = (() => Child) & { metadata: T }
 
-type Classes = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | boolean>> | (FunctionMaybe<null | undefined | boolean | string> | Classes)[]>
+export type Classes = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | boolean>> | (FunctionMaybe<null | undefined | boolean | string> | Classes)[]>
 
-type ComponentFunction<P = {}> = (props: P) => Child
+export type ComponentFunction<P = {}> = (props: P) => Child
 
-type ComponentIntrinsicElement = keyof JSX.IntrinsicElements
+export type ComponentIntrinsicElement = keyof JSX.IntrinsicElements
 
-type ComponentNode = Node
+export type ComponentNode = Node
 
-type Component<P = {}> = ComponentFunction<P> | ComponentIntrinsicElement | ComponentNode
+export type Component<P = {}> = ComponentFunction<P> | ComponentIntrinsicElement | ComponentNode
 
-type ComponentsMap = Record<string, ComponentFunction<any>>
+export type ComponentsMap = Record<string, ComponentFunction<any>>
 
-type Constructor<T = unknown> = { new(): T }
+export type Constructor<T = unknown> = { new(): T }
 
-type ConstructorWith<T = unknown, Arguments extends unknown[] = []> = { new(...args: Arguments): T }
+export type ConstructorWith<T = unknown, Arguments extends unknown[] = []> = { new(...args: Arguments): T }
 
-type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T }
+export type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T }
 
-type ContextProvider<T = unknown> = (props: { value: T, children: Child }) => Child
+export type ContextProvider<T = unknown> = (props: { value: T, children: Child, ref?: Refs }) => Child
 
-type Context<T = unknown> = { Provider: ContextProvider<T>, symbol: symbol }
+export type Context<T = unknown> = { Provider: ContextProvider<T>, symbol: symbol }
 
-type ContextWithDefault<T = unknown> = Context<T> & { readonly [ContextWithDefaultSymbol]: true, symbol: Symbol }
+export type ContextWithDefault<T = unknown> = Context<T> & { readonly [ContextWithDefaultSymbol]: true, symbol: Symbol }
 
-type DirectiveFunction<Arguments extends unknown[] = []> = (ref: globalThis.Element, ...args: Arguments) => void
+export type DirectiveFunction<Arguments extends unknown[] = []> = (ref: globalThis.Element, ...args: Arguments) => void
 
-type DirectiveProvider = (props: { children: Child }) => Child
+export type DirectiveProvider = (props: { children: Child }) => Child
 
-type DirectiveRef<Arguments extends unknown[] = []> = (...args: Arguments) => ((ref: globalThis.Element) => void)
+export type DirectiveRef<Arguments extends unknown[] = []> = (...args: Arguments) => ((ref: globalThis.Element) => void)
 
-type DirectiveRegister = () => void
+export type DirectiveRegister = () => void
 
-type Directive<Arguments extends unknown[] = []> = { Provider: DirectiveProvider, ref: DirectiveRef<Arguments>, register: DirectiveRegister }
+export type Directive<Arguments extends unknown[] = []> = { Provider: DirectiveProvider, ref: DirectiveRef<Arguments>, register: DirectiveRegister }
 
-type DirectiveData<Arguments extends unknown[] = []> = { fn: DirectiveFunction<Arguments>, immediate: boolean }
+export type DirectiveData<Arguments extends unknown[] = []> = { fn: DirectiveFunction<Arguments>, immediate: boolean }
 
-type DirectiveOptions = { immediate?: boolean }
+export type DirectiveOptions = { immediate?: boolean }
 
-type Disposer = (stack?: Error) => void
+export type Disposer = (stack?: Error) => void
 
-type EffectFunction = (stack?: Error) => Disposer | void
+export type EffectFunction = (stack?: Error) => Disposer | void
 
-type EffectOptions = import('soby').EffectOptions
+export type EffectOptions = import('soby').EffectOptions
 
-type Element = Child //<T = Child> = () => T;
+export type Element = Child //<T = Child> = () => T;
 
-type ExtractArray<T> = Extract<T, unknown[]>
+export type ExtractArray<T> = Extract<T, unknown[]>
 
-type EventListener = (event: Event) => void
+export type EventListener = (event: Event) => void
 
-type Falsy<T = unknown> = Extract<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>
+export type Falsy<T = unknown> = Extract<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>
 
-type ForOptions = import('soby').ForOptions
+export type ForOptions = import('soby').ForOptions
 
-type FN<Arguments extends unknown[], Return extends unknown = void> = (...args: Arguments) => Return
+export type FN<Arguments extends unknown[], Return extends unknown = void> = (...args: Arguments) => Return
 
-type FragmentUndefined = { values: undefined, fragmented?: false, length: 0 }
+export type FragmentUndefined = { values: undefined, fragmented?: false, length: 0 }
 
-type FragmentNode = { values: Node, fragmented?: false, length: 1 }
+export type FragmentNode = { values: Node, fragmented?: false, length: 1 }
 
-type FragmentFragment = { values: Fragment, fragmented: true, length: 1 }
+export type FragmentFragment = { values: Fragment, fragmented: true, length: 1 }
 
-type FragmentNodes = { values: Node[], fragmented?: false, length: 2 | 3 | 4 | 5 }
+export type FragmentNodes = { values: Node[], fragmented?: false, length: 2 | 3 | 4 | 5 }
 
-type FragmentFragments = { values: Fragment[], fragmented: true, length: 2 | 3 | 4 | 5 }
+export type FragmentFragments = { values: Fragment[], fragmented: true, length: 2 | 3 | 4 | 5 }
 
-type FragmentMixed = { values: (Node | Fragment)[], fragmented: true, length: 2 | 3 | 4 | 5 }
+export type FragmentMixed = { values: (Node | Fragment)[], fragmented: true, length: 2 | 3 | 4 | 5 }
 
-type Fragment = FragmentUndefined | FragmentNode | FragmentFragment | FragmentNodes | FragmentFragments | FragmentMixed
+export type Fragment = FragmentUndefined | FragmentNode | FragmentFragment | FragmentNodes | FragmentFragments | FragmentMixed
 
-type FunctionMaybe<T = unknown> = (() => T) | T
+export type FunctionMaybe<T = unknown> = (() => T) | T
 
-type Indexed<T = unknown> = T extends ObservableReadonly<infer U> ? ObservableReadonly<U> : ObservableReadonly<T>
+export type Indexed<T = unknown> = T extends ObservableReadonly<infer U> ? ObservableReadonly<U> : ObservableReadonly<T>
 
-type LazyComponent<P = {}> = (props: P) => ObservableReadonly<Child>
+export type LazyComponent<P = {}> = (props: P) => ObservableReadonly<Child>
 
-type LazyFetcher<P = {}> = () => Promise<{ default: ComponentFunction<P> } | ComponentFunction<P>>
+export type LazyFetcher<P = {}> = () => Promise<{ default: ComponentFunction<P> } | ComponentFunction<P>>
 
-type LazyResult<P = {}> = LazyComponent<P> & ({ preload: () => Promise<void> })
+export type LazyResult<P = {}> = LazyComponent<P> & ({ preload: () => Promise<void> })
 
-type MemoOptions<T = unknown> = import('soby').MemoOptions<T>
+export type MemoOptions<T = unknown> = import('soby').MemoOptions<T>
 
-type Observable<T = unknown> = import('soby').Observable<T>
+export type Observable<T = unknown> = import('soby').Observable<T>
 
-type ObservableLike<T = unknown> = import('soby').ObservableLike<T>
+export type ObservableLike<T = unknown> = import('soby').ObservableLike<T>
 
-type ObservableReadonly<T = unknown> = import('soby').ObservableReadonly<T>
+export type ObservableReadonly<T = unknown> = import('soby').ObservableReadonly<T>
 
-type ObservableReadonlyLike<T = unknown> = import('soby').ObservableReadonlyLike<T>
+export type ObservableReadonlyLike<T = unknown> = import('soby').ObservableReadonlyLike<T>
 
-type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | ObservableLike<T> | T
+export type ObservableMaybe<T = unknown> = Observable<T> | ObservableReadonly<T> | ObservableLike<T> | T
 
-type ObservableOptions<T = unknown> = import('soby').ObservableOptions<T>
+export type ObservableOptions<T = unknown> = import('soby').ObservableOptions<T>
 
-type PromiseMaybe<T = unknown> = Promise<T> | T
+export type PromiseMaybe<T = unknown> = Promise<T> | T
 
-type Props = Record<string, any>
+export type Props = Record<string, any>
 
-type Ref<T = unknown> = (value: T) => void
+export type Ref<T = unknown> = (value: T) => void
 
-type ResourceStaticPending<T = unknown> = { pending: true, error?: never, value?: never, latest?: T }
+export type ResourceStaticPending<T = unknown> = { pending: true, error?: never, value?: never, latest?: T }
 
-type ResourceStaticRejected = { pending: false, error: Error, value?: never, latest?: never }
+export type ResourceStaticRejected = { pending: false, error: Error, value?: never, latest?: never }
 
-type ResourceStaticResolved<T = unknown> = { pending: false, error?: never, value: T, latest: T }
+export type ResourceStaticResolved<T = unknown> = { pending: false, error?: never, value: T, latest: T }
 
-type ResourceStatic<T = unknown> = ResourceStaticPending<T> | ResourceStaticRejected | ResourceStaticResolved<T>
+export type ResourceStatic<T = unknown> = ResourceStaticPending<T> | ResourceStaticRejected | ResourceStaticResolved<T>
 
-type ResourceFunction<T = unknown> = { pending(): boolean, error(): Error | undefined, value(): T | undefined, latest(): T | undefined }
+export type ResourceFunction<T = unknown> = { pending(): boolean, error(): Error | undefined, value(): T | undefined, latest(): T | undefined }
 
-type Resource<T = unknown> = ObservableReadonly<ResourceStatic<T>> & ResourceFunction<T>
+export type Resource<T = unknown> = ObservableReadonly<ResourceStatic<T>> & ResourceFunction<T>
 
-type StoreOptions = import('soby').StoreOptions
+export type StoreOptions = import('soby').StoreOptions
 
-type Styles = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>> | (FunctionMaybe<null | undefined | number | string> | Styles)[]>
+export type Styles = FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>> | (FunctionMaybe<null | undefined | number | string> | Styles)[]>
 
-type SuspenseCollectorData = { active: Observable<boolean>, register: (suspense: SuspenseData) => void, unregister: (suspense: SuspenseData) => void }
+export type SuspenseCollectorData = { active: Observable<boolean>, register: (suspense: SuspenseData) => void, unregister: (suspense: SuspenseData) => void }
 
-type SuspenseData = { active: Observable<boolean>, increment: (nr?: number) => void, decrement: (nr?: number) => void }
+export type SuspenseData = { active: Observable<boolean>, increment: (nr?: number) => void, decrement: (nr?: number) => void }
 
-type TemplateActionPath = number[]
+export type TemplateActionPath = number[]
 
-type TemplateActionProxy = (target: Node, method: string, key?: string, targetNode?: Node) => void
+export type TemplateActionProxy = (target: Node, method: string, key?: string, targetNode?: Node) => void
 
-type TemplateActionWithNodes = [Node, string, string, string?, Node?]
+export type TemplateActionWithNodes = [Node, string, string, string?, Node?]
 
-type TemplateActionWithPaths = [TemplateActionPath, string, string, string?, TemplateActionPath?]
+export type TemplateActionWithPaths = [TemplateActionPath, string, string, string?, TemplateActionPath?]
 
-type TemplateVariableProperties = string[]
+export type TemplateVariableProperties = string[]
 
-type TemplateVariableData = { path: TemplateActionPath, properties: TemplateVariableProperties }
+export type TemplateVariableData = { path: TemplateActionPath, properties: TemplateVariableProperties }
 
-type TemplateVariablesMap = Map<TemplateActionPath, string>
+export type TemplateVariablesMap = Map<TemplateActionPath, string>
 
-type Truthy<T = unknown> = Exclude<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>
+export type Truthy<T = unknown> = Exclude<T, 0 | -0 | 0n | -0n | '' | false | null | undefined | void>
 
 /* EXPORT */
 
@@ -171,9 +171,6 @@ export type CSSProperties = {
   [K in keyof CSS.Properties<string | number>]: FunctionMaybe<CSS.Properties<string | number>[K]>
 }
 
-export type { ArrayMaybe, Callback, Child, ChildWithMetadata, Classes, ComponentFunction, ComponentIntrinsicElement, ComponentNode, Component, ComponentsMap, Constructor, ConstructorWith, ContextData, ContextProvider, Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData, DirectiveOptions, Disposer, EffectFunction, EffectOptions, Element, ExtractArray, EventListener, Falsy, ForOptions, FN, FragmentUndefined, FragmentNode, FragmentFragment, FragmentNodes, FragmentFragments, FragmentMixed, Fragment, FunctionMaybe, Indexed, LazyComponent, LazyFetcher, LazyResult, MemoOptions, Observable, ObservableLike, ObservableReadonly, ObservableReadonlyLike, ObservableMaybe, ObservableOptions, PromiseMaybe, Props, Ref, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource, StoreOptions, Styles, SuspenseCollectorData, SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy }
-
-
 export type Nullable<T = unknown> = T | undefined | null
 
 export type AllClassProperties = {
@@ -190,7 +187,6 @@ export type DOMCSSVariables = {
 
 export type HTMLAttributeReferrerPolicy = '' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url'
 
-/* MAIN */
 
 
 export type Children = Child
@@ -1707,6 +1703,7 @@ export interface IntrinsicElements {
   video: VideoHTMLAttributes<HTMLVideoElement>,
   wbr: WbrHTMLAttributes<HTMLElement>,
   webview: WebViewHTMLAttributes<HTMLElement>,
+  comment: { ref?: JSX.Refs, data?: ObservableMaybe<string> },
 
   // SVG
   svg: SVGAttributes<SVGSVGElement>,
@@ -1759,4 +1756,15 @@ export interface IntrinsicElements {
   tspan: SVGAttributes<SVGTSpanElement>,
   use: SVGAttributes<SVGUseElement>
 }
+
+export type Unobservant<T> = T extends object
+  ? { [K in keyof T]: T[K] extends ObservableMaybe<infer U> ? NonNullable<U> : T[K] }
+  : T
+
+/** Make every properties Observable */
+export type Observant<T> = T extends object
+  ? { [K in keyof T]: T[K] extends Function ? T[K] :
+    T[K] extends ObservableMaybe<infer U> ? Observable<U> : Observable<T[K]> } : T
+
+export type NonNullable<T> = T & {}
 

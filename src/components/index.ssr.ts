@@ -1,16 +1,12 @@
 
 /* IMPORT */
 
-import Dynamic from './dynamic.ssr'
-import ErrorBoundary from './error_boundary'
-import For from './for'
-import Fragment from './fragment'
-import If from './if'
+export * from './dynamic.ssr'
+export * from './error_boundary'
+export * from './for'
+export * from './fragment'
+export * from './if'
 // import Portal from './portal.ssr'
-import Suspense from './suspense'
-import Switch from './switch'
-import Ternary from './ternary'
-
-/* EXPORT */
-
-export { Dynamic, ErrorBoundary, For, Fragment, If, /* Portal,  */Suspense, Switch, Ternary }
+export * from './suspense'
+export * from './switch'
+export * from './ternary'

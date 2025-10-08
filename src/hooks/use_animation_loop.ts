@@ -1,12 +1,10 @@
 
-/* IMPORT */
 
-import useScheduler from '../hooks/use_scheduler'
+import { useScheduler } from '../hooks/use_scheduler'
 import type { Disposer, ObservableMaybe } from '../types'
 
-/* MAIN */
 
-const useAnimationLoop = (callback: ObservableMaybe<FrameRequestCallback>): Disposer => {
+export const useAnimationLoop = (callback: ObservableMaybe<FrameRequestCallback>): Disposer => {
   const stack = new Error()
 
   return useScheduler({
@@ -18,7 +16,3 @@ const useAnimationLoop = (callback: ObservableMaybe<FrameRequestCallback>): Disp
   })
 
 }
-
-/* EXPORT */
-
-export default useAnimationLoop

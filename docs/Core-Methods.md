@@ -13,6 +13,8 @@ This document covers the essential methods and functions provided by Woby for bu
 - [Component Rendering](#component-rendering)
 - [Context Creation (createContext)](#context-creation-createcontext)
 - [Custom Elements (customElement)](#custom-elements-customelement)
+- [Object Assignment (assign)](#object-assignment-assign)
+- [Component Defaults (defaults)](#component-defaults-defaults)
 
 ## Observable Creation ($)
 
@@ -32,6 +34,24 @@ const user = $({ id: 1, name: 'John' }, {
   equals: (a, b) => a.id === b.id
 })
 ```
+
+### Observable Options
+
+Observables can be created with options to control their behavior, including type information for custom elements:
+
+```typescript
+// Typed observables for proper HTML attribute synchronization
+const count = $(0, { type: 'number' } as const)
+const enabled = $(true, { type: 'boolean' } as const)
+const data = $({} as any, { type: 'object' } as const)
+
+// Custom equality function
+const user = $({ id: 1, name: 'John' }, {
+  equals: (a, b) => a.id === b.id
+})
+```
+
+For detailed information about type synchronization between HTML attributes and component props, see the [Type Synchronization Documentation](./Type-Synchronization.md) or the [Simple Type Synchronization Guide](./Type-Sync-Simple.md) for a more straightforward approach.
 
 ## Observable Unwrapping ($)
 
@@ -81,7 +101,7 @@ Memoized computations automatically recompute when their dependencies change.
 import { $, $, useMemo } from 'woby'
 
 const firstName = $('John')
-const lastName = $('Doe')
+const lastName = $('Doe'
 
 // Computed observable that updates when dependencies change
 const fullName = useMemo(() => {
@@ -118,7 +138,7 @@ batch(() => {
 
 Temporarily read observables without creating dependencies.
 
-```
+```typescript
 import { $, $, untrack } from 'woby'
 
 const count = $(0)
@@ -400,260 +420,205 @@ const Component = () => {
 
 ```
 
-## Context Creation (createContext)
+## Object Assignment (assign)
 
-Create context objects for sharing data between components.
+The `assign` function provides advanced object merging capabilities with support for observables, function preservation, deep copying, and conditional assignment.
 
-### Overview
-
-The `createContext` function creates a context object that can be used to share data between components without having to pass props down manually at every level.
-
-### Syntax
-
-``typescript
-function createContext<T>(defaultValue: T): ContextWithDefault<T>
-function createContext<T>(defaultValue?: T): Context<T>
-```
-
-### Parameters
-
-- `defaultValue`: The default value for the context (optional)
-
-### Basic Example
+Functions are treated specially in this function:
+- Functions are never converted to observables, regardless of options
+- Functions are assigned by reference directly
+- This behavior ensures that callback functions and methods work correctly
 
 ```typescript
-import { createContext, useContext } from 'woby'
+import { $, assign } from 'woby'
 
-// Create a context with a default value
-const ThemeContext = createContext<'light' | 'dark'>('light')
+// Basic usage
+const target = { a: 1, b: $(2) }
+const source = { b: 3, c: 4 }
+assign(target, source)
+// Result: { a: 1, b: 3, c: 4 } where b is now an observable
 
-// Create a context without a default value
-const UserContext = createContext<User | null>(null)
+// Function handling - functions are never converted to observables
+const target1 = { onClick: () => console.log('target') }
+const source1 = { onClick: () => console.log('source'), onHover: () => console.log('hover') }
+assign(target1, source1)
+// Result: { onClick: () => console.log('source'), onHover: () => console.log('hover') }
+// Note: onClick is directly assigned as a function, not converted to an observable
+
+// Copy by reference (default)
+const target2 = { a: $(1) }
+const source2 = { a: 2 }
+assign(target2, source2)
+// target2.a is updated to 2, but it's still the same observable
+
+// Copy by value
+const target3 = { a: $(1) }
+const source3 = { a: 2 }
+assign(target3, source3, { copyByRef: false })
+// target3.a is replaced with a new observable containing 2
+
+// Conditional assignment
+const target4 = { a: 1, b: 2 }
+const source4 = { b: 3, c: 4 }
+assign(target4, source4, { condition: 'new' })
+// Only assigns new properties: { a: 1, b: 2, c: 4 }
+
+// Merge specific keys
+const target5 = { style: 'red', class: 'btn' }
+const source5 = { style: 'bold', id: 'button' }
+assign(target5, source5, { merge: ['style'] })
+// Merges style property: { style: 'red bold', class: 'btn', id: 'button' }
+
+// Track source observables
+const target6 = { a: $(1) }
+const source6 = { a: $(2) }
+assign(target6, source6, { track: true })
+// Automatically updates target6.a when source6.a changes
 ```
 
-### Provider Pattern
+## Component Defaults (defaults)
 
-To provide a context value to child components, use the Provider component:
+The `defaults` function attaches default props to functional components, making it easier to create reusable components with sensible defaults. When used in conjunction with the internal `merge` function, it enables two-way synchronization between HTML attributes and function component props for custom elements.
+
+For detailed information about type synchronization between HTML attributes and component props, see the [Type Synchronization Documentation](./Type-Synchronization.md) or the [Simple Type Synchronization Guide](./Type-Sync-Simple.md) for a more straightforward approach.
+
+### Two-Way Synchronization with Custom Elements
+
+When creating custom elements, the `defaults` function uses an internal merge mechanism to provide seamless two-way synchronization between HTML attributes and component props:
+
+1. **HTML Attributes → Component Props**: When a custom element is used in HTML, attributes are automatically converted to component props
+2. **Component Props → HTML Attributes**: When props change programmatically, the corresponding HTML attributes are updated
+
+This synchronization only works when components are properly wrapped with `defaults`. Without this pattern, attributes and props are not synchronized.
 
 ```typescript
-import { createContext, useContext } from 'woby'
+import { $, defaults, customElement } from 'woby'
 
-const CounterContext = createContext<Observable<number>>($(0))
-
-const ParentComponent = () => {
-  const count = $(0)
-  
-  return (
-    <CounterContext.Provider value={count}>
-      <ChildComponent />
-    </CounterContext.Provider>
-  )
+interface CounterProps {
+  value?: Observable<number>
+  increment?: () => void
+  decrement?: () => void
 }
 
-const ChildComponent = () => {
-  const count = useContext(CounterContext)
-  
-  return <div>Count: {count}</div>
+// Default props function with type information
+function def() {
+  const value = $(0, { type: 'number' } as const)
+  return {
+    value,
+    increment: () => value(prev => $(prev) + 1),
+    decrement: () => value(prev => $(prev) - 1)
+  }
 }
-```
 
-### Context with useMountedContext
-
-For custom elements and more flexible context usage, use `useMountedContext`:
-
-```typescript
-import { createContext, useMountedContext } from 'woby'
-
-const CounterContext = createContext<Observable<number>>($(0))
-
-const CounterComponent = () => {
-  const { ref, context } = useMountedContext(CounterContext)
+// Component with two-way synchronization
+const Counter = defaults(def, (propss: CounterProps): JSX.Element => {
+  // This enables two-way synchronization between HTML attributes and props
+  // The merge functionality is handled internally by the defaults function
+  const { value, increment, decrement } = propss
   
   return (
-    <div ref={ref}>
-      <p>Count: {context}</p>
-      <button onClick={() => context(c => c + 1)}>+</button>
+    <div>
+      <p>Count: {value}</p>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
     </div>
   )
-}
-```
-
-### TypeScript Support
-
-For full TypeScript support, define the context type explicitly:
-
-```typescript
-import { createContext } from 'woby'
-
-interface ThemeContextType {
-  theme: 'light' | 'dark'
-  toggleTheme: () => void
-}
-
-const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
-  toggleTheme: () => {}
 })
-```
-
-### Best Practices
-
-1. **Use descriptive names** for context objects
-2. **Provide sensible defaults** when possible
-3. **Keep context values lightweight** - avoid passing large objects
-4. **Use observables** for reactive context values
-5. **Consider using useMountedContext** for better custom element support
-
-## Custom Elements (customElement)
-
-Create custom HTML elements that can be used as components with support for nested object properties.
-
-### Overview
-
-The `customElement` function registers a component as a standard web component that can be used directly in HTML or JSX. It now supports nested object properties through dash-separated attribute names, allowing for more organized and structured component APIs.
-
-### Syntax
-
-``typescript
-customElement<P>(
-  tagName: string, 
-  component: JSX.Component<P>,
-  ...attributes: ElementAttributePattern<P>[]
-): void
-```
-
-### Parameters
-
-- `tagName`: The HTML tag name for the custom element (must contain a hyphen)
-- `component`: The component function to render
-- `attributes`: Rest parameter of attribute patterns to observe (supports wildcards)
-
-### Nested Properties Support
-
-The enhanced `customElement` function now supports nested object properties through dash-separated attribute names:
-
-- Attribute `config-theme` maps to `props.config.theme`
-- Attribute `user-profile-name` maps to `props.user.profile.name`
-- Attribute `actions-onClick` maps to `props.actions.onClick`
-
-### Basic Example
-
-``typescript
-import { $, customElement } from 'woby'
-
-// Simple component
-const SimpleCounter = ({ value }: { value: number }) => {
-  return <div>Count: {value}</div>
-}
 
 // Register as custom element
-customElement('simple-counter', SimpleCounter, 'value')
+customElement('counter-element', Counter)
 
-// Usage
-// <simple-counter value="5"></simple-counter>
+// Usage examples:
+
+// 1. HTML usage with automatic attribute synchronization
+// <counter-element value="5" style-color="red"></counter-element>
+
+// 2. Function component usage
+// const App = () => {
+//   const count = $(10)
+//   return <Counter value={count} />
+// }
+
+// 3. Both approaches work seamlessly with synchronized props
 ```
 
-### Nested Properties Example
+### How It Works
 
-``typescript
-import { $, customElement } from 'woby'
+The `defaults` function stores default props information on the component and handles the merging internally:
 
-// Component with nested props
-const ThemedCounter = ({ 
-  value,
-  config,
-  actions
-}: { 
-  value: number,
-  config: {
-    theme: string,
-    size: string
-  },
-  actions: {
-    increment: () => void
+1. **`defaults(def, component)`**: Wraps a component and attaches default props information
+2. **Internal merge mechanism**: Automatically combines provided props with defaults for custom elements
+
+### Without Two-Way Synchronization
+
+Components that don't use the `defaults` pattern will not have attribute synchronization:
+
+```
+// ❌ No synchronization - attributes and props are not linked
+const SimpleCounter = ({ value = $(0) }: { value?: Observable<number> }) => (
+  <div>Count: {value}</div>
+)
+
+customElement('simple-counter', SimpleCounter)
+
+// In HTML: <simple-counter value="5"></simple-counter>
+// The value attribute will NOT be synchronized with the component prop
+```
+
+### Complete Example with Synchronization
+
+```
+import { $, defaults, customElement } from 'woby'
+
+interface CounterProps {
+  value?: Observable<number>
+  increment?: () => void
+  decrement?: () => void
+  label?: string
+}
+
+// Default props function with type information
+function def() {
+  const value = $(0, { type: 'number' } as const)
+  return {
+    value,
+    increment: () => value(prev => $(prev) + 1),
+    decrement: () => value(prev => $(prev) - 1),
+    label: 'Count'
   }
-}) => {
+}
+
+// Component with two-way synchronization
+const Counter = defaults(def, (propss: CounterProps): JSX.Element => {
+  // This enables two-way synchronization between HTML attributes and props
+  // The merge functionality is handled internally
+  const { value, increment, decrement, label } = propss
+  
   return (
-    <div class={`counter counter-${config.theme} counter-${config.size}`}>
-      <span>Count: {value}</span>
-      <button onClick={actions.increment}>+</button>
+    <div>
+      <label>{label}: </label>
+      <span>{value}</span>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
     </div>
   )
-}
+})
 
-// Register with nested attributes
-customElement('themed-counter', ThemedCounter,
-  'value',
-  'config-theme',
-  'config-size',
-  'actions-increment'
-)
+// Register as custom element
+customElement('counter-element', Counter)
 
-// Usage
-// <themed-counter 
-//   value="5" 
-//   config-theme="dark" 
-//   config-size="large"
-//   actions-increment="handleIncrement">
-// </themed-counter>
+// Usage examples:
+
+// 1. HTML usage with automatic attribute synchronization
+// <counter-element value="5" label="My Counter"></counter-element>
+
+// 2. Function component usage
+// const App = () => {
+//   const count = $(10)
+//   return <Counter value={count} label="App Counter" />
+// }
+
+// 3. Both approaches work seamlessly with synchronized props
 ```
 
-### Observable Integration
-
-Nested properties work seamlessly with observables:
-
-``typescript
-import { $, customElement, useMemo } from 'woby'
-
-const ObservableCounter = ({ 
-  value,
-  config
-}: { 
-  value: Observable<number>,
-  config: {
-    step: Observable<number>,
-    min: number,
-    max: number
-  }
-}) => {
-  const displayValue = useMemo(() => {
-    return `Value: ${$(value)}, Step: ${$(config.step)}`
-  })
-  
-  return <div>{displayValue}</div>
-}
-
-customElement('observable-counter', ObservableCounter,
-  'value',
-  'config-step',
-  'config-min',
-  'config-max'
-)
-```
-
-### TypeScript Support
-
-For full TypeScript support, declare the custom element in the JSX namespace:
-
-``typescript
-import { customElement, ElementAttributes } from 'woby'
-
-const MyComponent = ({ config }: { config: { theme: string } }) => {
-  return <div>Theme: {config.theme}</div>
-}
-
-customElement('my-component', MyComponent, 'config-theme')
-
-// TypeScript declaration
-declare module 'woby' {
-  namespace JSX {
-    interface IntrinsicElements {
-      'my-component': ElementAttributes<typeof MyComponent>
-    }
-  }
-}
-```
-
-### Best Practices
-
-These core methods form the foundation of Woby's reactivity system, enabling fine-grained updates and efficient rendering.
+This pattern is implemented in `@woby/woby/src/methods/defaults.ts` and is the recommended approach for creating custom elements that need to work in both HTML and JSX contexts with proper attribute synchronization.

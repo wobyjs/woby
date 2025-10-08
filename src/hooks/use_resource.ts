@@ -1,12 +1,12 @@
 
 /* IMPORT */
 
-import SuspenseManager from '../components/suspense.manager'
-import useCheapDisposed from '../hooks/use_cheap_disposed'
-import useReadonly from '../hooks/use_readonly'
-import useRenderEffect from '../hooks/use_render_effect'
-import $ from '../methods/S'
-import $$ from '../methods/SS'
+import { SuspenseManager } from '../components/suspense.manager'
+import { useCheapDisposed } from '../hooks/use_cheap_disposed'
+import { useReadonly } from '../hooks/soby'
+import { useRenderEffect } from '../hooks/use_render_effect'
+import { $ } from '../methods/soby'
+import { $$ } from '../methods/soby'
 import { assign, castError, isPromise } from '../utils/lang'
 import type { ObservableMaybe, PromiseMaybe, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource } from '../types'
 
@@ -16,7 +16,7 @@ import type { ObservableMaybe, PromiseMaybe, ResourceStaticPending, ResourceStat
 //TODO: Option for returning the resource as a store, where also the returned value gets wrapped in a store
 //FIXME: SSR demo: toggling back and forth between /home and /loader is buggy, /loader gets loaded with no data, which is wrong
 
-const useResource = <T>(fetcher: (() => ObservableMaybe<PromiseMaybe<T>>)): Resource<T> => {
+export const useResource = <T>(fetcher: (() => ObservableMaybe<PromiseMaybe<T>>)): Resource<T> => {
 
   const pending = $(true)
   const error = $<Error>()
@@ -103,7 +103,3 @@ const useResource = <T>(fetcher: (() => ObservableMaybe<PromiseMaybe<T>>)): Reso
   return assign(useReadonly(resource, stack), resourceFunction)
 
 }
-
-/* EXPORT */
-
-export default useResource

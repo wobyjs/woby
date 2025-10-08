@@ -1,44 +1,39 @@
+import { SuspenseContext } from '../components/suspense.context'
+import { useCleanup } from '../hooks/soby'
+import type { SuspenseData } from '../types'
 
-/* IMPORT */
-
-import SuspenseContext from '../components/suspense.context';
-import useCleanup from '../hooks/use_cleanup';
-import type {SuspenseData} from '../types';
-
-/* MAIN */
-
-class SuspenseManager {
+export class SuspenseManager {
 
   /* VARIABLES */
 
-  private suspenses = new Map<SuspenseData, number> ();
+  private suspenses = new Map<SuspenseData, number>();
 
   /* API */
 
-  change = ( suspense: SuspenseData, nr: number ): void => {
+  change = (suspense: SuspenseData, nr: number): void => {
 
-    const counter = this.suspenses.get ( suspense ) || 0;
-    const counterNext = Math.max ( 0, counter + nr );
+    const counter = this.suspenses.get(suspense) || 0
+    const counterNext = Math.max(0, counter + nr)
 
-    if ( counter === counterNext ) return;
+    if (counter === counterNext) return
 
-    if ( counterNext ) {
+    if (counterNext) {
 
-      this.suspenses.set ( suspense, counterNext );
+      this.suspenses.set(suspense, counterNext)
 
     } else {
 
-      this.suspenses.delete ( suspense );
+      this.suspenses.delete(suspense)
 
     }
 
-    if ( nr > 0 ) {
+    if (nr > 0) {
 
-      suspense.increment ( nr );
+      suspense.increment(nr)
 
     } else {
 
-      suspense.decrement ( nr );
+      suspense.decrement(nr)
 
     }
 
@@ -46,32 +41,28 @@ class SuspenseManager {
 
   suspend = (): void => {
 
-    const suspense = SuspenseContext.get ();
+    const suspense = SuspenseContext.get()
 
-    if ( !suspense ) return;
+    if (!suspense) return
 
-    this.change ( suspense, 1 );
+    this.change(suspense, 1)
 
-    useCleanup ( () => {
+    useCleanup(() => {
 
-      this.change ( suspense, -1 );
+      this.change(suspense, -1)
 
-    });
+    })
 
   };
 
   unsuspend = (): void => {
 
-    this.suspenses.forEach ( ( counter, suspense ) => {
+    this.suspenses.forEach((counter, suspense) => {
 
-      this.change ( suspense, - counter );
+      this.change(suspense, - counter)
 
-    });
+    })
 
   };
 
-};
-
-/* EXPORT */
-
-export default SuspenseManager;
+}

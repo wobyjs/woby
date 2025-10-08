@@ -1,15 +1,13 @@
 
-/* IMPORT */
 
 import { DIRECTIVES, SYMBOLS_DIRECTIVES } from '../constants'
 // import { JSX } from '../jsx/types';
-import resolve from '../methods/resolve'
+import { resolve } from '../methods/soby'
 import { context } from '../soby'
 import type { Child, DirectiveFunction, Directive, DirectiveData, DirectiveOptions, ExtractArray } from '../types'
 
-/* MAIN */
 
-const createDirective = <T extends keyof JSX.Directives>(name: T, fn: DirectiveFunction<ExtractArray<JSX.Directives[T]>>, options?: DirectiveOptions): Directive<ExtractArray<JSX.Directives[T]>> => {
+export const createDirective = <T extends keyof JSX.Directives>(name: T, fn: DirectiveFunction<ExtractArray<JSX.Directives[T]>>, options?: DirectiveOptions): Directive<ExtractArray<JSX.Directives[T]>> => {
 
   const immediate = !!options?.immediate
   const data: DirectiveData<ExtractArray<JSX.Directives[T]>> = { fn, immediate }
@@ -46,7 +44,3 @@ const createDirective = <T extends keyof JSX.Directives>(name: T, fn: DirectiveF
   return { Provider, ref, register }
 
 }
-
-/* EXPORT */
-
-export default createDirective

@@ -1,19 +1,17 @@
 
-/* IMPORT */
 
 import { SYMBOL_TEMPLATE_ACCESSOR } from '../constants'
-import wrapElement from '../methods/wrap_element'
+import { wrapElement } from '../methods/wrap_element'
 import { assign, indexOf, isFunction, isString } from '../utils/lang'
 import { setAttribute, setChildReplacement, setClasses, setEvent, setHTML, setProperty, setRef, setStyles } from '../utils/setters'
 import type { Child, TemplateActionPath, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap } from '../types'
 
-/* MAIN */
 
 //TODO: Avoid using "Function" and "eval", while still keeping similar performance, if possible
 //TODO: Support complex children in the template function
 //TODO: Support argumentless calls on props, like props.foo.bar()
 
-const template = <P = {}>(fn: ((props: P) => Child)): ((props: P) => () => Child) => {
+export const template = <P = {}>(fn: ((props: P) => Child)): ((props: P) => () => Child) => {
 
   const safePropertyRe = /^[a-z0-9-_]+$/i
 
@@ -310,7 +308,3 @@ const template = <P = {}>(fn: ((props: P) => Child)): ((props: P) => () => Child
   return makeComponent()
 
 }
-
-/* EXPORT */
-
-export default template

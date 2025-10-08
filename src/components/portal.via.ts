@@ -1,17 +1,13 @@
 
-/* IMPORT */
-
-import useBoolean from '../hooks/use_boolean'
-import useRenderEffect from '../hooks/use_render_effect'
-import render from '../methods/render.via'
-import $$ from '../methods/SS'
+import { useBoolean } from '../hooks/soby'
+import { useRenderEffect } from '../hooks/use_render_effect'
+import { render } from '../methods/render.via'
+import { $$ } from '../methods/soby'
 import { createHTMLNode } from '../utils/creators.via'
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 
-/* MAIN */
-
-const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
+export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
 
   const portal = $$(wrapper) || createHTMLNode('div')
 
@@ -50,7 +46,3 @@ const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when
   return assign(() => $$(condition) || children, { metadata: { portal } })
 
 }
-
-/* EXPORT */
-
-export default Portal

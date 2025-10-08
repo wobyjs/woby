@@ -1,12 +1,8 @@
-/* IMPORT */
-
-import useRoot from '../hooks/use_root'
+import { useRoot } from '../hooks/soby'
 import { setChild } from '../utils/setters.via'
 import type { Child, Disposer } from '../types'
 
-/* MAIN */
-
-const render = (child: Child, parent?: Element | null): Disposer => {
+export const render = (child: Child, parent?: Element | null): Disposer => {
 
     if (!parent || !(parent instanceof HTMLElement)) throw new Error('Invalid parent node')
 
@@ -28,7 +24,4 @@ const render = (child: Child, parent?: Element | null): Disposer => {
 
 }
 
-/* EXPORT */
-
-export default render
 

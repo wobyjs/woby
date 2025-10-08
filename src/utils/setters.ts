@@ -1,27 +1,22 @@
-
-/* IMPORT */
-
 import { DIRECTIVES, SYMBOLS_DIRECTIVES, SYMBOL_UNCACHED } from '../constants'
-import useMicrotask from '../hooks/use_microtask'
-import useRenderEffect from '../hooks/use_render_effect'
-import isStore from '../methods/is_store'
-import $$ from '../methods/SS'
-import store from '../methods/store'
-import untrack from '../methods/untrack'
+import { useMicrotask } from '../hooks/use_microtask'
+import { useRenderEffect } from '../hooks/use_render_effect'
+import { isStore } from '../methods/soby'
+import { $$ } from '../methods/soby'
+import { store } from '../methods/soby'
+import { untrack } from '../methods/soby'
 import { context, with as _with, batch } from '../soby'
 import { SYMBOL_STORE_OBSERVABLE } from '../soby'
 import { classesToggle } from '../utils/classlist'
 import { createText, createComment } from '../utils/creators'
-import diff from '../utils/diff'
+import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
 
-/* MAIN */
-
-const setAttributeStatic = (() => {
+export const setAttributeStatic = (() => {
 
     const attributesBoolean = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls', 'default', 'disabled', 'formnovalidate', 'hidden', 'indeterminate', 'ismap', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open', 'playsinline', 'readonly', 'required', 'reversed', 'seamless', 'selected'])
     const attributeCamelCasedRe = /e(r[HRWrv]|[Vawy])|Con|l(e[Tcs]|c)|s(eP|y)|a(t[rt]|u|v)|Of|Ex|f[XYa]|gt|hR|d[Pg]|t[TXYd]|[UZq]/ //URL: https://regex101.com/r/I8Wm4S/1
@@ -70,7 +65,7 @@ const setAttributeStatic = (() => {
 
 })()
 
-const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
+export const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -88,7 +83,7 @@ const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<nu
 
 }
 
-const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, child: (() => Child), stack: Stack): void => {
+export const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, child: (() => Child), stack: Stack): void => {
 
     useRenderEffect((stack) => {
 
@@ -106,7 +101,7 @@ const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, ch
 
 }
 
-const setChildReplacementText = (child: string, childPrev: Node): Node => {
+export const setChildReplacementText = (child: string, childPrev: Node): Node => {
 
     if (childPrev.nodeType === 3) {
 
@@ -130,7 +125,7 @@ const setChildReplacementText = (child: string, childPrev: Node): Node => {
 
 }
 
-const setChildReplacement = (child: Child, childPrev: Node, stack: Stack): void => {
+export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack): void => {
 
     const type = typeof child
 
@@ -160,7 +155,7 @@ const setChildReplacement = (child: Child, childPrev: Node, stack: Stack): void 
 
 }
 
-const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, stack: Stack): void => {
+export const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, stack: Stack): void => {
 
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
@@ -353,15 +348,15 @@ const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: b
 
 }
 
-const setChild = (parent: HTMLElement, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
+export const setChild = (parent: HTMLElement, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
 
     resolveChild(child, setChildStatic.bind(undefined, parent, fragment, false), false, stack)
 
 }
 
-const setClassStatic = classesToggle
+export const setClassStatic = classesToggle
 
-const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>, stack: Stack): void => {
+export const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>, stack: Stack): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -379,7 +374,7 @@ const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null |
 
 }
 
-const setClassBooleanStatic = (element: HTMLElement, value: boolean, key: null | undefined | boolean | string, keyPrev?: null | undefined | boolean | string): void => {
+export const setClassBooleanStatic = (element: HTMLElement, value: boolean, key: null | undefined | boolean | string, keyPrev?: null | undefined | boolean | string): void => {
 
     if (keyPrev && keyPrev !== true) {
 
@@ -395,7 +390,7 @@ const setClassBooleanStatic = (element: HTMLElement, value: boolean, key: null |
 
 }
 
-const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>, stack: Stack): void => {
+export const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>, stack: Stack): void => {
 
     if (isFunction(key) && isFunctionReactive(key)) {
 
@@ -419,7 +414,7 @@ const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMayb
 
 }
 
-const setClassesStatic = (element: HTMLElement, object: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, objectPrev: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, stack: Stack): void => {
+export const setClassesStatic = (element: HTMLElement, object: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, objectPrev: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, stack: Stack): void => {
 
     if (isString(object)) {
 
@@ -533,7 +528,7 @@ const setClassesStatic = (element: HTMLElement, object: null | undefined | strin
 
 }
 
-const setClasses = (element: HTMLElement, object: Classes, stack: Stack): void => {
+export const setClasses = (element: HTMLElement, object: Classes, stack: Stack): void => {
 
     if (isFunction(object) || isArray(object)) {
 
@@ -557,7 +552,7 @@ const setClasses = (element: HTMLElement, object: Classes, stack: Stack): void =
 
 }
 
-const setDirective = <T extends unknown[]>(element: HTMLElement, directive: string, args: T): void => {
+export const setDirective = <T extends unknown[]>(element: HTMLElement, directive: string, args: T): void => {
 
     const symbol = SYMBOLS_DIRECTIVES[directive] || Symbol()
     const data = context<DirectiveData<T>>(symbol) || DIRECTIVES[symbol]
@@ -580,7 +575,7 @@ const setDirective = <T extends unknown[]>(element: HTMLElement, directive: stri
 
 }
 
-const setEventStatic = (() => {
+export const setEventStatic = (() => {
 
     //TODO: Maybe delete event delegation
     //TODO: Maybe delegate more events: [onmousemove, onmouseout, onmouseover, onpointerdown, onpointermove, onpointerout, onpointerover, onpointerup, ontouchend, ontouchmove, ontouchstart]
@@ -698,19 +693,19 @@ const setEventStatic = (() => {
 
 })()
 
-const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>): void => {
+export const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>): void => {
 
     setEventStatic(element, event, value)
 
 }
 
-const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | string): void => {
+export const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | string): void => {
 
     element.innerHTML = String(isNil(value) ? '' : value)
 
 }
 
-const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
+export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
 
     useRenderEffect(() => {
 
@@ -720,7 +715,7 @@ const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMa
 
 }
 
-const setPropertyStatic = (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
+export const setPropertyStatic = (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
 
     if (key === 'tabIndex' && isBoolean(value)) {
 
@@ -762,7 +757,7 @@ const setPropertyStatic = (element: HTMLElement, key: string, value: null | unde
 
 }
 
-const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
+export const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -780,7 +775,7 @@ const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<nul
 
 }
 
-const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null | undefined | Ref<T>)[]): void => { // Scheduling a microtask to dramatically increase the probability that the element will get connected to the DOM in the meantime, which would be more convenient
+export const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null | undefined | Ref<T>)[]): void => { // Scheduling a microtask to dramatically increase the probability that the element will get connected to the DOM in the meantime, which would be more convenient
 
     if (isNil(value)) return
 
@@ -793,7 +788,7 @@ const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null | undefi
 
 }
 
-const setStyleStatic = (() => {
+export const setStyleStatic = (() => {
 
     // From Preact: https://github.com/preactjs/preact/blob/e703a62b77c9de45e886d8a7f59bd0db658318f9/src/constants.js#L3
     // const propertyNonDimensionalRe = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
@@ -829,7 +824,7 @@ const setStyleStatic = (() => {
 
 })()
 
-const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>, stack: Stack): void => {
+export const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>, stack: Stack): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -847,7 +842,7 @@ const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null |
 
 }
 
-const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, stack: Stack): void => {
+export const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, stack: Stack): void => {
 
     if (isString(object)) {
 
@@ -905,7 +900,7 @@ const setStylesStatic = (element: HTMLElement, object: null | undefined | string
 
 }
 
-const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Stack): void => {
+export const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Stack): void => {
 
     if (isFunction(object) || isArray(object)) {
 
@@ -929,7 +924,7 @@ const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined 
 
 }
 
-const setTemplateAccessor = (element: HTMLElement, key: string, value: TemplateActionProxy): void => {
+export const setTemplateAccessor = (element: HTMLElement, key: string, value: TemplateActionProxy): void => {
 
     if (key === 'children') {
 
@@ -987,59 +982,64 @@ const setTemplateAccessor = (element: HTMLElement, key: string, value: TemplateA
 
 }
 
-const setProp = (element: HTMLElement, key: string, value: any, stack: Stack): void => {
+export const setProp = (element: HTMLElement | Comment, key: string, value: any, stack: Stack): void => {
+    if (element instanceof Comment) {
+        if (key === 'ref')
+            setRef(element, value)
+    }
+    else {
+        if (value === undefined) return // Ignoring undefined props, for performance
 
-    if (value === undefined) return // Ignoring undefined props, for performance
+        if (isTemplateAccessor(value)) {
 
-    if (isTemplateAccessor(value)) {
+            setTemplateAccessor(element, key, value)
 
-        setTemplateAccessor(element, key, value)
+        } else if (key === 'children') {
 
-    } else if (key === 'children') {
+            setChild(element, value, FragmentUtils.make(), stack)
 
-        setChild(element, value, FragmentUtils.make(), stack)
+        } else if (key === 'ref') {
 
-    } else if (key === 'ref') {
+            setRef(element, value)
 
-        setRef(element, value)
+        } else if (key === 'style') {
 
-    } else if (key === 'style') {
+            setStyles(element, value, stack)
 
-        setStyles(element, value, stack)
+        } else if (key === 'class' || key === 'className') {
 
-    } else if (key === 'class' || key === 'className') {
+            setClasses(element, value, stack)
 
-        setClasses(element, value, stack)
+        } else if (key === 'dangerouslySetInnerHTML') {
 
-    } else if (key === 'dangerouslySetInnerHTML') {
+            setHTML(element, value, stack)
 
-        setHTML(element, value, stack)
+        } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
 
-    } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
+            setEvent(element, key.toLowerCase(), value)
 
-        setEvent(element, key.toLowerCase(), value)
+        } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
 
-    } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
+            setDirective(element, key.slice(4), value)
 
-        setDirective(element, key.slice(4), value)
+        } else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' || key === 'className') {
 
-    } else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' || key === 'className') {
+            // Forbidden props
 
-        // Forbidden props
+        } else if (key in element && !isSVG(element)) {
 
-    } else if (key in element && !isSVG(element)) {
+            setProperty(element, key, value, stack)
 
-        setProperty(element, key, value, stack)
+        } else {
 
-    } else {
+            setAttribute(element, key, value, stack)
 
-        setAttribute(element, key, value, stack)
-
+        }
     }
 
 }
 
-const setProps = (element: HTMLElement, object: Record<string, unknown>, stack: Stack): void => {
+export const setProps = (element: HTMLElement | Comment, object: Record<string, unknown>, stack: Stack): void => {
 
     for (const key in object) {
 
@@ -1048,7 +1048,3 @@ const setProps = (element: HTMLElement, object: Record<string, unknown>, stack: 
     }
 
 }
-
-/* EXPORT */
-
-export { setAttributeStatic, setAttribute, setChildReplacementFunction, setChildReplacementText, setChildReplacement, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassesStatic, setClasses, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps }

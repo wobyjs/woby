@@ -1,16 +1,11 @@
 
-/* IMPORT */
+export * from './dynamic.via'
+export * from './error_boundary'
+export * from './for'
+export * from './fragment'
+export * from './if'
+export * from './portal.via'
+export * from './suspense'
+export * from './switch'
+export * from './ternary'
 
-import Dynamic from './dynamic.via'
-import ErrorBoundary from './error_boundary'
-import For from './for'
-import Fragment from './fragment'
-import If from './if'
-import Portal from './portal.via'
-import Suspense from './suspense'
-import Switch from './switch'
-import Ternary from './ternary'
-
-/* EXPORT */
-
-export { Dynamic, ErrorBoundary, For, Fragment, If, Portal, Suspense, Switch, Ternary }

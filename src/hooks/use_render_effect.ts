@@ -1,7 +1,6 @@
 
-/* IMPORT */
 
-import useEffect from '../hooks/use_effect'
+import { useEffect } from '../hooks/soby'
 import type { Disposer, EffectFunction, EffectOptions } from '../types'
 import { Stack } from '../soby'
 
@@ -12,16 +11,11 @@ const options: EffectOptions = {
   stack: undefined
 }
 
-/* MAIN */
 
 // This function exists for convenience, and to avoid creating unnecessary options objects
 
-const useRenderEffect = (fn: EffectFunction, stack: Stack): Disposer => {
+export const useRenderEffect = (fn: EffectFunction, stack: Stack): Disposer => {
 
   return useEffect(fn, { ...options, stack })
 
 }
-
-/* EXPORT */
-
-export default useRenderEffect

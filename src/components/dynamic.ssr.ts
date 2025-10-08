@@ -1,16 +1,12 @@
-
-/* IMPORT */
-
-import useMemo from '../hooks/use_memo'
-import createElement from '../methods/create_element.ssr'
-import resolve from '../methods/resolve'
-import $$ from '../methods/SS'
+import { useMemo } from '../hooks/soby'
+import { createElement } from '../methods/create_element.ssr'
+import { resolve } from '../methods/soby'
+import { $$ } from '../methods/soby'
 import { isFunction } from '../utils/lang'
 import type { Child, Component, FunctionMaybe } from '../types'
 
-/* MAIN */
 
-const Dynamic = <P = {}>({ component, props/* , children */ }: { component: Component<P>, props?: FunctionMaybe<P | null>/* , children?: Child */ }): Child => {
+export const Dynamic = <P = {}>({ component, props/* , children */ }: { component: Component<P>, props?: FunctionMaybe<P | null>/* , children?: Child */ }): Child => {
 
     if (isFunction(component) || isFunction(props)) {
 
@@ -27,6 +23,3 @@ const Dynamic = <P = {}>({ component, props/* , children */ }: { component: Comp
     }
 }
 
-/* EXPORT */
-
-export default Dynamic

@@ -1,15 +1,14 @@
 # Context Demo
 
-This demo showcases how to use context in Woby applications with both `useContext` and `useMountedContext`.
+This demo showcases how to use context in Woby applications with `useContext`.
 
 ## Overview
 
 The Context demo demonstrates:
 
 1. Creating context objects with `createContext`
-2. Using `useContext` in JSX/TSX components
-3. Using `useMountedContext` in both JSX/TSX components and custom elements
-4. Context propagation in custom elements defined directly in HTML
+2. Using `useContext` in both JSX/TSX components and custom elements
+3. Context propagation in custom elements defined directly in HTML
 
 ## Component Structure
 
@@ -19,7 +18,7 @@ A component that provides theme context to its children.
 
 ### `ThemedComponent` Component
 
-A component that consumes theme context using both `useContext` and `useMountedContext`.
+A component that consumes theme context using `useContext`.
 
 ### Custom Element Registration
 
@@ -83,18 +82,10 @@ Providing context values to child components:
 
 ### Context Consumption with useContext
 
-Consuming context in JSX/TSX components:
-
-```tsx
-const theme = useContext(ThemeContext)
-```
-
-### Context Consumption with useMountedContext
-
 Consuming context in both JSX/TSX components and custom elements:
 
 ```tsx
-const { ref, context } = useMountedContext(ThemeContext)
+const theme = useContext(ThemeContext)
 ```
 
 ### Automatic Context Propagation
@@ -118,6 +109,6 @@ To run this demo:
 
 The demo will show:
 1. Context usage in JSX/TSX components with `useContext`
-2. Context usage in JSX/TSX components with `useMountedContext`
-3. Context usage in custom elements defined directly in HTML
-4. Context propagation from parent to child custom elements
+2. Context usage in custom elements defined directly in HTML
+3. Context propagation from parent to child custom elements
+```

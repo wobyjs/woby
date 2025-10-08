@@ -4,7 +4,7 @@ import { render } from '../methods/render.testing';
 import ErrorBoundary from './error_boundary';
 // Assuming $ is for creating simple text nodes or similar for testing.
 // If not, will adjust. For now, the example components create DOM elements directly.
-// import $ from '../methods/S'; 
+// import $ from '../methods/soby'; 
 
 /* TESTS */
 

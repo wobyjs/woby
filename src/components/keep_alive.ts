@@ -1,13 +1,12 @@
 
-/* IMPORT */
 
-import useCleanup from '../hooks/use_cleanup'
-import useMemo from '../hooks/use_memo'
-import useResolved from '../hooks/use_resolved'
-import useRoot from '../hooks/use_root'
-import useSuspense from '../hooks/use_suspense'
-import resolve from '../methods/resolve'
-import $ from '../methods/S'
+import { useCleanup } from '../hooks/soby'
+import { useMemo } from '../hooks/soby'
+import { useResolved } from '../hooks/use_resolved'
+import { useRoot } from '../hooks/soby'
+import { useSuspense } from '../hooks/soby'
+import { resolve } from '../methods/soby'
+import { $ } from '../methods/soby'
 import { with as _with } from 'soby'
 import type { Child, Disposer, FunctionMaybe, Observable, ObservableReadonly } from '../types'
 
@@ -29,11 +28,10 @@ const runWithSuperRoot = _with()
 
 let lockId = 1
 
-/* MAIN */
 
 //TODO: Support hot-swapping owner and context, to make the context JustWork™
 
-const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, ttl?: FunctionMaybe<number>, children: Child }): ObservableReadonly<Child> => {
+export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, ttl?: FunctionMaybe<number>, children: Child }): ObservableReadonly<Child> => {
 
   return useMemo((stack) => {
 
@@ -98,7 +96,3 @@ const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, ttl?: Fun
   })
 
 }
-
-/* EXPORT */
-
-export default KeepAlive

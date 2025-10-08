@@ -10,13 +10,12 @@
  * @module useMountedContext
  */
 
-/* IMPORT */
 
 import { Observable } from '../soby'
-import $ from '../methods/S'
-import $$ from '../methods/SS'
-import useMemo from './use_memo'
-import useContext from './use_context'
+import { $ } from '../methods/soby'
+import { $$ } from '../methods/soby'
+import { useMemo } from './soby'
+import { useContext } from './use_context'
 import { Context, ContextWithDefault, ObservableReadonly } from '../types'
 
 /**

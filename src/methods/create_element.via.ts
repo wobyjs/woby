@@ -1,8 +1,7 @@
 
-/* IMPORT */
 
-import untrack from '../methods/untrack'
-import wrapElement from '../methods/wrap_element'
+import { untrack } from '../methods/soby'
+import { wrapElement } from '../methods/wrap_element'
 import { createHTMLNode, createSVGNode } from '../utils/creators.via'
 import { isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters.via'
@@ -11,7 +10,6 @@ import { IgnoreSymbols } from 'via.js'
 import { FragmentUtils } from '../utils/fragment'
 // import { JSX } from '../jsx/types';
 
-/* MAIN */
 
 export const IsSvgSymbol = Symbol('isSvg')
 
@@ -19,7 +17,7 @@ IgnoreSymbols[IsSvgSymbol] = IsSvgSymbol
 
 // It's important to wrap components, so that they can be executed in the right order, from parent to child, rather than from child to parent in some cases
 
-const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]): Element => {
+export const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]): Element => {
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)
 
@@ -81,7 +79,3 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
     }
 
 }
-
-/* EXPORT */
-
-export default createElement

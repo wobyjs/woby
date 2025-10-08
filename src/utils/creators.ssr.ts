@@ -1,5 +1,5 @@
-/* IMPORT */
-import { Window } from 'happy-dom'
+//todo, now comment to reduce build time & size
+// import { Window } from 'happy-dom'
 import type { FN } from '../types'
 
 // Create a happy-dom window instance for SSR

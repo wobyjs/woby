@@ -1,9 +1,8 @@
-/* IMPORT */
 
-import useRoot from '../hooks/use_root'
+import { useRoot } from '../hooks/soby'
 import { setChild } from '../utils/setters'
 import type { Child, Disposer, IntrinsicElementsMap } from '../types'
-import $ from './S'
+import { $ } from './soby'
 import { FragmentUtils } from '../utils/fragment'
 // import { JSX } from 'src/jsx/types';
 

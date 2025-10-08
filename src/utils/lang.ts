@@ -1,4 +1,3 @@
-
 /* IMPORT */
 
 import { SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_TEMPLATE_ACCESSOR, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED } from '../constants'
@@ -6,15 +5,15 @@ import type { ComponentFunction, Falsy, TemplateActionProxy, Truthy } from '../t
 
 /* MAIN */
 
-const { assign } = Object
+export const assign = Object.assign
 
-const castArray = <T>(value: T[] | T): T[] => {
+export const castArray = <T>(value: T[] | T): T[] => {
 
   return isArray(value) ? value : [value]
 
 }
 
-const castError = (exception: unknown): Error => {
+export const castError = (exception: unknown): Error => {
 
   if (isError(exception)) return exception
 
@@ -24,7 +23,7 @@ const castError = (exception: unknown): Error => {
 
 }
 
-const flatten = <T>(arr: T[]) => {
+export const flatten = <T>(arr: T[]) => {
 
   for (let i = 0, l = arr.length; i < l; i++) {
 
@@ -38,7 +37,7 @@ const flatten = <T>(arr: T[]) => {
 
 }
 
-const indexOf = (() => {
+export const indexOf = (() => {
 
   const _indexOf = Array.prototype.indexOf
 
@@ -50,90 +49,90 @@ const indexOf = (() => {
 
 })()
 
-const { isArray } = Array
+export const { isArray } = Array
 
-const isBoolean = (value: unknown): value is boolean => {
+export const isBoolean = (value: unknown): value is boolean => {
 
   return typeof value === 'boolean'
 
 }
 
-const isComponent = (value: unknown): value is ComponentFunction => {
+export const isComponent = (value: unknown): value is ComponentFunction => {
 
   return isFunction(value) && (SYMBOL_UNTRACKED_UNWRAPPED in value)
 
 }
 
-const isError = (value: unknown): value is Error => {
+export const isError = (value: unknown): value is Error => {
 
   return value instanceof Error
 
 }
 
-const isFalsy = <T>(value: T): value is Falsy<T> => {
+export const isFalsy = <T>(value: T): value is Falsy<T> => {
 
   return !value
 
 }
 
-const isFunction = (value: unknown): value is ((...args: any[]) => any) => {
+export const isFunction = (value: unknown): value is ((...args: any[]) => any) => {
 
   return typeof value === 'function'
 
 }
 
-const isClass = <T,>(fn: T): boolean => {
+export const isClass = <T,>(fn: T): boolean => {
   return typeof fn === 'function' && /^class\s/.test(Function.prototype.toString.call(fn))
 }
 
-const isFunctionReactive = (value: Function): boolean => {
+export const isFunctionReactive = (value: Function): boolean => {
 
   return !(SYMBOL_UNTRACKED in value || SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value || value[SYMBOL_OBSERVABLE_READABLE]?.parent?.disposed)
 
 }
 
-const isNil = (value: unknown): value is null | undefined => {
+export const isNil = (value: unknown): value is null | undefined => {
 
   return value === null || value === undefined
 
 }
 
-const isNode = (value: unknown): value is Node => {
+export const isNode = (value: unknown): value is Node => {
 
   return value instanceof Node
 
 }
 
-const isObject = (value: unknown): value is object => {
+export const isObject = (value: unknown): value is object => {
 
   return typeof value === 'object' && value !== null
 
 }
 
-const isPrimitive = (value: unknown): value is string | number | boolean | symbol | null | undefined | bigint => {
+export const isPrimitive = (value: unknown): value is string | number | boolean | symbol | null | undefined | bigint => {
   const t = typeof value
   return !(t === 'object' || t === 'function')
 }
 
-const isPromise = (value: unknown): value is Promise<unknown> => {
+export const isPromise = (value: unknown): value is Promise<unknown> => {
 
   return value instanceof Promise
 
 }
 
-const isString = (value: unknown): value is string => {
+export const isString = (value: unknown): value is string => {
 
   return typeof value === 'string'
 
 }
 
-const isSVG = (value: Element): value is SVGElement => {
+export const isSVG = (value: Element): value is SVGElement => {
 
   return !!value['isSVG']
 
 }
 
-const isSVGElement = (() => {
+export const isSVGElement = (() => {
 
   const svgRe = /^(t(ext$|s)|s[vwy]|g)|^set|tad|ker|p(at|s)|s(to|c$|ca|k)|r(ec|cl)|ew|us|f($|e|s)|cu|n[ei]|l[ty]|[GOP]/ //URL: https://regex101.com/r/Ck4kFp/1
   const svgCache = {}
@@ -148,31 +147,31 @@ const isSVGElement = (() => {
 
 })()
 
-const isTemplateAccessor = (value: unknown): value is TemplateActionProxy => {
+export const isTemplateAccessor = (value: unknown): value is TemplateActionProxy => {
 
   return isFunction(value) && (SYMBOL_TEMPLATE_ACCESSOR in value)
 
 }
 
-const isTruthy = <T>(value: T): value is Truthy<T> => {
+export const isTruthy = <T>(value: T): value is Truthy<T> => {
 
   return !!value
 
 }
 
-const isVoidChild = (value: unknown): value is null | undefined | symbol | boolean => {
+export const isVoidChild = (value: unknown): value is null | undefined | symbol | boolean => {
 
   return value === null || value === undefined || typeof value === 'boolean' || typeof value === 'symbol'
 
 }
 
-const noop = (): void => {
+export const noop = (): void => {
 
   return
 
 }
 
-const once = <T>(fn: () => T): (() => T) => {
+export const once = <T>(fn: () => T): (() => T) => {
 
   let called = false
   let result: T
@@ -199,7 +198,3 @@ export const isProxy = (proxy): proxy is typeof Proxy => {
 export const fixBigInt = (v: any | bigint) => typeof v === 'bigint' ? v + 'n' : v
 
 export const toArray = <T,>(v: T | T[]) => [...[v].flat(Infinity)] as T[]
-
-/* EXPORT */
-
-export { assign, castArray, castError, flatten, indexOf, isArray, isBoolean, isComponent, isError, isFalsy, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isTruthy, isVoidChild, noop, once }

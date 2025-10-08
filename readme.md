@@ -37,8 +37,10 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **[Examples Gallery](./docs/Examples.md)** - Practical examples and patterns
 - **[Class Management](./docs/Class-Management.md)** - Advanced class handling with reactive support
 - **[Best Practices](./docs/Best-Practices.md)** - Recommended patterns and practices
-- **[Woby vs React](./docs/@woby/vs-React.md)** - API differences and migration guide
+- **[Woby vs React](./docs/Woby-vs-React.md)** - API differences and migration guide
 - **[FAQ](./docs/FAQ.md)** - Common questions and answers
+- **[Type Synchronization](./docs/Type-Synchronization.md)** - How HTML attributes sync with component props
+- **[Simple Type Synchronization](./docs/Type-Sync-Simple.md)** - Straightforward approach to type sync
 
 ## Demos
 

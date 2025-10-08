@@ -19,6 +19,7 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 
 ### Advanced Topics
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
+- **[Component Defaults](./Component-Defaults.md)** - Two-way synchronization for custom elements
 - **[Woby vs React](./@woby/vs-React.md)** - API differences and migration guide
 - **[FAQ](./FAQ.md)** - Frequently asked questions
 
@@ -34,6 +35,7 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 | **Examples** | [Examples Gallery](./Examples.md) |
 | **Class Management** | [Class Management](./Class-Management.md) |
 | **Context API** | [Context](./Context.md) |
+| **Custom Elements** | [Component Defaults](./Component-Defaults.md) |
 | **Help** | [FAQ](./FAQ.md) • [Contributing](./Contributing.md) |
 
 ## 🎯 Key Features
@@ -64,6 +66,7 @@ Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, pro
 
 ### 3. **Advanced Features**
 - [Class Management](./Class-Management.md)
+- [Component Defaults](./Component-Defaults.md)
 - [Examples Gallery](./Examples.md)
 - [Best Practices](./Best-Practices.md)
 

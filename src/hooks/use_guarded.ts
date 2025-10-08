@@ -1,17 +1,14 @@
 
-/* IMPORT */
-
-import useMemo from '../hooks/use_memo'
-import $$ from '../methods/SS'
+import { useMemo } from '../hooks/soby'
+import { $$ } from '../methods/soby'
 import { isNil } from '../utils/lang'
 import type { FunctionMaybe } from '../types'
 
-/* MAIN */
 
 //TODO: Maybe port this to soby, as "when" or "is" or "guarded"
 //TODO: Optimize this, checking if the value is actually potentially reactive
 
-const useGuarded = <T, U extends T>(value: FunctionMaybe<T>, guard: ((value: T) => value is U)): (() => U) => {
+export const useGuarded = <T, U extends T>(value: FunctionMaybe<T>, guard: ((value: T) => value is U)): (() => U) => {
 
   let valueLast: U | undefined
 
@@ -37,6 +34,4 @@ const useGuarded = <T, U extends T>(value: FunctionMaybe<T>, guard: ((value: T) 
 
 }
 
-/* EXPORT */
 
-export default useGuarded

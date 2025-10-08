@@ -1,11 +1,7 @@
-///// <reference path="../../../via/dist/controller/index.d.ts" />
-
-/* IMPORT */
 
 import type { ComponentIntrinsicElement, FN } from '../types'
 import 'via.js'
 
-/* MAIN */
 if (typeof via !== 'undefined')
     var document = via.document
 
@@ -15,5 +11,4 @@ export const createSVGNode = (name: string) => document.createElementNS('http://
 export const createText = document.createTextNode as any as FN<[any], Text>
 export const createDocumentFragment = document.createDocumentFragment as any as FN<[], DocumentFragment>
 
-/* EXPORT */
 

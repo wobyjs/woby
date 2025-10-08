@@ -1,10 +1,9 @@
 
-/* IMPORT */
 
-import useMemo from '../hooks/use_memo'
-import $ from '../methods/S'
-import resolve from '../methods/resolve'
-import untrack from '../methods/untrack'
+import { useMemo } from '../hooks/soby'
+import { $ } from '../methods/soby'
+import { resolve } from '../methods/soby'
+import { untrack } from '../methods/soby'
 import { isFunction } from '../utils/lang'
 import type { Observable, ObservableReadonly } from '../types'
 
@@ -17,12 +16,11 @@ const SYMBOL_HOT_COMPONENT = Symbol('HMR.Hot')
 const SYMBOL_HOT_ID = Symbol('HMR.ID')
 const SOURCES = new WeakMap<{}, Observable<any>>()
 
-/* MAIN */
 
 //TODO: This seems excessively complicated, maybe it can be simplified somewhat?
 //TODO: Make this work better when a nested component is added/removed too
 
-const hmr = <T extends Function>(accept: Function | undefined, component: T): T => {
+export const hmr = <T extends Function>(accept: Function | undefined, component: T): T => {
 
   if (accept) { // Making the component hot
 
@@ -96,7 +94,6 @@ const hmr = <T extends Function>(accept: Function | undefined, component: T): T 
 
     }
 
-    /* MAIN */
 
     const id = $({})
     const source = $(component)
@@ -126,7 +123,3 @@ const hmr = <T extends Function>(accept: Function | undefined, component: T): T 
   }
 
 }
-
-/* EXPORT */
-
-export default hmr

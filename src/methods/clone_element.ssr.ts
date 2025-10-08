@@ -1,13 +1,11 @@
 
-/* IMPORT */
 
 import type { Child, Props } from '../types';;
 import { isFunction, isPrimitive } from '../utils/lang'
 import { SYMBOL_CLONE } from '../constants'
-import createElement from './create_element.ssr'
+import { createElement } from './create_element.ssr'
 import { CloneableType, wrapCloneElement } from './wrap_clone_element'
 
-/* MAIN */
 
 export const cloneElement = <P extends Props>(element: Child | Element, props: P, ...children: Child[]): Child => {
   if (isPrimitive(element))
@@ -31,5 +29,4 @@ export const cloneElement = <P extends Props>(element: Child | Element, props: P
   throw new Error("Unknown element")
 }
 
-export default cloneElement
 

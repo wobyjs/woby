@@ -2,15 +2,15 @@
 /* IMPORT */
 
 import { SYMBOL_SUSPENSE, SYMBOL_SUSPENSE_COLLECTOR } from '../constants'
-import useCleanup from '../hooks/use_cleanup'
-import useMemo from '../hooks/use_memo'
-import $ from '../methods/S'
+import { useCleanup } from '../hooks/soby'
+import { useMemo } from '../hooks/soby'
+import { $ } from '../methods/soby'
 import { context, resolve } from '../soby'
 import type { SuspenseCollectorData, SuspenseData } from '../types'
 
 /* MAIN */
 
-const SuspenseContext = {
+export const SuspenseContext = {
 
   create: (): SuspenseData => {
 
@@ -53,7 +53,3 @@ const SuspenseContext = {
   }
 
 }
-
-/* EXPORT */
-
-export default SuspenseContext

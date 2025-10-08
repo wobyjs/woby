@@ -1,21 +1,19 @@
 
-/* IMPORT */
 
-import untrack from './untrack'
-import wrapElement from './wrap_element'
+import { untrack } from './soby'
+import { wrapElement } from './wrap_element'
 import { createHTMLNode, createSVGNode } from '../utils/creators.ssr'
 import { isClass, isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters.ssr'
-import type { Child, Component, Element } from '../types'
+import type { Child, Component, Element, Observable } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { customElement } from './custom_element'
 
 
-/* MAIN */
 
 // It's important to wrap components, so that they can be executed in the right order, from parent to child, rather than from child to parent in some cases
 
-const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]) => {
+export const createElement = <P = { children?: Observable<Child> }>(component: Component<P>, _props?: P | null, ..._children: Child[]) => {
 
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)
@@ -80,7 +78,3 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
     }
 
 }
-
-/* EXPORT */
-
-export default createElement
