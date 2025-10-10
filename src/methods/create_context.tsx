@@ -30,6 +30,57 @@ import { customElement, ElementAttributes } from './custom_element'
 //   }
 // }
 
+/**
+ * Creates a context object that can be used to pass data through the component tree
+ * without having to pass props down manually at every level.
+ * 
+ * The context object has a Provider component that allows consuming components to subscribe
+ * to context changes. The Provider component accepts a `value` prop that will be passed to
+ * all components that are descendants of the Provider.
+ * 
+ * @template T - The type of the context value
+ * @param defaultValue - The default value for the context when no Provider is found
+ * @returns A context object with a Provider component and a symbol for internal use
+ * 
+ * @example
+ * ```tsx
+ * // Create a context with a default value
+ * const ThemeContext = createContext('light')
+ * 
+ * // Create a context without a default value
+ * const UserContext = createContext<User | undefined>(undefined)
+ * 
+ * // Use the Provider to pass a value down the tree
+ * const App = () => (
+ *   <ThemeContext.Provider value="dark">
+ *     <Toolbar />
+ *   </ThemeContext.Provider>
+ * )
+ * 
+ * // Consume the context value in a component
+ * const ThemedButton = () => {
+ *   const theme = useContext(ThemeContext)
+ *   return <button className={theme}>Themed Button</button>
+ * }
+ * ```
+ * 
+ * @example
+ * ```tsx
+ * // Using context with custom elements
+ * const ValueContext = createContext(0)
+ * 
+ * // Provider works with both JSX and custom elements
+ * customElement('value-display', ({ value }: { value: Observable<number> }) => {
+ *   const context = useContext(ValueContext)
+ *   return <div>Value: {value}, Context: {context}</div>
+ * })
+ * 
+ * // In JSX:
+ * // <ValueContext.Provider value={42}>
+ * //   <value-display></value-display>
+ * // </ValueContext.Provider>
+ * ```
+ */
 export function createContext<T>(defaultValue: T): ContextWithDefault<T>
 export function createContext<T>(defaultValue?: T): Context<T>
 export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> {
