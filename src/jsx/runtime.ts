@@ -22,12 +22,14 @@ export const unwrapJsx = <P>(props: P) => {
   return props
 }
 
+export const isJsx = <P>(props: P) => !!props[SYMBOL_JSX]
+
 
 function getProps<P extends {} = { key?: string; children?: Child }>(component: string | Node | ComponentFunction<P>, props: P) {
   if (typeof component === 'string') {
     const ce = customElements.get(component)
     if (!!ce) {
-      const defaultPropsFn = (ce as any).__children__?.[SYMBOL_DEFAULT]
+      const defaultPropsFn = (ce as any).__component__?.[SYMBOL_DEFAULT]
       if (!defaultPropsFn) {
         console.error(`Component ${component} is missing default props. Please use the 'defaults' helper function to provide default props.`)
       }
@@ -74,3 +76,4 @@ export const jsxDEV = <P extends {} = {}>(component: Component<P>, props: P | nu
 export const getMeta = (target: Element) => target?.[SYMBOL_CLONE] as CloneableType
 
 
+export const jsxs = jsx 

@@ -6,10 +6,11 @@ import type { Child, Disposer } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 
 
-export const render = (child: Child, parent?: Element | null): Disposer => {
+export const render = (child: Child, parent?: Element | null | ShadowRoot): Disposer => {
 
-    if (!parent || !(parent instanceof HTMLElement)) throw new Error('Invalid parent node')
+    if (!parent || !(parent instanceof HTMLElement || parent instanceof ShadowRoot)) throw new Error('Invalid parent node')
 
+    // if (!(parent instanceof ShadowRoot))
     parent.textContent = ''
 
     return useRoot((stack, dispose) => {

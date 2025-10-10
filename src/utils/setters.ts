@@ -1,4 +1,4 @@
-import { DIRECTIVES, SYMBOLS_DIRECTIVES, SYMBOL_UNCACHED } from '../constants'
+import { DIRECTIVES, SYMBOLS_DIRECTIVES, SYMBOL_DOM, SYMBOL_UNCACHED } from '../constants'
 import { useMicrotask } from '../hooks/use_microtask'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { isStore } from '../methods/soby'
@@ -83,7 +83,7 @@ export const setAttribute = (element: HTMLElement, key: string, value: FunctionM
 
 }
 
-export const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, child: (() => Child), stack: Stack): void => {
+export const setChildReplacementFunction = (parent: HTMLElement | Node, fragment: Fragment, child: (() => Child), stack: Stack): void => {
 
     useRenderEffect((stack) => {
 
@@ -95,7 +95,7 @@ export const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragm
 
         }
 
-        setChildStatic(parent, fragment, false, valueNext, true, stack)
+        setChildStatic(parent, fragment, false, valueNext, true, child, stack)
 
     }, stack)
 
@@ -135,7 +135,7 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
 
     } else {
 
-        const parent = childPrev.parentElement
+        const parent = childPrev.parentElement ?? childPrev.parentNode
 
         if (!parent) throw new Error('Invalid child replacement')
 
@@ -155,7 +155,38 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
 
 }
 
-export const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, stack: Stack): void => {
+/**
+ * Sets child nodes on a parent element with static (non-reactive) values.
+ * 
+ * This function efficiently updates the DOM by comparing the current children (in the fragment)
+ * with the new children and applying the minimal set of DOM operations needed.
+ * 
+ * The function handles several optimization cases:
+ * 1. Fast path for appending a node the first time
+ * 2. Fast path for single text child replacement
+ * 3. Fast path for removing all children or replacing placeholders
+ * 4. General diffing algorithm for complex changes
+ * 
+ * @param parent - The parent DOM element to update
+ * @param fragment - A fragment representing the current children state
+ * @param fragmentOnly - Whether to only update the fragment without touching the actual DOM
+ * @param child - The new child or children to set
+ * @param dynamic - Whether the child is dynamic (reactive) or static
+ * @param stack - The stack trace for debugging purposes
+ * 
+ * @example
+ * ```ts
+ * // Set a simple text child
+ * setChildStatic(parent, fragment, false, "Hello World", false, stack)
+ * 
+ * // Set multiple children
+ * setChildStatic(parent, fragment, false, [node1, node2, "text"], false, stack)
+ * 
+ * // Set a function child (will be resolved)
+ * setChildStatic(parent, fragment, false, () => "Dynamic content", true, stack)
+ * ```
+ */
+export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, childComp: Function, stack: Stack): void => {
 
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
@@ -249,7 +280,7 @@ export const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragment
 
                 childFragmentOnly = false
 
-                setChildStatic(parent, fragment, fragmentOnly, child, dynamic, stack)
+                setChildStatic(parent, fragment, fragmentOnly, child, dynamic, children[i] as any, stack)
 
             }, false, stack)
 
@@ -276,7 +307,7 @@ export const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragment
 
             if (nextLength === 0) { // Placeholder, to keep the right spot in the array of children
 
-                const placeholder = createComment('')
+                const placeholder = childComp[SYMBOL_DOM] = createComment('')
 
                 FragmentUtils.pushNode(fragmentNext, placeholder)
 
@@ -305,11 +336,12 @@ export const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragment
 
                 if (next instanceof Array) {
 
-                    parent.append.apply(parent, next)
+                    // parent.append.apply(parent, next)
+                    for (const node of next) parent.appendChild(node)
 
                 } else {
 
-                    parent.append(next)
+                    parent.appendChild(next)
 
                 }
 
@@ -325,7 +357,7 @@ export const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragment
 
     if (nextLength === 0) { // Placeholder, to keep the right spot in the array of children
 
-        const placeholder = createComment('')
+        const placeholder = childComp[SYMBOL_DOM] = createComment('')
 
         FragmentUtils.pushNode(fragmentNext, placeholder)
 
@@ -348,10 +380,9 @@ export const setChildStatic = (parent: HTMLElement, fragment: Fragment, fragment
 
 }
 
-export const setChild = (parent: HTMLElement, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
-
-    resolveChild(child, setChildStatic.bind(undefined, parent, fragment, false), false, stack)
-
+export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
+    const cd = child
+    resolveChild(cd, (child, dynamic, stack) => setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack), false, stack)
 }
 
 export const setClassStatic = classesToggle
@@ -715,7 +746,8 @@ export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: Fun
 
 }
 
-export const setPropertyStatic = (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
+export const setPropertyStatic = (element: HTMLElement | Comment, key: string, value: null | undefined | boolean | number | string): void => {
+    const isComment = (element instanceof Comment)
 
     if (key === 'tabIndex' && isBoolean(value)) {
 
@@ -723,7 +755,7 @@ export const setPropertyStatic = (element: HTMLElement, key: string, value: null
 
     }
 
-    if (key === 'value') {
+    if (key === 'value' && !isComment) {
 
         if (element.tagName === 'PROGRESS') {
 
@@ -743,7 +775,7 @@ export const setPropertyStatic = (element: HTMLElement, key: string, value: null
 
         element[key] = value
 
-        if (isNil(value)) {
+        if (isNil(value) && !isComment) {
 
             setAttributeStatic(element, key, null)
 
@@ -751,13 +783,14 @@ export const setPropertyStatic = (element: HTMLElement, key: string, value: null
 
     } catch { // If it fails, maybe because like HTMLInputElement.form there's only a getter, we try as an attribute instead //TODO: Figure out something better than this
 
-        setAttributeStatic(element, key, value)
+        if (!isComment)
+            setAttributeStatic(element, key, value)
 
     }
 
 }
 
-export const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
+export const setProperty = (element: HTMLElement | Comment, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
 
     if (isFunction(value) && isFunctionReactive(value)) {
 
@@ -986,6 +1019,8 @@ export const setProp = (element: HTMLElement | Comment, key: string, value: any,
     if (element instanceof Comment) {
         if (key === 'ref')
             setRef(element, value)
+        else if (key in element)
+            setProperty(element, key, value, stack)
     }
     else {
         if (value === undefined) return // Ignoring undefined props, for performance

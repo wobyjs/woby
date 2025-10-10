@@ -66,8 +66,8 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                 }
 
                 // //already in prop
-                // if (hasChildren || ce?.__children__) {
-                //     // setChild(child, !!ce ? createElement(ce.__children__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
+                // if (hasChildren || ce?.__component__) {
+                //     // setChild(child, !!ce ? createElement(ce.__component__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
                 //     setChild(child, children ?? _props.children, FragmentUtils.make(), stack)
                 // }
 

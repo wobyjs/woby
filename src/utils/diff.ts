@@ -16,14 +16,59 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * A DOM diffing algorithm that efficiently updates the DOM by calculating the minimum
+ * number of operations needed to transform one list of nodes into another.
+ * 
+ * This implementation is based on udomdiff with customizations for the Woby framework:
+ * - Added TypeScript types
+ * - Removed accessor functions
+ * - Added support for diffing unwrapped nodes
+ * - Added safety checks for parent node consistency
+ * 
+ * The algorithm uses an optimized approach that:
+ * 1. Handles fast paths for common operations (append, prepend, remove)
+ * 2. Uses a mapping strategy for more complex rearrangements
+ * 3. Minimizes DOM operations by finding the longest common subsequence
+ * 
+ * @module diff
+ */
+
 import { createComment } from "./creators"
 
 // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
 
+/** Dummy comment node used as a placeholder for wrapping single nodes */
 const dummyNode = createComment('')
+
+/** Wrapper array for single "before" nodes to normalize them as arrays */
 const beforeDummyWrapper: [Node] = [dummyNode]
+
+/** Wrapper array for single "after" nodes to normalize them as arrays */
 const afterDummyWrapper: [Node] = [dummyNode]
 
+/**
+ * Efficiently diffs and updates the children of a parent node.
+ * 
+ * Compares two lists of DOM nodes ([before] and [after]) and applies the minimum
+ * number of DOM operations needed to transform the parent's current children
+ * to match the [after] list.
+ * 
+ * This is essential for reactive frameworks like Woby to efficiently update
+ * the DOM when component state changes, avoiding costly re-renders.
+ * 
+ * @param parent - The parent DOM node whose children need to be updated
+ * @param before - The current list of child nodes (or a single node)
+ * @param after - The desired list of child nodes (or a single node)
+ * @param nextSibling - The reference node for insertion operations, or null to append
+ * 
+ * @example
+ * ```ts
+ * // Update a parent's children from [nodeA, nodeB] to [nodeC, nodeA, nodeD]
+ * diff(parentElement, [nodeA, nodeB], [nodeC, nodeA, nodeD], null)
+ * // This will efficiently insert nodeC before nodeA, and append nodeD
+ * ```
+ */
 export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null): void => {
   if (before === after) return
   if (before instanceof Node) {

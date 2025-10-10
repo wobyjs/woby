@@ -57,8 +57,8 @@ export const createElement = <P = { children?: Observable<Child> }>(component: C
                     setProps(child, _props as any, stack)
                 }
 
-                if (hasChildren || ce?.__children__) {
-                    setChild(child, !!ce ? createElement(ce.__children__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
+                if (hasChildren || ce?.__component__) {
+                    setChild(child, !!ce ? createElement(ce.__component__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
                 }
 
             })

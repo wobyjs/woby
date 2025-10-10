@@ -1,12 +1,29 @@
-import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE } from '../constants'
+import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_DOM } from '../constants'
 import { isObservable } from '../methods/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { $$ } from '../methods/soby'
 import { createText } from '../utils/creators'
 import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
-import { Stack } from '../soby'
+import { Observable, Stack } from '../soby'
 
+const replaceSelf = <T extends { [SYMBOL_DOM]: HTMLElement | HTMLElement[] } & Observable<HTMLElement>>(value: T, newNode: HTMLElement | HTMLElement[]) => {
+  const node = value[SYMBOL_DOM]
+  if (!node)
+    return false
+
+  const isList = newNode instanceof NodeList
+
+  if (node instanceof NodeList || isArray(node)) {
+    const ns = [...(node as any)].flat()
+    ns.forEach((n, i) => i !== 0 && n.remove())
+    ns[0].replaceWith(...(value[SYMBOL_DOM] = (isList ? [...newNode as any] : [newNode]).flat()))
+  }
+  else
+    node.replaceWith(...(value[SYMBOL_DOM] = (isList ? [...newNode as any] : [newNode]).flat()))
+
+  return true
+}
 
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
 
@@ -17,7 +34,9 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
       if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
         (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
-      resolveChild(value(), setter, _dynamic, stack)
+      const newValue = $$(value)
+      // if (!replaceSelf(value as any, newValue as any))
+      resolveChild(newValue, setter, _dynamic, stack)
 
     } else {
 
@@ -26,7 +45,9 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
         if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
           (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
-        resolveChild(value(), setter, true, stack)
+        const newValue = $$(value)
+        // if (!replaceSelf(value as any, newValue as any))
+        resolveChild(newValue, setter, true, stack)
 
       }, stack)
 

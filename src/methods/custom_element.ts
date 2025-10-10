@@ -7,14 +7,18 @@
  * @module customElement
  */
 
-import { isObservable } from "./soby"
+import { $$, isObservable } from "./soby"
 import { SYMBOL_JSX, SYMBOL_DEFAULT } from '../constants'
-import { setChild, setProp } from "../utils/setters"
+import { setChild, setProp, setChildStatic, setChildReplacement } from "../utils/setters"
+import { resolveArraysAndStatics, resolveChild } from "../utils/resolvers"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
-import { Observable, Stack, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
+import { callStack, Observable, resolve, Stack, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNCACHED } from "soby"
 import type { ObservableOptions } from "soby"
-import { isObject } from "../utils"
+import { isFunction, isObject } from "../utils"
+import { useEffect } from "../hooks"
+import { render } from "./render"
+import { isJsx, jsx } from "../jsx-runtime"
 
 
 /**
@@ -240,7 +244,7 @@ const isPureFunction = (fn: Function) => typeof fn === 'function' && !isObservab
  * 
  * @template P - Component props type
  * @param tagName - The HTML tag name for the custom element
- * @param children - The component function that renders the element's content
+ * @param component - The component function that renders the element's content
  * @returns The custom element class
  * 
  * @example
@@ -257,8 +261,8 @@ const isPureFunction = (fn: Function) => typeof fn === 'function' && !isObservab
  * // <counter-element value={$(0)} style-color="red"></counter-element>
  * ```
  */
-export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, children: JSX.Component<P>) => {
-    const defaultPropsFn = (children as any)[SYMBOL_DEFAULT]
+export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
+    const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
     if (!defaultPropsFn) {
         console.error(`Component ${tagName} is missing default props. Please use the 'defaults' helper function to provide default props.`)
     }
@@ -271,7 +275,7 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
     const C = class extends HTMLElement {
         /** Reference to the children component function */
         //rename it to function component
-        static __children__ = children;
+        static __component__ = component;
 
         //obaserable attributes is deps on props
         static observedAttributes: string[] = []
@@ -280,31 +284,27 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
         public props: P
         public propDict: Record<string, string>
         childs: Node[] = []
+        public slots: HTMLSlotElement
+        public placeHolder: Comment
 
         constructor(props?: P) {
             super()
             this.props = !!props ? props : defaultPropsFn() || {} as P
             C.observedAttributes = Object.keys(this.props)
 
-            if (!this.props[SYMBOL_JSX]) //html creation of my-component, html to down, woby bottom up
-            {
-                this.childs = [...(this.childNodes as any)]
-                this.replaceChildren() //clear the children
+            if (!isJsx(this.props)) {
+                const shadowRoot = this.attachShadow({ mode: 'open' })
+                if (!($$(this.props.children) instanceof HTMLSlotElement)) {
+                    this.slots = document.createElement('slot')
+                    this.props.children(this.slots)
+                }
+                // this.placeHolder = document.createComment('')
+                // shadowRoot.append(this.placeHolder/* , this.slots */)
+                render(createElement(component, this.props), shadowRoot)
             }
-            setChild(this, () => createElement(children, this.props), FragmentUtils.make(), new Stack("customElement"))
-
-            // Temporary MutationObserver to monitor children removal
-            const tempObserver = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'childList') {
-                        if (mutation.removedNodes.length > 0) {
-                            console.log('Children removed from custom element:', mutation.removedNodes, mutation.target)
-                        }
-                    }
-                })
-            })
-
-            tempObserver.observe(this, { childList: true })
+            else {
+                setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
+            }
         }
 
         /**
@@ -318,18 +318,8 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
             const aKeys = observedAttributes.filter(attrName => !isPureFunction(props[attrName]) && !isObject(props[attrName]))
             const rKeys = observedAttributes.filter(attrName => isPureFunction(props[attrName]))
 
-            // this.attributes not in constructor, so do it here.
-            if (!props[SYMBOL_JSX]) {
-                // props -> attr
-                aKeys.forEach(k => !this.hasAttribute(k) /* && !isObject($$(props[k]))  */ && setProp(this, k, props[k], new Stack()))
-
-                //this.append(...(this.childs as any))
-                if (!!this.childs.length)
-                    this.props.children(this.childs)
-            }
-            else {
-                debugger
-            }
+            // this.props.children(this.slots/* .assignedNodes() */)
+            // setChildReplacement(jsx(children, this.props), this.placeHolder, callStack('connectedCallback'))
 
             rKeys.forEach(k => this.removeAttribute(k))
 
@@ -392,7 +382,7 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
 
     const ec = customElements.get(tagName)
     if (!!ec)
-        console.warn(`Element ${tagName} already exists. (ignore this in dev env), use ec.__children__ to find target component`)
+        console.warn(`Element ${tagName} already exists. (ignore this in dev env), use ec.__component__ to find target component`)
     else
         customElements.define(tagName, C)
 

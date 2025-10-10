@@ -126,8 +126,8 @@ export const isString = (value: unknown): value is string => {
 
 }
 
-export const isSVG = (value: Element): value is SVGElement => {
 
+export const isSVG = (value: Element | Comment): value is SVGElement => {
   return !!value['isSVG']
 
 }
