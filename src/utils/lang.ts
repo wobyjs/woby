@@ -2,6 +2,7 @@
 
 import { SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_TEMPLATE_ACCESSOR, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED } from '../constants'
 import type { ComponentFunction, Falsy, TemplateActionProxy, Truthy } from '../types'
+import { isObservable } from 'soby'
 
 /* MAIN */
 
@@ -196,5 +197,24 @@ export const isProxy = (proxy): proxy is typeof Proxy => {
 }
 
 export const fixBigInt = (v: any | bigint) => typeof v === 'bigint' ? v + 'n' : v
+
+/**
+ * Checks if a value is a pure function (not an observable)
+ * 
+ * This utility function determines whether a given value is a plain function
+ * that is not wrapped as an observable. This is useful for distinguishing
+ * between reactive and non-reactive functions in the Woby framework.
+ * 
+ * @param fn - The value to check
+ * @returns True if the value is a pure function, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * isPureFunction(() => {}) // returns true
+ * isPureFunction($(console.log)) // returns false
+ * isPureFunction('not a function') // returns false
+ * ```
+ */
+export const isPureFunction = (fn: Function) => typeof fn === 'function' && !isObservable(fn)
 
 export const toArray = <T,>(v: T | T[]) => [...[v].flat(Infinity)] as T[]

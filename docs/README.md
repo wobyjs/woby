@@ -24,6 +24,14 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 - **[Type Synchronization](./Type-Synchronization.md)** - How HTML attributes sync with component props
 - **[Simple Type Synchronization](./Type-Sync-Simple.md)** - Straightforward approach to type sync
 
+### Custom Elements
+- **[Custom Elements](../CUSTOM_ELEMENTS.md)** - Creating web components with Woby
+- **[Custom Element Best Practices](./Custom-Element-Best-Practices.md)** - Best practices for custom elements
+- **[Component Defaults](./Component-Defaults.md)** - Two-way synchronization patterns
+- **[Demos/Counter-Demo](./demos/Counter-Demo.md)** - Basic custom element example
+- **[Demos/Nested-Properties-Demo](./demos/Nested-Properties-Demo.md)** - Advanced nested properties
+- **[Demos/Custom-Element-Practical-Guide](./demos/Custom-Element-Practical-Guide.md)** - Comprehensive hands-on guide
+
 ### Help & Community
 - **[FAQ](./FAQ.md)** - Frequently asked questions
 - **[Contributing](./Contributing.md)** - How to contribute to Woby
@@ -41,7 +49,9 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 | **Learn best practices** | [Best Practices](./Best-Practices.md) |
 | **Compare with React** | [Woby vs React](./Woby-vs-React.md) |
 | **Convert React types** | [React to Woby Type Conversion](./React-to-Woby-Type-Conversion.md) |
-| **Implement custom elements** | [Component Defaults](./Component-Defaults.md) |
+| **Implement custom elements** | [Custom Elements](../CUSTOM_ELEMENTS.md) |
+| **Learn custom element best practices** | [Custom Element Best Practices](./Custom-Element-Best-Practices.md) |
+| **See practical custom element examples** | [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md) |
 | **Understand type sync** | [Type Synchronization](./Type-Synchronization.md) or [Simple Type Synchronization](./Type-Sync-Simple.md) |
 | **Get help** | [FAQ](./FAQ.md) |
 | **Contribute** | [Contributing](./Contributing.md) |
@@ -68,6 +78,13 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 3. Learn [Class Management](./Class-Management.md) for advanced class patterns
 4. Learn [Best Practices](./Best-Practices.md) for @woby/specific patterns
 5. Explore [Examples](./Examples.md) for practical usage
+
+### For Custom Element Developers
+1. Start with [Custom Elements](../CUSTOM_ELEMENTS.md) for an overview
+2. Follow the [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md) for hands-on examples
+3. Review [Custom Element Best Practices](./Custom-Element-Best-Practices.md) for advanced patterns
+4. Study the [Counter Demo](./demos/Counter-Demo.md) for a complete example
+5. Explore [Nested Properties Demo](./demos/Nested-Properties-Demo.md) for advanced features
 
 ### For Contributors
 1. Read [Contributing](./Contributing.md) guidelines

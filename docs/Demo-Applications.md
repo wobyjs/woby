@@ -211,6 +211,12 @@ Animated mathematical spiral demonstrating smooth animations and calculations.
 3. **HyperScript** - Functional approach
 4. **Custom Elements** - Web component integration
 
+### For Custom Element Developers
+1. **Counter Demo** - Basic custom element creation
+2. **Nested Properties Demo** - Advanced custom element features
+3. **Custom Element Practical Guide** - Comprehensive patterns and best practices
+4. **Playground Demo** - Advanced custom element testing
+
 ## 🛠️ Development Patterns
 
 ### Common Patterns Across Demos
@@ -398,6 +404,7 @@ For detailed guidelines, see [Contributing to Woby Demo](https://github.com/woby
 - [Woby Core Documentation](./Home.md) - Main framework docs
 - [API Reference](./Core-Methods.md) - Complete API documentation
 - [Examples Gallery](./Examples.md) - Code examples and patterns
+- [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md) - Hands-on custom element patterns
 
 ### Community
 - [GitHub Repository](https://github.com/wobyjs/woby) - Main framework

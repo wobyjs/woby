@@ -6,6 +6,8 @@ For a complete guide on best practices for custom elements, see [Custom Element 
 
 For information about how HTML string attributes are automatically converted to typed component props, see the [Type Synchronization Documentation](./Type-Synchronization.md).
 
+For practical, hands-on examples and patterns, see the [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md).
+
 ## Overview
 
 When creating custom elements in Woby, the `defaults` function provides seamless two-way synchronization between HTML attributes and component props:
@@ -392,3 +394,5 @@ customElement('simple-counter', SimpleCounter)
 9. **Store functions in observables using array notation** when they need to be passed to custom elements
 
 For a comprehensive guide to these best practices, see [Custom Element Best Practices](./Custom-Element-Best-Practices.md).
+
+For practical, hands-on examples and patterns, see the [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md).

@@ -2,6 +2,8 @@
 
 This document explains the key differences between ordinary functional components and custom elements in Woby, focusing on proper props initialization, two-way synchronization, and best practices for creating robust custom elements.
 
+For a practical, hands-on guide with detailed examples, see the [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md).
+
 ## Key Differences Between Ordinary Components and Custom Elements
 
 ### 1. Props Initialization
@@ -400,6 +402,8 @@ function def() {
 9. **Use `toHtml` and `fromHtml`** for complex object and date serialization
 10. **Store functions in observables using array notation** when they need to be passed to custom elements
 11. **Use array notation for functions**: To store a function in an observable, use the array notation `$([() => { /* function body */ }])`. This allows functions to be passed as props to custom elements while keeping them hidden from HTML attributes when the `toHtml: o => undefined` option is used.
+
+For practical, hands-on examples and patterns, see the [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md).
 
 ## Type Synchronization Reference
 

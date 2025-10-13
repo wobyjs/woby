@@ -6,6 +6,7 @@ Woby provides a powerful API for creating custom HTML elements that integrate se
 
 - [customElement](#customelement)
 - [ElementAttributes](#elementattributes)
+- [JSX Type Augmentation](#jsx-type-augmentation)
 - [Attribute to Prop Mapping](#attribute-to-prop-mapping)
 - [Type Conversion](#type-conversion)
 - [Nested Properties](#nested-properties)
@@ -81,6 +82,53 @@ declare module 'woby' {
   }
 }
 ```
+
+## JSX Type Augmentation
+
+To get proper TypeScript support and IDE autocomplete for your custom elements in JSX/TSX, you need to augment the JSX namespace. This can be done in two ways:
+
+### Method 1: In the same file as the component (Recommended)
+
+Add the augmentation directly in the same file where you define your component:
+
+```tsx
+import { $, customElement, defaults, ElementAttributes } from 'woby'
+
+const MyComponent = defaults(() => ({
+  value: $(0)
+}), ({ value }) => <div>Value: {value}</div>)
+
+// Register as a custom element
+customElement('my-component', MyComponent)
+
+// Augment JSX intrinsic elements for better TypeScript support
+declare module 'woby' {
+  namespace JSX {
+    interface IntrinsicElements {
+      'my-component': ElementAttributes<typeof MyComponent>
+    }
+  }
+}
+```
+
+### Method 2: In a separate declaration file
+
+Create a separate `.d.ts` file (e.g., `jsx.d.ts`) in your project:
+
+```ts
+import { MyComponent } from './MyComponent'
+import { ElementAttributes } from 'woby'
+
+declare module 'woby' {
+  namespace JSX {
+    interface IntrinsicElements {
+      'my-component': ElementAttributes<typeof MyComponent>
+    }
+  }
+}
+```
+
+Make sure your `tsconfig.json` includes the declaration file in the compilation.
 
 ## Attribute to Prop Mapping
 
@@ -391,4 +439,9 @@ const Component = defaults(() => ({
     fromHtml: o => JSON.parse(o) 
   }),
   date: $(new Date(), { 
+```
+```
+
+```
+
 ```

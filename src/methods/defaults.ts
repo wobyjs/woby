@@ -14,6 +14,19 @@ import { isJsxProp } from "./is_jsx_prop"
 import { make } from "./make"
 
 /**
+ * Props for controlling stylesheet encapsulation in custom elements
+ * 
+ * @property ignoreStyle - If true, prevents adoption of stylesheets in shadow DOM
+ */
+export interface StyleEncapsulationProps {
+    /**
+     * If true, prevents adoption of stylesheets in shadow DOM
+     * @default false
+     */
+    ignoreStyle?: boolean
+}
+
+/**
  * Merge function component props with custom element props
  * 
  * This specialized merge function handles the merging of props between
@@ -108,9 +121,26 @@ const merge = <T, S>(
  *     </div>
  *   )
  * })
+ * 
+ * // Using style encapsulation options
+ * const CounterNoStyles = defaults(() => ({
+ *   value: $(0),
+ *   increment: () => {},
+ *   decrement: () => {},
+ *   ignoreStyle: true // Prevent adoption of global stylesheets
+ * }), (props: CounterProps) => {
+ *   const { value, increment, decrement } = props
+ *   return (
+ *     <div>
+ *       <p>{value}</p>
+ *       <button onClick={increment}>+</button>
+ *       <button onClick={decrement}>-</button>
+ *     </div>
+ *   )
+ * })
  * ```
  */
-export const defaults = <P extends { children?: Observable<JSX.Children> }, T extends (props: P) => JSX.Element>(
+export const defaults = <P extends { children?: Observable<JSX.Children> } & StyleEncapsulationProps, T extends (props: P) => JSX.Element>(
     defs: () => P,
     component: T
 ): ((props: Observant<P>) => JSX.Element) & { [SYMBOL_DEFAULT]: () => P } => {
@@ -129,4 +159,4 @@ export const defaults = <P extends { children?: Observable<JSX.Children> }, T ex
         })
 
     return compFactory as ((props: Observant<P>) => JSX.Element) & { [SYMBOL_DEFAULT]: () => P }
-}       
+}

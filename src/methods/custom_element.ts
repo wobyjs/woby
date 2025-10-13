@@ -12,9 +12,12 @@
  * - Style property support (e.g., 'style$font-size' or 'style.font-size' in HTML, 'style$font-size' in JSX)
  * - Automatic kebab-case to camelCase conversion for all property names
  * - Automatic exclusion of properties with { toHtml: () => undefined } from HTML attributes
- * - Shadow DOM encapsulation
+ * - Shadow DOM encapsulation with optional stylesheet adoption
  * - Context support for custom elements
  * - Custom serialization using toHtml and fromHtml options
+ * 
+ * Style Encapsulation Options:
+ * - ignoreStyle: Set to true to prevent adoption of global stylesheets in shadow DOM
  * 
  * @module customElement
  */
@@ -27,12 +30,14 @@ import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
 import { callStack, Observable, resolve, Stack, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNCACHED } from "soby"
 import type { ObservableOptions } from "soby"
-import { isFunction, isObject } from "../utils"
+import { isFunction, isObject, isPureFunction } from "../utils"
 import { useEffect } from "../hooks"
 import { render } from "./render"
 import { isJsx, jsx } from "../jsx-runtime"
 import { kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
+// Import stylesheet utilities
+import { convertAllDocumentStylesToConstructed, observeStylesheetChanges, unobserveStylesheetChanges } from "../utils/stylesheets"
 
 /**
  * ElementAttributes type helper
@@ -46,6 +51,11 @@ export type ElementAttributes<T extends (...args: any) => any> =
     T extends (props: infer P) => any
     ? JSX.HTMLAttributes<HTMLElement> & P
     : JSX.HTMLAttributes<HTMLElement>
+
+// Initialize stylesheet observation at module level (run once)
+// This ensures we only have one observer watching for stylesheet changes
+// but each custom element can get the latest cached stylesheets
+observeStylesheetChanges()
 
 /**
  * ElementAttributePattern type
@@ -78,9 +88,9 @@ type ElementAttributePattern<P> =
  * To hide a property from HTML attributes, use { toHtml: () => undefined }
  * 
  * @param obj - The object containing the property to set
-    * @param key - The property key to set
-        * @param value - The string value to set on the property
-            */
+* @param key - The property key to set
+* @param value - The string value to set on the property
+*/
 const setObservableValue = (obj: any, key: string, value: string) => {
     if (isObservable(obj[key])) {
         // Cast value according to observable options type
@@ -255,8 +265,6 @@ const getNestedProperty = (obj: any, path: string) => {
     return (obj as any)[kebabToCamelCase(path)]
 }
 
-const isPureFunction = (fn: Function) => typeof fn === 'function' && !isObservable(fn)
-
 /**
  * Creates a custom HTML element with reactive properties
  * 
@@ -395,6 +403,20 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
                     this.slots = document.createElement('slot')
                     this.props.children(this.slots)
                 }
+
+                // Check if stylesheet encapsulation should be ignored
+                const ignoreStyle = (this.props as any).ignoreStyle === true
+
+                // Only adopt stylesheets if not explicitly disabled
+                if (!ignoreStyle) {
+                    // Get the latest cached stylesheets
+                    // The stylesheet observation is initialized once at the module level
+                    const allSheets = convertAllDocumentStylesToConstructed()
+
+                    // Adopt all the retrieved stylesheets
+                    shadowRoot.adoptedStyleSheets = allSheets
+                }
+
                 // this.placeHolder = document.createComment('')
                 // shadowRoot.append(this.placeHolder/* , this.slots */)
                 render(createElement(component, this.props), shadowRoot)
@@ -410,22 +432,6 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
                     this.propDict[k.toLowerCase()] = k
                 })
             }
-
-
-
-            // const { observedAttributes } = C
-            // const { props: p } = this
-            // const aKeys = observedAttributes.filter(attrName => !isPureFunction(p[attrName]) && !isObject(p[attrName]) && attrName !== 'children')
-            // const rKeys = observedAttributes.filter(attrName => isPureFunction(p[attrName]))
-
-
-            // props -> attr(1st)
-            // aKeys.forEach((k) => {
-            //     if (!this.attributes[k])
-            //         console.log(k)
-            //     this.setAttribute(k, $$(this.props[k]))
-            // })
-            // setProps(this, this.props, callStack('connectedCallback'))
         }
 
         /**
@@ -475,6 +481,17 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
             })
 
             observer.observe(this, { attributes: true, attributeOldValue: true })
+        }
+
+        /**
+         * Called when the element is removed from the document
+         * 
+         * Cleans up observers and resources.
+         */
+        disconnectedCallback() {
+            // Note: We don't unobserve stylesheet changes at the module level
+            // since stylesheet observation is shared across all custom elements
+            // and only initialized once
         }
 
         /**

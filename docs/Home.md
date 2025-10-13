@@ -19,8 +19,10 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 
 ### Advanced Topics
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
+- **[Custom Elements](../CUSTOM_ELEMENTS.md)** - Creating web components with Woby
+- **[Custom Element Best Practices](./Custom-Element-Best-Practices.md)** - Best practices for custom elements
 - **[Component Defaults](./Component-Defaults.md)** - Two-way synchronization for custom elements
-- **[Woby vs React](./@woby/vs-React.md)** - API differences and migration guide
+- **[Woby vs React](./Woby-vs-React.md)** - API differences and migration guide
 - **[FAQ](./FAQ.md)** - Frequently asked questions
 
 ### Community & Contributing
@@ -35,7 +37,8 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 | **Examples** | [Examples Gallery](./Examples.md) |
 | **Class Management** | [Class Management](./Class-Management.md) |
 | **Context API** | [Context](./Context.md) |
-| **Custom Elements** | [Component Defaults](./Component-Defaults.md) |
+| **Custom Elements** | [Custom Elements](../CUSTOM_ELEMENTS.md) • [Custom Element Best Practices](./Custom-Element-Best-Practices.md) • [Component Defaults](./Component-Defaults.md) |
+| **Demos** | [Counter Demo](./demos/Counter-Demo.md) • [Nested Properties Demo](./demos/Nested-Properties-Demo.md) • [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md) |
 | **Help** | [FAQ](./FAQ.md) • [Contributing](./Contributing.md) |
 
 ## 🎯 Key Features
@@ -51,6 +54,7 @@ Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, pro
 - **No key prop**: Built-in list handling with `For` component
 - **No Babel**: Works with plain JavaScript and JSX
 - **Built-in Class Management**: Advanced class handling similar to `classnames`/`clsx`
+- **Custom Elements**: Create standard web components with full two-way synchronization
 
 ## 📖 Learning Path
 
@@ -66,12 +70,15 @@ Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, pro
 
 ### 3. **Advanced Features**
 - [Class Management](./Class-Management.md)
+- [Custom Elements](../CUSTOM_ELEMENTS.md)
 - [Component Defaults](./Component-Defaults.md)
 - [Examples Gallery](./Examples.md)
 - [Best Practices](./Best-Practices.md)
 
 ### 4. **Specialized Topics**
-- [Woby vs React](./@woby/vs-React.md)
+- [Custom Element Best Practices](./Custom-Element-Best-Practices.md)
+- [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md)
+- [Woby vs React](./Woby-vs-React.md)
 - [FAQ](./FAQ.md)
 
 ## 🛠️ External Resources
