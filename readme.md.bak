@@ -6,7 +6,8 @@
 
 # Woby
 
-A high-performance framework with fine-grained observable-based reactivity for building rich applications. Woby is built upon the [Soby](https://github.com/wobyjs/soby) reactive core, providing an enhanced API for component-based development.
+
+A high-performance framework with fine-grained observable-based reactivity for building rich applications. Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, providing an enhanced API for component-based development.
 
 ## Features
 
@@ -24,9 +25,6 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **Observable-based**: observables are at the core of the reactivity system. While the approach differs significantly from React-like systems and may require an initial learning investment, it provides substantial benefits in terms of performance and developer experience.
 - **Minimal dependencies**: Woby is designed with a focus on minimal third-party dependencies, providing a streamlined API for developers who prefer a lightweight solution. The framework draws inspiration from [Solid](https://www.solidjs.com) while offering its own unique approach to reactive programming.
 - **Built-in Class Management**: Woby includes powerful built-in class management that supports complex class expressions similar to `classnames` and `clsx` libraries, with full reactive observable support.
-- **Web Components Support**: First-class support for creating and using custom elements with reactive properties.
-- **Advanced Context API**: Powerful context system that works seamlessly with both JSX components and custom elements.
-- **Advanced Nested Property Support**: Unique feature allowing deeply nested properties to be set directly through HTML attributes using both `$` and `.` notation - a capability not available in React or SolidJS.
 
 ## 📚 Documentation
 
@@ -43,88 +41,6 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **[FAQ](./docs/FAQ.md)** - Common questions and answers
 - **[Type Synchronization](./docs/Type-Synchronization.md)** - How HTML attributes sync with component props
 - **[Simple Type Synchronization](./docs/Type-Sync-Simple.md)** - Straightforward approach to type sync
-
-### Specialized Documentation
-- **[Context API](./CONTEXT_API.md)** - Advanced context management for components and custom elements
-- **[Custom Elements](./CUSTOM_ELEMENTS.md)** - Creating and using Web Components with Woby
-
-## Key Features
-
-### Context API
-
-Woby provides a powerful Context API that works seamlessly with both JSX components and custom elements:
-
-```tsx
-// Create a context
-const ThemeContext = createContext('light')
-
-// Use in JSX components
-const ThemedButton = () => {
-  const theme = useContext(ThemeContext)
-  return <button className={theme}>Themed Button</button>
-}
-
-// Use in custom elements
-const ThemedElement = defaults(() => ({}), () => {
-  const [theme, mount] = useMountedContext(ThemeContext)
-  return <div>{mount}Theme: {theme}</div>
-})
-
-customElement('themed-element', ThemedElement)
-```
-
-[Learn more about the Context API](./CONTEXT_API.md)
-
-### Custom Elements
-
-Woby provides first-class support for creating custom HTML elements with reactive properties:
-
-```tsx
-// Define a component with default props
-const Counter = defaults(() => ({
-  value: $(0, { type: 'number' }),
-  title: $('Counter')
-}), ({ value, title }) => (
-  <div>
-    <h1>{title}</h1>
-    <p>Count: {value}</p>
-    <button onClick={() => value(prev => prev + 1)}>+</button>
-  </div>
-))
-
-// Register as a custom element
-customElement('counter-element', Counter)
-
-// Use in JSX or HTML
-// JSX: <counter-element value={5} title="My Counter" />
-// HTML: <counter-element value="5" title="My Counter"></counter-element>
-```
-
-### Advanced Nested Property Support
-
-One of Woby's unique features is its advanced nested property support, allowing you to set deeply nested properties directly through HTML attributes:
-
-```html
-<!-- Set nested properties using $ notation (works in both HTML and JSX) -->
-<user-card 
-  user$name="John Doe"
-  user$details$age="30"
-  style$font-size="1.2em"
-  style$color="blue">
-</user-card>
-
-<!-- Set nested properties using . notation (HTML only) -->
-<user-card 
-  user.name="John Doe"
-  user.details.age="30"
-  style.font-size="1.2em"
-  style.color="blue">
-</user-card>
-```
-
-This feature is not available in React or SolidJS, making Woby a more powerful choice for creating highly configurable custom elements that can be used directly in HTML.
-
-[Learn more about Custom Elements](./CUSTOM_ELEMENTS.md)
 
 ## Demos
 
@@ -159,7 +75,7 @@ When using AI coding assistants to help with Woby development, please provide th
 
 ### Common Anti-Patterns to Avoid
 
-``tsx
+```tsx
 // ❌ Anti-pattern: React-style useState
 const [count, setCount] = useState(0)
 
@@ -189,20 +105,138 @@ useEffect(() => {
 <For values={todos}>{(todo) => <div>{todo.text}</div>}</For>
 ```
 
-## Contributing
+### React to Woby Translation Guide
 
-Contributions are welcome! Please read our [contributing guidelines](./docs/Contributing.md) before submitting pull requests.
+| React Pattern | Woby Equivalent | Notes |
+|---------------|-----------------|-------|
+| `useState(0)` | `const count = $(0)` | Declare with `$()` |
+| `useEffect(fn, [dep])` | `useEffect(() => { fn($(dep)) })` | No dependency array, use `$()` |
+| `useMemo(fn, [deps])` | `useMemo(() => fn($(dep1), $(dep2)))` | No dependency array |
+| `useCallback(fn, [deps])` | `const fn = () => {}` | Often unnecessary |
+| `array.map(item => <div>{item}</div>)` | `<For values={array}>{(item) => <div>{item}</div>}</For>` | Use `For` component |
+| `{condition && <div>Content</div>}` | `{() => $(condition) && <div>Content</div>}` | Use `use () => for reactivate` condition |
+| `ref={ref}` with `useRef()` | `ref={observableRef}` | Use observable refs, no .current |
 
-## Thanks
+## Key Differences from React
 
-- **[S](https://github.com/adamhaile/S)**: for pioneering reactive programming approaches that inspired this framework.
-- **[sinuous/observable](https://github.com/luwes/sinuous/tree/master/packages/sinuous/observable)**: for providing an excellent Observable implementation that served as the foundation for this library.
-- **[solid](https://www.solidjs.com)**: for serving as a reference implementation, popularizing signal-based reactivity, and building a strong community.
-- **[trkl](https://github.com/jbreckmckye/trkl)**: for demonstrating the power of minimal, focused implementations.
+1.  **Reactivity System**: Woby uses fine-grained observables instead of React's virtual DOM and reconciliation
+2.  **No Dependency Arrays**: Woby automatically tracks dependencies with `$()` instead of requiring manual dependency arrays
+3.  **Flexible Hooks**: Woby hooks can be called conditionally, nested, or outside components
+4.  **Built-in Control Flow**: Woby provides `If`, `Switch`, `For` components instead of JavaScript conditionals and array methods
+5.  **Direct DOM Updates**: Woby updates the DOM directly without a virtual DOM layer
 
-## License
+## Troubleshooting Common Issues
 
-MIT
+### Observable Not Updating
+
+Ensure you're declaring reactive variables with `$()` and accessing them with `$()` in reactive contexts:
+
+```tsx
+// ❌ Not reactive - won't update
+let count = 0
+
+// ✅ Reactive - will update
+const count = $(0)
+
+// ❌ Not reactive - only executes once
+<div>{$(count)}</div>
+
+// ✅ Reactive - updates automatically
+<div>{count}</div>
+<div>{() => $(count)}</div>
+```
+
+### Effects Not Running
+
+Make sure you're accessing observables with `$()` inside the effect:
+
+```tsx
+const name = $('John')
+const count = $(0)
+
+// ❌ Effect won't re-run when name or count changes
+useEffect(() => {
+  console.log('Effect ran')
+})
+
+// ✅ Effect will re-run when name or count changes
+useEffect(() => {
+  console.log(`Name: ${$(name)}, Count: ${$(count)}`)
+})
+```
+
+### Class Expressions Not Updating
+
+Ensure reactive elements in class expressions are wrapped in functions:
+
+```tsx
+const isActive = $(false)
+
+// ❌ Not reactive
+<div class={{ active: $(isActive) }}>Content</div>
+
+// ✅ Reactive
+<div class={{ active: isActive }}>Content</div>
+<div class={() => $(isActive) ? 'active' : ''}>Content</div>
+```
+
+## Complete Working Example
+
+Here's a complete Todo app showcasing Woby patterns:
+
+```tsx
+import { $, $, For, If, render, useMemo } from 'woby'
+
+interface Todo {
+  id: number
+  text: string
+  completed: boolean
+}
+
+const TodoApp = () => {
+  // Observable state
+  const todos = $<Todo[]>([])
+  const input = $('')
+  const filter = $('all') // all, active, completed
+
+  // Actions
+  const addTodo = () => {
+    const text = $(input).trim()
+    if (text) {
+      todos(prev => [...prev, {
+        id: Date.now(),
+        text,
+        completed: false
+      }])
+      input('')
+    }
+  }
+
+  const toggleTodo = (id: number) => {
+    todos(prev => prev.map(todo => 
+      todo.id === id 
+        ? { ...todo, completed: !$(todo.completed) }
+        : todo
+    ))
+  }
+
+  const removeTodo = (id: number) => {
+    todos(prev => $(prev).filter(todo => todo.id !== id))
+  }
+
+  const setFilter = (newFilter: string) => {
+    filter(newFilter)
+  }
+
+  // Computed values
+  const filteredTodos = useMemo(() => {
+    const currentFilter = $(filter)
+    const currentTodos = $(todos)
+    
+    if (currentFilter === 'active') {
+      return currentTodos.filter(todo => !todo.completed)
+    } else if (currentFilter === 'completed') {
+      return currentTodos.filter(todo => todo.completed)
     }
     return currentTodos
   })

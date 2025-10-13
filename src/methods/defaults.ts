@@ -123,7 +123,7 @@ export const defaults = <P extends { children?: Observable<JSX.Children> }, T ex
         return d
     }
     // const compFactory = Object.assign((props: Observant<P>) => component(merge(props, defFactory()) as unknown as P),
-    const compFactory = Object.assign((props: Observant<P>) => component(isJsxProp(props) ? merge(make(props), defFactory()) as any : props),
+    const compFactory = Object.assign((props: Observant<P>) => component(isJsxProp(props) ? merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any : props),
         {
             [SYMBOL_DEFAULT]: defFactory
         })

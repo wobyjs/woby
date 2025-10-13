@@ -53,6 +53,167 @@ When a custom element is used as a child of another custom element, the parent's
 
 This works without requiring explicit Provider components, making context sharing in HTML much simpler than with traditional React context.
 
+#### Context Usage Patterns
+
+When using context in custom elements, there are two main patterns:
+
+1. **Direct usage**: When you only need the context value for rendering, you can use `useMountedContext` directly (mount is auto taken care of)
+2. **Manual mounting**: When you need to process the context value or perform other operations, you must manually include the mounting element `{m}` in your JSX
+
+The output of context usage in JSX looks like:
+
+```tsx
+<context-value><span>(Context Value = <b>0<!----></b>)</span></context-value>
+<span>(Context Value = <b>0<!----></b>)</span>
+```
+
+Note that `<Counter>` components cannot be used directly in HTML, only custom elements can be used in HTML.
+
+### HTML Attribute Serialization
+
+Custom elements support custom serialization of observable values to and from HTML attributes using the `toHtml` and `fromHtml` options:
+
+#### Hiding Properties from HTML Attributes
+
+To prevent a property from appearing in HTML attributes, use the `toHtml` option with a function that returns `undefined`:
+
+```tsx
+const Counter = defaults(() => {
+  const value = $(0, { type: 'number' as const })
+  return {
+    value,
+    increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }), //hide this from html attributes
+  }
+}), ({ value, increment }) => (
+  <div>
+    <p>Count: {value}</p>
+    <button onClick={() => increment[0]()}>+</button>
+  </div>
+))
+
+customElement('counter-element', Counter)
+```
+
+#### Object and Date Serialization
+
+To serialize complex objects and dates to and from HTML attributes, use the `toHtml` and `fromHtml` options:
+
+```tsx
+const Component = defaults(() => ({
+  obj: $({ nested: { text: 'abc' } }, { 
+    toHtml: o => JSON.stringify(o), 
+    fromHtml: o => JSON.parse(o) 
+  }),
+  date: $(new Date(), { 
+    toHtml: o => o.toISOString(), 
+    fromHtml: o => new Date(o) 
+  })
+}), ({ obj, date }) => (
+  <div>
+    <p>Object: {() => JSON.stringify($$(obj))}</p>
+    <p>Date: {() => $$(date).toString()}</p>
+  </div>
+))
+
+customElement('my-component', Component)
+```
+
+### Function Properties
+
+Functions can be stored in observables using array notation. This is particularly useful for custom elements where you want to pass functions as props:
+
+```tsx
+const Counter = defaults(() => {
+  const value = $(0, { type: 'number' as const })
+  return {
+    value,
+    increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }), //hide this from html attributes
+  }
+}), ({ value, increment }) => (
+  <div>
+    <p>Count: {value}</p>
+    <button onClick={() => increment[0]()}>+</button>
+  </div>
+))
+
+customElement('counter-element', Counter)
+```
+
+To store a function in an observable, use the array notation `$([() => { /* function body */ }])`. This allows functions to be passed as props to custom elements while keeping them hidden from HTML attributes when the `toHtml: o => undefined` option is used.
+
+### HTML vs JSX Usage
+
+Custom elements behave differently when used in HTML versus JSX/TSX:
+
+#### HTML Usage
+
+In HTML, all attributes are strings and must be converted to appropriate types:
+
+```html
+<!-- All attributes are strings in HTML -->
+<my-component 
+  value="5" 
+  obj='{"nested":{"text":"abc"}}'
+  date="2023-01-01T00:00:00.000Z">
+</my-component>
+```
+
+In HTML, you cannot directly declare observables with `$()`, so you must use the `def()` function pattern in your component definition. All attributes in HTML are treated as observables in the `<my-component>` if they are defined in the `def()` function with proper type information. No way to declare `$()` in HTML, so use `def()`, which means objects will appear as attributes.
+
+#### JSX/TSX Usage
+
+In JSX/TSX, you can pass JavaScript values directly:
+
+```tsx
+// In JSX/TSX, you can pass JavaScript values directly
+const App = () => {
+  return (
+    <my-component 
+      value={$(5, { type: 'number' as const })} 
+      obj={$({ nested: { text: 'abc' } }, { 
+        toHtml: o => JSON.stringify(o), 
+        fromHtml: o => JSON.parse(o) 
+      })}
+      date={$(new Date(), { 
+        toHtml: o => o.toISOString(), 
+        fromHtml: o => new Date(o) 
+      })}>
+    </my-component>
+  )
+}
+```
+
+In JSX/TSX, when a statement is declared in `<my-component>` it won't appear in HTML attributes unless it's explicitly defined as an observable with `toHtml/fromHtml` options.
+
+#### Key Differences
+
+1. **In HTML**: All attributes are strings and require type conversion. In fact, all attributes in HTML are observables in `<my-component>` if not, they can't sync.
+2. **In JSX/TSX**: Values can be JavaScript objects, observables, or primitives
+3. **Two-way synchronization**: Only works with observables that have appropriate type information
+4. **Function properties**: Cannot be passed in HTML, only in JSX/TSX
+5. **Hidden properties**: Properties with `toHtml: () => undefined` won't appear in HTML attributes
+
+#### Conditional Attribute Display
+
+When using custom elements in JSX/TSX, properties defined with observables will appear as HTML attributes:
+
+```tsx
+// This will appear in HTML attributes because it's an observable with toHtml/fromHtml
+<my-component 
+  obj={$({ nested: { text: 'this obj will be serialized and deserialized to html attribute' } }, { 
+    toHtml: obj => JSON.stringify(obj), 
+    fromHtml: obj => JSON.parse(obj) 
+  })}>
+</my-component>
+
+// This will NOT appear in HTML attributes because it's not explicitly defined as an observable
+<my-component 
+  obj={{ nested: { text: 'this obj will not sync/display to html attributes' } }}>
+</my-component>
+```
+
+In HTML, `obj='{"name": "John", "age": 30}'` is already treated as an observable in `<my-component>` if it's defined in the `def()` function. In JSX/TSX, `<my-component>` attributes will be displayed and wrapped in the element, behaving like in HTML. However, for `<MyComponent>` (the component itself, not the custom element), children/innerHTML/content won't be wrapped in `<my-component>`. All attributes can be defined with or without `$()`, but only those with `$()` will appear in attributes for two-way sync in `<my-component>` only. For `<MyComponent>`, attributes won't sync unless specifically designed/defined in the component's return statement.
+
 ### Syntax
 
 ```typescript
@@ -74,7 +235,7 @@ customElement<P>(
 The `attributes` parameter now supports wildcard patterns:
 
 - `['*']` - Observe all attributes (default)
-- `['style-*']` - Observe all attributes that start with "style-"
+- `['style.*']` - Observe all attributes that start with "style."
 - `['value', 'config-*']` - Observe the "value" attribute and all attributes that start with "config-"
 
 ### Nested Properties Support
@@ -91,7 +252,7 @@ Custom elements can be embedded directly in HTML files without requiring JavaScr
 
 ```html
 <!-- Works without any JavaScript -->
-<my-counter value="5" style-color="red"></my-counter>
+<my-counter value="5" style.color="red"></my-counter>
 ```
 
 For this to work effectively, components should provide sensible default values for all props and use the `defaults` pattern for proper attribute synchronization.
@@ -101,9 +262,9 @@ You can also use nested properties directly in HTML:
 ```html
 <!-- Works without any JavaScript -->
 <counter-element 
-  style-color="blue" 
-  style-font-size="1.5em" 
-  nested-nested-text="xyz"
+  style.color="blue" 
+  style.font-size="1.5em" 
+  nested.nested.text="xyz"
   class="border-2 border-black border-solid bg-amber-400">
 </counter-element>
 ```
@@ -112,7 +273,7 @@ To enable direct HTML embedding, make sure to place the custom element before th
 
 ```html
 <body>
-  <counter-element style-color="blue" style-font-size="1.5em" nested-nested-text="xyz"
+  <counter-element style.color="blue" style.font-size="1.5em" nested.nested.text="xyz"
       class="border-2 border-black border-solid bg-amber-400">
   </counter-element>
   <div id="app"></div>
@@ -200,13 +361,13 @@ const StyledCounter = defaults(def, (props: StyledCounterProps): JSX.Element => 
 })
 
 // Register with specific patterns
-customElement('styled-counter', StyledCounter, 'value', 'style-*', 'label')
+customElement('styled-counter', StyledCounter, 'value', 'style.*', 'label')
 
 // Usage
 // <styled-counter 
 //   value="5" 
-//   style-color="red" 
-//   style-font-size="20px"
+//   style.color="red" 
+//   style.font-size="20px"
 //   label="My Counter">
 ```
 
@@ -257,18 +418,18 @@ const ThemedCounter = defaults(def, (props: ThemedCounterProps): JSX.Element => 
 // Register with nested attributes
 customElement('themed-counter', ThemedCounter,
   'value',
-  'config-theme',
-  'config-size',
-  'actions-increment',
+  'config.theme',
+  'config.size',
+  'actions.increment',
   'label'
 )
 
 // Usage
 // <themed-counter 
 //   value="5" 
-//   config-theme="dark" 
-//   config-size="large"
-//   actions-increment="handleIncrement"
+//   config.theme="dark" 
+//   config.size="large"
+//   actions.increment="handleIncrement"
 //   label="My Counter">
 // </themed-counter>
 ```
@@ -399,6 +560,8 @@ declare module 'woby' {
 7. **Provide Sensible Defaults**: Always provide default values for all props to enable HTML usage
 8. **Use Typed Observables**: Always specify the `type` option for non-string observables
 9. **Don't Use Inline Initialization**: Custom elements must use the `def` pattern, not inline parameter defaults
+10. **Use `toHtml` and `fromHtml` for Complex Serialization**: For objects and dates, use these options for proper serialization
+11. **Hide Functions from HTML**: Use `toHtml: () => undefined` to prevent functions from appearing in HTML attributes
 
 For a comprehensive guide to these best practices, see [Custom Element Best Practices](./Custom-Element-Best-Practices.md).
 

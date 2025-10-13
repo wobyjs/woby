@@ -1,11 +1,11 @@
-import { DIRECTIVES, SYMBOLS_DIRECTIVES, SYMBOL_DOM, SYMBOL_UNCACHED } from '../constants'
+import { DIRECTIVES, SYMBOLS_DIRECTIVES, /* SYMBOL_DOM, */ SYMBOL_UNCACHED } from '../constants'
 import { useMicrotask } from '../hooks/use_microtask'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { isStore } from '../methods/soby'
-import { $$ } from '../methods/soby'
+import { $$, isObservable } from '../methods/soby'
 import { store } from '../methods/soby'
 import { untrack } from '../methods/soby'
-import { context, with as _with, batch } from '../soby'
+import { context, with as _with, batch, Observable, SYMBOL_OBSERVABLE_WRITABLE } from '../soby'
 import { SYMBOL_STORE_OBSERVABLE } from '../soby'
 import { classesToggle } from '../utils/classlist'
 import { createText, createComment } from '../utils/creators'
@@ -13,6 +13,8 @@ import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
+import { kebabToCamelCase } from '../utils/string'
+import { normalizePropertyPath, setNestedAttribute } from '../utils/nested'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
 
@@ -30,6 +32,12 @@ export const setAttributeStatic = (() => {
     }
 
     return (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
+
+        // Handle nested properties with "." or "$" syntax
+        if (key.includes('.') || key.includes('$')) {
+            setNestedAttribute(element, key, value)
+            return
+        }
 
         if (isSVG(element)) {
 
@@ -67,19 +75,14 @@ export const setAttributeStatic = (() => {
 
 export const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
 
-    if (isFunction(value) && isFunctionReactive(value)) {
-
+    if (isFunction(value) && isFunctionReactive(value))
         useRenderEffect(() => {
-
-            setAttributeStatic(element, key, value())
-
+            const unwrappedValue = value()
+            const { toHtml } = value[SYMBOL_OBSERVABLE_WRITABLE]?.options ?? {}
+            setAttributeStatic(element, key, toHtml ? toHtml(unwrappedValue) : unwrappedValue)
         }, stack)
-
-    } else {
-
+    else
         setAttributeStatic(element, key, $$(value))
-
-    }
 
 }
 
@@ -307,7 +310,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
             if (nextLength === 0) { // Placeholder, to keep the right spot in the array of children
 
-                const placeholder = childComp[SYMBOL_DOM] = createComment('')
+                const placeholder = /* childComp[SYMBOL_DOM] = */ createComment('')
 
                 FragmentUtils.pushNode(fragmentNext, placeholder)
 
@@ -357,7 +360,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
     if (nextLength === 0) { // Placeholder, to keep the right spot in the array of children
 
-        const placeholder = childComp[SYMBOL_DOM] = createComment('')
+        const placeholder = /* childComp[SYMBOL_DOM] = */ createComment('')
 
         FragmentUtils.pushNode(fragmentNext, placeholder)
 
@@ -956,6 +959,7 @@ export const setStyles = (element: HTMLElement, object: FunctionMaybe<null | und
     }
 
 }
+
 
 export const setTemplateAccessor = (element: HTMLElement, key: string, value: TemplateActionProxy): void => {
 

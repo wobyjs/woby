@@ -37,7 +37,7 @@ defaults<P>(
 
 ### Example
 
-```
+```typescript
 import { $, defaults } from 'woby'
 
 interface CounterProps {
@@ -72,11 +72,50 @@ const Counter = defaults(def, (props: CounterProps): JSX.Element => {
 })
 ```
 
+## HTML Attribute Serialization
+
+Custom elements support custom serialization of observable values to and from HTML attributes using the `toHtml` and `fromHtml` options:
+
+### Hiding Properties from HTML Attributes
+
+To prevent a property from appearing in HTML attributes, use the `toHtml` option with a function that returns `undefined`:
+
+```typescript
+function def() {
+  const value = $(0, { type: 'number' } as const)
+  return {
+    value,
+    increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }), //hide this from html attributes
+  }
+}
+```
+
+### Object and Date Serialization
+
+To serialize complex objects and dates to and from HTML attributes, use the `toHtml` and `fromHtml` options:
+
+```typescript
+function def() {
+  return {
+    obj: $({ nested: { text: 'abc' } }, { 
+      toHtml: o => JSON.stringify(o), 
+      fromHtml: o => JSON.parse(o) 
+    }),
+    date: $(new Date(), { 
+      toHtml: o => o.toISOString(), 
+      fromHtml: o => new Date(o) 
+    })
+  }
+}
+```
+
+These serialization options allow complex JavaScript objects and Date instances to be properly converted to and from HTML attribute strings, enabling two-way synchronization between HTML attributes and component props.
+
 ## Complete Example
 
 Here's a complete example showing the `defaults` pattern in action:
 
-```
+```typescript
 import { $, $$, defaults, customElement } from 'woby'
 import type { Observable } from 'woby'
 
@@ -85,29 +124,41 @@ interface CounterProps {
   increment?: () => void
   decrement?: () => void
   label?: string
+  obj?: Observable<{ nested: { text: string } }>
+  date?: Observable<Date>
 }
 
 function def() {
   const value = $(0, { type: 'number' } as const)
   return {
     value,
-    increment: () => value($$(value) + 1),
-    decrement: () => value($$(value) - 1),
-    label: 'Count'
+    increment: $([() => value($$(value) + 1)], { toHtml: o => undefined }), // Hide from HTML attributes
+    decrement: $([() => value($$(value) - 1)], { toHtml: o => undefined }), // Hide from HTML attributes
+    label: 'Count',
+    obj: $({ nested: { text: 'abc' } }, { 
+      toHtml: o => JSON.stringify(o), 
+      fromHtml: o => JSON.parse(o) 
+    }),
+    date: $(new Date(), { 
+      toHtml: o => o.toISOString(), 
+      fromHtml: o => new Date(o) 
+    })
   }
 }
 
 const Counter = defaults(def, (props: CounterProps): JSX.Element => {
   // This enables two-way synchronization between HTML attributes and props
   // The merge functionality is handled internally
-  const { value, increment, decrement, label } = props
+  const { value, increment, decrement, label, obj, date } = props
   
   return (
     <div>
       <label>{label}: </label>
       <span>{value}</span>
-      <button onClick={increment}>+</button>
-      <button onClick={decrement}>-</button>
+      <button onClick={() => increment[0]()}>+</button>
+      <button onClick={() => decrement[0]()}>-</button>
+      <p>Object: {() => JSON.stringify($$(obj))}</p>
+      <p>Date: {() => $$(date).toString()}</p>
     </div>
   )
 })
@@ -118,7 +169,7 @@ customElement('counter-element', Counter)
 // Usage examples:
 
 // 1. HTML usage with automatic attribute synchronization
-// <counter-element value="5" label="My Counter"></counter-element>
+// <counter-element value="5" label="My Counter" obj='{"nested":{"text":"xyz"}}' date="2023-01-01T00:00:00.000Z"></counter-element>
 
 // 2. Function component usage
 // const App = () => {
@@ -135,19 +186,20 @@ customElement('counter-element', Counter)
 
 When a custom element is used in HTML:
 
-```
-<counter-element value="5" label="My Counter"></counter-element>
+```html
+<counter-element value="5" label="My Counter" obj='{"nested":{"text":"xyz"}}'></counter-element>
 ```
 
 The attributes are automatically converted to component props:
 - `value="5"` becomes `value: $(5)` (with proper type conversion)
 - `label="My Counter"` becomes `label: "My Counter"`
+- `obj='{"nested":{"text":"xyz"}}'` becomes `obj: $({nested: {text: "xyz"}})` (with JSON parsing)
 
 ### Component Props to HTML Attributes
 
 When props change programmatically, the corresponding HTML attributes are updated:
 
-```
+```typescript
 const count = $(10)
 // When count changes, the HTML attribute is automatically updated
 ```
@@ -158,7 +210,7 @@ const count = $(10)
 
 Only observables can synchronize with HTML attributes:
 
-```
+```typescript
 // ✅ Correct - observable for synchronization
 function def() {
   return {
@@ -178,7 +230,7 @@ function def() {
 
 For proper type conversion, specify the `type` option:
 
-```
+```typescript
 // ✅ Correct - with type information
 function def() {
   return {
@@ -202,7 +254,7 @@ function def() {
 
 Always use the `defaults` function for proper synchronization:
 
-```
+```typescript
 // ✅ Correct - with defaults
 const Counter = defaults(def, (props: CounterProps): JSX.Element => {
   const { value } = props  // Enables synchronization
@@ -221,8 +273,8 @@ const Counter = (props: CounterProps): JSX.Element => {
 
 When a custom element is instantiated from HTML, the props come from parsed HTML attributes:
 
-```
-<counter-element value="5" label="My Counter"></counter-element>
+```html
+<counter-element value="5" label="My Counter" obj='{"nested":{"text":"xyz"}}'></counter-element>
 ```
 
 In this case:
@@ -234,7 +286,7 @@ In this case:
 
 When a component is used directly in JSX/TSX:
 
-```
+```typescript
 const App = () => {
   const count = $(10)
   return <Counter value={count} label="App Counter" />
@@ -250,7 +302,7 @@ In this case:
 
 Using inline parameter initialization can conflict with the `def()` pattern:
 
-```
+```typescript
 // ❌ Potential conflict - inline initialization
 const Counter = defaults(def, ({ value = $(0) }: CounterProps): JSX.Element => {
   // ...
@@ -271,7 +323,7 @@ When inline parameters are used:
 
 Functions and complex objects don't appear in HTML attributes and should not be expected to synchronize:
 
-```
+```typescript
 interface ComponentProps {
   value: Observable<number>
   // Functions don't appear in HTML attributes - no synchronization
@@ -297,11 +349,25 @@ function def() {
 }
 ```
 
+For functions that need to be passed to custom elements, store them in observables using array notation:
+
+```typescript
+function def() {
+  const value = $(0, { type: 'number' } as const)
+  return {
+    value,
+    increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }), //hide this from html attributes
+  }
+}
+```
+
+To store a function in an observable, use the array notation `$([() => { /* function body */ }])`. This allows functions to be passed as props to custom elements while keeping them hidden from HTML attributes when the `toHtml: o => undefined` option is used.
+
 ## Without Two-Way Synchronization
 
 Components that don't use the `defaults` pattern will not have attribute synchronization:
 
-```
+```typescript
 // ❌ No synchronization - attributes and props are not linked
 const SimpleCounter = ({ value = $(0) }: { value?: Observable<number> }) => (
   <div>Count: {value}</div>
@@ -321,5 +387,8 @@ customElement('simple-counter', SimpleCounter)
 4. **Don't use inline parameter initialization** in custom elements
 5. **Only functions and complex objects** should not be synchronized
 6. **Test both HTML and JSX usage** to ensure proper synchronization
+7. **Use `toHtml: () => undefined`** to hide functions from HTML attributes
+8. **Use `toHtml` and `fromHtml`** for complex object serialization
+9. **Store functions in observables using array notation** when they need to be passed to custom elements
 
 For a comprehensive guide to these best practices, see [Custom Element Best Practices](./Custom-Element-Best-Practices.md).

@@ -5,7 +5,7 @@ import { isStore } from '../methods/soby'
 import { $$ } from '../methods/soby'
 import { store } from '../methods/soby'
 import { untrack } from '../methods/soby'
-import { context, with as _with, isObservable } from 'soby'
+import { context, with as _with, isObservable, SYMBOL_OBSERVABLE_WRITABLE } from 'soby'
 import { SYMBOL_STORE_OBSERVABLE } from 'soby'
 import { classesToggle } from '../utils/classlist'
 import { createText } from '../utils/creators.via'
@@ -80,13 +80,19 @@ export const setAttribute = (element: HTMLElement, key: string, value: FunctionM
     if (isFunction(value)) {
 
         if (isObservable(value)) {
-
-            useRenderEffect(() => {
-
-                setAttributeStatic(element, key, value())
-
-            }, stack)
-
+            // Check if value is an observable with toHtml option
+            if (isObservable(value) && value[SYMBOL_OBSERVABLE_WRITABLE]?.options?.toHtml) {
+                useRenderEffect(() => {
+                    const unwrappedValue = value()
+                    const options = value[SYMBOL_OBSERVABLE_WRITABLE].options
+                    const htmlValue = options.toHtml(unwrappedValue)
+                    setAttributeStatic(element, key, htmlValue)
+                }, stack)
+            } else {
+                useRenderEffect(() => {
+                    setAttributeStatic(element, key, value())
+                }, stack)
+            }
         } else {
 
             setAttributeStatic(element, key, value())

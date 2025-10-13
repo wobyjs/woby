@@ -100,6 +100,45 @@ function def() {
    props.someProp$(newValue)
    ```
 
+## HTML Attribute Serialization
+
+Custom elements support custom serialization of observable values to and from HTML attributes using the `toHtml` and `fromHtml` options:
+
+### Hiding Properties from HTML Attributes
+
+To prevent a property from appearing in HTML attributes, use the `toHtml` option with a function that returns `undefined`:
+
+```typescript
+function def() {
+  const value = $(0, { type: 'number' } as const)
+  return {
+    value,
+    increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }), //hide this from html attributes
+  }
+}
+```
+
+### Object and Date Serialization
+
+To serialize complex objects and dates to and from HTML attributes, use the `toHtml` and `fromHtml` options:
+
+```typescript
+function def() {
+  return {
+    obj: $({ nested: { text: 'abc' } }, { 
+      toHtml: o => JSON.stringify(o), 
+      fromHtml: o => JSON.parse(o) 
+    }),
+    date: $(new Date(), { 
+      toHtml: o => o.toISOString(), 
+      fromHtml: o => new Date(o) 
+    })
+  }
+}
+```
+
+These serialization options allow complex JavaScript objects and Date instances to be properly converted to and from HTML attribute strings, enabling two-way synchronization between HTML attributes and component props.
+
 ## Handling Different Prop Sources
 
 Custom elements can receive props from different sources, and the `merge` function handles each appropriately:
@@ -135,7 +174,7 @@ The `merge` function:
 
 Avoid inline parameter initialization in custom elements as it can conflict with the `def()` pattern:
 
-```
+```typescript
 // ❌ Potential conflict - inline initialization
 const Counter = defaults(def, ({ count = $(0) }: CounterProps): JSX.Element => {
   // The inline default $(0) is applied before merge() is called
@@ -161,7 +200,7 @@ When inline parameters are used:
 
 Here's a complete example showing proper custom element implementation:
 
-```
+```typescript
 import { $, $$, defaults, merge, customElement } from 'woby'
 import type { Observable, ObservableMaybe } from 'woby'
 
@@ -176,6 +215,10 @@ interface CounterProps {
   decrement?: () => void
   // Regular strings can be used for labels, etc.
   label?: string
+  // Complex objects with custom serialization
+  obj?: Observable<{ nested: { text: string } }>
+  // Dates with custom serialization
+  date?: Observable<Date>
 }
 
 /**
@@ -183,14 +226,25 @@ interface CounterProps {
  * This is where you define the type information for synchronization
  */
 function def() {
+  const value = $(0, { type: 'number' } as const)
   return {
     // Typed observable for two-way synchronization
-    count: $(0, { type: 'number' } as const),
-    // Functions are not synchronized
-    increment: () => {},
-    decrement: () => {},
+    count: value,
+    // Functions are not synchronized, hidden from HTML attributes
+    increment: $([() => { value($$(value) + 1) }], { toHtml: o => undefined }),
+    decrement: $([() => { value($$(value) - 1) }], { toHtml: o => undefined }),
     // Regular string (no synchronization needed)
-    label: 'Counter'
+    label: 'Counter',
+    // Complex object with custom serialization
+    obj: $({ nested: { text: 'abc' } }, { 
+      toHtml: o => JSON.stringify(o), 
+      fromHtml: o => JSON.parse(o) 
+    }),
+    // Date with custom serialization
+    date: $(new Date(), { 
+      toHtml: o => o.toISOString(), 
+      fromHtml: o => new Date(o) 
+    })
   }
 }
 
@@ -202,14 +256,16 @@ const Counter = defaults(def, (props: CounterProps): JSX.Element => {
   // Critical: Merge props with defaults for two-way synchronization
   const mergedProps = merge(props, def())
   
-  const { count, increment, decrement, label } = mergedProps
+  const { count, increment, decrement, label, obj, date } = mergedProps
   
   return (
     <div>
       <label>{label}: </label>
       <span>{count}</span>
-      <button onClick={increment}>+</button>
-      <button onClick={decrement}>-</button>
+      <button onClick={() => increment[0]()}>+</button>
+      <button onClick={() => decrement[0]()}>-</button>
+      <p>Object: {() => JSON.stringify($$(obj))}</p>
+      <p>Date: {() => $$(date).toString()}</p>
     </div>
   )
 })
@@ -223,11 +279,13 @@ export default Counter
 ## Usage Patterns
 
 ### 1. HTML Usage (with synchronization)
-```
+```html
 <!-- HTML attributes will be converted and synchronized -->
 <counter-element 
   count="5" 
-  label="My Counter">
+  label="My Counter"
+  obj='{"nested":{"text":"xyz"}}'
+  date="2023-01-01T00:00:00.000Z">
 </counter-element>
 ```
 
@@ -236,33 +294,28 @@ export default Counter
 const App = () => {
   const count = $(10)
   
-  const increment = () => count(prev => prev + 1)
-  const decrement = () => count(prev => prev - 1)
-  
   return (
     <counter-element 
       count={count} 
-      increment={increment}
-      decrement={decrement}
-      label="App Counter">
+      label="App Counter"
+      obj={$({ nested: { text: 'xyz' } }, { 
+        toHtml: o => JSON.stringify(o), 
+        fromHtml: o => JSON.parse(o) 
+      })}
+      date={$(new Date())}>
     </counter-element>
   )
 }
 ```
 
 ### 3. Pure Component Usage (no synchronization)
-``tsx
+```tsx
 const App = () => {
   const count = $(10)
-  
-  const increment = () => count(prev => prev + 1)
-  const decrement = () => count(prev => prev - 1)
   
   return (
     <Counter 
       count={count} 
-      increment={increment}
-      decrement={decrement}
       label="Direct Component">
     </Counter>
   )
@@ -272,7 +325,7 @@ const App = () => {
 ## Common Pitfalls and Solutions
 
 ### 1. Not Using merge() Function
-```
+```typescript
 // ❌ Wrong - no synchronization
 const Counter = defaults(def, (props: CounterProps): JSX.Element => {
   const { count, increment, decrement } = props  // Direct destructuring
@@ -287,7 +340,7 @@ const Counter = defaults(def, (props: CounterProps): JSX.Element => {
 ```
 
 ### 2. Inline Parameter Initialization
-```
+```typescript
 // ❌ Wrong - inline initialization breaks custom element behavior
 const Counter = defaults(def, ({ count = $(0) }: CounterProps): JSX.Element => {
   // ...
@@ -301,7 +354,7 @@ const Counter = defaults(def, (props: CounterProps): JSX.Element => {
 ```
 
 ### 3. Missing Type Information
-```
+```typescript
 // ❌ Wrong - no type information
 function def() {
   return {
@@ -317,6 +370,23 @@ function def() {
 }
 ```
 
+### 4. Not Hiding Functions from HTML Attributes
+```typescript
+// ❌ Wrong - functions will appear in HTML attributes
+function def() {
+  return {
+    increment: $([() => { /* increment logic */ }]) // Will appear as "[object Object]" in HTML
+  }
+}
+
+// ✅ Correct - hide functions from HTML attributes
+function def() {
+  return {
+    increment: $([() => { /* increment logic */ }], { toHtml: o => undefined }) // Hidden from HTML
+  }
+}
+```
+
 ## Best Practices Summary
 
 1. **Always use the `defaults` and `def` pattern** for custom elements
@@ -326,6 +396,10 @@ function def() {
 5. **Only functions and complex objects** should not be synchronized (they don't appear in HTML attributes)
 6. **Test both HTML and JSX usage** to ensure proper synchronization
 7. **Use `ObservableMaybe<T>`** for props that can come from HTML attributes
+8. **Use `toHtml: () => undefined`** to hide functions from HTML attributes
+9. **Use `toHtml` and `fromHtml`** for complex object and date serialization
+10. **Store functions in observables using array notation** when they need to be passed to custom elements
+11. **Use array notation for functions**: To store a function in an observable, use the array notation `$([() => { /* function body */ }])`. This allows functions to be passed as props to custom elements while keeping them hidden from HTML attributes when the `toHtml: o => undefined` option is used.
 
 ## Type Synchronization Reference
 
@@ -335,7 +409,9 @@ function def() {
 | boolean | `"true"` | `$(true)` | Use `{ type: 'boolean' }` |
 | string | `"text"` | `"text"` | Default behavior |
 | object | `'{"a":1}'` | `$( {a:1} )` | Use `{ type: 'object' }` |
-| function | N/A | Function | Not synchronized |
+| function | N/A | Function | Not synchronized, use `toHtml: () => undefined` |
 | undefined | N/A | `undefined` | Not synchronized |
+| Date | `"2023-01-01T00:00:00.000Z"` | `$(new Date(...))` | Use `toHtml` and `fromHtml` options |
+| Complex Object | `'{"nested":{"text":"abc"}}'` | `$( {nested: {text: "abc"}} )` | Use `toHtml` and `fromHtml` options |
 
 This approach ensures that your custom elements work seamlessly in both HTML and JSX contexts with proper two-way synchronization.

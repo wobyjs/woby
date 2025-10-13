@@ -6,21 +6,22 @@ This module provides functionality to create custom HTML elements with reactive 
 
 The `customElement` function allows you to define custom HTML elements that can:
 - Observe attribute changes and automatically update corresponding props
-- Handle nested properties (e.g., `nested-prop-value`)
-- Process style attributes (e.g., `style-color`, `style-font-size`)
+- Handle nested properties (e.g., `nested$prop$value` or `nested.prop.value` in HTML, `nested$prop$value` in JSX)
+- Process style attributes (e.g., `style$font-size` or `style.font-size` in HTML, `style$font-size` in JSX)
+- Automatically convert kebab-case attribute names to camelCase property names
+- Automatically exclude properties with `{ toHtml: () => undefined }` from HTML attributes
 - Work with Woby's observable system for reactive updates
 - Be embedded directly in HTML files without JavaScript initialization
 
 ## API Reference
 
-### `customElement<P>(tagName, children, ...attributes)`
+### `customElement<P>(tagName, component)`
 
 Creates and registers a custom HTML element.
 
 **Parameters:**
 - `tagName`: The HTML tag name for the custom element
-- `children`: The component function that renders the element's content
-- `attributes`: Rest parameter of attribute patterns to observe (supports wildcards)
+- `component`: The component function that renders the element's content
 
 **Returns:** The custom element class
 
@@ -32,13 +33,14 @@ const Counter = ({ value }: { value: Observable<number> }) => (
   </div>
 )
 
-customElement('counter-element', Counter, 'value', 'style-*')
+customElement('counter-element', Counter)
 
 // Usage in JSX:
-// <counter-element value={$(0)} style-color="red"></counter-element>
+// <counter-element value={$(0)} style$font-size="red"></counter-element>
 
 // Usage in HTML:
-// <counter-element style-color="red"></counter-element>
+// <counter-element value="0" style$font-size="red"></counter-element>
+// <counter-element value="0" style.font-size="red"></counter-element>
 ```
 
 ### `ElementAttributes<T>`
@@ -71,10 +73,6 @@ Sets nested properties on an element, handling style properties and nested objec
 
 Retrieves values from nested property paths.
 
-### `matchesWildcard(attributeName, patterns)`
-
-Checks if an attribute name matches any of the provided patterns.
-
 ## Usage Examples
 
 ### Basic Custom Element
@@ -86,7 +84,7 @@ const SimpleCounter = ({ count }: { count: Observable<number> }) => (
   </div>
 )
 
-customElement('simple-counter', SimpleCounter, 'count')
+customElement('simple-counter', SimpleCounter)
 ```
 
 ### Custom Element with Style Attributes
@@ -98,7 +96,7 @@ const StyledBox = ({ color, size }: { color: string, size: string }) => (
   </div>
 )
 
-customElement('styled-box', StyledBox, 'style-*')
+customElement('styled-box', StyledBox)
 ```
 
 ### Custom Element with Nested Properties
@@ -111,7 +109,7 @@ const UserProfile = ({ user }: { user: { name: string, email: string } }) => (
   </div>
 )
 
-customElement('user-profile', UserProfile, 'user-*')
+customElement('user-profile', UserProfile)
 ```
 
 ## Complete Working Example
@@ -119,35 +117,27 @@ customElement('user-profile', UserProfile, 'user-*')
 Here's a complete counter example that demonstrates Woby's reactive capabilities with custom elements:
 
 ```tsx
-import { $, $$, useMemo, render, Observable, customElement, ElementAttributes } from 'woby'
+import { $, $$, useMemo, render, Observable, customElement, ElementAttributes, defaults } from 'woby'
 
-const Counter = ({ increment, decrement, value, ...props }: { 
-  increment?: () => number, 
-  decrement?: () => number, 
-  value?: Observable<number> 
+const Counter = defaults(() => ({
+  value: $(0, { type: 'number' } as const),
+  color: $('black'),
+  size: $('1em')
+}), ({ value, color, size }: { 
+  value: Observable<number>,
+  color: Observable<string>,
+  size: Observable<string>
 }): JSX.Element => {
-  // Provide defaults for optional props
-  const counterValue = value || $(0)
-  
-  const handleIncrement = increment || (() => counterValue($$(counterValue) + 1))
-  const handleDecrement = decrement || (() => counterValue($$(counterValue) - 1))
-  
-  const v = $('abc')
-  const m = useMemo(() => {
-    return $$(counterValue) + $$(v)
-  })
-  
-  return <div {...props}>
+  return <div style={{ color: color(), fontSize: size() }}>
     <h1>Counter</h1>
-    <p>{counterValue}</p>
-    <p>{m}</p>
-    <button onClick={handleIncrement}>+</button>
-    <button onClick={handleDecrement}>-</button>
+    <p>{value}</p>
+    <button onClick={() => value(prev => prev + 1)}>+</button>
+    <button onClick={() => value(prev => prev - 1)}>-</button>
   </div>
 }
 
 // Register as custom element
-customElement('counter-element', Counter, 'value', 'class', 'style-*')
+customElement('counter-element', Counter)
 
 declare module 'woby' {
     namespace JSX {
@@ -158,17 +148,11 @@ declare module 'woby' {
 }
 
 const App = () => {
-  const value = $(0)
-  const increment = () => value(prev => prev + 1)
-  const decrement = () => value(prev => prev - 1)
-
   return <counter-element 
-    value={value} 
-    increment={increment} 
-    decrement={decrement} 
-    class="border-2 border-black border-solid bg-amber-400" 
-    style-color="red"
-    style-font-size="2em"
+    value={5}
+    color="red"
+    size="2em"
+    style$font-size="2em"
   />
 }
 
@@ -179,45 +163,49 @@ render(<App />, document.getElementById('app'))
 
 ### Nested Property Handling
 
-The custom element implementation supports nested properties with dash-separated names:
+The custom element implementation supports nested properties with different syntaxes:
+- In HTML: Both `$` notation (`nested$prop$value`) and `.` notation (`nested.prop.value`) 
+- In JSX: Only `$` notation (`nested$prop$value`)
 
-```tsx
-// For an attribute like "nested-prop-value", the system will:
-// 1. Create nested structure in props: props.nested.prop.value
-// 2. Set the value appropriately with observable support
-customElement('my-element', MyComponent, 'nested-prop-value')
+```html
+<!-- HTML usage - both syntaxes work -->
+<counter-element 
+  nested$prop$value="xyz"
+  nested.prop.value="abc">
+</counter-element>
 ```
 
-For components that need to support dynamic nested properties, you can use the `nested-${string}` pattern:
-
 ```tsx
-// Support any nested property with the prefix "nested-"
-customElement('my-element', MyComponent, 'nested-${string}')
+// JSX usage - only $ notation works
+<counter-element 
+  nested$prop$value="xyz">
+</counter-element>
 ```
 
 ### Style Property Processing
 
-Style attributes are automatically converted from kebab-case to camelCase:
+Style attributes support different syntaxes:
+- In HTML: Both `$` notation (`style$font-size`) and `.` notation (`style.font-size`)
+- In JSX: Only `$` notation (`style$font-size`)
 
-```tsx
-// Attributes like "style-font-size" become:
-// element.style.fontSize = value
-customElement('my-element', MyComponent, 'style-*')
+Style properties are automatically converted from kebab-case to camelCase:
+
+```html
+<!-- HTML usage - both syntaxes work -->
+<counter-element 
+  style$color="red" 
+  style$font-size="2em"
+  style.color="blue"
+  style.font-size="1.5em">
+</counter-element>
 ```
 
-### Wildcard Support
-
-The custom element system supports wildcard patterns for attribute observation:
-
 ```tsx
-// Observe all attributes
-customElement('my-element', MyComponent, '*')
-
-// Observe all style attributes
-customElement('my-element', MyComponent, 'style-*')
-
-// Observe all nested attributes under a prefix
-customElement('my-element', MyComponent, 'data-*')
+// JSX usage - only $ notation works
+<counter-element 
+  style$color="red"
+  style$font-size="2em">
+</counter-element>
 ```
 
 ### Observable Integration
@@ -238,8 +226,10 @@ Custom elements can be embedded directly in HTML files without JavaScript initia
 ```html
 <!-- Works without any JavaScript -->
 <counter-element 
-  style-color="blue" 
-  style-font-size="1.5em" 
+  value="5"
+  color="blue" 
+  style$font-size="1.5em" 
+  style.font-size="1.5em"
   class="border-2 border-black border-solid bg-amber-400">
 </counter-element>
 ```

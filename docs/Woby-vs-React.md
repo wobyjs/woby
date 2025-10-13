@@ -12,6 +12,8 @@ This document highlights the key differences between Woby and React APIs, focusi
   - [useCallback](#usecallback)
   - [forwardRef](#forwardref)
 - [Dependency Management](#dependency-management)
+- [Advanced Features](#advanced-features)
+  - [Nested Property Support](#nested-property-support)
 - [Summary of Key Differences](#summary-of-key-differences)
 
 ## Core Philosophy Differences
@@ -350,6 +352,89 @@ const handleClick = () => {
 - Access values with `$$()` in reactive contexts for automatic dependency tracking
 - Plain variables won't trigger reactivity even if changed
 
+## Advanced Features
+
+### Nested Property Support
+
+One of Woby's standout features is its advanced nested property support, which allows you to set deeply nested properties directly through HTML attributes. This feature is not available in React or SolidJS.
+
+**Woby:**
+```html
+<!-- Set nested properties using $ notation (works in both HTML and JSX) -->
+<user-card 
+  user$name="John Doe"
+  user$details$age="30"
+  style$font-size="1.2em"
+  style$color="blue">
+</user-card>
+
+<!-- Set nested properties using . notation (HTML only) -->
+<user-card 
+  user.name="John Doe"
+  user.details.age="30"
+  style.font-size="1.2em"
+  style.color="blue">
+</user-card>
+```
+
+In Woby custom elements, you can set deeply nested properties directly through HTML attributes using both `$` and `.` notation:
+
+1. **$ Notation**: Works in both HTML and JSX (`user$details$age`)
+2. **. Notation**: Works only in HTML (`user.details.age`)
+3. **Automatic Kebab-Case Conversion**: Property names are automatically converted from kebab-case to camelCase (`font-size` becomes `fontSize`)
+
+This feature provides several advantages over traditional frameworks:
+
+1. **Direct Property Setting**: Unlike React where you need to pass complex objects as props, Woby allows you to directly set nested properties through HTML attributes
+2. **HTML Compatibility**: You can set deeply nested properties directly in HTML without any JavaScript
+3. **Framework Uniqueness**: This level of nested property support is not available in React or SolidJS
+
+**React Comparison:**
+```jsx
+// React requires passing complex objects as props
+<UserCard 
+  user={{
+    name: "John Doe",
+    details: {
+      age: 30
+    }
+  }}
+  style={{
+    fontSize: "1.2em",
+    color: "blue"
+  }}
+/>
+```
+
+**SolidJS Comparison:**
+```jsx
+// SolidJS also requires passing complex objects as props
+<UserCard 
+  user={{
+    name: "John Doe",
+    details: {
+      age: 30
+    }
+  }}
+  style={{
+    fontSize: "1.2em",
+    color: "blue"
+  }}
+/>
+```
+
+With Woby, you can achieve the same result directly in HTML:
+```html
+<user-card 
+  user$name="John Doe"
+  user$details$age="30"
+  style$font-size="1.2em"
+  style$color="blue">
+</user-card>
+```
+
+This makes Woby custom elements significantly more powerful and flexible than components in React or SolidJS, especially for use cases where you want to configure components directly in HTML without requiring JavaScript initialization.
+
 ## Key Points About Dependency Management
 
 1. **Automatic Tracking**: In Woby, whenever you use `$$()` to unwrap an observable inside a reactive context (like `useEffect` or `useMemo`), that observable is automatically tracked as a dependency.
@@ -389,5 +474,7 @@ const handleClick = () => {
 5. **Automatic Optimization**: Woby's observable-based system automatically optimizes re-renders based on actual data dependencies rather than manual dependency management.
 
 6. **Flexible Hooks**: Woby hooks can be called conditionally, nested, or outside components, unlike React's strict rules.
+
+7. **Advanced Nested Property Support**: Woby's unique nested property support allows direct setting of deeply nested properties through HTML attributes, a feature not available in React or SolidJS.
 
 These differences make Woby's API streamlined and robust while maintaining high performance through fine-grained reactivity. The framework's design philosophy prioritizes developer experience and performance by reducing common sources of bugs and boilerplate code found in traditional frameworks.

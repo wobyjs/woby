@@ -2,14 +2,26 @@
  * Custom Element Implementation for Woby Framework
  * 
  * This module provides functionality to create custom HTML elements with reactive properties
- * that integrate seamlessly with the Woby framework's observable system.
+ * that integrate seamlessly with the Woby framework's observable system. Custom elements
+ * created with this API can be used both in JSX/TSX and directly in HTML.
+ * 
+ * Features:
+ * - Automatic attribute to prop mapping
+ * - Type conversion for observable props
+ * - Nested property support (e.g., 'nested$prop$value' or 'nested.prop.value' in HTML, 'nested$prop$value' in JSX)
+ * - Style property support (e.g., 'style$font-size' or 'style.font-size' in HTML, 'style$font-size' in JSX)
+ * - Automatic kebab-case to camelCase conversion for all property names
+ * - Automatic exclusion of properties with { toHtml: () => undefined } from HTML attributes
+ * - Shadow DOM encapsulation
+ * - Context support for custom elements
+ * - Custom serialization using toHtml and fromHtml options
  * 
  * @module customElement
  */
 
 import { $$, isObservable } from "./soby"
 import { SYMBOL_JSX, SYMBOL_DEFAULT } from '../constants'
-import { setChild, setProp, setChildStatic, setChildReplacement } from "../utils/setters"
+import { setChild, setProp, setChildStatic, setChildReplacement, setProps, setAttribute } from "../utils/setters"
 import { resolveArraysAndStatics, resolveChild } from "../utils/resolvers"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
@@ -19,7 +31,8 @@ import { isFunction, isObject } from "../utils"
 import { useEffect } from "../hooks"
 import { render } from "./render"
 import { isJsx, jsx } from "../jsx-runtime"
-
+import { kebabToCamelCase } from "../utils/string"
+import { normalizePropertyPath } from "../utils/nested"
 
 /**
  * ElementAttributes type helper
@@ -39,6 +52,9 @@ export type ElementAttributes<T extends (...args: any) => any> =
  * 
  * Defines the pattern for allowed attributes in custom elements.
  * Supports wildcards, style properties, and component-specific props.
+ * In HTML, use dot notation (e.g., style.color, nested.prop.value)
+ * In JSX, use dash notation (e.g., style-color, nested-prop-value)
+ * All kebab-case attribute names are automatically converted to camelCase property names.
  * 
  * @template P - Component props type
  */
@@ -46,21 +62,8 @@ type ElementAttributePattern<P> =
     | (keyof P extends string ? keyof P : never)
     | (keyof JSX.HTMLAttributes<HTMLElement> extends string ? keyof JSX.HTMLAttributes<HTMLElement> : never)
     | '*'
-    | `style-${keyof JSX.StyleProperties extends string ? keyof JSX.StyleProperties : never}`
-    | `style-*`
-
-/**
- * Converts kebab-case strings to camelCase
- * 
- * Utility function to convert CSS-style property names to JavaScript-style property names.
- * For example: 'font-size' becomes 'fontSize'
- * 
- * @param str - The kebab-case string to convert
- * @returns The camelCase version of the input string
- */
-const kebabToCamelCase = (str: string): string => {
-    return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
-}
+    | `style.${keyof JSX.StyleProperties extends string ? keyof JSX.StyleProperties : never}`
+    | `style.*`
 
 /**
  * Sets observable values with appropriate type conversion
@@ -68,63 +71,81 @@ const kebabToCamelCase = (str: string): string => {
  * Handles setting values on observables without automatic type conversion.
  * All casting must be done manually in the component function since HTML attributes are strings only.
  * 
+ * Supports custom serialization using toHtml and fromHtml options:
+ * - toHtml: Function to convert observable value to string for HTML attributes
+ * - fromHtml: Function to convert string from HTML attributes back to observable value
+ * 
+ * To hide a property from HTML attributes, use { toHtml: () => undefined }
+ * 
  * @param obj - The object containing the property to set
- * @param key - The property key to set
- * @param value - The string value to set on the property
- */
+    * @param key - The property key to set
+        * @param value - The string value to set on the property
+            */
 const setObservableValue = (obj: any, key: string, value: string) => {
     if (isObservable(obj[key])) {
         // Cast value according to observable options type
         const observable = obj[key] as Observable<any>
         const options = (observable[SYMBOL_OBSERVABLE_WRITABLE]).options as ObservableOptions<any> | undefined
-
-        if (options?.type) {
-            switch (options.type) {
+        const { type, fromHtml } = options ?? {}
+        if (type) {
+            switch (type) {
                 case 'number':
-                    obj[key](Number(value))
+                    obj[key](fromHtml ? fromHtml(value) : Number(value))
                     break
                 case 'boolean':
                     // Handle various boolean representations
-                    const lowerValue = value?.toLowerCase()
-                    obj[key](lowerValue === 'true' || lowerValue === '1' || lowerValue === '')
+                    if (fromHtml) {
+                        obj[key](fromHtml(value))
+                    } else {
+                        const lowerValue = value?.toLowerCase()
+                        obj[key](lowerValue === 'true' || lowerValue === '1' || lowerValue === '')
+                    }
                     break
                 case 'bigint':
-                    try {
-                        obj[key](BigInt(value))
-                    } catch (e) {
-                        // If parsing fails, fallback to string
-                        obj[key](value)
+                    if (fromHtml) {
+                        obj[key](fromHtml(value))
+                    } else {
+                        try {
+                            obj[key](BigInt(value))
+                        } catch (e) {
+                            // If parsing fails, fallback to string
+                            obj[key](value)
+                        }
                     }
                     break
                 case 'object':
-                    try {
-                        obj[key](JSON.parse(value))
-                    } catch (e) {
-                        // If parsing fails, fallback to string
-                        obj[key](value)
+                    if (fromHtml) {
+                        obj[key](fromHtml(value))
+                    } else {
+                        try {
+                            obj[key](JSON.parse(value))
+                        } catch (e) {
+                            // If parsing fails, fallback to string
+                            obj[key](value)
+                        }
                     }
                     break
                 case 'function':
                     // For function types, we can't really convert from string
                     // This would typically be handled by the component itself
-                    obj[key](value)
+                    obj[key](fromHtml ? fromHtml(value) : value)
                     break
                 case 'symbol':
                     // For symbol types, create a symbol from the string
-                    obj[key](Symbol(value))
+                    obj[key](fromHtml ? fromHtml(value) : Symbol(value))
                     break
                 case 'undefined':
-                    obj[key](undefined)
+                    obj[key](fromHtml ? fromHtml(value) : undefined)
                     break
                 default:
                     // For constructor types or other custom types, treat as string
                     // since HTML attributes are always strings and we can't instantiate
                     // arbitrary constructors from strings
-                    obj[key](value)
+                    obj[key](fromHtml ? fromHtml(value) : value)
                     break
             }
         } else {
-            obj[key](value)
+            obj[key](fromHtml ? fromHtml(value) : value)
         }
     } else {
         obj[key] = value
@@ -139,22 +160,22 @@ const setObservableValue = (obj: any, key: string, value: string) => {
  * Nested properties are created in the element's props object.
  * 
  * @param obj - The HTMLElement to set properties on
- * @param path - The property path (e.g., 'style-font-size' or 'nested-prop-value')
+ * @param path - The property path (e.g., 'style.font-size' or 'nested.prop.value')
  * @param value - The value to set
  */
 const setNestedProperty = (obj: HTMLElement, path: string, value: any) => {
     // For style properties, handle them specially
-    if (path.startsWith('style-')) {
-        const styleProperty = kebabToCamelCase(path.slice(6)) // Remove 'style-' prefix and convert to camelCase
+    if (path.startsWith('style.')) {
+        const styleProperty = kebabToCamelCase(path.slice(6)) // Remove 'style.' prefix and convert to camelCase
         if (obj.style) {
             obj.style[styleProperty as any] = value
         }
         return
     }
 
-    // For other properties with dashes, create nested structure
-    if (path.includes('-')) {
-        const keys = path.split('-')
+    // For other properties with dots, create nested structure
+    if (path.includes('.')) {
+        const keys = path.split('.').map(key => kebabToCamelCase(key)) // Convert all keys to camelCase
         const lastKey = keys.pop()
 
         // Navigate to the nested object
@@ -186,8 +207,8 @@ const setNestedProperty = (obj: HTMLElement, path: string, value: any) => {
         return
     }
 
-    // For simple properties, set them using the observable value setter
-    setObservableValue((obj as any), path, value)
+    // For simple properties, convert to camelCase and set them using the observable value setter
+    setObservableValue((obj as any), kebabToCamelCase(path), value)
 }
 
 /**
@@ -197,22 +218,22 @@ const setNestedProperty = (obj: HTMLElement, path: string, value: any) => {
  * Style properties are converted from kebab-case to camelCase when accessing.
  * 
  * @param obj - The object to get properties from
- * @param path - The property path (e.g., 'style-font-size' or 'nested-prop-value')
+ * @param path - The property path (e.g., 'style.font-size' or 'nested.prop.value')
  * @returns The value at the specified path, or undefined if not found
  */
 const getNestedProperty = (obj: any, path: string) => {
     // For style properties, handle them specially
-    if (path.startsWith('style-')) {
-        const styleProperty = kebabToCamelCase(path.slice(6)) // Remove 'style-' prefix and convert to camelCase
+    if (path.startsWith('style.')) {
+        const styleProperty = kebabToCamelCase(path.slice(6)) // Remove 'style.' prefix and convert to camelCase
         if (obj.style) {
             return obj.style[styleProperty as any]
         }
         return undefined
     }
 
-    // For other properties with dashes, navigate nested structure
-    if (path.includes('-')) {
-        const keys = path.split('-')
+    // For other properties with dots, navigate nested structure
+    if (path.includes('.')) {
+        const keys = path.split('.').map(key => kebabToCamelCase(key)) // Convert all keys to camelCase
         let target = obj
 
         for (let i = 0; i < keys.length; i++) {
@@ -230,8 +251,8 @@ const getNestedProperty = (obj: any, path: string) => {
         return target
     }
 
-    // For simple properties, get them directly
-    return (obj as any)[path]
+    // For simple properties, convert to camelCase and get them directly
+    return (obj as any)[kebabToCamelCase(path)]
 }
 
 const isPureFunction = (fn: Function) => typeof fn === 'function' && !isObservable(fn)
@@ -241,24 +262,100 @@ const isPureFunction = (fn: Function) => typeof fn === 'function' && !isObservab
  * 
  * Defines a custom element that integrates with the Woby framework's observable system.
  * The element can observe attribute changes and update corresponding props automatically.
+ * All props defined in the component's defaults are automatically observed as attributes.
+ * 
+ * Requirements:
+ * - Component must have default props defined using the `defaults` helper
+ * - Component props that are observables will be updated with type conversion
+ * - Component can be used in both JSX/TSX and HTML
  * 
  * @template P - Component props type
- * @param tagName - The HTML tag name for the custom element
+ * @param tagName - The HTML tag name for the custom element (must contain a hyphen)
  * @param component - The component function that renders the element's content
  * @returns The custom element class
  * 
  * @example
  * ```tsx
- * const Counter = ({ value }: { value: Observable<number> }) => (
+ * // Define a component with default props
+ * const Counter = defaults(() => ({
+ *   value: $(0, { type: 'number' } as const),
+ *   title: $('Counter')
+ * }), ({ value, title }: { value: Observable<number>, title: Observable<string> }) => (
  *   <div>
- *     <p>{value}</p>
+ *     <h1>{title}</h1>
+ *     <p>Count: {value}</p>
+ *     <button onClick={() => value(prev => prev + 1)}>+</button>
  *   </div>
- * )
+ * ))
  * 
+ * // Register as a custom element
  * customElement('counter-element', Counter)
  * 
  * // Usage in JSX:
- * // <counter-element value={$(0)} style-color="red"></counter-element>
+ * // <counter-element value={5} title="My Counter" style$font-size="red"></counter-element>
+ * 
+ * // Usage in HTML:
+ * // <counter-element value="5" title="My Counter" style$font-size="red"></counter-element>
+ * ```
+ * 
+ * @example
+ * ```tsx
+ * // Component with nested properties
+ * const UserCard = defaults(() => ({
+ *   user: {
+ *     name: $('John'),
+ *     details: {
+ *       age: $(30, { type: 'number' } as const)
+ *     }
+ *   }
+ * }), ({ user }: { user: { name: Observable<string>, details: { age: Observable<number> } } }) => (
+ *   <div>
+ *     <h2>{user.name}</h2>
+ *     <p>Age: {user.details.age}</p>
+ *   </div>
+ * ))
+ * 
+ * customElement('user-card', UserCard)
+ * 
+ * // Usage with nested attributes:
+ * // <user-card user$name="Jane" user$details$age="25"></user-card> (both HTML and JSX)
+ * ```
+ * 
+ * @example
+ * ```tsx
+ * // Component with custom serialization
+ * const DateComponent = defaults(() => ({
+ *   date: $(new Date(), { 
+ *     toHtml: o => o.toISOString(), 
+ *     fromHtml: o => new Date(o) 
+ *   })
+ * }), ({ date }: { date: Observable<Date> }) => (
+ *   <div>Date: {() => $$(date).toString()}</div>
+ * ))
+ * 
+ * customElement('date-component', DateComponent)
+ * 
+ * // Usage:
+ * // <date-component date="2023-01-01T00:00:00.000Z"></date-component>
+ * ```
+ * 
+ * @example
+ * ```tsx
+ * // Component with hidden functions
+ * const Counter = defaults(() => {
+ *   const value = $(0, { type: 'number' } as const)
+ *   return {
+ *     value,
+ *     increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }) // Hide from HTML attributes
+ *   }
+ * }), ({ value, increment }: { value: Observable<number>, increment: Observable<(() => void)[]> }) => (
+ *   <div>
+ *     <p>Count: {value}</p>
+ *     <button onClick={() => increment[0]()}>+</button>
+ *   </div>
+ * ))
+ * 
+ * customElement('counter-element', Counter)
  * ```
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
@@ -305,6 +402,30 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
             else {
                 setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
             }
+
+            if (!this.propDict) {
+                this.propDict = {}
+
+                Object.keys(this.props).forEach((k) => {
+                    this.propDict[k.toLowerCase()] = k
+                })
+            }
+
+
+
+            // const { observedAttributes } = C
+            // const { props: p } = this
+            // const aKeys = observedAttributes.filter(attrName => !isPureFunction(p[attrName]) && !isObject(p[attrName]) && attrName !== 'children')
+            // const rKeys = observedAttributes.filter(attrName => isPureFunction(p[attrName]))
+
+
+            // props -> attr(1st)
+            // aKeys.forEach((k) => {
+            //     if (!this.attributes[k])
+            //         console.log(k)
+            //     this.setAttribute(k, $$(this.props[k]))
+            // })
+            // setProps(this, this.props, callStack('connectedCallback'))
         }
 
         /**
@@ -313,19 +434,33 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
          * Sets up attribute observation and initializes the element.
          */
         connectedCallback() {
+            // ------------ not working for <my-comp> in TSX files------------
             const { observedAttributes } = C
-            const { props } = this
-            const aKeys = observedAttributes.filter(attrName => !isPureFunction(props[attrName]) && !isObject(props[attrName]))
-            const rKeys = observedAttributes.filter(attrName => isPureFunction(props[attrName]))
+            const { props: p } = this
+            const aKeys = Object.keys(p).filter(k => /* !isPureFunction(p[k]) && !isObject(p[k]) && */ k !== 'children' && isObservable(p[k]))
+            const rKeys = Object.keys(p).filter(k => isPureFunction(p[k]) || isObject(p[k]))
 
             // this.props.children(this.slots/* .assignedNodes() */)
             // setChildReplacement(jsx(children, this.props), this.placeHolder, callStack('connectedCallback'))
 
             rKeys.forEach(k => this.removeAttribute(k))
 
+            // props -> attr (1st)
+            for (const k of aKeys as any)
+                if (!this.attributes[this.propDict[k]] || isJsx(p))
+                    setProp(this, k, p[k], callStack('connectedCallback'))
+            // ------------
+
             // attr -> props (1st)
             for (const attr of this.attributes as any)
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
+
+            // // props -> attr(1st)
+            // aKeys.forEach((k) => {
+            //     if (!this.attributes[k])
+            //         this.setAttribute(k, JSON.stringify($$(this.props[k])))
+            //     // setAttribute(this, k, this.props[k], callStack('init connected'))
+            // })
 
             const observer = new MutationObserver(mutations => {
                 mutations.forEach(m => {
@@ -353,29 +488,29 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
          */
         attributeChangedCallback1(name, oldValue, newValue) {
             if (oldValue === newValue) return
+
+            if (newValue === '[object Object]') return //TSX's <my-comp obj={{}}> obj is raw object literal but not $()
+
             const { props } = this
-
-            if (!this.propDict) {
-                this.propDict = {}
-
-                Object.keys(props).forEach((k) => {
-                    this.propDict[k.toLowerCase()] = k
-                })
-            }
-
             // if (!matchesWildcard(name, C.observedAttributes)) return
 
-            // Check if this is a nested property (contains dashes)
-            if (name.includes('-')) {
-                // Handle nested properties
-                setNestedProperty(this, name, newValue)
+            // Check if this is a nested property (contains $ or .)
+            if (name.includes('$') || name.includes('.')) {
+                // Normalize the property path using the utility function
+                const normalizedPath = normalizePropertyPath(name)
+
+                // Handle nested properties (including style properties)
+                setNestedProperty(this, normalizedPath, newValue)
 
                 // Also update any observable in the nested path
-                setObservableValue(props, this.propDict[name], newValue)
+                // Note: We need to convert the attribute name to the property name for the propDict lookup
+                const propName = kebabToCamelCase(name.replace(/\$/g, '.').replace(/\./g, '.'))
+                setObservableValue(props, propName, newValue)
             } else {
                 // Handle flat properties (existing behavior)
-                const val = props[name]
-                setObservableValue(this.props, this.propDict[name], newValue)
+                // Convert kebab-case attribute name to camelCase property name
+                const propName = kebabToCamelCase(name)
+                setObservableValue(this.props, propName, newValue)
             }
         }
     }

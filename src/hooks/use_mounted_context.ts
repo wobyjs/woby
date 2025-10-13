@@ -1,22 +1,25 @@
 /**
  * useMountedContext Hook
  * 
- * A hook that provides context values for components, with special support for custom elements.
- * This hook works in both JSX/TSX components and custom elements defined in HTML.
+ * A specialized hook that provides context values for components with enhanced support 
+ * for custom elements. This hook works in both JSX/TSX components and custom elements 
+ * defined in HTML, providing seamless context access across both paradigms.
  * 
- * For custom elements, it attempts to retrieve context from the parent element's context property.
- * For JSX/TSX components, it falls back to the standard useContext hook.
+ * For custom elements, it attempts to retrieve context from the parent element's 
+ * context property by traversing the DOM tree. For JSX/TSX components, it falls back 
+ * to the standard useContext hook.
  * 
  * @module useMountedContext
  */
 
-
-import { Observable } from '../soby'
 import { $ } from '../methods/soby'
 import { $$ } from '../methods/soby'
 import { useMemo } from './soby'
 import { useContext } from './use_context'
 import { Context, ContextWithDefault, ObservableReadonly } from '../types'
+import { jsx } from '../jsx-runtime'
+import type { Child } from '../types'
+import { DEBUGGER } from 'soby'
 
 /**
  * useMountedContext Hook
@@ -32,7 +35,7 @@ import { Context, ContextWithDefault, ObservableReadonly } from '../types'
  * @template E - The type of HTMLElement
  * @param Context - The context object created with createContext
  * @param ref - Optional existing observable ref to use
- * @returns Object containing ref and context, or just the context value
+ * @returns When used with destructuring as [context, mount], returns a tuple with the context value and a mounting placeholder comment element
  * 
  * @example
  * ```tsx
@@ -54,38 +57,65 @@ import { Context, ContextWithDefault, ObservableReadonly } from '../types'
  * ```
  * 
  * @example
+ * ```tsx
+ * // Usage in custom elements for rendering only (mount is auto taken care of)
+ * const CounterContext = createContext<number>(0)
+ * const context = useMountedContext(CounterContext) //direct use
+ * 
+ * return <span>(Context Value = <b>{context}</b>)</span>
+ * ```
+ * 
+ * @example
+ * ```tsx
+ * // Usage in custom elements with manual mounting (required when processing context value)
+ * const CounterContext = createContext<number>(0)
+ * const [context, m] = useMountedContext(CounterContext)
+ * // Must put in {m} mounting component manually to receive context
+ * return <span>(Processed Context Value = <b>{useMemo(() => $$($$(context)) + ' Processed')}</b>){m}</span>
+ * ```
+ * 
+ * @example
  * ```html
  * <!-- Usage in HTML custom elements -->
- * <counter-element>
- *   <counter-element><!-- This child can access parent's context --></counter-element>
- * </counter-element>
+ * <counter-context-provider value="42">
+ *   <counter-display><!-- This child can access parent's context --></counter-display>
+ * </counter-context-provider>
+ * ```
+ * 
+ * @example
+ * ```tsx
+ * // Custom element implementation using useMountedContext
+ * const CounterDisplay = defaults(() => ({}), () => {
+ *   const [context, mount] = useMountedContext(CounterContext)
+ *   return <div>{mount}Count: {context}</div>
+ * })
+ * 
+ * customElement('counter-display', CounterDisplay)
  * ```
  */
-export function useMountedContext<T, E extends HTMLElement>(Context: ContextWithDefault<T> | Context<T>): { ref: Observable<E>, context: ObservableReadonly<T> }
-export function useMountedContext<T, E extends HTMLElement>(Context: ContextWithDefault<T> | Context<T>, ref: Observable<E>): ObservableReadonly<T>
-export function useMountedContext<T, E extends HTMLElement>(Context: ContextWithDefault<T> | Context<T>, ref?: Observable<E>): ObservableReadonly<T> | { ref: Observable<E>, context: ObservableReadonly<T> } {
-  const r = ref
-  ref = r ?? $<E>()
-  const context = useMemo(() => {
+export function useMountedContext<T, E extends HTMLElement>(Context: ContextWithDefault<T> | Context<T>): [ObservableReadonly<T>, Child] {
+  const ref = $<E>()
+  const ctx = useMemo(() => {
     if (!$$(ref)) return undefined
 
-    const root = $$(ref).getRootNode()
+    const element = $$(ref) as unknown as Element
+    const root = element.getRootNode()
     if (root === document) {
-      if ($$(ref).parentElement && $$(ref).parentElement.firstChild && $$(ref).parentElement.firstChild[Context.symbol]) {
-        return $$(ref).parentElement.firstChild[Context.symbol]
+      if (element.parentElement && element.parentElement.firstChild && element.parentElement.firstChild[Context.symbol]) {
+        return element.parentElement.firstChild[Context.symbol]
       } else {
         // Traverse up if parentElement.firstChild[Context.symbol] not found
-        const traverseUp = (element: Element | null): any => {
-          if (!element) return undefined
-          if (element.parentElement && element.parentElement.firstChild && element.parentElement.firstChild[Context.symbol]) {
-            return element.parentElement.firstChild[Context.symbol]
+        const traverseUp = (elem: Element | null): any => {
+          if (!elem) return undefined
+          if (elem.parentElement && elem.parentElement.firstChild && elem.parentElement.firstChild[Context.symbol]) {
+            return elem.parentElement.firstChild[Context.symbol]
           }
-          if (element.parentElement) {
-            return traverseUp(element.parentElement)
+          if (elem.parentElement) {
+            return traverseUp(elem.parentElement)
           }
           return undefined
         }
-        return traverseUp($$(ref).parentElement)
+        return traverseUp(element.parentElement)
       }
     }
     //shadow dom
@@ -94,17 +124,17 @@ export function useMountedContext<T, E extends HTMLElement>(Context: ContextWith
       const host = root.host
 
       // Helper function to traverse up through slots and shadow roots
-      const traverseUp = (element: Element | null): any => {
-        if (!element) return undefined
+      const traverseUp = (elem: Element | null): any => {
+        if (!elem) return undefined
 
         // Context is always stored at parent.firstChild[Context.symbol]
-        if (element.parentElement && element.parentElement.firstChild && element.parentElement.firstChild[Context.symbol]) {
-          return element.parentElement.firstChild[Context.symbol]
+        if (elem.parentElement && elem.parentElement.firstChild && elem.parentElement.firstChild[Context.symbol]) {
+          return elem.parentElement.firstChild[Context.symbol]
         }
 
         // If element is assigned to a slot, traverse up through the slot
-        if (element.assignedSlot) {
-          const slot = element.assignedSlot
+        if (elem.assignedSlot) {
+          const slot = elem.assignedSlot
           // Check if slot's parent element's first child has the context
           if (slot.parentElement && slot.parentElement.firstChild && slot.parentElement.firstChild[Context.symbol]) {
             return slot.parentElement.firstChild[Context.symbol]
@@ -125,13 +155,13 @@ export function useMountedContext<T, E extends HTMLElement>(Context: ContextWith
         }
 
         // Check first child for context (in case this element has children with context)
-        if (element.firstElementChild && element.firstElementChild[Context.symbol]) {
-          return element.firstElementChild[Context.symbol]
+        if (elem.firstElementChild && elem.firstElementChild[Context.symbol]) {
+          return elem.firstElementChild[Context.symbol]
         }
 
         // If element has a parent, continue traversal
-        if (element.parentElement) {
-          return traverseUp(element.parentElement)
+        if (elem.parentElement) {
+          return traverseUp(elem.parentElement)
         }
 
         return undefined
@@ -168,19 +198,19 @@ export function useMountedContext<T, E extends HTMLElement>(Context: ContextWith
     }
 
     // Regular DOM element context lookup
-    if ($$(ref)?.parentElement) {
+    if (element.parentElement) {
       // Helper function to traverse up for regular DOM elements
-      const traverseUp = (element: Element | null): any => {
-        if (!element) return undefined
+      const traverseUp = (elem: Element | null): any => {
+        if (!elem) return undefined
 
         // Context is always stored at parent.firstChild[Context.symbol]
-        if (element.parentElement && element.parentElement.firstChild && element.parentElement.firstChild[Context.symbol]) {
-          return element.parentElement.firstChild[Context.symbol]
+        if (elem.parentElement && elem.parentElement.firstChild && elem.parentElement.firstChild[Context.symbol]) {
+          return elem.parentElement.firstChild[Context.symbol]
         }
 
         // If element is assigned to a slot, traverse up through the slot
-        if (element.assignedSlot) {
-          const slot = element.assignedSlot
+        if (elem.assignedSlot) {
+          const slot = elem.assignedSlot
           // Check if slot's parent element's first child has the context
           if (slot.parentElement && slot.parentElement.firstChild && slot.parentElement.firstChild[Context.symbol]) {
             return slot.parentElement.firstChild[Context.symbol]
@@ -202,19 +232,19 @@ export function useMountedContext<T, E extends HTMLElement>(Context: ContextWith
         }
 
         // Check first child for context (in case this element has children with context)
-        if (element.firstElementChild && element.firstElementChild[Context.symbol]) {
-          return element.firstElementChild[Context.symbol]
+        if (elem.firstElementChild && elem.firstElementChild[Context.symbol]) {
+          return elem.firstElementChild[Context.symbol]
         }
 
         // If element has a parent, continue traversal
-        if (element.parentElement) {
-          return traverseUp(element.parentElement)
+        if (elem.parentElement) {
+          return traverseUp(elem.parentElement)
         }
 
         return undefined
       }
 
-      const result = traverseUp($$(ref)?.parentElement)
+      const result = traverseUp(element.parentElement)
       if (result !== undefined) {
         return result
       }
@@ -224,7 +254,5 @@ export function useMountedContext<T, E extends HTMLElement>(Context: ContextWith
     return useContext(Context)
   })
 
-  if (!r)
-    return { ref, context }
-  return context
+  return [ctx, jsx('comment', { ref, data: DEBUGGER.verboseComment ? 'mount' : '' })]
 }

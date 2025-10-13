@@ -115,7 +115,7 @@ function def() {
  * <Counter value={value} increment={increment} decrement={decrement} />
  * 
  * // HTML custom element usage
- * // <counter-element value="5" style-color="red" nested-nested-text="xyz"></counter-element>
+ * // <counter-element value="5" style.color="red" nested.nested.text="xyz"></counter-element>
  * ```
  */
 const Counter = defaults(def, (propss: CounterProps): JSX.Element => {
@@ -183,8 +183,8 @@ const Counter = defaults(def, (propss: CounterProps): JSX.Element => {
  * Observed attributes:
  * - 'value': The counter value
  * - 'class': CSS classes
- * - 'style-*': Style properties (e.g., style-color, style-font-size)
- * - 'nested-*': Nested properties (e.g., nested-nested-text)
+ * - 'style.*': Style properties (e.g., style.color, style.font-size in HTML, style-color, style-font-size in JSX)
+ * - 'nested.*': Nested properties (e.g., nested.nested.text in HTML, nested-nested-text in JSX)
  */
 customElement('counter-element', Counter)
 
@@ -453,7 +453,7 @@ customElement('counter-element', Counter)
 **Usage:**
 ```html
 <!-- Can be used in regular HTML with two-way synchronization -->
-<counter-element value="5" style-color="red" nested-nested-text="xyz"></counter-element>
+<counter-element value="5" style.color="red" nested.nested.text="xyz"></counter-element>
 ```
 
 ### 8. Nested Properties Support

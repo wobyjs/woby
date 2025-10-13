@@ -531,7 +531,7 @@ customElement('counter-element', Counter)
 // Usage examples:
 
 // 1. HTML usage with automatic attribute synchronization
-// <counter-element value="5" style-color="red"></counter-element>
+// <counter-element value="5" style.color="red"></counter-element>
 
 // 2. Function component usage
 // const App = () => {

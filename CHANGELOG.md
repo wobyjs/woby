@@ -5,6 +5,7 @@
 - *(tooling)* Automate changelog generation and adopt conventional commits
 - *(tooling)* Add commit script and adopt conventional commits
 - *(tooling)* Add commit script and adopt conventional commits
+- *(context)* Enhance Shadow DOM and Custom Element integration
 ## [1.58.33] - 2025-09-22
 
 ### 🚀 Features
