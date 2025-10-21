@@ -38,7 +38,11 @@ export {
     setRef,
     customElement,
 } from './methods'
-export type { ElementAttributes } from './methods'
+export type {
+    ElementAttributes,
+    CustomElementChildren,
+    StyleEncapsulationProps,
+} from './methods'
 export {
     castArray,
     castError,
