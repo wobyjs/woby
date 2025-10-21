@@ -90,7 +90,7 @@ export type {
     Context, ContextWithDefault, DirectiveFunction, DirectiveProvider, DirectiveRef, DirectiveRegister, Directive, DirectiveData,
     DirectiveOptions, Disposer, Element, EventListener, Falsy, FN, FragmentUndefined, FragmentNode, FragmentFragment,
     FragmentNodes, FragmentFragments, FragmentMixed, /* Fragment, */ FunctionMaybe, MemoOptions, LazyComponent, LazyFetcher, LazyResult,
-    /* Observable, ObservableReadonly, */ ObservableMaybe, /* ObservableOptions, PromiseMaybe, */ ObservableLike, Props, Ref,
+    /* Observable, ObservableReadonly, */ ObservableMaybe, /* ObservableOptions, */ PromiseMaybe, ObservableLike, Props, Ref,
     ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource,
     /* StoreOptions, */ SuspenseData, TemplateActionPath, TemplateActionProxy, TemplateActionWithNodes, TemplateActionWithPaths,
     TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap, Truthy,
