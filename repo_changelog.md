@@ -27,6 +27,7 @@ This release introduces a comprehensive suite of features focused on enhancing t
     -   `CUSTOM_ELEMENTS.md`: Extensive documentation on creating and using custom elements with Woby, covering everything from basic usage to advanced features like nested properties and data serialization.
 -   **Major Documentation Overhaul**: Updated nearly all existing documentation to reflect the new features and best practices. This includes significant updates to the main `readme.md`, `Component-Defaults.md`, `Custom-Element-Best-Practices.md`, and `Type-Synchronization.md`.
 -   **Framework Correction**: Corrected the name of the core reactive library from "Woby" to "Soby" in the main `readme.md` to give proper credit.
+-   **Soby Integration Documentation**: Updated documentation to reflect new Soby features including `toHtml`/`fromHtml` options for ObservableOptions and enhanced debugging with `DEBUGGER.verboseComment`.
 
 ### Changed
 

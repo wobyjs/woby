@@ -2,6 +2,7 @@
 import { setChild } from '../utils/setters.ssr'
 import type { Child } from '../types'
 import { FragmentUtils } from '../utils/fragment.ssr'
+import { isArray } from '../utils'
 
 
 export const render = (child: Child): string => {
@@ -17,7 +18,7 @@ export const render = (child: Child): string => {
 
     // Get the rendered content
     const children = FragmentUtils.getChildren(fragment)
-    if (Array.isArray(children)) {
+    if (isArray(children)) {
         return children.map(node => (node as any).outerHTML || (node as any).textContent || node.toString()).join('')
     } else {
         return (children as any).outerHTML || (children as any).textContent || children.toString()

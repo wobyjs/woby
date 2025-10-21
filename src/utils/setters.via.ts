@@ -111,8 +111,8 @@ export const setChildStatic = (parent: HTMLElement, child: Child, dynamic: boole
 
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
-    if (Array.isArray(child)) {
-        const children = (Array.isArray(child) ? child : [child]) as Node[] //TSC
+    if (isArray(child)) {
+        const children = (isArray(child) ? child : [child]) as Node[] //TSC
 
         const cs: any[] = children.map(c => resolveChild(c, null, false, stack)).flat(Infinity)
         parent.replaceChildren(...cs)

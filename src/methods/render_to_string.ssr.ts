@@ -2,6 +2,7 @@
 import { FragmentUtils } from '../utils/fragment.ssr'
 import type { Child } from '../types'
 import { setChild } from '../utils/setters.ssr'
+import { isArray } from '../utils/lang'
 
 export const renderToString = (child: Child): string => {
     // Create a container for SSR
@@ -16,7 +17,7 @@ export const renderToString = (child: Child): string => {
 
     // Get the rendered content
     const children = FragmentUtils.getChildren(fragment)
-    if (Array.isArray(children)) {
+    if (isArray(children)) {
         return children.map(node => {
             if (typeof node === 'object' && node !== null) {
                 if ('outerHTML' in node) {

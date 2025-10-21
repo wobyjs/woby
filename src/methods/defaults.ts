@@ -8,8 +8,8 @@
 
 import { isObservable, Observable } from "soby"
 import { SYMBOL_DEFAULT, SYMBOL_JSX } from "../constants"
-import { assign, AssignOptions } from './assign'
-import { $, Observant } from ".."
+import { assign } from './assign'
+import { $, ObservableMaybe, Observant } from ".."
 import { isJsxProp } from "./is_jsx_prop"
 import { make } from "./make"
 
@@ -61,10 +61,11 @@ const merge = <T, S>(
     //     return assign(target, source, { condition: 'new' })
     // // For regular objects, merge them with target taking precedence
     // else
+    // copyOptions(target, source)
     return assign(target, source, { condition: 'new' })
 }
 
-
+export type CustomElementChildren = ObservableMaybe<JSX.Children | HTMLSlotElement> | undefined
 /**
  * Attaches default props to a functional component
  * 
@@ -140,12 +141,12 @@ const merge = <T, S>(
  * })
  * ```
  */
-export const defaults = <P extends { children?: Observable<JSX.Children> } & StyleEncapsulationProps, T extends (props: P) => JSX.Element>(
+export const defaults = <P extends Record<string, any>>(
     defs: () => P,
-    component: T
-): ((props: Observant<P>) => JSX.Element) & { [SYMBOL_DEFAULT]: () => P } => {
+    component: ((props: P & { children?: CustomElementChildren } & StyleEncapsulationProps) => JSX.Element)
+): ((props: Partial<P> & { children?: CustomElementChildren } & StyleEncapsulationProps) => JSX.Element) /* & { [SYMBOL_DEFAULT]: () => P } */ => {
     const defFactory = () => {
-        const d: P & { children?: Observable<JSX.Children> } = defs() // as P & { children?: Observable<JSX.Children> }
+        const d: P & { children?: CustomElementChildren } & StyleEncapsulationProps = defs() as P & { children?: CustomElementChildren } & StyleEncapsulationProps
         if (d.children !== undefined && !isObservable(d.children))
             d.children = $(d.children)
         if (!d.children)
@@ -153,10 +154,12 @@ export const defaults = <P extends { children?: Observable<JSX.Children> } & Sty
         return d
     }
     // const compFactory = Object.assign((props: Observant<P>) => component(merge(props, defFactory()) as unknown as P),
-    const compFactory = Object.assign((props: Observant<P>) => component(isJsxProp(props) ? merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any : props),
+    const compFactory = Object.assign((props: P & { children?: CustomElementChildren } & StyleEncapsulationProps) => component(isJsxProp(props) ? merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any : props),
         {
             [SYMBOL_DEFAULT]: defFactory
         })
 
-    return compFactory as ((props: Observant<P>) => JSX.Element) & { [SYMBOL_DEFAULT]: () => P }
+    return compFactory as any /// ((props: Partial<P>) => JSX.Element)
 }
+
+// const a = defaults(() => ({ name: 'aa' }), (_props) => _props.children)

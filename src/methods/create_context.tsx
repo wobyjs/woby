@@ -1,9 +1,32 @@
 import { useEffect } from '../hooks'
 import { CONTEXTS_DATA, } from '../constants'
-import { $, $$, resolve } from './soby'
-import { context, DEBUGGER, Observable } from '../soby'
-import type { Child, Context, ContextWithDefault } from '../types'
-import { jsx } from '../jsx/runtime'
+import { $, $$ } from './soby'
+import { ObservableOptions } from '../soby'
+import type { Child, Context, ContextWithDefault, ObservableMaybe } from '../types'
+import { } from '../soby'
+import { defaults } from './defaults'
+import { customElement, ElementAttributes } from './custom_element'
+import { jsx } from '../jsx-runtime'
+
+// const serializer = { toHtml: (o) => o + '', fromHtml: o => o } as ObservableOptions
+const hidden = { toHtml: o => undefined } as ObservableOptions
+const ContextProvider = defaults(() => ({
+  value: $(undefined) as ObservableMaybe<any> | undefined,
+  children: $(undefined) as ObservableMaybe<Child> | undefined,
+  symbol: $<Symbol>(undefined) as ObservableMaybe<Symbol> | undefined
+}), ({ children }) => {
+  return children
+})
+
+customElement('context-provider', ContextProvider)
+
+declare module '../index' {
+  namespace JSX {
+    interface IntrinsicElements {
+      'context-provider': ElementAttributes<typeof ContextProvider>
+    }
+  }
+}
 
 
 /**
@@ -73,30 +96,22 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
   const symbol = Symbol()
 
   const Provider = ({ value, children }: { value: T, children: Child }): Child => {
-    return context({ [symbol]: value }, () => {
+    // return context({ [symbol]: value }, () => {
+    const ref = $<Comment>()
 
-      const ref = $<Comment>()
-      useEffect(() => {
-        if (!$$(ref)) return
-        $$(ref)[symbol] = value
-        return () => delete $$(ref)[symbol]
-      })
-
-      // const props = {ref, children}
-
-      // //can't use jsx syntax here,
-      //cannot use nested slot or double slot
-      // const r = jsx('woby-context', props)
-
-      // return r
-
-      // return <woby-context ref={ref}>{children}</woby-context>
-
-      return [
-        jsx('comment', { ref, data: DEBUGGER.verboseComment ? 'ctx' : '' }),
-        resolve(children)
-      ]
+    useEffect(() => {
+      if (!$$(ref)) return
+      $$(ref)[symbol] = value
+      return () => delete $$(ref)[symbol]
     })
+
+    return jsx('context-provider', {
+      ref,
+      value,
+      symbol: $(symbol, hidden),
+      children
+    })
+    // })
   }
 
   const Context = { Provider, symbol }

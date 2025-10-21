@@ -17,6 +17,7 @@ import { kebabToCamelCase } from '../utils/string'
 import { normalizePropertyPath, setNestedAttribute } from '../utils/nested'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
+import { isJsx } from '../jsx-runtime'
 
 export const setAttributeStatic = (() => {
 
@@ -254,7 +255,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
     const fragmentNext = FragmentUtils.make()
 
-    const children = (Array.isArray(child) ? child : [child]) as Node[] //TSC
+    const children = (isArray(child) ? child : [child]) as Node[] //TSC
 
     for (let i = 0, l = children.length; i < l; i++) {
 
@@ -1020,7 +1021,7 @@ export const setTemplateAccessor = (element: HTMLElement, key: string, value: Te
 }
 
 export const setProp = (element: HTMLElement | Comment, key: string, value: any, stack: Stack): void => {
-    if (element instanceof Comment) {
+    if (element instanceof Comment || element instanceof Text) {
         if (key === 'ref')
             setRef(element, value)
         else if (key in element)

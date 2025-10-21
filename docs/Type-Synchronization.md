@@ -1,12 +1,12 @@
 # Type Synchronization Between HTML Attributes and Component Props
 
-This document explains how Woby synchronizes types between HTML string-only attributes and typed function component props, enabling seamless two-way binding for custom elements.
+This document explains how Woby synchronizes types between HTML string-only attributes and typed function component props, enabling seamless two-way binding for custom elements. It includes both a comprehensive approach and a simpler approach to type synchronization.
 
 ## Overview
 
-In web components, HTML attributes are always strings, but JavaScript/TypeScript components often need typed values (numbers, booleans, objects). Woby provides a sophisticated mechanism to automatically convert attribute strings to the appropriate types based on observable declarations.
+In web components, HTML attributes are always strings, but JavaScript/TypeScript components often need typed values (numbers, booleans, objects). Woby provides mechanisms to automatically convert attribute strings to the appropriate types based on observable declarations.
 
-For a simpler approach to type synchronization, see the [Simple Type Synchronization Guide](./Type-Sync-Simple.md).
+This document covers both the comprehensive type synchronization mechanism and a simpler approach.
 
 For information about how the `merge` function handles different prop sources, see [Component Defaults](./Component-Defaults.md).
 
@@ -353,6 +353,111 @@ In this example:
 6. **Use `toHtml` and `fromHtml`**: For complex objects and dates, use these options for proper serialization
 7. **Hide Functions from HTML**: Use `toHtml: () => undefined` to prevent functions from appearing in HTML attributes
 8. **Store Functions in Array Notation**: Use `$([() => { /* function body */ }])` to store functions in observables for custom elements
+
+## Simple Type Synchronization Approach
+
+For those who prefer a more straightforward approach to type synchronization, Woby also provides a simpler mechanism.
+
+### Basic Implementation
+
+The simplest way to achieve type synchronization is by declaring observables with explicit type information using the `{ type: '...' }` option:
+
+```typescript
+const def = () => ({
+  // Number type
+  count: $(0, { type: 'number' } as const),
+  
+  // Boolean type
+  enabled: $(true, { type: 'boolean' } as const),
+  
+  // String type (default)
+  label: $('', { type: 'string' } as const),
+  
+  // Object type
+  config: $({} as MyConfig, { type: 'object' } as const)
+})
+```
+
+### How It Works
+
+1. **Declaration**: When defining observables, specify the expected type using the `type` option
+2. **Attribute Binding**: HTML attributes automatically bind to these typed observables
+3. **Automatic Conversion**: The framework converts string attributes to the declared types
+
+#### Example Component
+
+```typescript
+import { $, component, defaults } from 'woby'
+
+const def = () => ({
+  value: $(0, { type: 'number' } as const),
+  disabled: $(false, { type: 'boolean' } as const),
+  label: $('', { type: 'string' } as const)
+})
+
+const Counter = (props: ReturnType<typeof def>) => {
+  const { value, disabled, label } = defaults(def, props)
+  
+  // value is typed as number
+  // disabled is typed as boolean
+  // label is typed as string
+  
+  return (
+    <div>
+      <span>{label}</span>
+      <button disabled={disabled} onclick={() => value(prev => prev + 1)}>
+        Count: {value}
+      </button>
+    </div>
+  )
+}
+
+component('my-counter', Counter, def)
+```
+
+#### HTML Usage
+
+```html
+<!-- The framework automatically converts these string attributes -->
+<my-counter value="5" disabled="false" label="My Counter"></my-counter>
+```
+
+In this example:
+- `"5"` (string) gets converted to `5` (number)
+- `"false"` (string) gets converted to `false` (boolean)
+- `"My Counter"` remains as string
+
+### Supported Types
+
+The simple type synchronization supports these types:
+
+| Type     | Conversion Rule                            | Example           |
+|----------|--------------------------------------------|-------------------|
+| number   | `Number(attributeValue)`                   | "42" → 42         |
+| boolean  | `"true"/"1"/""` → `true`, otherwise false  | "false" → false   |
+| string   | No conversion (default)                    | "text" → "text"   |
+| object   | `JSON.parse(attributeValue)`               | '{"a":1}' → {a:1} |
+
+### Key Benefits
+
+1. **Automatic**: No manual parsing required in components
+2. **Type-safe**: TypeScript knows the correct types
+3. **Declarative**: Type information is declared with the observable
+4. **Bidirectional**: Works for both HTML attributes and programmatic updates
+
+### Best Practices
+
+1. Always use `as const` with the type option for proper TypeScript inference:
+   ```typescript
+   $(0, { type: 'number' } as const) // ✅ Good
+   $(0, { type: 'number' })          // ❌ Less precise typing
+   ```
+
+2. Declare all attributes that should participate in type synchronization with explicit types
+
+3. Use sensible defaults that match your expected types
+
+This simple approach eliminates the need for manual attribute parsing while maintaining full TypeScript type safety.
 
 ## Limitations
 

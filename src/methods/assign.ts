@@ -2,7 +2,7 @@
 import { $, $$, isObservable } from './soby'
 import { useEffect } from '../hooks/soby'
 import type { Observant } from '../types'
-import { isFunction } from '../utils'
+import { isArray, isFunction } from '../utils'
 
 /**
  * Options for the assignObject function
@@ -45,6 +45,14 @@ export type AssignOptions<T = unknown> = {
      * @default [] - no keys are merged by default
      */
     merge?: Array<keyof T>
+
+    /**
+     * If true, copy options from source[key][SYMBOL_OBSERVABLE_WRITABLE].options 
+     * to target[key] when both are observables.
+     * 
+     * @default false
+     */
+    copyOptions?: boolean
 }
 
 /**
@@ -85,6 +93,27 @@ const set = <T,>(target: T, source: T, merge: boolean) => {
         (target as any)($$(source))
 }
 
+// /**
+//  * Copy options from source observable to target observable.
+//  * 
+//  * @param target - The target observable
+//  * @param source - The source observable
+//  * @param copyOptions - Whether to copy options
+//  */
+// const mergeObservableOptions = <T,>(target: T, source: T, copyOptions: boolean) => {
+//     // Check if we should copy options and both target and source are observables with SYMBOL_OBSERVABLE_WRITABLE
+//     if (copyOptions && isObservable(target) && isObservable(source) &&
+//         source[SYMBOL_OBSERVABLE_WRITABLE] &&
+//         target[SYMBOL_OBSERVABLE_WRITABLE]) {
+
+//         // Copy options from source to target
+//         const sourceOptions = source[SYMBOL_OBSERVABLE_WRITABLE].options
+//         if (sourceOptions) {
+//             target[SYMBOL_OBSERVABLE_WRITABLE].options = { ...sourceOptions, ...target[SYMBOL_OBSERVABLE_WRITABLE].options }
+//         }
+//     }
+// }
+
 /**
  * Check if a value is a plain object.
  * 
@@ -110,6 +139,7 @@ const isObject = (obj: {}) => {
  * - Conditional assignment (new, old, all, empty)
  * - Tracking source observables for automatic updates
  * - Merging specific keys rather than replacing them
+ * - Copying observable options from source to target
  * 
  * Functions are treated specially in this function:
  * - Functions are never converted to observables, regardless of options
@@ -170,6 +200,12 @@ const isObject = (obj: {}) => {
  * const source6 = { a: $(2) }
  * assign(target6, source6, { track: true })
  * // Automatically updates target6.a when source6.a changes
+ * 
+ * // Copy observable options
+ * const target7 = { a: $(1, { equals: (a, b) => a === b }) }
+ * const source7 = { a: $(2, { equals: (a, b) => Object.is(a, b) }) }
+ * assign(target7, source7, { copyOptions: true })
+ * // Copies the equals function from source7.a to target7.a
  * ```
  */
 export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, options?: O):
@@ -179,7 +215,7 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
 
     if (!source) return target as any
 
-    const { condition: method = 'all', copyByRef = true, keepTargetNoObservable = false, track = false, merge = [] } = options ?? {}
+    const { condition: method = 'all', copyByRef = true, keepTargetNoObservable = false, track = false, merge = [], copyOptions = false } = options ?? {}
     const m = merge.reduce((acc, item) => (acc[item] = true, acc), {} as Record<keyof T, true>)
 
     // Get the keys based on the selected method
@@ -199,7 +235,7 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                         targetValue === 0 ||
                         isNaN(targetValue) ||
                         targetValue === '' ||
-                        (Array.isArray(targetValue) && targetValue.length === 0)
+                        (isArray(targetValue) && targetValue.length === 0)
                     )
                     const isSourceNonEmpty = !(
                         sourceValue === undefined ||
@@ -207,7 +243,7 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                         sourceValue === 0 ||
                         isNaN(sourceValue) ||
                         sourceValue === '' ||
-                        (Array.isArray(sourceValue) && sourceValue.length === 0)
+                        (isArray(sourceValue) && sourceValue.length === 0)
                     )
                     return isTargetEmpty && isSourceNonEmpty
                 })
@@ -223,12 +259,21 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                 // Update observable by reference
                 set(target[key], source[key], m[key])
 
+                // // Copy options if requested
+                // mergeObservableOptions(target[key], source[key], copyOptions)
+
                 if (track && isObservable(source[key]))
-                    useEffect(() => set(target[key], source[key], m[key]))
+                    useEffect(() => {
+                        set(target[key], source[key], m[key])
+                        // mergeObservableOptions(target[key], source[key], copyOptions)
+                    })
             } else {
                 // Direct reference assignment/override
                 const temp = $$(target[key])
                 target[key] = isObservable(source[key]) || isFunction(source[key]) ? source[key] : $(source[key])
+
+                // Copy options if requested
+                // mergeObservableOptions(target[key], source[key], copyOptions)
 
                 if (m[key as keyof T])
                     (target[key] as any)(mv(temp, $$(source[key])))
@@ -247,6 +292,9 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                         if (track && isObservable(source[key]))
                             useEffect(() => { (target[key] as any)(assign<T, S, O>({} as T, $$(source[key]), options)) })
                     }
+
+                    // Copy options
+                    // mergeObservableOptions(target[key], source[key], copyOptions)
                 } else {
                     // Assign or initialize nondobservable nested objects
                     const temp = target[key]
@@ -256,6 +304,9 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
 
                     if (track && isObservable(target[key]) && isObservable(source[key]))
                         useEffect(() => { (target[key] as any)(assign(m[key] ? temp : {}, $$(source[key]), options as any)) })
+
+                    // Copy options
+                    // mergeObservableOptions(target[key], source[key], copyOptions)
                 }
             } else { //primitive
                 if (isObservable(target[key])) {
@@ -265,6 +316,9 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
 
                     if (track && isObservable(source[key]))
                         useEffect(() => (target[key] as any)(m[key] ? mv(temp, $$(source[key])) : $$(source[key])))
+
+                    // Copy options
+                    // mergeObservableOptions(target[key], source[key], copyOptions)
                 }
                 else {
                     const temp = target[key]
@@ -278,6 +332,9 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                     if (track && isObservable(target[key]) && isObservable(source[key]))
                         if (target[key] !== source[key])
                             useEffect(() => (target[key] as any)(m[key] ? mv(temp, $$(source[key])) : $$(source[key])))
+
+                    // Copy options
+                    // mergeObservableOptions(target[key], source[key], copyOptions)
                 }
             }
         }
@@ -285,3 +342,12 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
 
     return target as any
 }
+
+// export const copyOptions = (target: any, source: any) => {
+//     Object.keys(source)
+//         .filter((key) => key in target)
+//         .forEach((key) => {
+//             if (isObservable(target[key]) && isObservable(source[key]))
+//                 mergeObservableOptions(target[key], source[key], true)
+//         })
+// }

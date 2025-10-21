@@ -3,6 +3,7 @@ export {
     $,
     $$,
     batch,
+    context,
     isBatching,
     isObservable,
     isObservableWritable,

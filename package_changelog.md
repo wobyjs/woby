@@ -1,73 +1,70 @@
 # Changelog: `package.json`
 
-## Version 1.58.28 - 1.58.33
+This document outlines the revision history of the `package.json` file, detailing the evolution of the project's metadata, dependencies, and build processes.
 
-### New Features
-- Added a new `commit` script to streamline the version bumping and push process.
+## Thematic Changes
 
-### Refactoring
-- The `git` script was updated to use `git-cliff` for changelog generation.
-- The repository URL was updated to `github:wongchichong/woby`.
+### Versioning & Release Management
 
-### Housekeeping
-- The `docs` folder has been included in the published files.
-- Removed several scripts, including `changelog`, `release:automatic`, and `commit:help`.
-- The `auto-changelog` dev dependency has been removed.
+The project's versioning and release process has evolved significantly.
 
-## Version 1.58.24 - 1.58.27
+- **Initial State:** Versions were manually bumped.
+- **`v0.58.4`:** Introduced structured release scripts:
+  - `git`: Commits and pushes changes.
+  - `bump`: Increments the patch version using `pnpm version patch`.
+  - `npmjs`: Publishes the package.
+  - `release`: A sequential script to run `git`, `bump`, and `npmjs`.
+- **`v1.58.28` (and later):** The release process was automated further:
+  - The `git` script was updated to use `git-cliff` for automatic `CHANGELOG.md` generation.
+  - A `commit` script was added (`pnpm bump && pnpm push`).
+  - Scripts for conventional commits (`commit`, `commit:help`) and automated releases (`release:automatic` using `semantic-release`) were added and later removed, indicating experimentation with different release workflows.
 
-### New Features
-- Added `ssr/jsx-dev-runtime` to the `exports` field.
+### Build System & Configuration
 
-### Bug Fixes
-- Corrected paths in the `typesVersions` field.
+The build and compilation process has been refined for better development and production builds.
 
-### Dependency Updates
-- Added a wide range of new dependencies and dev dependencies to enhance functionality and development experience, including:
-  - `browserify-zlib`, `crypto-browserify`, `happy-dom`, `http-browserify`, `https-browserify`, `net`, `path-browserify`, `perf_hooks`, `stream-browserify`, `util`, `vm-browserify`
-  - `@esbuild-plugins/node-globals-polyfill`, `@esbuild-plugins/node-modules-polyfill`, `@rollup/plugin-node-resolve`, `buffer`, `native-url`, `node-stdlib-browser`, `vite-plugin-node-polyfills`, `web-streams-polyfill`
+- **`v0.58.0`:** The `build` script was updated to include declaration file generation (`tsc --declaration --emitDeclarationOnly --declarationMap`).
+- **`v0.58.5`:** The build process was split into more granular scripts:
+  - `declaration` & `declaration:watch`
+  - `build:only` & `watch:only`
+  - `watch`: Combines `watch:only` and `declaration:watch`.
+  - `build`: Runs `clean`, `build:only`, and `declaration` in sequence.
+- **`v0.58.5`:** A `clean` script (`tsex clean`) was added and integrated into the main `build` script.
 
-## Version 1.58.20 - 1.58.23
+### Dependencies
 
-### Breaking Changes
-- The versioning scheme was updated from `0.58.x` to `1.58.x`.
+- **`v0.58.10`:** The core reactivity dependency `oby` was renamed to `soby`.
+- **`v1.58.24`:** A significant number of dependencies and devDependencies were added to improve browser compatibility and Node.js polyfills for the browser environment.
+  - **Dependencies:** `browserify-zlib`, `crypto-browserify`, `happy-dom`, `http-browserify`, `https-browserify`, `net`, `path-browserify`, `perf_hooks`, `stream-browserify`, `util`, `vm-browserify`.
+  - **DevDependencies:** `@esbuild-plugins/node-globals-polyfill`, `@esbuild-plugins/node-modules-polyfill`, `@rollup/plugin-node-resolve`, `buffer`, `native-url`, `node-stdlib-browser`, `vite-plugin-node-polyfills`, `web-streams-polyfill`.
+- The dependency `vhtml` was removed around version `v1.58.24`.
+- Workspace dependencies (`workspace:*`) were adopted for local packages like `soby` and `via.js`, improving monorepo management.
 
-### New Features
-- Added `woby: link:` to the dependencies for local development.
+### Module Exports & Type Definitions
 
-## Version 0.58.11 - 0.58.19
+The way modules and their types are exposed to consumers has been a key area of evolution.
 
-### Bug Fixes
-- Corrected the types path for `jsx-dev-runtime`.
-- Updated the `exports` for `jsx-runtime` to point to the correct build artifacts.
+- **`v0.58.4`:** Type definition paths in the `exports` map were corrected to point to the `dist/types` directory instead of the root.
+- **`v0.58.5`:** The `types` property was consistently placed as the first key within each entry in the `exports` map for better readability and to adhere to conventions.
+- **`v1.58.24`:**
+  - Added a separate `ssr/jsx-dev-runtime` export.
+  - Corrected multiple paths in the `typesVersions` field to ensure TypeScript resolves the correct declaration files for different module entry points.
 
-## Version 0.58.10
+### Repository & Project Management
 
-### Breaking Changes
-- The `oby` dependency has been renamed to `soby`.
+- The repository URL has switched between `github:wongchichong/woby` and `github:wobyjs/woby`, reflecting changes in ownership or organization.
+- The `files` array was updated to include the `docs` directory, ensuring documentation is published with the package.
 
-## Version 0.58.5 - 0.58.9
+## Version History
 
-### New Features
-- Added a `clean` script to the package.
-- The build process has been enhanced with the addition of `declaration` and `watch` scripts.
+The package has seen a rapid succession of patch and minor version bumps, indicating a fast pace of development and iteration.
 
-### Refactoring
-- The `exports` field has been reordered for better readability.
-- Updated `tsex` and `vite` dev dependencies.
-- The `types` paths in the `exports` field have been updated.
+- **`v0.57.14` -> `v0.58.0`**: Major version bump, signifying substantial changes.
+- **`v0.58.0` -> `v0.58.20`**: A series of patch releases.
+- **`v0.58.20` -> `v1.58.20`**: A major version jump from `0.x` to `1.x`, indicating a move towards a stable public API.
+- **`v1.58.20` -> `v1.58.33`**: Continued patch releases, suggesting ongoing bug fixes, performance improvements, and minor feature additions.
 
-## Version 0.58.0 - 0.58.4
+### 📝 Documentation Updates
 
-### New Features
-- The `release` script has been updated for a more streamlined release process.
-- The `build` and `compile` scripts have been updated to generate declaration maps.
-
-### Dependency Updates
-- Updated `typescript` and other dev dependencies.
-- The `oby` dependency has been updated.
-
-## Version 0.57.13 - 0.57.14
-
-### Bug Fixes
-- Changed `jsx-runtime.ts` to `jsx-runtime.js` in the `files` array.
+- **`v1.58.32`**: Updated documentation to reflect new Soby features including `toHtml`/`fromHtml` options for ObservableOptions and enhanced debugging with `DEBUGGER.verboseComment`.
+- **`v1.58.32`**: Fixed typo in DEBUGGER documentation (`DEBUGGERER` → `DEBUGGER`).

@@ -12,11 +12,11 @@
  * @module useMounted
  */
 
-import { DEBUGGER, Observable } from '../soby'
+import { Observable } from '../soby'
 import { $ } from '../methods/soby'
 import { $$ } from '../methods/soby'
 import { useMemo } from './soby'
-import { jsx } from '../jsx/runtime'
+import { mark } from '../utils/mark'
 
 /**
  * useMounted Hook
@@ -75,7 +75,7 @@ export function useMounted<T extends HTMLElement>(ref?: Observable<T>) {
   const isMounted = useMemo(() => !!$$(internalRef))
 
   // Only create a mount point (comment node) for debugging when no external ref is provided
-  const mount = !given ? jsx('comment', { ref: internalRef, data: DEBUGGER.verboseComment ? 'mount' : '' }) : undefined
+  const mount = !given ? mark('mount', internalRef) : undefined
 
   // Return the appropriate ref based on whether one was provided
   return {

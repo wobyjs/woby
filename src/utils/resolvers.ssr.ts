@@ -11,7 +11,16 @@ import { Stack } from '../soby'
 
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
 
-  if (isFunction(value)) {
+  if (isArray(value)) {
+
+    const [values, hasObservables] = resolveArraysAndStatics(value)
+
+    values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED] // Preserving this special symbol
+
+    setter(values, hasObservables || _dynamic, stack)
+
+  }
+  else if (isFunction(value)) {
 
     if (SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value || value[SYMBOL_OBSERVABLE_READABLE]?.parent?.disposed) {
 
@@ -32,16 +41,8 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
       }, stack)
 
     }
-
-  } else if (isArray(value)) {
-
-    const [values, hasObservables] = resolveArraysAndStatics(value)
-
-    values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED] // Preserving this special symbol
-
-    setter(values, hasObservables || _dynamic, stack)
-
-  } else {
+  }
+  else {
 
     setter(value, _dynamic, stack)
 

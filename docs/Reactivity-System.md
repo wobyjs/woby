@@ -8,6 +8,12 @@ Woby's reactivity system is built upon observables and provides fine-grained rea
 - [Reactive Dependencies](#reactive-dependencies)
 - [Stores](#stores)
 - [Batching](#batching)
+- [Enhanced Observable Functions](#enhanced-observable-functions)
+- [Reactive Utilities](#reactive-utilities)
+  - [Observable Creation ($)](#observable-creation-)
+  - [Observable Unwrapping ($$)](#observable-unwrapping-)
+  - [API Reference](#api-reference)
+    - [$$ Function](#-function)
 - [Advanced Patterns](#advanced-patterns)
 - [Best Practices](#best-practices)
 - [Effect Management](#effect-management)
@@ -199,409 +205,388 @@ userStore.personal({
 ### Store Arrays
 
 ```typescript
-// Add items
+// Access array items
+console.log($$(userStore.todos[0].text)) // 'Learn Woby'
+
+// Update array items
+userStore.todos[0].done(true)
+
+// Replace entire array
 userStore.todos([
-  ...$$(userStore.todos),
+  { id: 1, text: 'Learn Woby', done: true },
   { id: 2, text: 'Build app', done: false }
 ])
 ```
 
-## Best Practices
-
-### Use `$$()` for Unwrapping Observables
-
-When accessing the value of an observable, prefer using `$$()` over direct invocation `()`:
-
-```typescript
-import { $, $$ } from 'woby'
-
-// ❌ Avoid - Direct invocation
-const count = $(0)
-console.log($$(count)) // Works, but not recommended
-
-// ✅ Prefer - Using $$ for unwrapping
-const count = $(0)
-console.log($$(count)) // Recommended approach
-
-// ❌ Dangerous - Direct invocation can be ambiguous
-const maybeObservable = getValue() // Could be observable or plain value
-const value = $$(maybeObservable) // If it's not observable, this will cause an error
-
-// ✅ Safe - Using $$ handles both cases
-const maybeObservable = getValue()
-const value = $$(maybeObservable) // Works for both observables and plain values
-```
-
-**Why this matters:**
-- `$$()` safely handles both observable and non-observable values
-- `$$()` is more explicit about intent to unwrap a value
-- Prevents errors when dealing with uncertain types
-
-### Declaring Reactive Variables with `$()`
-
-To participate in Woby's reactivity system, variables must be declared using `$()`:
-
-```typescript
-import { $, $$, useEffect, useMemo } from 'woby'
-
-// ❌ Not reactive - plain variables don't trigger updates
-let count = 0;
-let name = 'John';
-
-// ✅ Reactive - variables declared with $() are trackable
-const count = $(0);
-const name = $('John');
-
-// Effects automatically track dependencies when accessed with $$()
-useEffect(() => {
-  console.log(`Count: ${$$(count)}, Name: ${$$(name)}`);
-  // This effect will re-run whenever count or name changes
-});
-
-// Memoized computations automatically track dependencies
-const doubledCount = useMemo(() => {
-  return $$(count) * 2; // Tracks count
-});
-```
-
-### Avoid Setting Observables to Undefined
-
-Be careful when calling observables without parameters as this sets them to `undefined`:
-
-```typescript
-import { $, $$ } from 'woby'
-
-const count = $(0)
-
-// ❌ Avoid - This sets count to undefined
-count() // Equivalent to count(undefined)
-
-// ✅ Correct - Only set values explicitly
-count(5) // Set to 5
-console.log($$(count)) // Read the value
-```
-
 ## Batching
 
-### Automatic Batching
-
-Woby automatically batches updates in event handlers and async operations:
-
-``typescript
-const count = $(0)
-const doubled = $(() => $$(count) * 2)
-
-const handleClick = () => {
-  count(1) // These updates are automatically batched
-  count(2)
-  count(3)
-  // Only one re-render occurs with final value of 3
-}
-```
-
-### Manual Batching
+Batch multiple updates to prevent unnecessary re-renders:
 
 ```typescript
 import { batch } from 'woby'
 
+const firstName = $('John')
+const lastName = $('Doe')
+const fullName = $(() => `${$$(firstName)} ${$$(lastName)}`)
+
+// Without batching - triggers multiple updates
+firstName('Jane')
+lastName('Smith')
+
+// With batching - triggers only one update
+batch(() => {
+  firstName('Bob')
+  lastName('Johnson')
+})
+```
+
+## Enhanced Observable Functions
+
+Recent enhancements to Soby (which Woby uses as its reactive core) have added automatic `valueOf()` and `toString()` methods to observable functions. These methods use `deepResolve()` to automatically resolve observables to their current values in various contexts.
+
+### Technical Implementation
+
+The enhancement was implemented in Soby's `src/objects/callable.ts` by adding the following lines to both `readable` and `writable` observable function generators:
+
+```typescript
+fn.valueOf = () => deepResolve(fn)
+fn.toString = () => fn.valueOf().toString()
+```
+
+This change affects the creation of observable functions, making them behave more naturally in JavaScript contexts where primitives are expected.
+
+### Automatic String Conversion in JSX
+
+Observables now automatically resolve to their values in JSX expressions:
+
+```typescript
+const Component = () => {
+  const name = $('John')
+  const count = $(5)
+  
+  return (
+    <div>
+      <p>Hello, {name}!</p>  // Renders: "Hello, John!"
+      <p>Count: {count}</p>   // Renders: "Count: 5"
+    </div>
+  )
+}
+```
+
+### Template Literals
+
+Observables automatically resolve in template literals:
+
+```typescript
 const name = $('John')
 const age = $(30)
 
-// Without batching: triggers 2 updates
-name('Jane')
-age(31)
-
-// With batching: triggers 1 update
-batch(() => {
-  name('Jane')
-  age(31)
-})
+console.log(`User: ${name}, Age: ${age}`)
+// Outputs: "User: John, Age: 30"
 ```
 
-### Checking Batch State
+### Mathematical Operations
+
+Observables automatically resolve in mathematical operations:
 
 ```typescript
-import { isBatching } from 'woby'
+const price = $(19.99)
+const quantity = $(3)
+const taxRate = $(0.08)
 
-console.log(isBatching()) // false
-
-batch(() => {
-  console.log(isBatching()) // true
-})
+const subtotal = price * quantity  // Results in 59.97
+const tax = subtotal * taxRate     // Results in 4.7976
+const total = subtotal + tax       // Results in 64.7676
 ```
 
-## Advanced Patterns
+### DOM Attribute Binding
 
-### Derived State
+When binding observables to DOM attributes, they automatically convert to appropriate string representations:
 
 ```typescript
-const items = $([
-  { name: 'Apple', price: 1.00, category: 'fruit' },
-  { name: 'Bread', price: 2.50, category: 'bakery' },
-  { name: 'Banana', price: 0.50, category: 'fruit' }
-])
+const isVisible = $(true)
+const opacity = $(0.5)
+const fontSize = $(16)
 
-const filter = $('all')
-
-const filteredItems = $(() => {
-  const f = $$(filter)
-  if (f === 'all') return $$(items)
-  return $$(items).filter(item => item.category === f)
-})
-
-const totalPrice = $(() => {
-  return $$(filteredItems).reduce((sum, item) => sum + item.price, 0)
-})
-
-const itemCount = $(() => $$(filteredItems).length)
-```
-
-### Reactive Patterns
-
-**Observer Pattern:**
-```typescript
-const eventBus = $<{ type: string, data: any } | null>(null)
-
-// Multiple components can listen to events
-const Component1 = () => {
-  const message = $('')
-  
-  // React to events
-  $(() => {
-    const event = $$(eventBus)
-    if (event?.type === 'notification') {
-      message(event.data.message)
-    }
-  })
-  
-  return <div>{message}</div> {/* Direct observable usage - reactive */}
-}
-
-// Emit events
-const emitEvent = (type: string, data: any) => {
-  eventBus({ type, data })
-}
-```
-
-**State Machine Pattern:**
-```typescript
-const state = $<'idle' | 'loading' | 'success' | 'error'>('idle')
-const data = $<any>(null)
-const error = $<string | null>(null)
-
-const fetchData = async () => {
-  state('loading')
-  error(null)
-  
-  try {
-    const result = await fetch('/api/data')
-    const json = await result.json()
-    
-    batch(() => {
-      data(json)
-      state('success')
-    })
-  } catch (err) {
-    batch(() => {
-      error(err.message)
-      state('error')
-    })
-  }
-}
-
-const Component = () => (
-  <div>
-    <button onClick={fetchData} disabled={() => $$(state) === 'loading'}>
-      {() => $$(state) === 'loading' ? 'Loading...' : 'Fetch Data'}
-    </button>
-    
-    <If when={() => $$(state) === 'success'}>
-      <pre>{() => JSON.stringify($$(data), null, 2)}</pre>
-    </If>
-    
-    <If when={() => $$(state) === 'error'}>
-      <div>Error: {error}</div>
-    </If>
+const element = (
+  <div 
+    hidden={!isVisible} 
+    style={{ 
+      opacity: opacity,
+      fontSize: `${fontSize}px`
+    }}
+  >
+    Content
   </div>
 )
 ```
 
-### Memory Management
+### Nested Object Properties
 
-**Cleanup:**
+Enhanced observables work seamlessly with nested objects and stores:
+
 ```typescript
-import { useCleanup } from 'woby'
+import { store } from 'woby'
 
-const Component = () => {
-  const timer = setInterval(() => {
-    console.log('tick')
-  }, 1000)
-  
-  useCleanup(() => {
-    clearInterval(timer)
+const user = store({ 
+  profile: {
+    name: $('John'), 
+    age: $(30)
+  },
+  settings: {
+    theme: $('dark')
+  }
+})
+
+// Automatic resolution in string contexts
+console.log(`User: ${user.profile.name}, Age: ${user.profile.age}, Theme: ${user.settings.theme}`)
+// Outputs: "User: John, Age: 30, Theme: dark"
+```
+
+### Performance Considerations
+
+The `deepResolve` function recursively resolves observables, which means for deeply nested structures there could be performance implications in hot paths. The resolution happens every time `valueOf()` or `toString()` is called.
+
+For performance-critical applications with deeply nested structures, explicit unwrapping with `$$()` may be preferred:
+
+```typescript
+// This maintains reactivity by directly passing the observable
+const reactive = <div>{deeplyNestedObject}</div>
+
+// This unwraps the observable to get its static value, losing reactivity
+const staticValue = <div>{$$(deeplyNestedObject)}</div>
+
+// With the valueOf enhancement, mathematical operations are simplified
+const price = $(19.99);
+const quantity = $(3);
+const total = <div>Total: {() => price * quantity}</div>; // Automatically computes 59.97
+```
+
+### Backward Compatibility
+
+This enhancement improves rather than breaks existing functionality:
+
+1. All existing code continues to work as before
+2. Explicit unwrapping with `$$()` still works and may be preferred in performance-critical situations
+3. The enhancement provides additional convenience without removing any capabilities
+
+## Reactive Utilities
+
+Woby provides several utility functions for working with reactive observables, built on top of the Soby reactive core. Recent enhancements to Soby have significantly improved how observables work in various JavaScript contexts.
+
+### Observable Creation ($)
+
+The `$()` function creates reactive observables that can track dependencies and notify subscribers of changes.
+
+```typescript
+import { $ } from 'woby'
+
+// Create a primitive observable
+const count = $(0)
+
+// Create a computed observable
+const doubled = $(() => $(count) * 2)
+
+// Create an observable with custom equality function
+const user = $({ id: 1, name: 'John' }, {
+  equals: (a, b) => a.id === b.id
+})
+```
+
+### Observable Unwrapping ($$)
+
+The `$$()` function (alias for Soby's `$.get`) safely unwraps observables, providing a consistent way to access values whether they're observables or plain values.
+
+```typescript
+import { $, $$ } from 'woby'
+
+// Unwrap a primitive observable
+const count = $(0)
+console.log($$(count)) // 0
+
+// Unwrap a computed observable
+const doubled = $(() => $$(count) * 2)
+console.log($$(doubled)) // 0
+
+// Safely unwrap uncertain values
+const maybeObservable = getValue() // Could be observable or plain value
+const value = $$(maybeObservable) // Works for both cases
+```
+
+### API Reference
+
+#### `$$` Function
+
+Alias for Soby's `$.get` function.
+
+```typescript
+function $$<T>(value: T, getFunction?: boolean): T extends (() => infer U) ? U : T
+```
+
+Parameters:
+- `value`: The value to unwrap (observable, function, or plain value)
+- `getFunction`: Whether to execute functions (default: true)
+
+Returns:
+- The unwrapped value if the input is an observable or function
+- The original value if it's neither an observable nor a function
+
+Examples:
+```typescript
+import { $, $$ } from 'woby'
+
+// Unwrapping observables
+const obs = $(42)
+console.log($$(obs)) // 42
+
+// Unwrapping functions
+console.log($$(() => 'hello')) // 'hello'
+
+// Plain values
+console.log($$(123)) // 123
+
+// Opt out of function execution
+const fn = () => 'function result'
+console.log($$(fn, false)) // () => 'function result'
+```
+
+## Advanced Patterns
+
+### Computed Observables with Complex Logic
+
+```typescript
+const items = $([
+  { id: 1, name: 'Item 1', price: 10 },
+  { id: 2, name: 'Item 2', price: 20 },
+  { id: 3, name: 'Item 3', price: 30 }
+])
+
+const total = $(() => {
+  return $$(items).reduce((sum, item) => sum + item.price, 0)
+})
+
+console.log($$(total)) // 60
+```
+
+### Reactive Filtering and Mapping
+
+```typescript
+const todos = $([
+  { id: 1, text: 'Task 1', done: true },
+  { id: 2, text: 'Task 2', done: false },
+  { id: 3, text: 'Task 3', done: true }
+])
+
+const completedTodos = $(() => {
+  return $$(todos).filter(todo => todo.done)
+})
+
+const todoTexts = $(() => {
+  return $$(todos).map(todo => todo.text)
+})
+```
+
+### Async Data with Resources
+
+```typescript
+import { useResource } from 'woby'
+
+const UserProfile = ({ userId }) => {
+  const user = useResource(async () => {
+    const response = await fetch(`/api/users/${userId}`)
+    return response.json()
   })
   
-  return <div>Component with cleanup</div>
+  return (
+    <div>
+      <If when={() => $$(user.loading)}>
+        <p>Loading...</p>
+      </If>
+      
+      <If when={user}>
+        <h1>{$$(user).name}</h1>
+        <p>Age: {$$(user).age}</p>
+      </If>
+    </div>
+  )
 }
 ```
 
-**Weak References:**
+## Best Practices
+
+### Efficient Observable Usage
+
+1. **Minimize Observable Creation**: Create observables at the appropriate scope level
+2. **Use Computed Observables**: For derived values that depend on other observables
+3. **Batch Updates**: When updating multiple observables that affect the same computation
+
+### When to Use $$ vs Direct Observable Usage
+
+1. **In JSX Expressions**: Direct observable passing is preferred for simple cases:
 ```typescript
-// Use WeakMap for component-specific observables
-const componentObservables = new WeakMap()
-
-const useComponentObservable = (component, initialValue) => {
-  if (!componentObservables.has(component)) {
-    componentObservables.set(component, $(initialValue))
-  }
-  return componentObservables.get(component)
-}
-```
-
-### Performance Optimization
-
-**Memoization:**
-```typescript
-import { useMemo } from 'woby'
-
-const expensiveComputation = (data) => {
-  // Expensive operation
-  return data.map(item => ({ ...item, processed: true }))
-}
-
 const Component = () => {
-  const data = $([/* large dataset */])
-  
-  // Only recomputes when data changes
-  const processedData = useMemo(() => expensiveComputation($$(data)))
-  
-  return <div>{() => $$(processedData).length} items processed</div>
+  const userName = $('John')
+  return <div>Hello {userName}</div> // Preferred
 }
 ```
 
-**Selective Updates:**
+2. **In Complex Expressions**: Use function expressions for complex logic:
 ```typescript
-const largeList = $([/* thousands of items */])
-
-// Only update specific item instead of entire list
-const updateItem = (id, updates) => {
-  largeList(prev => prev.map(item => 
-    item.id === id ? { ...item, ...updates } : item
-  ))
+const Component = () => {
+  const count = $(0)
+  return <div>Count: {() => $$(count) > 0 ? $$(count) : 'None'}</div>
 }
-
-// Or use a store for even finer granularity
-const listStore = store({ items: [/* items */] })
-listStore.items[5].name('Updated name') // Only updates this specific item
 ```
 
-For more performance optimization techniques, see our [Performance Guide](./Performance.md).
+3. **In Utility Functions**: Use `$$` when you need to ensure a value is unwrapped:
+```typescript
+const processData = (value) => {
+  const unwrapped = $$(value) // Ensures we have the actual value
+  return unwrapped.toString().toUpperCase()
+}
+```
+
+### When to Use Explicit Unwrapping
+
+For cases where you need the current static value of an observable rather than maintaining reactivity, it may be preferable to use explicit unwrapping with `$$()`:
+
+```typescript
+// This maintains reactivity by directly passing the observable
+const reactive = <div>{deeplyNestedObject}</div>
+
+// This unwraps the observable to get its static value, losing reactivity
+const staticValue = <div>{$$(deeplyNestedObject)}</div>
+
+// With the valueOf enhancement, mathematical operations are simplified
+const price = $(19.99);
+const quantity = $(3);
+const total = <div>Total: {() => price * quantity}</div>; // Automatically computes 59.97
+```
+
+### Avoiding Common Pitfalls
+
+1. **Don't Call `$$()` in Reactive Contexts**: This prevents automatic dependency tracking
+2. **Don't Mutate Objects Directly**: Use store methods or create new objects
+3. **Be Mindful of Circular Dependencies**: These can cause infinite update loops
 
 ## Effect Management
 
-### Automatic Dependency Tracking in Effects
-
-Woby's [useEffect](file://d:\Developments\tslib\woby\src\hooks\use_effect.ts#L28-L32) hook automatically tracks which observables are accessed within its callback function. This eliminates the need for manual dependency arrays required in React:
+Effects are used for side effects that should run when dependencies change:
 
 ```typescript
-import { $, $$, useEffect } from 'woby'
+import { useEffect } from 'woby'
 
-const userId = $(123)
-const theme = $('dark')
-
-// Woby automatically tracks userId and theme
-useEffect(() => {
-  console.log(`User ID: ${$$(userId)}, Theme: ${$$(theme)}`)
-})
-
-// The effect will automatically re-run when either observable changes
-userId(456) // Effect re-runs with new userId
-theme('light') // Effect re-runs with new theme
-```
-
-### Component Mounting vs Effect Re-execution
-
-Unlike React where components re-execute completely on prop changes, Woby components execute only once when mounted, while effects re-run based on observable changes:
-
-React behavior (for comparison):
-```typescript
-function ReactComponent({ userName }) {
-  console.log("Component re-running") // Runs on every render
+const Component = () => {
+  const count = $(0)
   
+  // Runs when count changes
   useEffect(() => {
-    console.log(userName) // Runs when userName changes (based on dependency array)
-  }, [userName])
-}
-```
-
-Woby behavior:
-```typescript
-const WobyComponent = ({ userName }) => {
-  console.log("Component mounting") // Runs only once
-  
-  useEffect(() => {
-    console.log($$(userName)) // Runs when userName observable changes
+    console.log(`Count is now: ${$$(count)}`)
   })
   
-  return <div>Hello {() => $$(userName)}</div>
+  return (
+    <button onClick={() => count(c => $$(c) + 1)}>
+      Increment: {count}
+    </button>
+  )
 }
-```
-
-### Optimizing Effects with Early Returns
-
-Use early returns to prevent unnecessary work in effects:
-
-```typescript
-import { $, $$, useEffect } from 'woby'
-
-const name = $('John')
-const previousName = $('John')
-
-useEffect(() => {
-  // Skip effect if name hasn't meaningfully changed
-  if ($$(previousName) === $$(name)) return
-  
-  previousName($$(name)) // Update tracking observable
-  performExpensiveOperation($$(name))
-})
-```
-
-### Separating Unrelated Concerns
-
-Organize unrelated reactive logic into separate effects for better performance:
-
-```typescript
-import { $, $$, useEffect } from 'woby'
-
-const userProfile = store({ name: 'John', age: 30 })
-const appTheme = $('dark')
-const networkStatus = $('online')
-
-// Separate effects for unrelated concerns
-useEffect(() => {
-  // Only tracks userProfile.name
-  document.title = `Welcome ${$$(userProfile.name)}`
-})
-
-useEffect(() => {
-  // Only tracks appTheme
-  document.body.className = `theme-${$$(appTheme)}`
-})
-
-useEffect(() => {
-  // Only tracks networkStatus
-  showNotification(`Network status: ${$$(networkStatus)}`)
-})
-```
-
-### Comparison with React's Approach
-
-| Aspect | React | Woby |
-|--------|-------|------|
-| Component Execution | Re-runs on every render | Runs once on mount |
-| Dependency Tracking | Manual dependency arrays | Automatic observable tracking |
-| Effect Re-execution | Based on dependency array comparison | Based on observable access |
-| Performance | Virtual DOM diffing | Direct DOM updates |
-| Code Complexity | Requires careful dependency management | Automatic dependency tracking |
-
-This automatic dependency tracking system is one of Woby's key advantages, making reactive programming more intuitive and less error-prone compared to manual dependency management in other frameworks.

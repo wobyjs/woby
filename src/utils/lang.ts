@@ -50,7 +50,8 @@ export const indexOf = (() => {
 
 })()
 
-export const { isArray } = Array
+// export const { isArray } = Array
+export const isArray = <T>(a: any): a is Array<T> => a instanceof Array
 
 export const isBoolean = (value: unknown): value is boolean => {
 

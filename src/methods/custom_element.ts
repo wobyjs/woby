@@ -22,22 +22,24 @@
  * @module customElement
  */
 
-import { $$, isObservable } from "./soby"
-import { SYMBOL_JSX, SYMBOL_DEFAULT } from '../constants'
-import { setChild, setProp, setChildStatic, setChildReplacement, setProps, setAttribute } from "../utils/setters"
-import { resolveArraysAndStatics, resolveChild } from "../utils/resolvers"
+import { $, $$, isObservable } from "./soby"
+import { SYMBOL_DEFAULT } from '../constants'
+import { setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
-import { callStack, Observable, resolve, Stack, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNCACHED } from "soby"
+import { callStack, isObservableWritable, Observable, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
 import type { ObservableOptions } from "soby"
-import { isFunction, isObject, isPureFunction } from "../utils"
+import { isObject, isPureFunction } from "../utils"
 import { useEffect } from "../hooks"
-import { render } from "./render"
-import { isJsx, jsx } from "../jsx-runtime"
+import { isJsx } from "../jsx-runtime"
 import { kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
-import { convertAllDocumentStylesToConstructed, observeStylesheetChanges, unobserveStylesheetChanges } from "../utils/stylesheets"
+import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from "../utils/stylesheets"
+import { ObservableMaybe } from "~/types"
+import { useLightDom } from "../hooks/use_attached"
+import { mark } from "../utils/mark"
+
 
 /**
  * ElementAttributes type helper
@@ -47,10 +49,26 @@ import { convertAllDocumentStylesToConstructed, observeStylesheetChanges, unobse
  * 
  * @template T - Component function type
  */
+export type ElementAttributesPattern<P> =
+    | (keyof P extends string ? keyof P : never)
+    | (keyof JSX.HTMLAttributes<HTMLElement> extends string ? keyof JSX.HTMLAttributes<HTMLElement> : never)
+    | `style.${keyof JSX.StyleProperties extends string ? keyof JSX.StyleProperties : never}`
+    | `style$${keyof JSX.StyleProperties extends string ? keyof JSX.StyleProperties : never}`
+
+export type ExtractProps<T> = T extends (props: infer P) => any ? P : never
+
+export type ElementAttributes1<T extends (...args: any) => any> =
+    // {} | { children?: JSX.Child } | 
+    (T extends (props: infer P) => any
+        ? Partial<(JSX.HTMLAttributes<HTMLElement> & ElementAttributesPattern<P>)>
+        : Partial<JSX.HTMLAttributes<HTMLElement>>)
+
 export type ElementAttributes<T extends (...args: any) => any> =
-    T extends (props: infer P) => any
-    ? JSX.HTMLAttributes<HTMLElement> & P
-    : JSX.HTMLAttributes<HTMLElement>
+    Partial<JSX.HTMLAttributes<HTMLElement>> &
+    Partial<Record<ElementAttributesPattern<ExtractProps<T>>, any>>
+
+// export type ElementAttributes<T extends (props: P) => any, P> =
+//     Partial<(JSX.HTMLAttributes<HTMLElement> & ElementAttributesPattern<P>)>
 
 // Initialize stylesheet observation at module level (run once)
 // This ensures we only have one observer watching for stylesheet changes
@@ -93,6 +111,7 @@ type ElementAttributePattern<P> =
 */
 const setObservableValue = (obj: any, key: string, value: string) => {
     if (isObservable(obj[key])) {
+        if (!isObservableWritable(obj[key])) return
         // Cast value according to observable options type
         const observable = obj[key] as Observable<any>
         const options = (observable[SYMBOL_OBSERVABLE_WRITABLE]).options as ObservableOptions<any> | undefined
@@ -265,6 +284,71 @@ const getNestedProperty = (obj: any, path: string) => {
     return (obj as any)[kebabToCamelCase(path)]
 }
 
+export const useAttached = (ref?: ObservableMaybe<Node | null>, match?: (parent: Node | null) => boolean) => {
+    const isGiven = ref !== undefined
+
+    if (!ref)
+        ref = $<Node>()
+
+    const parent = $<Node | null>(null)
+
+    useEffect(() => {
+        if (!$$(ref)) return
+
+        const updateParent = () => {
+            let currentParent: Node | null = $$(ref).parentNode
+
+            // If match function is provided, traverse up until match or root
+            if (match) {
+                while (currentParent) {
+                    if (match(currentParent)) {
+                        parent(currentParent)
+                        return
+                    }
+                    currentParent = currentParent.parentNode
+                }
+                // If no match found, parent remains null
+                parent(null)
+            } else {
+                // Default behavior: return immediate parent
+                parent(currentParent)
+            }
+        }
+
+        // Initial parent check
+        updateParent()
+
+        // Create a MutationObserver to watch for parent changes
+        const observer = new MutationObserver(() => {
+            updateParent()
+        })
+
+        // Start observing the parent element changes
+        observer.observe($$(ref).getRootNode() as Node, { subtree: true, childList: true })
+
+        // Cleanup observer on unmount
+        return () => observer.disconnect()
+    })
+
+    // Return the reference node
+    return {
+        parent,
+        mount: isGiven ? undefined : mark('attach', ref),
+        ref
+    }
+}
+
+
+const isLightDom = (node: Node): boolean => {
+    let current: Node | null = node?.parentNode
+    while (current) {
+        if ((current as Element)?.shadowRoot) {
+            return true
+        }
+        current = current.parentNode
+    }
+    return false
+}
 /**
  * Creates a custom HTML element with reactive properties
  * 
@@ -398,12 +482,22 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
             C.observedAttributes = Object.keys(this.props)
 
             if (!isJsx(this.props)) {
-                const shadowRoot = this.attachShadow({ mode: 'open' })
+                const shadowRoot = this.attachShadow({ mode: 'open', serializable: true })
                 if (!($$(this.props.children) instanceof HTMLSlotElement)) {
                     this.slots = document.createElement('slot')
+                    // this.slots.onslotchange = () => {
+                    //     console.log('slotchange', this.slots.assignedElements())
+                    // }
                     this.props.children(this.slots)
                 }
 
+                // console.log('isLightDom', isLightDom(this), [this])
+                // if (isLightDom(this)) {
+                //     const { lightDom } = useLightDom(this)
+                //     useEffect(() => {
+                //         console.log('lightDom parent', $$(lightDom), /* ($$(lp) as Element).assignedSlot, */ this, [component])
+                //     })
+                // }
                 // Check if stylesheet encapsulation should be ignored
                 const ignoreStyle = (this.props as any).ignoreStyle === true
 
@@ -419,9 +513,13 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
 
                 // this.placeHolder = document.createComment('')
                 // shadowRoot.append(this.placeHolder/* , this.slots */)
-                render(createElement(component, this.props), shadowRoot)
+                // render(createElement(component, this.props), shadowRoot) 
+
+                //creating the child in tsx
+                setChild(shadowRoot, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
             }
             else {
+                //never happen
                 setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
             }
 

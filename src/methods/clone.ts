@@ -43,7 +43,7 @@ export const clone = <T,>(source: T, deepClone = false): T => {
 		if (typeof source[key] === "function" && !isObservable(source[key])) {
 			newObject[key] = source[key]
 		}
-		else if (isObservable(source[key]) && isObject($$(source[key])) && !Array.isArray($$(source[key]))) {
+		else if (isObservable(source[key]) && isObject($$(source[key])) && !isArray($$(source[key]))) {
 			const innerObject = clone($$(source[key]))
 			newObject[key] = innerObject
 		}

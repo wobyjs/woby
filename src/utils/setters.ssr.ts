@@ -226,7 +226,7 @@ export const setChildStatic = (parent: any, fragment: Fragment, fragmentOnly: bo
 
     const fragmentNext = FragmentUtils.make()
 
-    const children = (Array.isArray(child) ? child : [child]) as any[] //TSC
+    const children = (isArray(child) ? child : [child]) as any[] //TSC
 
     for (let i = 0, l = children.length; i < l; i++) {
 

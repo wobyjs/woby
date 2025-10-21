@@ -36,6 +36,8 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **[Installation Guide](./docs/Installation.md)** - Get started with Woby
 - **[Quick Start Tutorial](./docs/Quick-Start.md)** - Build your first app
 - **[API Reference](./docs/Core-Methods.md)** - Complete API documentation
+- **[Reactive Utilities](./docs/Reactive-Utilities.md)** - Working with observables and the `$$` function
+- **[Reactivity System](./docs/Reactivity-System.md)** - Understanding Woby's reactivity model
 - **[Examples Gallery](./docs/Examples.md)** - Practical examples and patterns
 - **[Class Management](./docs/Class-Management.md)** - Advanced class handling with reactive support
 - **[Best Practices](./docs/Best-Practices.md)** - Recommended patterns and practices
@@ -82,7 +84,7 @@ Woby provides first-class support for creating custom HTML elements with reactiv
 ```tsx
 // Define a component with default props
 const Counter = defaults(() => ({
-  value: $(0, { type: 'number' }),
+  value: $(0, { type: 'number' } as const),
   title: $('Counter')
 }), ({ value, title }) => (
   <div>
@@ -197,6 +199,7 @@ Contributions are welcome! Please read our [contributing guidelines](./docs/Cont
 
 - **[S](https://github.com/adamhaile/S)**: for pioneering reactive programming approaches that inspired this framework.
 - **[sinuous/observable](https://github.com/luwes/sinuous/tree/master/packages/sinuous/observable)**: for providing an excellent Observable implementation that served as the foundation for this library.
+- **[solid](https://www.solidjs.com)**: for serving as a reference implementation, popularizing signal-based reactivity, and building a strong community.
 - **[solid](https://www.solidjs.com)**: for serving as a reference implementation, popularizing signal-based reactivity, and building a strong community.
 - **[trkl](https://github.com/jbreckmckye/trkl)**: for demonstrating the power of minimal, focused implementations.
 
@@ -726,6 +729,132 @@ $ ( () => 123, false ); // => () => 123
 
 $ ( 123 ); // => 123
 ```
+
+#### `$$`
+
+This function unwraps a potentially observable value. Recent enhancements to Soby (which Woby uses as its reactive core) have added automatic `valueOf()` and `toString()` methods to observable functions, making them behave more naturally in JavaScript contexts where primitives are expected.
+
+[Read upstream documentation](https://github.com/wobyjs/soby#get).
+
+Interface:
+
+```ts
+function $$ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
+```
+
+Usage:
+
+```tsx
+import {$$} from 'woby';
+
+// Getting the value out of an observable
+
+const o = $(123);
+
+$$ ( o ); // => 123
+
+// Getting the value out of a function
+
+$$ ( () => 123 ); // => 123
+
+// Getting the value out of an observable but not out of a function
+
+$$ ( o, false ); // => 123
+$$ ( () => 123, false ); // => () => 123
+
+// Getting the value out of a non-observable and non-function
+
+$$ ( 123 ); // => 123
+```
+
+##### Enhanced Observable Functions
+
+Recent enhancements to Soby have added automatic `valueOf()` and `toString()` methods to observable functions. These methods use `deepResolve()` to automatically resolve observables to their current values in various contexts.
+
+###### Technical Implementation
+
+The enhancement was implemented in Soby's `src/objects/callable.ts` by adding the following lines to both `readable` and `writable` observable function generators:
+
+```typescript
+fn.valueOf = () => deepResolve(fn)
+fn.toString = () => fn.valueOf().toString()
+```
+
+This change affects the creation of observable functions, making them behave more naturally in JavaScript contexts where primitives are expected.
+
+###### Automatic String Conversion
+
+Observables now automatically resolve to their values in string contexts:
+
+```typescript
+import {$} from 'woby'
+
+// In template literals
+const name = $('John')
+console.log(`Hello, ${name}!`) // Outputs: "Hello, John!"
+
+// In JSX expressions
+const App = () => {
+  const count = $(5)
+  return <div>Count: {count}</div> // Renders: "Count: 5"
+}
+```
+
+###### Mathematical Operations
+
+Observables automatically resolve in mathematical operations:
+
+```typescript
+import {$} from 'woby'
+
+const count = $(5)
+const result = count + 10 // Results in 15 automatically
+
+const price = $(19.99)
+const tax = $(0.08)
+const total = price * (1 + tax) // Automatically calculates with current values
+```
+
+###### DOM Attribute Binding
+
+When binding observables to DOM attributes, they automatically convert to appropriate string representations:
+
+```typescript
+import {$} from 'woby'
+
+const isVisible = $(true)
+const opacity = $(0.5)
+
+// These will automatically convert to appropriate string values
+const element = <div hidden={isVisible} style={{ opacity }}>Content</div>
+```
+
+###### Performance Considerations
+
+The `deepResolve` function recursively resolves observables, which means for deeply nested structures there could be performance implications in hot paths. The resolution happens every time `valueOf()` or `toString()` is called.
+
+For performance-critical applications with deeply nested structures, explicit unwrapping with `$$()` may be preferred:
+
+```typescript
+// This maintains reactivity by directly passing the observable
+const reactive = <div>{deeplyNestedObject}</div>
+
+// This unwraps the observable to get its static value, losing reactivity
+const staticValue = <div>{$$(deeplyNestedObject)}</div>
+
+// With the valueOf enhancement, mathematical operations are simplified
+const price = $(19.99);
+const quantity = $(3);
+const total = <div>Total: {() => price * quantity}</div>; // Automatically computes 59.97
+```
+
+###### Backward Compatibility
+
+This enhancement improves rather than breaks existing functionality:
+
+1. All existing code continues to work as before
+2. Explicit unwrapping with `$$()` still works and may be preferred in performance-critical situations
+3. The enhancement provides additional convenience without removing any capabilities
 
 #### `batch`
 
@@ -1893,7 +2022,7 @@ This hook is the crucial other ingredient that we need, other than observables t
 
 This hook registers a function to be called when any of its dependencies change, and the return of that function is wrapped in a read-only observable and returned.
 
-The function receives an optional `stack` parameter (an Stack object) that provides a debugging stack trace to help pinpoint the source of reactive dependencies. To enable this feature, set `DEBUGGERER.debug = true`.
+The function receives an optional `stack` parameter (an Stack object) that provides a debugging stack trace to help pinpoint the source of reactive dependencies. To enable this feature, set `DEBUGGER.debug = true`. Additionally, you can enable verbose comment debugging by setting `DEBUGGER.verboseComment = true`.
 
 [Read upstream documentation](https://github.com/wobyjs/soby#memo).
 
@@ -2322,9 +2451,24 @@ Interface:
 
 ```ts
 type ObservableOptions<T> = {
-  equals?: (( value: T, valuePrev: T ) => boolean) | false
+  equals?: (( value: T, valuePrev: T ) => boolean) | false,
+  type?: 'string' | 'function' | 'object' | 'number' | 'boolean' | 'symbol' | 'undefined' | 'bigint' | Constructor<any> | T,
+  toHtml?: (t: T) => string,
+  fromHtml?: (s: string) => T
 };
 ```
+
+The `type` option provides runtime type checking for observables. When specified, any value assigned to the observable will be validated against this type, and a `TypeError` will be thrown if the types don't match.
+
+The `toHtml` option provides a function to convert the observable value to a string representation for HTML attributes. This is useful when binding observables to DOM element attributes.
+
+The `fromHtml` option provides a function to convert a string value from HTML attributes back to the observable's type. This is useful when binding HTML attributes back to observables.
+
+The type option supports:
+- Primitive type strings: `'string'`, `'number'`, `'boolean'`, `'function'`, `'object'`, `'symbol'`, `'undefined'`, `'bigint'`
+- Constructor functions (like `String`, `Number`, `Boolean`, etc.)
+- Custom constructor types
+- Generic type `T`
 
 Usage:
 
@@ -2335,6 +2479,22 @@ import {$} from 'woby';
 const createTimestamp = ( options?: ObservableOptions ): Observable<number> => {
   return $( Date.now (), options );
 };
+
+// Create an observable that only accepts number values
+const numberObservable = $( 0, { type: 'number' } );
+
+// This would work fine
+numberObservable( 123 );
+
+// This would throw a TypeError at runtime
+// numberObservable('123'); // TypeError: Expected value of type 'number', but received 'string'
+
+// Create an observable with HTML conversion functions
+const dateObservable = $(new Date(), { 
+  type: 'object',
+  toHtml: (date) => date.toISOString(),
+  fromHtml: (str) => new Date(str)
+});
 ```
 
 #### `Resource`

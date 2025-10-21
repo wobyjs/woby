@@ -15,7 +15,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T |
     const updateElement = (/** null placeholder */e: Text, f: boolean, v: any, pv: HTMLElement[] /** in proxy */) => {
         e.textContent = ''
 
-        if (Array.isArray(v)) {
+        if (isArray(v)) {
             e[HTMLValue] = 'array'
             if (!f)
                 e.parentElement.replaceChildren(e, ...toArray(v) as any)
@@ -92,6 +92,27 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T |
         return value as T
     }
     //Observable
+    else if (isArray(value)) {
+        const [values, hasObservables] = resolveArraysAndStatics(value)
+
+        values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED] // Preserving this special symbol
+
+        if (hasObservables) {
+            const e = createText('')
+            let f = true  //first time no parent
+            let v: any[]
+            useRenderEffect(() => {
+                const pv = v
+                v = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined') //, true)
+                v = updateElement(e, f, v, pv)
+                f = false
+            }, stack)
+            return v //[...v] as any
+        } else {
+            const vs: any[] = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined')
+            return vs
+        }
+    }
     else if (isFunction(value)) {
 
         if (SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value || value[SYMBOL_OBSERVABLE_READABLE]?.parent?.disposed) {
@@ -114,26 +135,6 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T |
                 f = false
             }, stack)
             return v as any // [e, ...[v].flat(Infinity)] as any
-        }
-    } else if (isArray(value)) {
-        const [values, hasObservables] = resolveArraysAndStatics(value)
-
-        values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED] // Preserving this special symbol
-
-        if (hasObservables) {
-            const e = createText('')
-            let f = true  //first time no parent
-            let v: any[]
-            useRenderEffect(() => {
-                const pv = v
-                v = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined') //, true)
-                v = updateElement(e, f, v, pv)
-                f = false
-            }, stack)
-            return v //[...v] as any
-        } else {
-            const vs: any[] = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined')
-            return vs
         }
     }
     else {

@@ -10,7 +10,7 @@
 
 import { untrack } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
-import { createComment, createHTMLNode, createSVGNode } from '../utils/creators'
+import { createComment, createHTMLNode, createSVGNode, createText } from '../utils/creators'
 import { isClass, isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
@@ -65,7 +65,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
     if (isFunction(component)) {
 
-        const props = hasChildren ? { ..._props, children } : _props
+        const props = hasChildren ? Object.assign(_props, { children }) : _props
 
         return wrapElement(() => {
 
@@ -77,12 +77,15 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
         const isSVG = isSVGElement(component)
         const isComment = component === 'comment'
+        const isText = component === 'text'
+
         const createNode = isSVG ? createSVGNode : createHTMLNode
+        const create = isComment ? () => createComment((_props as any).data ?? '') : isText ? () => createText((_props as any).data ?? '') : createNode
 
         return wrapElement((): Child => {
             const ce = customElements.get(component) as ReturnType<typeof customElement>
 
-            const child = !!ce ? new ce(_props) : (isComment ? createComment((_props as any).data ?? '') : createNode(component) as HTMLElement)
+            const child = !!ce ? new ce(_props) : create(component) as HTMLElement
 
             // if (!!ce)
             //     (child as InstanceType<ReturnType<typeof customElement>>).props = { ..._props }
