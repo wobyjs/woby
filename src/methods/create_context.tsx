@@ -1,7 +1,7 @@
 import { useEffect } from '../hooks'
 import { CONTEXTS_DATA, } from '../constants'
 import { $, $$ } from './soby'
-import { ObservableOptions } from '../soby'
+import { context, ObservableOptions, resolve } from '../soby'
 import type { Child, Context, ContextWithDefault, ObservableMaybe } from '../types'
 import { } from '../soby'
 import { defaults } from './defaults'
@@ -96,22 +96,22 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
   const symbol = Symbol()
 
   const Provider = ({ value, children }: { value: T, children: Child }): Child => {
-    // return context({ [symbol]: value }, () => {
-    const ref = $<Comment>()
+    return context({ [symbol]: value }, () => {
+      const ref = $<Comment>()
 
-    useEffect(() => {
-      if (!$$(ref)) return
-      $$(ref)[symbol] = value
-      return () => delete $$(ref)[symbol]
-    })
+      useEffect(() => {
+        if (!$$(ref)) return
+        $$(ref)[symbol] = value
+        return () => delete $$(ref)[symbol]
+      })
 
-    return jsx('context-provider', {
-      ref,
-      value,
-      symbol: $(symbol, hidden),
-      children
+      return jsx('context-provider', {
+        ref,
+        value,
+        symbol: $(symbol, hidden),
+        children: resolve(children) //must resolve, for non dom
+      })
     })
-    // })
   }
 
   const Context = { Provider, symbol }

@@ -37,6 +37,7 @@ export {
     cloneElement,
     setRef,
     customElement,
+    wrapCloneElement,
 } from './methods'
 export type {
     ElementAttributes,
@@ -71,7 +72,9 @@ export {
     noop,
     once,
     fixBigInt,
-    toArray
+    toArray,
+    setProp,
+    resolveArraysAndStatics
 } from './utils'
 export * from "./constants"
 
