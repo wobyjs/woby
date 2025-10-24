@@ -78,9 +78,10 @@
     "scripts": {
         "git": "git-cliff > CHANGELOG.md && git-commit-m",
         "bump": "pnpm version patch",
-        "npmjs": "pnpm publish",
+        "npmjs": "pnpm publish --access public",
+        "push": "git push && git push --tags",
         "commit": "pnpm bump && pnpm push",
-        "release": "run-s -c git bump npmjs",
+        "release": "run-s -c git commit npmjs",
         "declaration": "tsc --declaration --emitDeclarationOnly --declarationMap",
         "declaration:watch": "tsc --declaration --emitDeclarationOnly  --declarationMap--watch",
         "build:only": "vite build",
