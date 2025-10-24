@@ -60,6 +60,41 @@ This document provides a comprehensive mapping of React types to their Woby equi
 | `React.ReactNodeArray` | `JSX.Child[]` | Array of renderable nodes |
 | `React.ReactPortal` | `JSX.Portal` | Portal component |
 
+## HTML Utility Types
+
+Woby provides a set of HTML utility types for handling common HTML attribute patterns:
+
+| Woby Utility | Description |
+|--------------|-------------|
+| `HtmlBoolean` | Handles boolean values with automatic conversion |
+| `HtmlNumber` | Handles numeric values with automatic conversion |
+| `HtmlDate` | Handles Date values with ISO string serialization |
+| `HtmlBigInt` | Handles BigInt values with automatic conversion |
+| `HtmlObject` | Handles Object values with JSON serialization |
+| `HtmlLength` | Handles CSS length values (px, em, rem, %, etc.) |
+| `HtmlBox` | Handles CSS box values (margin, padding, border, etc.) |
+| `HtmlColor` | Handles CSS color values (hex, rgb, etc.) |
+| `HtmlStyle` | Handles CSS style values (objects and strings) |
+
+### Usage Example
+
+``tsx
+// Woby with HTML utilities
+import { $, HtmlBoolean, HtmlNumber, HtmlColor } from 'woby'
+
+interface Props {
+  enabled?: boolean
+  count?: number
+  color?: string
+}
+
+const def = () => ({
+  enabled: $(false, HtmlBoolean),
+  count: $(0, HtmlNumber),
+  color: $('#000000', HtmlColor)
+})
+```
+
 ## State and Dispatch Types
 
 | React Type | Woby Equivalent | Description |

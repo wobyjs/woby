@@ -377,6 +377,66 @@ const doubled = useMemo(() => $(count) * 2)
 
 For a comprehensive guide on React to Woby type conversions, see our [React to Woby Type Conversion Guide](./docs/React-to-Woby-Type-Conversion.md).
 
+## HTML Utility Types
+
+Woby provides a set of HTML utility types that make it easier to work with common HTML attribute patterns in custom elements. These utilities implement the `ObservableOptions` interface and provide consistent conversion between JavaScript values and HTML attributes.
+
+### Available HTML Utilities
+
+| Woby Utility | Description |
+|--------------|-------------|
+| `HtmlBoolean` | Handles boolean values with automatic conversion |
+| `HtmlNumber` | Handles numeric values with automatic conversion |
+| `HtmlDate` | Handles Date values with ISO string serialization |
+| `HtmlBigInt` | Handles BigInt values with automatic conversion |
+| `HtmlObject` | Handles Object values with JSON serialization |
+| `HtmlLength` | Handles CSS length values (px, em, rem, %, etc.) |
+| `HtmlBox` | Handles CSS box values (margin, padding, border, etc.) |
+| `HtmlColor` | Handles CSS color values (hex, rgb, etc.) |
+| `HtmlStyle` | Handles CSS style values (objects and strings) |
+
+### Usage Example
+
+``tsx
+import { $, defaults, customElement, HtmlBoolean, HtmlNumber, HtmlColor, HtmlStyle } from 'woby'
+
+interface CounterProps {
+  count?: number
+  enabled?: boolean
+  color?: string
+  styles?: Record<string, string | number>
+}
+
+const def = () => ({
+  count: $(0, HtmlNumber),
+  enabled: $(true, HtmlBoolean),
+  color: $('#000000', HtmlColor),
+  styles: $({} as Record<string, string | number>, HtmlStyle)
+})
+
+const Counter = defaults(def, (props: CounterProps) => {
+  const { count, enabled, color, styles } = props
+  return (
+    <div style={() => ({ color: $(color), ...$$(styles) })}>
+      <span>Count: {count}</span>
+      <span>Status: {enabled ? 'Enabled' : 'Disabled'}</span>
+    </div>
+  )
+})
+
+// Register as custom element
+customElement('styled-counter', Counter)
+```
+
+### Benefits of HTML Utility Types
+
+1. **Type Safety**: Each utility provides proper type conversion between HTML attributes and JavaScript values
+2. **Consistency**: All utilities follow the same pattern and behavior
+3. **Automatic Serialization**: Complex values are automatically serialized to/from HTML attributes
+4. **Error Handling**: Utilities handle edge cases and invalid values gracefully
+5. **Empty String Handling**: All utilities treat empty strings as `undefined` for consistent behavior
+6. **Equality Checking**: Each utility implements proper equality checking for value comparison
+
 ## Performance Tips
 
 1.  **Use Direct Observable Passing**: For simple reactive content, pass observables directly rather than using `$()` in functions

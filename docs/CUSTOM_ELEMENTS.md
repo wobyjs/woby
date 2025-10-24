@@ -471,6 +471,227 @@ customElement('toggle-element', Toggle)
 - `symbol`: Created using `Symbol()`
 - Other types: Treated as strings
 
+## HTML Utility Types
+
+Woby provides a set of HTML utility types that make it easier to work with common HTML attribute patterns. These utilities implement the `ObservableOptions` interface and provide consistent conversion between JavaScript values and HTML attributes.
+
+### HtmlBoolean
+
+Handles boolean values with automatic conversion from HTML string attributes:
+
+```tsx
+import { HtmlBoolean } from 'woby'
+
+const Toggle = defaults(() => ({
+  enabled: $(false, HtmlBoolean)
+}), ({ enabled }) => <div>Enabled: {enabled ? 'Yes' : 'No'}</div>)
+
+customElement('toggle-element', Toggle)
+
+// HTML usage:
+// <toggle-element enabled="true"></toggle-element>  // enabled = $(true)
+// <toggle-element enabled="1"></toggle-element>     // enabled = $(true)
+// <toggle-element enabled=""></toggle-element>      // enabled = $(true)
+// <toggle-element enabled="false"></toggle-element> // enabled = $(false)
+```
+
+### HtmlNumber
+
+Handles numeric values with automatic conversion from HTML string attributes:
+
+```tsx
+import { HtmlNumber } from 'woby'
+
+const Counter = defaults(() => ({
+  value: $(0, HtmlNumber)
+}), ({ value }) => <div>Count: {value}</div>)
+
+customElement('counter-element', Counter)
+
+// HTML usage:
+// <counter-element value="42"></counter-element>  // value = $(42)
+// <counter-element value="-5"></counter-element>  // value = $(-5)
+// <counter-element value="3.14"></counter-element> // value = $(3.14)
+```
+
+### HtmlDate
+
+Handles Date values with ISO string serialization:
+
+```tsx
+import { HtmlDate } from 'woby'
+
+const DatePicker = defaults(() => ({
+  selectedDate: $(new Date(), HtmlDate)
+}), ({ selectedDate }) => <div>Date: {() => $$(selectedDate).toString()}</div>)
+
+customElement('date-picker', DatePicker)
+
+// HTML usage:
+// <date-picker selected-date="2023-01-01T00:00:00.000Z"></date-picker>
+// selectedDate = $(new Date("2023-01-01T00:00:00.000Z"))
+```
+
+### HtmlBigInt
+
+Handles BigInt values with automatic conversion:
+
+```tsx
+import { HtmlBigInt } from 'woby'
+
+const BigIntComponent = defaults(() => ({
+  largeNumber: $(BigInt(0), HtmlBigInt)
+}), ({ largeNumber }) => <div>Number: {() => $$(largeNumber).toString()}</div>)
+
+customElement('bigint-component', BigIntComponent)
+
+// HTML usage:
+// <bigint-component large-number="12345678901234567890"></bigint-component>
+// largeNumber = $(BigInt("12345678901234567890"))
+```
+
+### HtmlObject
+
+Handles Object values with JSON serialization:
+
+```tsx
+import { HtmlObject } from 'woby'
+
+const ObjectComponent = defaults(() => ({
+  config: $({} as any, HtmlObject)
+}), ({ config }) => <div>Config: {() => JSON.stringify($$(config))}</div>)
+
+customElement('object-component', ObjectComponent)
+
+// HTML usage:
+// <object-component config='{"key":"value","nested":{"num":42}}'></object-component>
+// config = $({ key: "value", nested: { num: 42 } })
+```
+
+### HtmlLength
+
+Handles CSS length values (px, em, rem, %, etc.):
+
+```tsx
+import { HtmlLength } from 'woby'
+
+const SizeComponent = defaults(() => ({
+  width: $('100px', HtmlLength),
+  height: $('auto', HtmlLength)
+}), ({ width, height }) => (
+  <div style={() => ({ width: $$(width), height: $$(height) })}>
+    Sized content
+  </div>
+))
+
+customElement('size-component', SizeComponent)
+
+// HTML usage:
+// <size-component width="50%" height="200px"></size-component>
+// width = $("50%"), height = $("200px")
+```
+
+### HtmlBox
+
+Handles CSS box values (margin, padding, border, etc.):
+
+```tsx
+import { HtmlBox } from 'woby'
+
+const BoxComponent = defaults(() => ({
+  margin: $('10px', HtmlBox),
+  padding: $('5px 10px', HtmlBox)
+}), ({ margin, padding }) => (
+  <div style={() => ({ margin: $$(margin), padding: $$(padding) })}>
+    Box content
+  </div>
+))
+
+customElement('box-component', BoxComponent)
+
+// HTML usage:
+// <box-component margin="1em" padding="5px 10px 15px 20px"></box-component>
+```
+
+### HtmlColor
+
+Handles CSS color values (hex, rgb, etc.):
+
+```tsx
+import { HtmlColor } from 'woby'
+
+const ColorComponent = defaults(() => ({
+  backgroundColor: $('#ffffff', HtmlColor),
+  textColor: $('rgb(0, 0, 0)', HtmlColor)
+}), ({ backgroundColor, textColor }) => (
+  <div style={() => ({ backgroundColor: $$(backgroundColor), color: $$(textColor) })}>
+    Colored content
+  </div>
+))
+
+customElement('color-component', ColorComponent)
+
+// HTML usage:
+// <color-component background-color="#ff0000" text-color="blue"></color-component>
+// backgroundColor = $("#ff0000"), textColor = $("blue")
+```
+
+### HtmlStyle
+
+Handles CSS style values (objects and strings):
+
+```tsx
+import { HtmlStyle } from 'woby'
+
+const StyleComponent = defaults(() => ({
+  customStyles: $({} as any, HtmlStyle)
+}), ({ customStyles }) => (
+  <div style={() => $$(customStyles)}>
+    Styled content
+  </div>
+))
+
+customElement('style-component', StyleComponent)
+
+// HTML usage:
+// <style-component custom-styles="color: red; font-size: 1.5em;"></style-component>
+// customStyles = $({ color: "red", fontSize: "1.5em" })
+```
+
+### Using HTML Utility Types
+
+All HTML utility types follow a consistent pattern:
+
+1. **Import the utility**: Import the desired HTML utility from 'woby'
+2. **Apply to observables**: Use the utility as the second parameter to `$()`
+3. **Automatic conversion**: The utility handles conversion between HTML strings and JavaScript values
+
+``tsx
+import { $, defaults, customElement, HtmlBoolean, HtmlNumber, HtmlColor } from 'woby'
+
+const StyledCounter = defaults(() => ({
+  count: $(0, HtmlNumber),
+  enabled: $(true, HtmlBoolean),
+  color: $('#000000', HtmlColor)
+}), ({ count, enabled, color }) => (
+  <div style={() => ({ color: $$(color) })}>
+    <span>Count: {count}</span>
+    <span>Status: {enabled ? 'Enabled' : 'Disabled'}</span>
+  </div>
+))
+
+customElement('styled-counter', StyledCounter)
+```
+
+### Benefits of HTML Utility Types
+
+1. **Type Safety**: Each utility provides proper type conversion between HTML attributes and JavaScript values
+2. **Consistency**: All utilities follow the same pattern and behavior
+3. **Automatic Serialization**: Complex values are automatically serialized to/from HTML attributes
+4. **Error Handling**: Utilities handle edge cases and invalid values gracefully
+5. **Empty String Handling**: All utilities treat empty strings as `undefined` for consistent behavior
+6. **Equality Checking**: Each utility implements proper equality checking for value comparison
+
 ## Nested Properties
 
 Custom elements support nested properties using both dash-separated attribute names and dot notation:

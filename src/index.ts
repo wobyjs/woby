@@ -109,4 +109,4 @@ export const ObservableSymbol = SYMBOL_OBSERVABLE
 export * as JSX from './types'
 
 // Add HtmlBoolean export
-export { HtmlBoolean, HtmlNumber, HtmlDate, HtmlBigInt, HtmlObject, HtmlLength, HtmlBox, HtmlColor } from 'soby'
+export { HtmlBoolean, HtmlNumber, HtmlDate, HtmlBigInt, HtmlObject, HtmlLength, HtmlBox, HtmlColor, HtmlStyle } from 'soby'

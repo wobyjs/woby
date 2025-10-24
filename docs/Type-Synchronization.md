@@ -72,6 +72,130 @@ Boolean conversion follows HTML standards:
 <my-element disabled="anything"></my-element>
 ```
 
+## HTML Utility Types
+
+Woby provides a set of HTML utility types that make it easier to work with common HTML attribute patterns. These utilities implement the `ObservableOptions` interface and provide consistent conversion between JavaScript values and HTML attributes.
+
+### HtmlBoolean
+
+Handles boolean values with automatic conversion from HTML string attributes:
+
+```tsx
+import { HtmlBoolean } from 'woby'
+
+const def = () => ({
+  enabled: $(false, HtmlBoolean)
+})
+```
+
+### HtmlNumber
+
+Handles numeric values with automatic conversion from HTML string attributes:
+
+```tsx
+import { HtmlNumber } from 'woby'
+
+const def = () => ({
+  value: $(0, HtmlNumber)
+})
+```
+
+### HtmlDate
+
+Handles Date values with ISO string serialization:
+
+```tsx
+import { HtmlDate } from 'woby'
+
+const def = () => ({
+  selectedDate: $(new Date(), HtmlDate)
+})
+```
+
+### HtmlBigInt
+
+Handles BigInt values with automatic conversion:
+
+```tsx
+import { HtmlBigInt } from 'woby'
+
+const def = () => ({
+  largeNumber: $(BigInt(0), HtmlBigInt)
+})
+```
+
+### HtmlObject
+
+Handles Object values with JSON serialization:
+
+```tsx
+import { HtmlObject } from 'woby'
+
+const def = () => ({
+  config: $({} as any, HtmlObject)
+})
+```
+
+### HtmlLength
+
+Handles CSS length values (px, em, rem, %, etc.):
+
+```tsx
+import { HtmlLength } from 'woby'
+
+const def = () => ({
+  width: $('100px', HtmlLength),
+  height: $('auto', HtmlLength)
+})
+```
+
+### HtmlBox
+
+Handles CSS box values (margin, padding, border, etc.):
+
+```tsx
+import { HtmlBox } from 'woby'
+
+const def = () => ({
+  margin: $('10px', HtmlBox),
+  padding: $('5px 10px', HtmlBox)
+})
+```
+
+### HtmlColor
+
+Handles CSS color values (hex, rgb, etc.):
+
+```tsx
+import { HtmlColor } from 'woby'
+
+const def = () => ({
+  backgroundColor: $('#ffffff', HtmlColor),
+  textColor: $('rgb(0, 0, 0)', HtmlColor)
+})
+```
+
+### HtmlStyle
+
+Handles CSS style values (objects and strings):
+
+```tsx
+import { HtmlStyle } from 'woby'
+
+const def = () => ({
+  customStyles: $({} as any, HtmlStyle)
+})
+```
+
+### Benefits of HTML Utility Types
+
+1. **Type Safety**: Each utility provides proper type conversion between HTML attributes and JavaScript values
+2. **Consistency**: All utilities follow the same pattern and behavior
+3. **Automatic Serialization**: Complex values are automatically serialized to/from HTML attributes
+4. **Error Handling**: Utilities handle edge cases and invalid values gracefully
+5. **Empty String Handling**: All utilities treat empty strings as `undefined` for consistent behavior
+6. **Equality Checking**: Each utility implements proper equality checking for value comparison
+
 ## HTML Attribute Serialization
 
 Custom elements support custom serialization of observable values to and from HTML attributes using the `toHtml` and `fromHtml` options:
