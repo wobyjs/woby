@@ -8,7 +8,7 @@ In web components, HTML attributes are always strings, but JavaScript/TypeScript
 
 This document covers both the comprehensive type synchronization mechanism and a simpler approach.
 
-For information about how the `merge` function handles different prop sources, see [Component Defaults](./Component-Defaults.md).
+For information about how the `merge` function handles different prop sources, see [Component Defaults](./CUSTOM_ELEMENTS.md#component-defaults-and-two-way-synchronization).
 
 ## How It Works
 

@@ -10,13 +10,24 @@ import { jsx } from '../jsx-runtime'
 
 // const serializer = { toHtml: (o) => o + '', fromHtml: o => o } as ObservableOptions
 const hidden = { toHtml: o => undefined } as ObservableOptions
-const ContextProvider = defaults(() => ({
-  value: $(undefined) as ObservableMaybe<any> | undefined,
-  children: $(undefined) as ObservableMaybe<Child> | undefined,
-  symbol: $<Symbol>(undefined) as ObservableMaybe<Symbol> | undefined
-}), ({ children }) => {
-  return children
-})
+
+// Define the props interface explicitly to help with type generation
+interface ContextProviderProps {
+  value?: ObservableMaybe<any>
+  children?: ObservableMaybe<Child>
+  symbol?: ObservableMaybe<Symbol>
+}
+
+const ContextProvider = defaults(
+  (): ContextProviderProps => ({
+    value: $(undefined),
+    children: $(undefined),
+    symbol: $<Symbol>(undefined)
+  }),
+  ({ children }: ContextProviderProps) => {
+    return children
+  }
+)
 
 customElement('context-provider', ContextProvider)
 

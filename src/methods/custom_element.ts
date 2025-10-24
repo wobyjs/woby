@@ -32,11 +32,11 @@ import type { ObservableOptions } from "soby"
 import { isObject, isPureFunction } from "../utils"
 import { useEffect } from "../hooks"
 import { isJsx } from "../jsx-runtime"
-import { kebabToCamelCase } from "../utils/string"
+import { camelToKebabCase, kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
 import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from "../utils/stylesheets"
-import { ObservableMaybe } from "~/types"
+import { ObservableMaybe } from "../types"
 import { useLightDom } from "../hooks/use_attached"
 import { mark } from "../utils/mark"
 
@@ -527,7 +527,9 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
                 this.propDict = {}
 
                 Object.keys(this.props).forEach((k) => {
-                    this.propDict[k.toLowerCase()] = k
+                    const c = camelToKebabCase(k)
+                    this.propDict[c] = k
+                    this.propDict[k] = c
                 })
             }
         }
@@ -552,7 +554,7 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
             // props -> attr (1st)
             for (const k of aKeys as any)
                 if (!this.attributes[this.propDict[k]] || isJsx(p))
-                    setProp(this, k, p[k], callStack('connectedCallback'))
+                    setProp(this, this.propDict[k], p[k], callStack('connectedCallback'))
             // ------------
 
             // attr -> props (1st)

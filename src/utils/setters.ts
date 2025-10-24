@@ -11,7 +11,7 @@ import { classesToggle } from '../utils/classlist'
 import { createText, createComment } from '../utils/creators'
 import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
-import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
+import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isObject, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
 import { kebabToCamelCase } from '../utils/string'
 import { normalizePropertyPath, setNestedAttribute } from '../utils/nested'
@@ -853,7 +853,7 @@ export const setStyleStatic = (() => {
 
         } else {
 
-            element.style[key] = (isString(value) || (propertyNonDimensionalCache[key] ||= propertyNonDimensionalRe.test(key)) ? value : `${value}px`)
+            element.style[key] = (isString(value) || isObject(value) || (propertyNonDimensionalCache[key] ||= propertyNonDimensionalRe.test(key)) ? value : `${value}px`)
 
         }
 

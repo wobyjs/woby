@@ -84,6 +84,7 @@ export * from "./constants"
 export type { BatchFunction, CallbackFunction, CleanupFunction, DisposeFunction, EffectFunction, ErrorFunction, EqualsFunction, /* ListenerFunction, */ MapFunction, /* MapIndexFunction, */ MapValueFunction, MemoFunction, /* ObservedFunction, ObservedDisposableFunction, ReactionFunction, */ SelectorFunction, SuspenseFunction, TryCatchFunction, UntrackFunction, UpdateFunction, WithFunction } from './soby'
 export type { Observable, ObservableReadonly, ObservableOptions } from 'soby'
 export { DEBUGGER, Stack, callStack } from 'soby'
+export type { CSSUnit, CSSLength } from 'soby'
 
 import { SYMBOL_OBSERVABLE } from 'soby'
 
@@ -106,3 +107,6 @@ export type {
 
 export const ObservableSymbol = SYMBOL_OBSERVABLE
 export * as JSX from './types'
+
+// Add HtmlBoolean export
+export { HtmlBoolean, HtmlNumber, HtmlDate, HtmlBigInt, HtmlObject, HtmlLength, HtmlBox, HtmlColor } from 'soby'

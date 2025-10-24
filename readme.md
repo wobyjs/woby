@@ -47,8 +47,8 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **[Simple Type Synchronization](./docs/Type-Sync-Simple.md)** - Straightforward approach to type sync
 
 ### Specialized Documentation
-- **[Context API](./CONTEXT_API.md)** - Advanced context management for components and custom elements
-- **[Custom Elements](./CUSTOM_ELEMENTS.md)** - Creating and using Web Components with Woby
+- **[Context API](./docs/CONTEXT_API.md)** - Advanced context management for components and custom elements
+- **[Custom Elements](./docs/CUSTOM_ELEMENTS.md)** - Creating and using Web Components with Woby
 
 ## Key Features
 
@@ -75,7 +75,7 @@ const ThemedElement = defaults(() => ({}), () => {
 customElement('themed-element', ThemedElement)
 ```
 
-[Learn more about the Context API](./CONTEXT_API.md)
+[Learn more about the Context API](./docs/CONTEXT_API.md)
 
 ### Custom Elements
 
@@ -126,7 +126,7 @@ One of Woby's unique features is its advanced nested property support, allowing 
 
 This feature is not available in React or SolidJS, making Woby a more powerful choice for creating highly configurable custom elements that can be used directly in HTML.
 
-[Learn more about Custom Elements](./CUSTOM_ELEMENTS.md)
+[Learn more about Custom Elements](./docs/CUSTOM_ELEMENTS.md)
 
 ## Demos
 

@@ -49,11 +49,11 @@
     "typeRoots": [
       "types",
     ],
-    "paths": {
-      "~/*": [
-        "./src/*"
-      ],
-    }
+    // "paths": {
+    //   "~/*": [
+    //     "./src/*"
+    //   ],
+    // }
     // "incremental": true,
     // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     // "composite": true,

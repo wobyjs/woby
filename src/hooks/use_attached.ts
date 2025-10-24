@@ -23,10 +23,9 @@
  */
 
 import { $, $$, } from "../methods/soby"
-import { DEBUGGER, isObservable } from "soby"
-import { useEffect, useMemo } from "../hooks"
-import { jsx } from "../jsx-runtime"
-import { ObservableMaybe } from "~/types"
+import { isObservable } from "soby"
+import { useEffect } from "../hooks"
+import { ObservableMaybe } from "../types"
 import { mark } from "../utils/mark"
 
 export const useAttached = (ref?: ObservableMaybe<Node | null>, match?: (parent: Node | null) => boolean) => {
