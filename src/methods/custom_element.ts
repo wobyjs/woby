@@ -73,7 +73,10 @@ export type ElementAttributes<T extends (...args: any) => any> =
 // Initialize stylesheet observation at module level (run once)
 // This ensures we only have one observer watching for stylesheet changes
 // but each custom element can get the latest cached stylesheets
-observeStylesheetChanges()
+// Only initialize in browser environment
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    observeStylesheetChanges()
+}
 
 /**
  * ElementAttributePattern type
@@ -451,9 +454,85 @@ const isLightDom = (node: Node): boolean => {
  * ```
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
-    const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
+    // Check if we're in an SSR environment
+    const isSSR = typeof window === 'undefined' || typeof document === 'undefined';
+    
+    // For SSR, we just return a simple function that creates a standard HTML element
+    if (isSSR) {
+        // In SSR mode, we create a function that renders the component as a regular HTML element
+        // without shadow DOM or custom element registration
+        const ssrComponent = (props?: P) => {
+            // Create a standard HTML element
+            const element: any = {
+                nodeType: 1,
+                tagName: tagName.toUpperCase(),
+                attributes: {},
+                childNodes: [],
+                style: {},
+                
+                // Method to set attributes
+                setAttribute: function (name: string, value: any) {
+                    this.attributes[name] = String(value);
+                },
+                
+                // Method to append child nodes
+                appendChild: function (child: any) {
+                    this.childNodes.push(child);
+                },
+                
+                // Getter for outerHTML
+                get outerHTML() {
+                    // Build attributes string
+                    const attrs = Object.entries(this.attributes)
+                        .map(([name, value]) => `${name}="${value}"`)
+                        .join(' ');
+                    const attrStr = attrs ? ` ${attrs}` : '';
+                    
+                    // Handle self-closing tags
+                    if (['br', 'hr', 'img', 'input', 'meta', 'link'].includes(this.tagName.toLowerCase())) {
+                        return `<${this.tagName}${attrStr}>`;
+                    }
+                    
+                    // Build children string
+                    const children = this.childNodes.map((child: any) => {
+                        if (typeof child === 'object' && child !== null) {
+                            if ('outerHTML' in child) {
+                                return child.outerHTML;
+                            } else if ('textContent' in child) {
+                                return child.textContent;
+                            }
+                        }
+                        return String(child);
+                    }).join('');
+                    
+                    return `<${this.tagName}${attrStr}>${children}</${this.tagName}>`;
+                }
+            };
+            
+            // Set props as attributes
+            if (props) {
+                Object.keys(props).forEach(key => {
+                    if (key !== 'children' && props[key] !== undefined) {
+                        // Handle observable values
+                        const value = isObservable(props[key]) ? $$(props[key]) : props[key];
+                        // Convert to string for HTML attributes
+                        element.setAttribute(key, String(value));
+                    }
+                });
+            }
+            
+            return element;
+        };
+        
+        // Attach the component function for internal use
+        (ssrComponent as any).__component__ = component;
+        
+        return ssrComponent;
+    }
+    
+    const defaultPropsFn = (component as any)[SYMBOL_DEFAULT];
     if (!defaultPropsFn) {
-        console.error(`Component ${tagName} is missing default props. Please use the 'defaults' helper function to provide default props.`)
+        console.error(`Component ${tagName} is missing default props. Please use the 'defaults' helper function to provide default props.`);
     }
 
     /**

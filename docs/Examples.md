@@ -22,12 +22,21 @@ import { $, render } from 'woby'
 const Counter = () => {
   const count = $(0)
   
+  // Multiple ways to update observables (all valid):
+  const increment = () => count(count + 1)        // Direct observable reference
+  const decrement = () => count(count - 1)        // Direct observable reference
+  const reset = () => count(0)                    // Direct value assignment
+  
+  // Alternative syntaxes (also valid):
+  // const increment = () => count($$(count) + 1) // Using $$ unwrapping
+  // const increment = () => count(c => c + 1)    // Using function updater
+  
   return (
     <div>
       <h1>Count: {count}</h1>
-      <button onClick={() => count(c => c + 1)}>+</button>
-      <button onClick={() => count(c => c - 1)}>-</button>
-      <button onClick={() => count(0)}>Reset</button>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+      <button onClick={reset}>Reset</button>
     </div>
   )
 }
@@ -175,9 +184,13 @@ import { $, useBoolean } from 'woby'
 
 const useCounter = (initial = 0) => {
   const count = $(initial)
-  const increment = () => count(c => c + 1)
-  const decrement = () => count(c => c - 1)
+  const increment = () => count(count + 1)  // Direct observable reference
+  const decrement = () => count(count - 1)  // Direct observable reference
   const reset = () => count(initial)
+  
+  // Alternative syntaxes (also valid):
+  // const increment = () => count($$(count) + 1) // Using $$ unwrapping
+  // const increment = () => count(c => c + 1)    // Using function updater
   
   return { count, increment, decrement, reset }
 }
@@ -762,4 +775,4 @@ const handleClick = (e) => {
 - **[Boxes](https://codesandbox.io/s/demo-boxes-wx6rqb)** - Animated boxes
 - **[Triangle](https://codesandbox.io/s/demo-triangle-l837v0)** - Performance test
 
-**[View More Examples](https://github.com/wobyjs/demo)**
+**[View More Examples](https://github.com/wobyjs/demo)

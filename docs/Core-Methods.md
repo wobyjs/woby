@@ -35,6 +35,25 @@ const user = $({ id: 1, name: 'John' }, {
 })
 ```
 
+### Observable Update Syntax
+
+Woby provides multiple ways to update observables, all of which are valid and functionally equivalent:
+
+```typescript
+const count = $(0)
+
+// Method 1: Direct observable reference (recommended)
+count(count + 1)
+
+// Method 2: Using $$ unwrapping
+count($$(count) + 1)
+
+// Method 3: Using function updater (similar to React)
+count(c => c + 1)
+```
+
+All three methods will correctly update the observable value and trigger any dependent computations or UI updates.
+
 ### Observable Options
 
 Observables can be created with options to control their behavior, including type information for custom elements:
@@ -135,7 +154,7 @@ const name = $('John')
 
 // Effect automatically tracks count and name
 useEffect(() => {
-  console.log(`Count: ${$$count)}, Name: ${$$name)}`)
+  console.log(`Count: ${$$(count)}, Name: ${$$(name)}`)
 })
 
 // Effect re-runs when either observable changes
@@ -155,7 +174,7 @@ const lastName = $('Doe')
 
 // Computed observable that updates when dependencies change
 const fullName = useMemo(() => {
-  return `${$$firstName)} ${$$lastName)}`
+  return `${$$(firstName)} ${$$(lastName)}`
 })
 
 console.log($$(fullName)) // "John Doe"
@@ -217,7 +236,7 @@ const App = () => {
   return (
     <div>
       <h1>Count: {count}</h1>
-      <button onClick={() => count(c => $$(c) + 1)}>+</button>
+      <button onClick={() => count(count + 1)}>+</button>
     </div>
   )
 }
@@ -397,7 +416,7 @@ const Component = () => {
   const count = $(0)
   
   const handleClick = () => {
-    count(c => $$(c) + 1)
+    count(count + 1)  // Direct observable reference
   }
   
   const handleInputChange = (e) => {
@@ -447,4 +466,3 @@ const DataComponent = () => {
     </div>
   )
 }
-```

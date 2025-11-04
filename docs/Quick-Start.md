@@ -363,7 +363,7 @@ Woby supports complex class expressions including arrays, objects, and functions
 
 All class expressions support reactive observables that automatically update when values change:
 
-```
+```typescript
 const isActive = $(false)
 const theme = $('dark')
 const error = $(false)
@@ -386,7 +386,7 @@ const error = $(false)
 
 Woby supports object syntax for conditional classes where keys are class names and values are boolean conditions:
 
-```
+```typescript
 const error = $(false)
 const warning = $(false)
 
@@ -402,7 +402,7 @@ const warning = $(false)
 
 Classes can be computed using functions that return class strings or other class expressions:
 
-```
+```typescript
 const count = $(0)
 
 <div class={() => count() > 5 ? 'high-count' : 'low-count'}>
@@ -451,9 +451,22 @@ const input = $('')          // String observable
 
 ### 2. **Reactive Updates**
 
+Woby provides multiple ways to update observables, all of which are valid:
+
 ```typescript
-todos(prev => [...prev, newTodo])  // State updates trigger re-renders
+const count = $(0)
+
+// Method 1: Direct observable reference (recommended)
+count(count + 1)
+
+// Method 2: Using $$ unwrapping
+count($$(count) + 1)
+
+// Method 3: Using function updater (similar to React)
+count(c => c + 1)
 ```
+
+All three methods will correctly update the observable value and trigger any dependent computations or UI updates.
 
 ### 3. **Dynamic Rendering**
 

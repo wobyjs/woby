@@ -62,11 +62,9 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         throw new Error('Providing "children" both as a prop and as rest arguments is forbidden')
 
     }
+    const props = hasChildren ? Object.assign(rest, { children }) : _props
 
     if (isFunction(component)) {
-
-        const props = hasChildren ? Object.assign(_props, { children }) : _props
-
         return wrapElement(() => {
 
             return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
@@ -80,15 +78,15 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         const isText = component === 'text'
 
         const createNode = isSVG ? createSVGNode : createHTMLNode
-        const create = isComment ? () => createComment((_props as any).data ?? '') : isText ? () => createText((_props as any).data ?? '') : createNode
+        const create = isComment ? () => createComment((props as any).data ?? '') : isText ? () => createText((props as any).data ?? '') : createNode
 
         return wrapElement((): Child => {
             const ce = customElements.get(component) as ReturnType<typeof customElement>
 
-            const child = !!ce ? new ce(_props) : create(component) as HTMLElement
+            const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
 
             // if (!!ce)
-            //     (child as InstanceType<ReturnType<typeof customElement>>).props = { ..._props }
+            //     (child as InstanceType<ReturnType<typeof customElement>>).props = { ...props }
 
             if (isSVG) child['isSVG'] = true
 
@@ -96,19 +94,19 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
             untrack(() => {
 
-                if (_props) {
+                if (props) {
                     if (!!ce) {
-                        const { children, ...np } = _props as any //children already initialized in new ce(_props)
+                        const { children, ...np } = props as any //children already initialized in new ce(props)
                         setProps(child, np, stack)
                     }
                     else
-                        setProps(child, _props as any, stack)
+                        setProps(child, props as any, stack)
                 }
 
                 // //already in prop
                 // if (hasChildren || ce?.__component__) {
                 //     // setChild(child, !!ce ? createElement(ce.__component__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
-                //     setChild(child, children ?? _props.children, FragmentUtils.make(), stack)
+                //     setChild(child, children ?? props.children, FragmentUtils.make(), stack)
                 // }
 
             })

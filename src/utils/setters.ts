@@ -207,7 +207,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 
-            const textNode = createText(child)
+            const textNode = createText(child as any)
 
             if (!fragmentOnly) {
 
@@ -264,7 +264,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 
-            FragmentUtils.pushNode(fragmentNext, createText(child))
+            FragmentUtils.pushNode(fragmentNext, createText(child as any))
 
         } else if (type === 'object' && child !== null && typeof child.nodeType === 'number') {
 

@@ -1,0 +1,19 @@
+{
+    "private": true,
+    "name": "counter",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --force --mode dev --host",
+        "prod": "vite --force",
+        "build": "vite build",
+        "test": "playwright test",
+        "test:ui": "playwright test -ui"
+    },
+    "dependencies": {
+        "vite": "^4.4.11",
+        "woby": "workspace:*"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.56.1"
+    }
+}

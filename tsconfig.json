@@ -61,13 +61,13 @@
   "exclude": [
     "vite.*.*ts",
     "dist",
-    "dist1",
+    "test",
     "dist/*",
-    "src1",
     "jsx-runtime.d.tsx",
     "ssr.d.tsx",
     "testing.d.tsx",
     "via.d.tsx",
     "node_modules",
+    "demo",
   ]
 }

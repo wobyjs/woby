@@ -37,9 +37,11 @@ console.log($$(count)) // 0
 count(1)
 console.log($$(count)) // 1
 
-// Update with a function
-count(prev => prev + 1)
-console.log(count()) // 2
+// Update with different syntaxes
+count(count + 1)         // Direct observable reference
+count($$(count) + 1)     // Using $$ unwrapping
+count(c => c + 1)        // Using function updater (similar to React)
+console.log(count()) // 4
 ```
 
 ### Observable Types
@@ -110,7 +112,7 @@ const Component = () => {
   return (
     <div>
       <p>{message}: {count}</p>
-      <button onClick={() => count(c => $$(c) + 1)}>+</button>
+      <button onClick={() => count(count + 1)}>+</button>
     </div>
   )
 }
@@ -562,6 +564,25 @@ const price = $(19.99);
 const quantity = $(3);
 const total = <div>Total: {() => price * quantity}</div>; // Automatically computes 59.97
 ```
+
+### Observable Update Syntax
+
+Woby provides multiple ways to update observables, all of which are valid and functionally equivalent:
+
+```typescript
+const count = $(0)
+
+// Method 1: Direct observable reference (recommended)
+count(count + 1)
+
+// Method 2: Using $$ unwrapping
+count($$(count) + 1)
+
+// Method 3: Using function updater (similar to React)
+count(c => c + 1)
+```
+
+All three methods will correctly update the observable value and trigger any dependent computations or UI updates.
 
 ### Avoiding Common Pitfalls
 
