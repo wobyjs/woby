@@ -1,5 +1,3 @@
-
-
 import { untrack } from './soby'
 import { wrapElement } from './wrap_element'
 import { createHTMLNode, createSVGNode } from '../utils/creators.ssr'
@@ -41,11 +39,28 @@ export const createElement = <P = { children?: Observable<Child> }>(component: C
         const createNode = isSVG ? createSVGNode : createHTMLNode
 
         return wrapElement((): Child => {
-            const ce = customElements.get(component) as ReturnType<typeof customElement>
+            // Check if we're in SSR mode (no customElements API)
+            const isSSR = typeof customElements === 'undefined'
+            let ce = null
+
+            // Only try to get custom element if we're not in SSR mode
+            if (!isSSR) {
+                ce = customElements.get(component) as ReturnType<typeof customElement>
+            }
+
             const child = createNode(component) as HTMLElement //TSC
 
-            if (!!ce)
-                (child as InstanceType<ReturnType<typeof customElement>>).props = { ..._props }
+            // Check if this is our custom element class (SSR version)
+            if (!!ce) {
+                // For SSR custom elements, we need to handle them differently
+                if (typeof ce === 'function' && (ce as any).__component__) {
+                    // This is our SSR custom element, just pass props directly
+                    (child as any).props = { ..._props }
+                } else {
+                    // This is a regular custom element - cast to any to avoid TypeScript errors
+                    (child as any).props = { ..._props }
+                }
+            }
 
             if (isSVG) child['isSVG'] = true
 
@@ -57,8 +72,14 @@ export const createElement = <P = { children?: Observable<Child> }>(component: C
                     setProps(child, _props as any, stack)
                 }
 
-                if (hasChildren || ce?.__component__) {
-                    setChild(child, !!ce ? createElement(ce.__component__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
+                // Check if this is our custom element class (SSR version)
+                if (hasChildren || (ce && (ce as any).__component__)) {
+                    // For SSR custom elements, we need to handle them differently
+                    if (ce && typeof ce === 'function' && (ce as any).__component__) {
+                        setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
+                    } else if (ce) {
+                        setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
+                    }
                 }
 
             })

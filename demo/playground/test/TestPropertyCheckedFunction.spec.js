@@ -5,7 +5,6 @@ test.use({
     baseURL: 'http://localhost:5173',
 });
 
-
 test('TestPropertyCheckedFunction', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
@@ -13,19 +12,26 @@ test('TestPropertyCheckedFunction', async ({ page }) => {
     // Wait for content to load
     await page.waitForLoadState('networkidle');
 
-    // Look for TestPropertyCheckedFunction component
-    const propertyCheckedFunctionHeading = page.locator('h3', { hasText: 'Property - Checked Function' });
-    const propertyCheckedFunctionCount = await propertyCheckedFunctionHeading.count();
+    // Find the heading for TestPropertyCheckedFunction component
+    const heading = page.getByText('Property - Checked Function');
+    const headingCount = await heading.count();
 
-    if (propertyCheckedFunctionCount > 0) {
-        // Get the parent container of the heading
-        const container = propertyCheckedFunctionHeading.locator('..');
-        // Check that it has elements
-        const elements = container.locator('*');
-        const elementCount = await elements.count();
-        expect(elementCount).toBeGreaterThan(0);
-        console.log('Playground demo TestPropertyCheckedFunction component renders correctly');
+    if (headingCount > 0) {
+        // Find the checkbox input that comes immediately after the heading
+        const checkbox = heading.locator('+ p input[type="checkbox"]');
+        const checkboxCount = await checkbox.count();
+
+        if (checkboxCount > 0) {
+            // Check if the checkbox is checked (it should be since the initial value is true)
+            const isChecked = await checkbox.evaluate(el => el.checked);
+
+            // Verify the checkbox is checked
+            expect(isChecked).toBe(true);
+            console.log('Playground demo TestPropertyCheckedFunction component renders correctly');
+        } else {
+            console.log('TestPropertyCheckedFunction component checkbox not found');
+        }
     } else {
-        console.log('Playground demo TestPropertyCheckedFunction component not found');
+        console.log('TestPropertyCheckedFunction component heading not found');
     }
 });

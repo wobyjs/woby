@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // Configure the web server for this specific test suite
 test.use({
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
 });
 
 test('TestPropertyCheckedStatic', async ({ page }) => {
@@ -13,18 +13,18 @@ test('TestPropertyCheckedStatic', async ({ page }) => {
     await page.waitForLoadState('networkidle');
 
     // Find the specific heading for TestPropertyCheckedStatic
-    const heading = page.locator('h3', { hasText: 'Property - Checked Static' });
+    const heading = page.getByText('Property - Checked Static');
     const headingCount = await heading.count();
-    
+
     if (headingCount > 0) {
         // Find the checkbox input that comes immediately after the heading
         const checkbox = heading.locator('+ p input[type="checkbox"]');
         const checkboxCount = await checkbox.count();
-        
+
         if (checkboxCount > 0) {
             // Check if the checkbox is checked
             const isChecked = await checkbox.evaluate(el => el.checked);
-            
+
             // Verify the checkbox is checked
             expect(isChecked).toBe(true);
             console.log('Playground demo TestPropertyCheckedStatic component renders correctly');

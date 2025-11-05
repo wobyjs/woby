@@ -111,7 +111,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
             })
 
-            return child
+            return child as any
 
         })
 

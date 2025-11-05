@@ -1,30 +1,37 @@
 /* IMPORT */
 
-import { $, $$, useMemo, render, Component } from 'woby/ssr'
+import { $, $$, useMemo, Component } from 'woby/ssr'
+import { renderToString } from 'woby/ssr'
+import { customElement } from '../../src/methods/custom_element'
+import { defaults } from '../../src/methods/defaults'
+
+// Define a simple counter component with defaults
+const Counter = defaults(() => ({
+    value: $(0, { type: 'number' } as const),
+    title: $('Counter')
+}), ({ value, title }: { value: any, title: any }) => {
+    return <div>
+        <h1>{title}</h1>
+        <p>Count: {value}</p>
+    </div>
+})
+
+// Register as a custom element
+customElement('counter-element', Counter)
 
 /* MAIN */
 
-const Counter: Component<{ value: any }> = ({ value }) => {
-    const v = $('abc')
-    const m = useMemo(() => {
-        console.log($$(value) + $$(v))
-        return $$(value) + $$(v)
-    })
-
+const App: Component = () => {
     return <div>
-        <h1>SSR Counter</h1>
-        <p>{value}</p>
-        <p>{m}</p>
+        <h1>SSR Custom Element Test</h1>
+        {/* In SSR mode, we can't use custom elements directly in JSX */}
+        {/* We'll test the component directly instead */}
+        <Counter value={5} title="SSR Counter" />
     </div>
 }
 
-const value = $(0)
-const increment = () => value(value() + 1)
-const decrement = () => value(value() - 1)
-
 // Render the app to a string for SSR
-// await render(<Counter value={value} />)
+const htmlString = renderToString(<App />)
 
-
-// document.getElementById('app').innerHTML = render(<Counter value={value} />)
-document.getElementById('app').innerHTML = render(<div>hello</div>)
+// Export the rendered string for server-side usage
+export default () => htmlString

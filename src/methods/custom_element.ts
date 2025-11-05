@@ -341,6 +341,8 @@ export const useAttached = (ref?: ObservableMaybe<Node | null>, match?: (parent:
     }
 }
 
+const isSSR = typeof window === 'undefined' || typeof document === 'undefined' || typeof customElements === 'undefined'
+
 
 const isLightDom = (node: Node): boolean => {
     let current: Node | null = node?.parentNode
@@ -352,6 +354,7 @@ const isLightDom = (node: Node): boolean => {
     }
     return false
 }
+
 /**
  * Creates a custom HTML element with reactive properties
  * 
@@ -455,84 +458,19 @@ const isLightDom = (node: Node): boolean => {
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
     // Check if we're in an SSR environment
-    const isSSR = typeof window === 'undefined' || typeof document === 'undefined';
-    
-    // For SSR, we just return a simple function that creates a standard HTML element
+    // We need to check both window and document to ensure we're in a browser environment
+
+    // For SSR, we use the SSR-specific implementation
     if (isSSR) {
-        // In SSR mode, we create a function that renders the component as a regular HTML element
-        // without shadow DOM or custom element registration
-        const ssrComponent = (props?: P) => {
-            // Create a standard HTML element
-            const element: any = {
-                nodeType: 1,
-                tagName: tagName.toUpperCase(),
-                attributes: {},
-                childNodes: [],
-                style: {},
-                
-                // Method to set attributes
-                setAttribute: function (name: string, value: any) {
-                    this.attributes[name] = String(value);
-                },
-                
-                // Method to append child nodes
-                appendChild: function (child: any) {
-                    this.childNodes.push(child);
-                },
-                
-                // Getter for outerHTML
-                get outerHTML() {
-                    // Build attributes string
-                    const attrs = Object.entries(this.attributes)
-                        .map(([name, value]) => `${name}="${value}"`)
-                        .join(' ');
-                    const attrStr = attrs ? ` ${attrs}` : '';
-                    
-                    // Handle self-closing tags
-                    if (['br', 'hr', 'img', 'input', 'meta', 'link'].includes(this.tagName.toLowerCase())) {
-                        return `<${this.tagName}${attrStr}>`;
-                    }
-                    
-                    // Build children string
-                    const children = this.childNodes.map((child: any) => {
-                        if (typeof child === 'object' && child !== null) {
-                            if ('outerHTML' in child) {
-                                return child.outerHTML;
-                            } else if ('textContent' in child) {
-                                return child.textContent;
-                            }
-                        }
-                        return String(child);
-                    }).join('');
-                    
-                    return `<${this.tagName}${attrStr}>${children}</${this.tagName}>`;
-                }
-            };
-            
-            // Set props as attributes
-            if (props) {
-                Object.keys(props).forEach(key => {
-                    if (key !== 'children' && props[key] !== undefined) {
-                        // Handle observable values
-                        const value = isObservable(props[key]) ? $$(props[key]) : props[key];
-                        // Convert to string for HTML attributes
-                        element.setAttribute(key, String(value));
-                    }
-                });
-            }
-            
-            return element;
-        };
-        
-        // Attach the component function for internal use
-        (ssrComponent as any).__component__ = component;
-        
-        return ssrComponent;
+        // Use dynamic import for SSR version to avoid bundling it in browser builds
+        // This approach works better with TypeScript and bundlers
+        return createSSRCustomElement(tagName, component)
     }
-    
-    const defaultPropsFn = (component as any)[SYMBOL_DEFAULT];
+
+    // Browser environment - use the original implementation
+    const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
     if (!defaultPropsFn) {
-        console.error(`Component ${tagName} is missing default props. Please use the 'defaults' helper function to provide default props.`);
+        console.error(`Component ${tagName} is missing default props. Please use the 'defaults' helper function to provide default props.`)
     }
 
     /**
@@ -718,4 +656,57 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
         customElements.define(tagName, C)
 
     return C
+}
+
+/**
+ * Creates a mock custom element for SSR environments
+ * 
+ * This function creates a mock implementation of a custom element for use in 
+ * server-side rendering environments where browser APIs are not available.
+ * 
+ * @template P - Component props type
+ * @param tagName - The HTML tag name for the custom element
+ * @param component - The component function that renders the element's content
+ * @returns A mock custom element class
+ */
+const createSSRCustomElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
+    // Create a mock class for SSR that behaves like the browser version
+    class SSRCustomElement {
+        static __component__ = component;
+        public props: P
+        public attributes: Record<string, string> = {};
+
+        constructor(props?: P) {
+            // In SSR, we just store the props
+            this.props = props || {} as P
+        }
+
+        // Mock methods for SSR
+        static get observedAttributes() {
+            return []
+        }
+
+        // Mock HTMLElement methods needed for SSR
+        setAttribute(name: string, value: string) {
+            this.attributes[name] = value
+        }
+
+        getAttribute(name: string) {
+            return this.attributes[name]
+        }
+
+        removeAttribute(name: string) {
+            delete this.attributes[name]
+        }
+
+        connectedCallback() { }
+        disconnectedCallback() { }
+        attributeChangedCallback() { }
+    }
+
+    // Add static properties that the SSR code expects
+    (SSRCustomElement as any).__component__ = component
+
+    // Return the mock class for SSR
+    return SSRCustomElement as unknown as typeof HTMLElement
 }

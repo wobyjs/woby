@@ -1,4 +1,3 @@
-
 export {
     $,
     $$,
@@ -23,3 +22,4 @@ export * from './render_to_string.ssr'
 export * from './template.ssr'
 export * from './merge_style'
 export * from './wrap_clone_element'
+export * from './defaults'
