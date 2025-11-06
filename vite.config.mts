@@ -3,6 +3,9 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import path from 'path'
 // import dts from 'vite-plugin-dts'
 
+// Check if we're in watch mode
+const isWatchMode = process.env.WATCH === 'true' || process.argv.includes('--watch')
+
 const config = defineConfig({
     build: {
         minify: false,
@@ -24,7 +27,9 @@ const config = defineConfig({
         sourcemap: true,
         rollupOptions: {
             external: []
-        }
+        },
+        // Prevent Vite from clearing the output directory only in watch mode
+        emptyOutDir: !isWatchMode
     },
     esbuild: {
         jsx: 'automatic',
@@ -32,7 +37,7 @@ const config = defineConfig({
     plugins: [
         nodePolyfills({
             // To exclude specific polyfills, add them to this list.
-            exclude: ['net', 'perf_hooks'],
+            exclude: ['net'],
             // Whether to polyfill specific globals.
             globals: {
                 Buffer: true, // can also be 'build', 'dev', or false

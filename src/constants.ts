@@ -1,4 +1,6 @@
 
+export const isSSR = typeof window === 'undefined' || typeof document === 'undefined' || typeof customElements === 'undefined'
+
 export { SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED } from 'soby'
 import type { ContextData, Context, DirectiveData } from './types'
 

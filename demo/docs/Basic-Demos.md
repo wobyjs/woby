@@ -391,6 +391,30 @@ Clean conditional rendering patterns:
 {items().length === 0 ? <EmptyState /> : <ItemList />}
 ```
 
+### 5. Direct DOM Access with Refs
+Access DOM elements directly using Woby's observable ref pattern:
+```typescript
+// ✅ Correct Woby pattern
+const MyComponent = () => {
+  const divRef = $<HTMLDivElement>()
+  
+  const handleClick = () => {
+    if ($$(divRef)) {
+      $$(divRef).style.backgroundColor = 'red'
+    }
+  }
+  
+  return (
+    <div>
+      <div ref={divRef}>Hello World</div>
+      <button onClick={handleClick}>Change Color</button>
+    </div>
+  )
+}
+```
+
+**Note**: Unlike other frameworks, Woby uses observables for refs rather than callback functions. Always use `$<ElementType>()` to create refs and `$$()` to access their values.
+
 ## Next Steps
 
 After exploring these basic demos:

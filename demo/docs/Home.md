@@ -30,11 +30,10 @@ Welcome to the Woby Demo repository documentation! This wiki provides comprehens
 - [UIBench](./demos/UIBench.md) - UI performance benchmarking
 
 ### Development
-- [Creating New Demos](./Creating-New-Demos.md) - How to add new demo applications
-- [Demo Guidelines](./Demo-Guidelines.md) - Best practices for demo development
 - [Contributing](./Contributing.md) - How to contribute to the demo repository
 
 ### Resources
+- [DOM Access Patterns](./DOM-Access-Patterns.md) - Correct patterns for direct DOM access
 - [Code Patterns](./Code-Patterns.md) - Common patterns used across demos
 - [Performance Tips](./Performance-Tips.md) - Optimization techniques
 - [Troubleshooting](./Troubleshooting.md) - Common issues and solutions

@@ -8,7 +8,7 @@ const toFunctionString = (value: Function | null | undefined): string | undefine
     return undefined
 }
 
-export const HtmlFunction: ObservableOptions<Function> = {
+export const HtmlFunction: ObservableOptions<Function | undefined> = {
     equals: (a: Function | null | undefined, b: Function | null | undefined) => {
         // Functions are compared by reference
         return a === b

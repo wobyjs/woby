@@ -9,7 +9,8 @@ export { Fragment } from '../components/fragment'
 import type { Child, Component, ComponentFunction, Element } from '../types'
 import { wrapCloneElement, CloneableType } from '../methods/wrap_clone_element'
 import { createElement } from '../index'
-import { SYMBOL_CLONE, SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
+import { isSSR, SYMBOL_CLONE, SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
+import { customElements as ces } from '../methods/ssr.obj'
 
 const wrapJsx = <P>(props: P) => {
   if (props[SYMBOL_JSX]) return props
@@ -22,12 +23,14 @@ export const unwrapJsx = <P>(props: P) => {
   return props
 }
 
+const CES = isSSR ? ces : customElements
+
 export const isJsx = <P>(props: P) => !!props[SYMBOL_JSX]
 
 
 function getProps<P extends {} = { key?: string; children?: Child }>(component: string | Node | ComponentFunction<P>, props: P) {
   if (typeof component === 'string') {
-    const ce = customElements.get(component)
+    const ce = CES.get(component)
     if (!!ce) {
       const defaultPropsFn = (ce as any).__component__?.[SYMBOL_DEFAULT]
       if (!defaultPropsFn) {

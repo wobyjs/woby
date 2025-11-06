@@ -151,7 +151,7 @@ You can find some demos and benchmarks below, more demos are contained inside th
 
 When using AI coding assistants to help with Woby development, please provide these explicit instructions to ensure proper understanding of Woby patterns:
 
-1.  **Framework Specific Instructions**: "Use Woby patterns, NOT React patterns. Woby uses observables with `$()` and `$()` functions, not React hooks like useState, useEffect with dependency arrays, or useCallback."
+1.  **Framework Specific Instructions**: "Use Woby patterns, NOT React patterns. Woby uses observables with `$()` and `$$()` functions, not React hooks like useState, useEffect with dependency arrays, or useCallback."
 
 2.  **Observable-Based Reactivity**: "In Woby, declare reactive variables with `$()`, and access their values with `$()` in reactive contexts. Woby automatically tracks dependencies when you use `$()`."
 
@@ -211,7 +211,7 @@ MIT
   })
 
   const activeCount = useMemo(() => {
-    return $(todos).filter(todo => !todo.completed).length
+    return $$(todos).filter(todo => !todo.completed).length
   })
 
   return (
@@ -244,7 +244,7 @@ MIT
             onClick={() => setFilter(filterName)}
             class={[
               'px-3 py-1 rounded',
-              () => $(filter) === filterName 
+              () => $$(filter) === filterName 
                 ? 'bg-blue-500 text-white' 
                 : 'bg-gray-200 hover:bg-gray-300'
             ]}
@@ -285,9 +285,9 @@ MIT
 
       {/* Stats */}
       <div class="mt-4 p-2 bg-gray-100 rounded text-sm">
-        Total: {() => $(todos).length} | 
+        Total: {() => $$(todos).length} | 
         Active: {activeCount} |
-        Completed: {() => $(todos).filter(t => t.completed).length}
+        Completed: {() => $$(todos).filter(t => t.completed).length}
       </div>
     </div>
   )
@@ -332,7 +332,7 @@ useEffect(() => {
 const doubled = useMemo(() => count * 2, [count])
 
 // Woby
-const doubled = useMemo(() => $(count) * 2)
+const doubled = useMemo(() => $$(count) * 2)
 // No dependency array needed!
 ```
 
@@ -417,7 +417,7 @@ const def = () => ({
 const Counter = defaults(def, (props: CounterProps) => {
   const { count, enabled, color, styles } = props
   return (
-    <div style={() => ({ color: $(color), ...$$(styles) })}>
+    <div style={() => ({ color: $$(color), ...$$(styles) })}>
       <span>Count: {count}</span>
       <span>Status: {enabled ? 'Enabled' : 'Disabled'}</span>
     </div>
@@ -496,7 +496,7 @@ const Counter = ({ increment, decrement, value, ...props }: {
 }): JSX.Element => {
   const v = $('abc')
   const m = useMemo(() => {
-    return $(value) + $(v)
+    return $$(value) + $$(v)
   })
   return <div {...props}>
     <h1>Counter</h1>

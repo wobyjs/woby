@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "jsx": "react-jsx",
+        "jsxImportSource": "woby",
+        "types": [
+            "node",
+            "vite/client"
+        ],
+        "outDir": "./dist"
+    },
+    "include": [
+        "index.tsx"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

@@ -1,4 +1,5 @@
 import type { FN } from '../types'
+import { BaseNode } from '../methods/ssr.obj'
 
 // Enhanced mock implementations for SSR without happy-dom
 // These implementations better support the html`` template pattern from index.tsx
@@ -10,36 +11,55 @@ export const createComment = ((content: string) => ({
 })) as any as FN<[string], Comment>
 
 export const createHTMLNode = ((tagName: string) => {
-    const element: any = {
-        nodeType: 1,
-        tagName: tagName.toUpperCase(),
-        attributes: {},
-        childNodes: [],
-        style: {},
+    class HTMLNode extends BaseNode {
+        tagName: string
+        style: any
+        className: string
 
-        // Method to set attributes
-        setAttribute: function (name: string, value: any) {
+        constructor() {
+            super(1)
+            this.tagName = tagName.toUpperCase()
+            this.style = {}
+            this.className = ''
+        }
+
+        // Override setAttribute for special HTML handling
+        setAttribute(name: string, value: any) {
             // Handle special cases for style and class
             if (name === 'style') {
                 this.style = value
             } else if (name === 'class' || name === 'className') {
                 this.className = value
             }
-            this.attributes[name] = String(value)
-        },
-
-        // Method to append child nodes
-        appendChild: function (child: any) {
-            this.childNodes.push(child)
-        },
+            super.setAttribute(name, value)
+        }
 
         // Method to set innerHTML (simplified)
         set innerHTML(content: string) {
             // Clear existing children
             this.childNodes = []
             // Add as text node
-            this.childNodes.push(createText(content))
-        },
+            this.appendChild(createText(content))
+        }
+
+        // Add append method for compatibility with diff algorithm
+        append(...nodes: any[]) {
+            nodes.forEach(node => {
+                this.appendChild(node)
+            })
+        }
+
+        // Add before method for compatibility with diff algorithm
+        before(...nodes: any[]) {
+            // This is a simplified implementation
+            // In a real DOM, this would insert nodes before this node
+            // But for our purposes, we'll just append to the parent
+            if (this.parentNode) {
+                nodes.forEach(node => {
+                    this.parentNode.insertBefore(node, this)
+                })
+            }
+        }
 
         // Getter for outerHTML
         get outerHTML() {
@@ -70,27 +90,21 @@ export const createHTMLNode = ((tagName: string) => {
         }
     }
 
-    return element
+    return new HTMLNode()
 }) as any as FN<[string], HTMLElement>
 
 export const createSVGNode = ((tagName: string) => {
-    const element: any = {
-        nodeType: 1,
-        tagName: tagName.toUpperCase(),
-        isSVG: true,
-        attributes: {},
-        childNodes: [],
-        style: {},
+    class SVGNode extends BaseNode {
+        tagName: string
+        isSVG: boolean
+        style: any
 
-        // Method to set attributes
-        setAttribute: function (name: string, value: any) {
-            this.attributes[name] = String(value)
-        },
-
-        // Method to append child nodes
-        appendChild: function (child: any) {
-            this.childNodes.push(child)
-        },
+        constructor() {
+            super(1)
+            this.tagName = tagName.toUpperCase()
+            this.isSVG = true
+            this.style = {}
+        }
 
         // Getter for outerHTML
         get outerHTML() {
@@ -116,7 +130,7 @@ export const createSVGNode = ((tagName: string) => {
         }
     }
 
-    return element
+    return new SVGNode()
 }) as any as FN<[string], SVGElement>
 
 export const createText = ((text: string) => ({
@@ -125,10 +139,12 @@ export const createText = ((text: string) => ({
     toString: () => String(text)
 })) as any as FN<[string], Text>
 
-export const createDocumentFragment = (() => ({
-    nodeType: 11,
-    childNodes: [],
-    appendChild: function (node: any) {
-        this.childNodes.push(node)
+export const createDocumentFragment = (() => {
+    class DocumentFragmentNode extends BaseNode {
+        constructor() {
+            super(11)
+        }
     }
-})) as any as FN<[], DocumentFragment>
+
+    return new DocumentFragmentNode()
+}) as any as FN<[], DocumentFragment>

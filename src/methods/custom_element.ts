@@ -23,7 +23,7 @@
  */
 
 import { $, $$, isObservable } from "./soby"
-import { SYMBOL_DEFAULT } from '../constants'
+import { isSSR, SYMBOL_DEFAULT } from '../constants'
 import { setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
@@ -39,7 +39,13 @@ import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from 
 import { ObservableMaybe } from "../types"
 import { useLightDom } from "../hooks/use_attached"
 import { mark } from "../utils/mark"
+import { customElements as ces, document as doc } from './ssr.obj'
+import { createSSRCustomElement } from './custom_element.ssr'
 
+if (isSSR) {
+    globalThis.customElements = ces as any
+    globalThis.document = doc as any
+}
 
 /**
  * ElementAttributes type helper
@@ -287,62 +293,6 @@ const getNestedProperty = (obj: any, path: string) => {
     return (obj as any)[kebabToCamelCase(path)]
 }
 
-export const useAttached = (ref?: ObservableMaybe<Node | null>, match?: (parent: Node | null) => boolean) => {
-    const isGiven = ref !== undefined
-
-    if (!ref)
-        ref = $<Node>()
-
-    const parent = $<Node | null>(null)
-
-    useEffect(() => {
-        if (!$$(ref)) return
-
-        const updateParent = () => {
-            let currentParent: Node | null = $$(ref).parentNode
-
-            // If match function is provided, traverse up until match or root
-            if (match) {
-                while (currentParent) {
-                    if (match(currentParent)) {
-                        parent(currentParent)
-                        return
-                    }
-                    currentParent = currentParent.parentNode
-                }
-                // If no match found, parent remains null
-                parent(null)
-            } else {
-                // Default behavior: return immediate parent
-                parent(currentParent)
-            }
-        }
-
-        // Initial parent check
-        updateParent()
-
-        // Create a MutationObserver to watch for parent changes
-        const observer = new MutationObserver(() => {
-            updateParent()
-        })
-
-        // Start observing the parent element changes
-        observer.observe($$(ref).getRootNode() as Node, { subtree: true, childList: true })
-
-        // Cleanup observer on unmount
-        return () => observer.disconnect()
-    })
-
-    // Return the reference node
-    return {
-        parent,
-        mount: isGiven ? undefined : mark('attach', ref),
-        ref
-    }
-}
-
-const isSSR = typeof window === 'undefined' || typeof document === 'undefined' || typeof customElements === 'undefined'
-
 
 const isLightDom = (node: Node): boolean => {
     let current: Node | null = node?.parentNode
@@ -466,7 +416,6 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
         // This approach works better with TypeScript and bundlers
         return createSSRCustomElement(tagName, component)
     }
-
     // Browser environment - use the original implementation
     const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
     if (!defaultPropsFn) {
@@ -656,57 +605,4 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
         customElements.define(tagName, C)
 
     return C
-}
-
-/**
- * Creates a mock custom element for SSR environments
- * 
- * This function creates a mock implementation of a custom element for use in 
- * server-side rendering environments where browser APIs are not available.
- * 
- * @template P - Component props type
- * @param tagName - The HTML tag name for the custom element
- * @param component - The component function that renders the element's content
- * @returns A mock custom element class
- */
-const createSSRCustomElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
-    // Create a mock class for SSR that behaves like the browser version
-    class SSRCustomElement {
-        static __component__ = component;
-        public props: P
-        public attributes: Record<string, string> = {};
-
-        constructor(props?: P) {
-            // In SSR, we just store the props
-            this.props = props || {} as P
-        }
-
-        // Mock methods for SSR
-        static get observedAttributes() {
-            return []
-        }
-
-        // Mock HTMLElement methods needed for SSR
-        setAttribute(name: string, value: string) {
-            this.attributes[name] = value
-        }
-
-        getAttribute(name: string) {
-            return this.attributes[name]
-        }
-
-        removeAttribute(name: string) {
-            delete this.attributes[name]
-        }
-
-        connectedCallback() { }
-        disconnectedCallback() { }
-        attributeChangedCallback() { }
-    }
-
-    // Add static properties that the SSR code expects
-    (SSRCustomElement as any).__component__ = component
-
-    // Return the mock class for SSR
-    return SSRCustomElement as unknown as typeof HTMLElement
 }

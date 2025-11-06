@@ -17,6 +17,11 @@ import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { customElement } from './custom_element'
 import { Stack } from 'soby'
+import { customElements as ces } from './ssr.obj'
+import { createSSRCustomElement } from './custom_element.ssr'
+import { isSSR } from '../constants'
+
+if (isSSR) globalThis.customElements = ces as any
 
 /**
  * Creates an element from a component, props, and children

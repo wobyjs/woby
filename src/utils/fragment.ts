@@ -1,6 +1,7 @@
 
 /* IMPORT */
 
+import { isSSR } from '../constants'
 import type { FragmentNode, FragmentFragment, Fragment } from '../types'
 
 /* HELPERS */
@@ -8,6 +9,7 @@ import type { FragmentNode, FragmentFragment, Fragment } from '../types'
 const NOOP_CHILDREN: Node[] = []
 
 /* MAIN */
+if (isSSR) globalThis.Node = class { } as any
 
 export const FragmentUtils = {
 

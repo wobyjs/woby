@@ -72,13 +72,24 @@ export const createElement = <P = { children?: Observable<Child> }>(component: C
                     setProps(child, _props as any, stack)
                 }
 
-                // Check if this is our custom element class (SSR version)
-                if (hasChildren || (ce && (ce as any).__component__)) {
+                // Set children for both regular HTML elements and custom elements
+                if (hasChildren) {
                     // For SSR custom elements, we need to handle them differently
                     if (ce && typeof ce === 'function' && (ce as any).__component__) {
                         setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
-                    } else if (ce) {
-                        setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
+                    } else {
+                        // For regular HTML elements, just set the children directly
+                        setChild(child, children, FragmentUtils.make(), stack)
+                    }
+                } else if (_props && isObject(_props) && 'children' in _props && !isVoidChild((_props as any).children)) {
+                    // Handle children from props
+                    const propsChildren = (_props as any).children as Child
+                    // For SSR custom elements, we need to handle them differently
+                    if (ce && typeof ce === 'function' && (ce as any).__component__) {
+                        setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : propsChildren, FragmentUtils.make(), stack)
+                    } else {
+                        // For regular HTML elements, just set the children directly
+                        setChild(child, propsChildren, FragmentUtils.make(), stack)
                     }
                 }
 

@@ -1,7 +1,7 @@
 
 import { useBoolean } from '../hooks/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
-import { render } from '../methods/render'
+import { render } from '../methods/render.ssr'
 import { $$ } from '../methods/soby'
 import { createHTMLNode } from '../utils/creators.ssr'
 import { assign } from '../utils/lang'
@@ -11,7 +11,7 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
 
     const portal = $$(wrapper) || createHTMLNode('div')
 
-    if (!(portal instanceof HTMLElement)) throw new Error('Invalid wrapper node')
+    if (!('appendChild' in (portal as HTMLElement))) throw new Error('Invalid wrapper node')
 
     const condition = useBoolean(when)
 
@@ -21,15 +21,15 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
 
         if (!$$(condition)) return
 
-        const parent = $$(mount) || document.body
+        const parent: HTMLElement = $$(mount) as any || createHTMLNode('div')
 
-        if (!(parent instanceof Element)) throw new Error('Invalid mount node')
+        if (!('appendChild' in (parent as HTMLElement))) throw new Error('Invalid mount node')
 
-        parent.insertBefore(portal, null)
+        parent.insertBefore(portal as any, null)
 
         return (): void => {
 
-            parent.removeChild(portal)
+            parent.removeChild(portal as any)
 
         }
 
@@ -39,10 +39,10 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
 
         if (!$$(condition)) return
 
-        return render(children, portal)
+        return render(children/* , portal */)
 
     }, stack)
 
-    return assign(() => $$(condition) || children, { metadata: { portal } })
+    return assign(() => $$(condition) || children, { metadata: { portal } }) as any
 
 }

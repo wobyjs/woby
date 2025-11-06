@@ -6,12 +6,14 @@ import { createText } from '../utils/creators.ssr'
 import { isArray, isFunction, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { SYMBOL_OBSERVABLE_WRITABLE } from 'soby'
+import { SYMBOL_CLONE } from '../constants'
 import { Stack } from '../soby'
 
 
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
 
   if (isArray(value)) {
+    console.log('resolveChild: handling array', value)
 
     const [values, hasObservables] = resolveArraysAndStatics(value)
 
@@ -21,13 +23,18 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
 
   }
   else if (isFunction(value)) {
+    console.log('resolveChild: handling function', value)
+    console.log('resolveChild: function has SYMBOL_UNTRACKED_UNWRAPPED:', SYMBOL_UNTRACKED_UNWRAPPED in value)
+    console.log('resolveChild: function has SYMBOL_CLONE:', SYMBOL_CLONE in value)
 
     if (SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value || value[SYMBOL_OBSERVABLE_READABLE]?.parent?.disposed) {
 
       if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
         (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
-      resolveChild(value(), setter, _dynamic, stack)
+      const resolvedValue = value()
+      console.log('resolveChild: resolved function to', resolvedValue)
+      resolveChild(resolvedValue, setter, _dynamic, stack)
 
     } else {
 
@@ -36,14 +43,15 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
         if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
           (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
-        resolveChild(value(), setter, true, stack)
+        const resolvedValue = value()
+        resolveChild(resolvedValue, setter, true, stack)
 
       }, stack)
 
     }
   }
   else {
-
+    console.log('resolveChild: handling value', value)
     setter(value, _dynamic, stack)
 
   }

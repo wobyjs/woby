@@ -1,0 +1,97 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - heading "Property - Checked Static" [level=3] [ref=e3]
+    - paragraph [ref=e4]:
+      - checkbox [checked] [ref=e5]
+    - heading "Property - Checked Observable" [level=3] [ref=e6]
+    - paragraph [ref=e7]:
+      - checkbox [ref=e8]
+    - heading "Property - Checked Function" [level=3] [ref=e9]
+    - paragraph [ref=e10]:
+      - checkbox [ref=e11]
+    - heading "Property - Checked Removal" [level=3] [ref=e12]
+    - paragraph [ref=e13]:
+      - checkbox [ref=e14]
+    - heading "Property - Value Static" [level=3] [ref=e15]
+    - paragraph [ref=e16]:
+      - textbox [ref=e17]: value
+    - heading "Property - Value Observable" [level=3] [ref=e18]
+    - paragraph [ref=e19]:
+      - textbox [ref=e20]: "0.7921739238035086"
+    - heading "Property - Value Function" [level=3] [ref=e21]
+    - paragraph [ref=e22]:
+      - textbox [ref=e23]: "0.30809922214686836"
+    - heading "Property - Value Removal" [level=3] [ref=e24]
+    - paragraph [ref=e25]:
+      - textbox [ref=e26]
+    - heading "Input - Label For" [level=3] [ref=e27]
+    - paragraph [ref=e28]: htmlFor
+    - paragraph [ref=e29]: for
+    - paragraph [ref=e30]:
+      - textbox "htmlFor for" [ref=e31]
+    - heading "Event - Click Static" [level=3] [ref=e32]
+    - paragraph [ref=e33]:
+      - button "0" [ref=e34]
+    - heading "Event - Click Observable" [level=3] [ref=e35]
+    - paragraph [ref=e36]:
+      - button "0" [ref=e37]
+    - heading "Event - Click Removal" [level=3] [ref=e38]
+    - paragraph [ref=e39]:
+      - button "0" [ref=e40]
+    - heading "Event - Click Capture Static" [level=3] [ref=e41]
+    - paragraph [ref=e42]:
+      - button "0" [ref=e43]
+    - heading "Event - Click Capture Observable" [level=3] [ref=e44]
+    - paragraph [ref=e45]:
+      - button "0" [ref=e46]
+    - heading "Event - Click Capture Removal" [level=3] [ref=e47]
+    - paragraph [ref=e48]:
+      - button "0" [ref=e49]
+    - heading "Event - Click & Click Capture Static" [level=3] [ref=e50]
+    - paragraph [ref=e51]:
+      - button "0" [ref=e52]
+    - heading "Event - Click - Stop Propagation" [level=3] [ref=e53]
+    - paragraph [ref=e54]:
+      - button "0 0" [ref=e55]:
+        - text: "0"
+        - button "0" [ref=e56]
+    - heading "Event - Click - Stop Immediate Propagation" [level=3] [ref=e57]
+    - paragraph [ref=e58]:
+      - button "0 0" [ref=e59]:
+        - text: "0"
+        - button "0" [ref=e60]
+    - heading "Event - Enter - Stop Propagation" [level=3] [ref=e61]
+    - paragraph [ref=e62]:
+      - button "0 0" [ref=e63]:
+        - text: "0"
+        - button "0" [ref=e64]
+    - heading "Event - Enter - Stop Immediate Propagation" [level=3] [ref=e65]
+    - paragraph [ref=e66]:
+      - button "0 0" [ref=e67]:
+        - text: "0"
+        - button "0" [ref=e68]
+    - heading "Event - Enter & Enter Capture Static" [level=3] [ref=e69]
+    - paragraph [ref=e70]:
+      - button "0" [ref=e71]
+    - heading "Event - Middle Click Static" [level=3] [ref=e72]
+    - paragraph [ref=e73]:
+      - button "0" [ref=e74]
+    - heading "Event - Middle Click Capture Static" [level=3] [ref=e75]
+    - paragraph [ref=e76]:
+      - button "0" [ref=e77]
+    - heading "Event - Target - Current Target" [level=3] [ref=e78]
+    - generic [ref=e79]:
+      - paragraph [ref=e80]: paragraph
+      - list [ref=e81]:
+        - listitem [ref=e82]: one
+        - listitem [ref=e83]: two
+        - listitem [ref=e84]: three
+  - generic [ref=e85]:
+    - heading "Cleanup - Inner" [level=3] [ref=e86]
+    - paragraph [ref=e87]: page2 - true
+    - button "Toggle" [ref=e88]
+    - button "Toggle Page" [ref=e89]
+```

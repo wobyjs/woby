@@ -10,10 +10,16 @@ declare const via
 // Simple approach: always use SSR versions in Node.js environment
 const isNodeEnvironment = typeof window === 'undefined' && typeof document === 'undefined'
 
-const { createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment } = isNodeEnvironment
-    // ? { createComment: cc as typeof document['createComment'], createHTMLNode: ch as typeof document['createElement'], createSVGNode: cs as any as typeof document['createElementNS'], createText: ct as any as typeof document['createTextNode'], createDocumentFragment: cd as typeof document['createDocumentFragment'] }
-    ? { createComment: cc, createHTMLNode: ch, createSVGNode: cs, createText: ct, createDocumentFragment: cd }
-    : (() => {
+function getCreators() {
+    if (isNodeEnvironment) {
+        return {
+            createComment: cc,
+            createHTMLNode: ch,
+            createSVGNode: cs,
+            createText: ct,
+            createDocumentFragment: cd
+        }
+    } else {
         // Browser environment
         if (typeof via !== 'undefined') {
             const document = via.document
@@ -26,15 +32,34 @@ const { createComment, createHTMLNode, createSVGNode, createText, createDocument
             }
         } else {
             // Standard browser environment
+            try {
+                // Check if document exists before trying to bind
+                if (typeof document !== 'undefined' && document !== null) {
+                    return {
+                        createComment: document.createComment.bind(document, '') as FN<[any], Comment>,
+                        createHTMLNode: document.createElement.bind(document) as FN<[ComponentIntrinsicElement], HTMLElement>,
+                        createSVGNode: document.createElementNS.bind(document, 'http://www.w3.org/2000/svg') as FN<[ComponentIntrinsicElement], Element>,
+                        createText: document.createTextNode.bind(document) as FN<[any], Text>,
+                        createDocumentFragment: document.createDocumentFragment.bind(document) as FN<[], DocumentFragment>
+                    }
+                }
+            } catch (e) {
+                // Ignore error and fall through to SSR versions
+            }
+
+            // Fallback to SSR versions if document is not available or binding fails
             return {
-                createComment: document.createComment.bind(document, '') as FN<[any], Comment>,
-                createHTMLNode: document.createElement.bind(document) as FN<[ComponentIntrinsicElement], HTMLElement>,
-                createSVGNode: document.createElementNS.bind(document, 'http://www.w3.org/2000/svg') as FN<[ComponentIntrinsicElement], Element>,
-                createText: document.createTextNode.bind(document) as FN<[any], Text>,
-                createDocumentFragment: document.createDocumentFragment.bind(document) as FN<[], DocumentFragment>
+                createComment: cc,
+                createHTMLNode: ch,
+                createSVGNode: cs,
+                createText: ct,
+                createDocumentFragment: cd
             }
         }
-    })()
+    }
+}
+
+const { createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment } = getCreators()
 
 /* EXPORT */
 

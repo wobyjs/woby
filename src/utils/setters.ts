@@ -1,4 +1,4 @@
-import { DIRECTIVES, SYMBOLS_DIRECTIVES, /* SYMBOL_DOM, */ SYMBOL_UNCACHED } from '../constants'
+import { DIRECTIVES, SYMBOLS_DIRECTIVES, /* SYMBOL_DOM, */ SYMBOL_UNCACHED, isSSR } from '../constants'
 import { useMicrotask } from '../hooks/use_microtask'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { isStore } from '../methods/soby'
@@ -612,9 +612,9 @@ export const setDirective = <T extends unknown[]>(element: HTMLElement, directiv
 
 export const setEventStatic = (() => {
 
-    //TODO: Maybe delete event delegation
-    //TODO: Maybe delegate more events: [onmousemove, onmouseout, onmouseover, onpointerdown, onpointermove, onpointerout, onpointerover, onpointerup, ontouchend, ontouchmove, ontouchstart]
-
+    // Expanded event delegation for better memory efficiency
+    // Added more events: mouse events, pointer events, and touch events for improved performance
+    // TODO: Implement proper cleanup mechanism for event delegation
     const delegatedEvents = <const>{
         onauxclick: ['_onauxclick', false],
         onbeforeinput: ['_onbeforeinput', false],
@@ -626,17 +626,27 @@ export const setEventStatic = (() => {
         onkeydown: ['_onkeydown', false],
         onkeyup: ['_onkeyup', false],
         onmousedown: ['_onmousedown', false],
-        onmouseup: ['_onmouseup', false]
+        onmouseenter: ['_onmouseenter', false],
+        onmouseleave: ['_onmouseleave', false],
+        onmousemove: ['_onmousemove', false],
+        onmouseout: ['_onmouseout', false],
+        onmouseover: ['_onmouseover', false],
+        onmouseup: ['_onmouseup', false],
+        onpointerdown: ['_onpointerdown', false],
+        onpointermove: ['_onpointermove', false],
+        onpointerout: ['_onpointerout', false],
+        onpointerover: ['_onpointerover', false],
+        onpointerup: ['_onpointerup', false],
+        ontouchend: ['_ontouchend', false],
+        ontouchmove: ['_ontouchmove', false],
+        ontouchstart: ['_ontouchstart', false]
     }
 
     const delegate = (event: string): void => {
-
         const key = `_${event}`
 
         document.addEventListener(event.slice(2), event => {
-
             const targets = event.composedPath()
-
             let target: EventTarget | null = null
 
             Object.defineProperty(event, 'currentTarget', {
@@ -647,9 +657,7 @@ export const setEventStatic = (() => {
             })
 
             for (let i = 0, l = targets.length; i < l; i++) {
-
                 target = targets[i]
-
                 const handler = target[key]
 
                 if (!handler) continue
@@ -657,13 +665,10 @@ export const setEventStatic = (() => {
                 handler(event)
 
                 if (event.cancelBubble) break
-
             }
 
             target = null
-
         })
-
     }
 
     return (element: HTMLElement, event: string, value: null | undefined | EventListener): void => {
@@ -1019,6 +1024,8 @@ export const setTemplateAccessor = (element: HTMLElement, key: string, value: Te
     }
 
 }
+
+if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
 
 export const setProp = (element: HTMLElement | Comment, key: string, value: any, stack: Stack): void => {
     if (element instanceof Comment || element instanceof Text) {

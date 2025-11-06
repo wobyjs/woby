@@ -815,4 +815,63 @@ function usePermissions() {
 }
 ```
 
+### Direct DOM Access with Refs
+
+Woby provides a simple and consistent approach to DOM references using observables:
+
+```typescript
+import { $, $$, render } from 'woby'
+
+// ❌ INCORRECT - Traditional approach that doesn't work properly in Woby
+const MyComponentIncorrect = () => {
+  // Don't use regular variables for refs
+  let divRef: HTMLDivElement | undefined
+
+  const handleClick = () => {
+    // This approach doesn't work properly with Woby's reactivity
+    if (divRef) {
+      divRef.style.backgroundColor = 'red'
+    }
+  }
+
+  return (
+    <div>
+      {/* Don't use callback functions for refs */}
+      <div ref={el => divRef = el}>Hello World</div>
+      <button onClick={handleClick}>Change Color</button>
+    </div>
+  )
+}
+
+// ✅ CORRECT - Woby preferred pattern using observables
+const MyComponent = () => {
+  // Create a ref using the $ function with proper typing
+  const divRef = $<HTMLDivElement>()
+
+  const handleClick = () => {
+    // Access the ref value using the $$ function
+    if ($$(divRef)) {
+      $$(divRef).style.backgroundColor = 'red'
+    }
+  }
+
+  return (
+    <div>
+      {/* Directly pass the observable ref to the element */}
+      <div ref={divRef}>Hello World</div>
+      <button onClick={handleClick}>Change Color</button>
+    </div>
+  )
+}
+
+render(<MyComponent />, document.getElementById('app'))
+```
+
+**Key Points:**
+1. **Always use `$<ElementType>()`** to create refs, not regular variables
+2. **Use `$$()`** to access the current value of a ref
+3. **Pass the observable directly** to the ref attribute, not a callback function
+4. **Check for null/undefined** before using ref values with optional chaining (`?.`)
+5. **This pattern is consistent** with all other reactive values in Woby
+
 For more advanced patterns and examples, see our [Best Practices](./Best-Practices.md) guide.
