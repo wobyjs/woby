@@ -4,6 +4,9 @@ import { setChild } from '../utils/setters.ssr'
 import { isArray } from '../utils/lang'
 import { BaseNode } from './ssr.obj'
 import { createHTMLNode } from '../utils/creators.ssr'
+import { $$, resolve } from '../methods/soby'
+import { SYMBOL_CLONE } from '../constants'
+import { isFunction } from '../utils/lang'
 
 export const renderToString = (child: Child): string => {
     // Create a container for SSR using HTMLNode
@@ -35,6 +38,22 @@ function getNodeContent(node: any): string {
     // Handle primitive types
     if (typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
         return String(node)
+    }
+
+    // Handle functions (component functions or observables)
+    if (isFunction(node)) {
+        // Handle component functions with SYMBOL_CLONE
+        if (SYMBOL_CLONE in node) {
+            // Check if props have SYMBOL_JSX
+
+            // Execute the component function and resolve the result
+            const result = resolve(node)
+            return getNodeContent(result)
+        }
+
+        // Handle observables
+        const unwrapped = $$(node)
+        return getNodeContent(unwrapped)
     }
 
     // Handle objects

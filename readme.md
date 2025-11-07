@@ -30,25 +30,25 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 
 ## 📚 Documentation
 
-**[📖 Complete Documentation Wiki](./docs/README.md)** - Comprehensive guides, tutorials, and API reference
+**[📖 Complete Documentation Wiki](./doc/README.md)** - Comprehensive guides, tutorials, and API reference
 
 ### Quick Links
-- **[Installation Guide](./docs/Installation.md)** - Get started with Woby
-- **[Quick Start Tutorial](./docs/Quick-Start.md)** - Build your first app
-- **[API Reference](./docs/Core-Methods.md)** - Complete API documentation
-- **[Reactive Utilities](./docs/Reactive-Utilities.md)** - Working with observables and the `$$` function
-- **[Reactivity System](./docs/Reactivity-System.md)** - Understanding Woby's reactivity model
-- **[Examples Gallery](./docs/Examples.md)** - Practical examples and patterns
-- **[Class Management](./docs/Class-Management.md)** - Advanced class handling with reactive support
-- **[Best Practices](./docs/Best-Practices.md)** - Recommended patterns and practices
-- **[Woby vs React](./docs/Woby-vs-React.md)** - API differences and migration guide
-- **[FAQ](./docs/FAQ.md)** - Common questions and answers
-- **[Type Synchronization](./docs/Type-Synchronization.md)** - How HTML attributes sync with component props
-- **[Simple Type Synchronization](./docs/Type-Sync-Simple.md)** - Straightforward approach to type sync
+- **[Installation Guide](./doc/Installation.md)** - Get started with Woby
+- **[Quick Start Tutorial](./doc/Quick-Start.md)** - Build your first app
+- **[API Reference](./doc/Core-Methods.md)** - Complete API documentation
+- **[Reactive Utilities](./doc/Reactive-Utilities.md)** - Working with observables and the `$$` function
+- **[Reactivity System](./doc/Reactivity-System.md)** - Understanding Woby's reactivity model
+- **[Examples Gallery](./doc/Examples.md)** - Practical examples and patterns
+- **[Class Management](./doc/Class-Management.md)** - Advanced class handling with reactive support
+- **[Best Practices](./doc/Best-Practices.md)** - Recommended patterns and practices
+- **[Woby vs React](./doc/Woby-vs-React.md)** - API differences and migration guide
+- **[FAQ](./doc/FAQ.md)** - Common questions and answers
+- **[Type Synchronization](./doc/Type-Synchronization.md)** - How HTML attributes sync with component props
+- **[Simple Type Synchronization](./doc/Type-Sync-Simple.md)** - Straightforward approach to type sync
 
 ### Specialized Documentation
-- **[Context API](./docs/CONTEXT_API.md)** - Advanced context management for components and custom elements
-- **[Custom Elements](./docs/CUSTOM_ELEMENTS.md)** - Creating and using Web Components with Woby
+- **[Context API](./doc/CONTEXT_API.md)** - Advanced context management for components and custom elements
+- **[Custom Elements](./doc/CUSTOM_ELEMENTS.md)** - Creating and using Web Components with Woby
 
 ## Key Features
 
@@ -75,7 +75,7 @@ const ThemedElement = defaults(() => ({}), () => {
 customElement('themed-element', ThemedElement)
 ```
 
-[Learn more about the Context API](./docs/CONTEXT_API.md)
+[Learn more about the Context API](./doc/CONTEXT_API.md)
 
 ### Custom Elements
 
@@ -126,7 +126,7 @@ One of Woby's unique features is its advanced nested property support, allowing 
 
 This feature is not available in React or SolidJS, making Woby a more powerful choice for creating highly configurable custom elements that can be used directly in HTML.
 
-[Learn more about Custom Elements](./docs/CUSTOM_ELEMENTS.md)
+[Learn more about Custom Elements](./doc/CUSTOM_ELEMENTS.md)
 
 ## Demos
 
@@ -161,7 +161,7 @@ When using AI coding assistants to help with Woby development, please provide th
 
 ### Common Anti-Patterns to Avoid
 
-``tsx
+```tsx
 // ❌ Anti-pattern: React-style useState
 const [count, setCount] = useState(0)
 
@@ -193,7 +193,7 @@ useEffect(() => {
 
 ## Contributing
 
-Contributions are welcome! Please read our [contributing guidelines](./docs/Contributing.md) before submitting pull requests.
+Contributions are welcome! Please read our [contributing guidelines](./doc/Contributing.md) before submitting pull requests.
 
 ## Thanks
 
@@ -375,7 +375,7 @@ const doubled = useMemo(() => $$(count) * 2)
 | `React.HTMLProps<T>` | `JSX.HTMLAttributes<T>` | HTML element props |
 | `React.CSSProperties` | `JSX.CSSProperties` | CSS properties object |
 
-For a comprehensive guide on React to Woby type conversions, see our [React to Woby Type Conversion Guide](./docs/React-to-Woby-Type-Conversion.md).
+For a comprehensive guide on React to Woby type conversions, see our [React to Woby Type Conversion Guide](./doc/React-to-Woby-Type-Conversion.md).
 
 ## HTML Utility Types
 

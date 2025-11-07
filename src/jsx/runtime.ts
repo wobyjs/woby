@@ -63,7 +63,7 @@ export function jsx<P extends {} = { key?: string; children?: Child }>(component
   if (typeof children === 'string') // React 16, key
     Object.assign(props as any, { children })
 
-  return wrapCloneElement(createElement<P>(component as any, props, (props as any)?.key as string), component, props)
+  return wrapCloneElement(createElement<P>(component as any, props, ...children), component, props)
 };
 
 //React 17 only

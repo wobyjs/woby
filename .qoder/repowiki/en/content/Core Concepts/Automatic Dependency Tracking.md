@@ -5,8 +5,8 @@
 - [soby.ts](file://src/soby.ts)
 - [hooks/soby.ts](file://src/hooks/soby.ts)
 - [readme.md](file://readme.md)
-- [docs/Woby-vs-React.md](file://docs/Woby-vs-React.md)
-- [docs/Reactivity-System.md](file://docs/Reactivity-System.md)
+- [doc/Woby-vs-React.md](file://doc/Woby-vs-React.md)
+- [doc/Reactivity-System.md](file://doc/Reactivity-System.md)
 </cite>
 
 ## Table of Contents
@@ -107,11 +107,11 @@ I --> J["Re-execute only when tracked observables change"]
 
 **Diagram sources**
 - [readme.md](file://readme.md#L400-L450)
-- [docs/Reactivity-System.md](file://docs/Reactivity-System.md#L0-L50)
+- [doc/Reactivity-System.md](file://doc/Reactivity-System.md#L0-L50)
 
 **Section sources**
 - [readme.md](file://readme.md#L400-L500)
-- [docs/Reactivity-System.md](file://docs/Reactivity-System.md#L0-L100)
+- [doc/Reactivity-System.md](file://doc/Reactivity-System.md#L0-L100)
 
 ## Comparison with React's Dependency Model
 
@@ -144,11 +144,11 @@ E --> |Contrast| J
 
 **Diagram sources**
 - [readme.md](file://readme.md#L500-L550)
-- [docs/Woby-vs-React.md](file://docs/Woby-vs-React.md#L82-L114)
+- [doc/Woby-vs-React.md](file://doc/Woby-vs-React.md#L82-L114)
 
 **Section sources**
 - [readme.md](file://readme.md#L500-L600)
-- [docs/Woby-vs-React.md](file://docs/Woby-vs-React.md#L82-L155)
+- [doc/Woby-vs-React.md](file://doc/Woby-vs-React.md#L82-L155)
 
 ## Common Issues with Manual Dependency Arrays
 
@@ -158,7 +158,7 @@ Another issue is over-specification, where developers include unnecessary depend
 
 **Section sources**
 - [readme.md](file://readme.md#L600-L700)
-- [docs/Woby-vs-React.md](file://docs/Woby-vs-React.md#L115-L155)
+- [doc/Woby-vs-React.md](file://doc/Woby-vs-React.md#L115-L155)
 
 ## Performance Implications and Optimization
 
@@ -170,7 +170,7 @@ Fine-grained tracking allows for more efficient updates, as the system can preci
 
 **Section sources**
 - [readme.md](file://readme.md#L700-L800)
-- [docs/Reactivity-System.md](file://docs/Reactivity-System.md#L0-L100)
+- [doc/Reactivity-System.md](file://doc/Reactivity-System.md#L0-L100)
 
 ## Conclusion
 

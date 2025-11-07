@@ -8,8 +8,8 @@
 - [create_element.ts](file://src/methods/create_element.ts)
 - [render.ts](file://src/methods/render.ts)
 - [setters.ts](file://src/utils/setters.ts)
-- [Core-Methods.md](file://docs/Core-Methods.md)
-- [Type-Synchronization.md](file://docs/Type-Synchronization.md)
+- [Core-Methods.md](file://doc/Core-Methods.md)
+- [Type-Synchronization.md](file://doc/Type-Synchronization.md)
 - [readme.md](file://readme.md)
 </cite>
 
@@ -55,7 +55,7 @@ Observable --> Effect : "notifies on change"
 
 **Diagram sources**
 - [soby.ts](file://src/methods/soby.ts)
-- [Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
+- [Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
 
 Observables can be created with options to control their behavior, including type information for custom elements and custom equality functions. This allows for fine-tuned control over when updates occur and how values are synchronized between different parts of the application.
 
@@ -63,7 +63,7 @@ The automatic dependency tracking eliminates the need for dependency arrays that
 
 **Section sources**
 - [soby.ts](file://src/methods/soby.ts)
-- [Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
+- [Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
 
 ## No VDOM Architecture
 
@@ -287,5 +287,5 @@ These architectural advantages make Woby particularly well-suited for applicatio
 
 **Section sources**
 - [readme.md](file://readme.md)
-- [Type-Synchronization.md](file://docs/Type-Synchronization.md)
-- [Core-Methods.md](file://docs/Core-Methods.md)
+- [Type-Synchronization.md](file://doc/Type-Synchronization.md)
+- [Core-Methods.md](file://doc/Core-Methods.md)

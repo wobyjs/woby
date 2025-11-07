@@ -6,12 +6,12 @@ import { useEffect } from '../hooks/soby'
 import { useRoot } from '../hooks/soby'
 import { $$ } from '../methods/soby'
 import type { Child } from '../types'
-// import { html } from './html.ssr'
+export { renderToString } from './render_to_string.ssr'
 
 
 //TODO: Implement this properly, without relying on JSDOM or stuff like that
 
-export const renderToString = (child: Child)/* : Promise<string>  */ => {
+export const renderToStringOri = (child: Child)/* : Promise<string>  */ => {
 
   return new Promise(resolve => {
 
@@ -38,3 +38,4 @@ export const renderToString = (child: Child)/* : Promise<string>  */ => {
   })
 
 }
+

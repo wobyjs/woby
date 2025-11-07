@@ -1,3 +1,5 @@
+/// @jsxImportSource woby/ssr
+
 /**
  * Counter Component Demo
  * 
@@ -16,7 +18,7 @@
  */
 
 /* IMPORT */
-import { $, $$, useMemo, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, renderToString } from 'woby/ssr'
+import { $, $$, useMemo, render, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe, renderToString } from 'woby'
 
 DEBUGGER.verboseComment = true
 
@@ -25,23 +27,23 @@ const NestedContext = createContext(null)
 // const useCounterContext = () => useContext(CounterContext)
 
 const useCounterContext = () => useMountedContext(CounterContext)
-const useNestedContext = (ref?: any) => useMountedContext(NestedContext, ref)
+const useNestedContext = (ref?: ObservableMaybe<Node>) => useMountedContext(NestedContext, ref)
 
 // Apply defaults to the Counter component manually
 const def = () => {
-    const value: any = $(0, { type: 'number' } as const)
+    const value: ObservableMaybe<number> | undefined = $(0, { type: 'number' } as const)
     return {
-        title: $('Counter') as (any | undefined),
+        title: $('Counter') as (ObservableMaybe<string> | undefined),
         // Store function in observable array to hide it from HTML attributes
-        increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }) as any | undefined, //hide this from html attributes
-        decrement: undefined as (any | undefined), //hide this from html attributes
+        increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }) as ObservableMaybe<Function> | undefined, //hide this from html attributes
+        decrement: undefined as (ObservableMaybe<Function> | undefined), //hide this from html attributes
         value,
-        nested: { nested: { text: $('abc') } } as any | undefined,
+        nested: { nested: { text: $('abc') } } as ObservableMaybe<{ nested: { text: ObservableMaybe<string> } }> | undefined,
         // Object with custom serialization
-        obj: $({ nested: { text: 'abc' } }, { toHtml: o => JSON.stringify(o), fromHtml: o => JSON.parse(o) }) as any | undefined,
+        obj: $({ nested: { text: 'abc' } }, { toHtml: o => JSON.stringify(o), fromHtml: o => JSON.parse(o) }) as ObservableMaybe<{ nested: { text: ObservableMaybe<string> } }> | undefined,
         // Date with custom serialization
-        date: $(new Date(), { toHtml: o => o.toISOString(), fromHtml: o => new Date(o) }) as any | undefined,
-        disabled: $(false, { type: 'boolean' } as const) as any | undefined
+        date: $(new Date(), { toHtml: o => o.toISOString(), fromHtml: o => new Date(o) }) as ObservableMaybe<Date> | undefined,
+        disabled: $(false, { type: 'boolean' } as const) as ObservableMaybe<boolean> | undefined
         // Note: children is handled separately by the framework, not included in defaults
     }
 }
@@ -170,7 +172,7 @@ const ProcessedContextValue = defaults(() => ({}), (props) => {
  */
 customElement('counter-element', Counter)
 customElement('context-value', ContextValue)
-customElement('my-上下문-값', ContextValue)
+customElement('my-上下文-값', ContextValue)
 customElement('processed-context-value', ProcessedContextValue)
 
 // Export components for potential use in other modules
@@ -195,10 +197,10 @@ declare module 'woby' {
              * - Style properties via the style-* pattern (style$font-size in HTML, style-font-size in JSX)
              * - Nested properties via the nested-* pattern (nested$nested$text in HTML, nested-nested-text in JSX)
              */
-            'counter-element': any
-            'context-value': any
-            'my-上下문-값': any
-            'processed-context-value': any
+            'counter-element': ElementAttributes<typeof Counter>
+            'context-value': ElementAttributes<typeof ContextValue>
+            'my-上下문-값': ElementAttributes<typeof ContextValue>
+            'processed-context-value': ElementAttributes<typeof ProcessedContextValue>
 
         }
     }
@@ -229,15 +231,80 @@ const App = () => {
      */
     const decrement = () => value(prev => prev - 1)
 
-    return (
-        <div>
-            <h1>Simple Test</h1>
-            <div class="test">
-                <h2>Hello World</h2>
-                <p>This is a simple test.</p>
-            </div>
-        </div>
-    )
+    return <>
+
+        <h1>Custom element<br /></h1>
+        <h1>&lt;counter-element&gt; - &lt;counter-element&gt;:<br /></h1>
+        {/* <counter-element title={'Custom element in TSX'}
+            style$background-color={'#eee'}
+            style$color={'red'}
+            style$font-size='1.1em'
+            nested$nested$text='xyz'
+            // value={0}
+            // increment={increment}
+            // decrement={decrement}
+            nested={{ nested: { text: $('abc') } }}
+            obj={$({ nested: { text: 'this obj will be serialized and deserialized to html attribute' } }, { toHtml: obj => JSON.stringify(obj), fromHtml: obj => JSON.parse(obj) })} //this obj will be serialized and deserialized to html attribute
+            class={'border-2 border-black border-solid bg-amber-400'}>
+            <context-value />
+            <ContextValue />
+            <ProcessedContextValue />
+            <processed-context-value />
+
+            <h2>Nested Custom &lt;counter-element&gt;:<br /></h2>
+
+            <counter-element title={'counter-element Nested'}
+                style$color={'orange'}
+                style$font-size='1em'
+                nested$nested$text=' nested context'
+                nested={{ nested: { text: $(' nested context') } }}
+                class={'border-2 border-black border-solid bg-amber-400 m-10'}>
+                <context-value />
+                <ContextValue />
+            </counter-element>
+        </counter-element>
+        <h1>Pure TSX &lt;Counter&gt; - &lt;Counter&gt;</h1>
+        <Counter title='TSX Counter Main' value={value} increment={increment} decrement={decrement} >
+            <context-value />
+            <ContextValue />
+            <Counter title='TSX Counter Nested' >
+                <context-value />
+                <ContextValue />
+            </Counter>
+        </Counter>
+
+        <h1>TSX - HTML &lt;Counter&gt; - &lt;counter-element&gt;</h1>
+        <Counter title='TSX - HTML Counter Main' >
+            <context-value />
+            <ContextValue />
+            <counter-element title={'counter-element Nested'}
+                style$color={'orange'}
+                style$font-size='1em'
+                nested$nested$text=' nested context'
+                nested={{ nested: { text: $(' nested context') } }}
+                class={'border-2 border-black border-solid bg-amber-400 m-10'}>
+                <p>obj attribute not diplay since, it is not explicit defined</p>
+                <context-value />
+                <ContextValue />
+            </counter-element>
+        </Counter>
+
+        <h1>HTML - TSX &lt;counter-element&gt; - &lt;Counter&gt;</h1>
+        <counter-element title={'HTML - TSX main'}
+            style$color={'orange'}
+            style$font-size='1em'
+            nested$nested$text=' nested context'
+            nested={{ nested: { text: $(' nested context') } }}
+            class={'border-2 border-black border-solid bg-amber-400 m-10'}>
+            <context-value />
+            <ContextValue />
+            <Counter title='TSX Counter nested' >
+                <context-value />
+                <ContextValue />
+            </Counter>
+        </counter-element> */}
+
+    </>
 }
 
 /**
@@ -246,6 +313,7 @@ const App = () => {
  * Mounts the App component to the element with ID 'app'.
  */
 const result = renderToString(<App />)
+
 console.log('Rendered HTML:')
 console.log(result)
 console.log('--- End of rendered HTML ---')

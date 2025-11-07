@@ -578,5 +578,5 @@ The Counter demo provides the foundation for understanding all other Woby concep
 
 - [Basic Demos Overview](../Basic-Demos.md)
 - [Code Patterns](../Code-Patterns.md)
-- [Woby Core Methods](../../woby/docs/Core-Methods.md)
+- [Woby Core Methods](../../woby/doc/Core-Methods.md)
 - [Creating New Demos](../Creating-New-Demos.md)

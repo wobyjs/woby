@@ -3,7 +3,7 @@
 <cite>
 **Referenced Files in This Document**   
 - [readme.md](file://readme.md)
-- [docs/React-to-Woby-Type-Conversion.md](file://docs/React-to-Woby-Type-Conversion.md)
+- [doc/React-to-Woby-Type-Conversion.md](file://doc/React-to-Woby-Type-Conversion.md)
 - [src/components/if.ts](file://src/components/if.ts)
 - [src/components/for.ts](file://src/components/for.ts)
 - [src/hooks/soby.ts](file://src/hooks/soby.ts)
@@ -170,7 +170,7 @@ Woby also provides specialized HTML utility types for handling common attribute 
 For advanced type scenarios, Woby's type system supports reactive properties through the `FunctionMaybe<T>` type, which represents values that can be either a static value of type T or a function that returns T. This enables seamless integration of observables and static values in component props and attributes.
 
 **Section sources**
-- [docs/React-to-Woby-Type-Conversion.md](file://docs/React-to-Woby-Type-Conversion.md#L0-L415)
+- [doc/React-to-Woby-Type-Conversion.md](file://doc/React-to-Woby-Type-Conversion.md#L0-L415)
 - [src/types.ts](file://src/types.ts#L0-L799)
 
 ## Mindset Shifts
@@ -207,4 +207,4 @@ Finally, developers may struggle with the concept of no props diffing. Since Wob
 
 **Section sources**
 - [readme.md](file://readme.md#L147-L190)
-- [docs/React-to-Woby-Type-Conversion.md](file://docs/React-to-Woby-Type-Conversion.md#L0-L415)
+- [doc/React-to-Woby-Type-Conversion.md](file://doc/React-to-Woby-Type-Conversion.md#L0-L415)

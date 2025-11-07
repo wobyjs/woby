@@ -3,7 +3,7 @@
 <cite>
 **Referenced Files in This Document**   
 - [readme.md](file://readme.md)
-- [docs/Examples.md](file://docs/Examples.md)
+- [doc/Examples.md](file://doc/Examples.md)
 - [src/hooks/use_context.ts](file://src/hooks/use_context.ts)
 - [src/methods/create_context.tsx](file://src/methods/create_context.tsx)
 </cite>
@@ -42,13 +42,13 @@ UpdateUI --> RenderUI
 
 **Diagram sources**
 - [readme.md](file://readme.md#L428-L536)
-- [docs/Examples.md](file://docs/Examples.md#L15-L37)
+- [doc/Examples.md](file://doc/Examples.md#L15-L37)
 
 ### Digital Clock
 The digital clock example demonstrates time-based reactivity using the `useInterval` hook. It shows how to create a reactive timestamp that updates every second, with the framework automatically handling the subscription and cleanup. The example highlights Woby's ability to integrate with browser APIs while maintaining fine-grained reactivity.
 
 **Section sources**
-- [docs/Examples.md](file://docs/Examples.md#L39-L55)
+- [doc/Examples.md](file://doc/Examples.md#L39-L55)
 
 ### Todo Application
 The todo application provides a complete example of state management in Woby. It demonstrates array manipulation with observables, conditional rendering with the `For` component, and form handling. The example shows how to manage a collection of items with CRUD operations while maintaining reactivity throughout the application.
@@ -77,7 +77,7 @@ TodoApp --> For : "uses for rendering"
 ```
 
 **Diagram sources**
-- [docs/Examples.md](file://docs/Examples.md#L57-L134)
+- [doc/Examples.md](file://doc/Examples.md#L57-L134)
 
 ## Component Composition and State Management
 
@@ -85,7 +85,7 @@ TodoApp --> For : "uses for rendering"
 This example demonstrates component composition using the `Portal` component to render content outside the normal DOM hierarchy. It shows how to create reusable components with props for control (isOpen, onClose) and content (title, children). The example illustrates proper event handling to prevent propagation and manage focus.
 
 **Section sources**
-- [docs/Examples.md](file://docs/Examples.md#L136-L172)
+- [doc/Examples.md](file://doc/Examples.md#L136-L172)
 
 ### Custom Hooks
 The custom hooks example demonstrates code reuse and abstraction in Woby. It shows how to create composable logic using Woby's hook system, specifically illustrating the creation of `useCounter` and `useToggle` hooks. These custom hooks encapsulate stateful logic that can be shared across components while maintaining reactivity.
@@ -105,13 +105,13 @@ Component->>Component : Update UI with new count
 ```
 
 **Diagram sources**
-- [docs/Examples.md](file://docs/Examples.md#L174-L195)
+- [doc/Examples.md](file://doc/Examples.md#L174-L195)
 
 ### Shopping Cart with Store
 The shopping cart example demonstrates advanced state management using Woby's store system. It shows how to manage complex state with nested objects and computed properties using `useMemo`. The example illustrates proper state mutation patterns and demonstrates how to create a context-like state management system that can be accessed from multiple components.
 
 **Section sources**
-- [docs/Examples.md](file://docs/Examples.md#L197-L244)
+- [doc/Examples.md](file://doc/Examples.md#L197-L244)
 
 ## Advanced Examples
 
@@ -130,13 +130,13 @@ RenderComponents --> DisplayData["Display data, loading, or error state"]
 ```
 
 **Diagram sources**
-- [docs/Examples.md](file://docs/Examples.md#L246-L287)
+- [doc/Examples.md](file://doc/Examples.md#L246-L287)
 
 ### Form Handling with Validation
 The form handling example demonstrates complex user input management with validation. It shows how to manage multiple form fields with observables, implement validation logic, and provide user feedback. The example illustrates conditional styling based on validation state and demonstrates proper form submission handling with loading states.
 
 **Section sources**
-- [docs/Examples.md](file://docs/Examples.md#L289-L418)
+- [doc/Examples.md](file://doc/Examples.md#L289-L418)
 
 ### Animation with useAnimationLoop
 This example demonstrates real-time animation using the `useAnimationLoop` hook. It shows how to create smooth animations synchronized with the browser's refresh rate. The example illustrates how to update multiple reactive properties (rotation, scale) in response to animation time, demonstrating Woby's ability to handle high-frequency state updates efficiently.
@@ -175,7 +175,7 @@ The custom elements example demonstrates Woby's first-class support for Web Comp
 Woby provides powerful built-in class management that supports complex class expressions. The array-based approach allows combining multiple classes, including conditional ones, in a clean and readable manner. This pattern is particularly useful for component libraries and design systems.
 
 **Section sources**
-- [docs/Examples.md](file://docs/Examples.md#L558-L575)
+- [doc/Examples.md](file://doc/Examples.md#L558-L575)
 
 ### Complex Conditional Classes
 The complex conditional classes example demonstrates handling sophisticated UI states with nested expressions and function-based class computations. It shows how to use switch statements and multiple conditions within class expressions, enabling dynamic styling based on application state.
@@ -196,7 +196,7 @@ ApplyUrgent --> UpdateDOM
 ```
 
 **Diagram sources**
-- [docs/Examples.md](file://docs/Examples.md#L577-L610)
+- [doc/Examples.md](file://doc/Examples.md#L577-L610)
 
 ### Integration with Tailwind CSS
 The Tailwind CSS integration example demonstrates how Woby works seamlessly with utility-first CSS frameworks. It shows how to combine static utility classes with dynamic, reactive classes to create responsive and state-driven UIs. The example highlights the synergy between Woby's reactivity system and Tailwind's design philosophy.

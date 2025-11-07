@@ -5,9 +5,9 @@
 - [src/soby.ts](file://src/soby.ts)
 - [src/hooks/soby.ts](file://src/hooks/soby.ts)
 - [src/methods/soby.ts](file://src/methods/soby.ts)
-- [docs/Core-Methods.md](file://docs/Core-Methods.md)
-- [docs/Best-Practices.md](file://docs/Best-Practices.md)
-- [docs/Reactivity-System.md](file://docs/Reactivity-System.md)
+- [doc/Core-Methods.md](file://doc/Core-Methods.md)
+- [doc/Best-Practices.md](file://doc/Best-Practices.md)
+- [doc/Reactivity-System.md](file://doc/Reactivity-System.md)
 - [readme.md](file://readme.md)
 </cite>
 
@@ -29,8 +29,8 @@
 Woby's observable-based reactivity system provides a fine-grained, efficient approach to state management that eliminates the need for dependency arrays and manual effect tracking. Built on the soby engine, this system enables automatic dependency resolution and re-execution of effects when observables change. The core principle revolves around the `$()` function for creating observables and the `$$()` function for safely unwrapping values, whether they are observables or plain values.
 
 **Section sources**
-- [docs/Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
-- [docs/Best-Practices.md](file://docs/Best-Practices.md#L16-L44)
+- [doc/Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
+- [doc/Best-Practices.md](file://doc/Best-Practices.md#L16-L44)
 
 ## Core Reactivity Mechanism
 The reactivity system in Woby is powered by the soby engine, which provides the foundational observable implementation. The `$()` function serves as the primary mechanism for creating signals that can be tracked and reacted to automatically. When an observable is created using `$()`, it becomes a fine-grained signal that can be subscribed to by any reading context, such as effects, memos, or rendering operations.
@@ -81,7 +81,7 @@ const data = $({} as any, { type: 'object' } as const)
 The type options ensure that when these observables are used in HTML attributes, they are properly serialized and deserialized according to their type. This feature is particularly useful when integrating with custom elements that expect specific data types for their properties.
 
 **Section sources**
-- [docs/Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
+- [doc/Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
 
 ## Automatic Dependency Tracking
 Woby's reactivity system automatically tracks dependencies without requiring explicit dependency arrays. When a function reads an observable value, the system records this dependency. If the observable changes in the future, the function is automatically re-executed.
@@ -121,7 +121,7 @@ const value = $$(maybeObservable) // Works for both observables and plain values
 This pattern is particularly useful in utility functions and higher-order components where the input type might vary. The `$$()` function checks if the value is an observable by testing for callable properties and returns the unwrapped value accordingly.
 
 **Section sources**
-- [docs/Best-Practices.md](file://docs/Best-Practices.md#L16-L44)
+- [doc/Best-Practices.md](file://doc/Best-Practices.md#L16-L44)
 
 ## Mathematical Operations and Observable Resolution
 Observables in Woby automatically resolve their values in mathematical operations, allowing for natural expression of derived state. When observables are used in arithmetic expressions, they are automatically unwrapped and the operation is performed on their current values.
@@ -138,7 +138,7 @@ const total = price * (1 + tax) // Automatically calculates with current values
 This behavior enables more intuitive and readable code for derived state calculations, eliminating the need for explicit unwrapping in mathematical contexts.
 
 **Section sources**
-- [docs/Core-Methods.md](file://docs/Core-Methods.md#L55-L124)
+- [doc/Core-Methods.md](file://doc/Core-Methods.md#L55-L124)
 
 ## Custom Equality Functions
 Observables can be configured with custom equality functions to control when changes are considered significant. This feature is particularly useful for object references where structural equality is more appropriate than reference equality.
@@ -152,7 +152,7 @@ const user = $({ id: 1, name: 'John' }, {
 When a new value is set on such an observable, the custom equality function is used to compare the old and new values. If the function returns true, the change is considered insignificant and no notifications are sent to subscribers, optimizing performance by avoiding unnecessary updates.
 
 **Section sources**
-- [docs/Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
+- [doc/Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
 
 ## Integration with Rendering System
 The observable system is tightly integrated with Woby's rendering engine, enabling automatic re-rendering when observables change. When a component reads an observable during rendering, the rendering context establishes a dependency on that observable. Subsequent changes trigger only the minimal necessary re-renders.
@@ -196,7 +196,7 @@ Woby's observable-based reactivity system offers significant performance advanta
 The elimination of dependency arrays reduces both memory overhead and computational cost, as the system doesn't need to compare arrays on every render cycle.
 
 **Section sources**
-- [docs/Reactivity-System.md](file://docs/Reactivity-System.md)
+- [doc/Reactivity-System.md](file://doc/Reactivity-System.md)
 - [readme.md](file://readme.md)
 
 ## Custom Elements Integration
@@ -205,7 +205,7 @@ The observable system seamlessly integrates with custom elements through type sy
 This integration ensures that custom elements receive properly typed values and that changes are propagated efficiently. The type system handles the conversion between JavaScript types and HTML attribute representations, maintaining consistency across the application.
 
 **Section sources**
-- [docs/Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
+- [doc/Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
 
 ## Elimination of Stale Closures
 One of the key benefits of Woby's reactivity system is the elimination of stale closures. Traditional React-style hooks can suffer from stale closure issues when dependencies are not properly specified in dependency arrays. Woby's automatic dependency tracking ensures that all relevant observables are always tracked, making it impossible to have stale closures due to missing dependencies.
@@ -213,7 +213,7 @@ One of the key benefits of Woby's reactivity system is the elimination of stale 
 Effects and memos automatically re-execute when any of their dependencies change, with the latest values always available in the execution context. This behavior provides more predictable and reliable reactivity compared to manual dependency management.
 
 **Section sources**
-- [docs/Best-Practices.md](file://docs/Best-Practices.md)
+- [doc/Best-Practices.md](file://doc/Best-Practices.md)
 - [readme.md](file://readme.md)
 
 ## Conclusion

@@ -4,7 +4,7 @@ Via.js lets you write JavaScript code that runs in a different context. The two 
 - **Use the DOM in a Web Worker**: write DOM calls in a worker and have them run on the main thread
 - **Write code that conveniently calls Web Worker code on the DOM**: write calls that automatically happen on a Web Worker, helping prevent heavy JavaScript calls janking the main thread. This is similar in spirit to [ComLink](https://github.com/GoogleChromeLabs/comlink), although Via.js does it differently.
 
-Note Via.js requires [WeakRefs](https://github.com/tc39/proposal-weakrefs) to clean up memory and avoid memory leaks. This is supported in [Chrome 84+](https://www.chromestatus.com/feature/5892186633666560), [Firefox 79+](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/79), and [Safari 14.1+](https://developer.apple.com/documentation/safari-release-notes/safari-14_1-release-notes). (If WeakRefs are not supported Via.js will continue to work, but will unavoidably leak memory.)
+Note Via.js requires [WeakRefs](https://github.com/tc39/proposal-weakrefs) to clean up memory and avoid memory leaks. This is supported in [Chrome 84+](https://www.chromestatus.com/feature/5892186633666560), [Firefox 79+](https://developer.mozilla.org/en-US/doc/Mozilla/Firefox/Releases/79), and [Safari 14.1+](https://developer.apple.com/documentation/safari-release-notes/safari-14_1-release-notes). (If WeakRefs are not supported Via.js will continue to work, but will unavoidably leak memory.)
 
 # Examples
 ## Using the DOM in a Web Worker
@@ -51,7 +51,7 @@ This works in Chrome, Firefox and Edge. Safari works but doesn't play audio sinc
 A basic demo of controlling a Web Worker from the DOM is hosted here: [via.js/demos/worker-calls](https://ashleyscirra.github.io/via.js/demos/worker-calls)
 
 # How it works
-JavaScript's [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) objects allow object sets, gets, calls etc. to be intercepted. Via.js uses an arrangement of Proxy objects that simply records all operations and builds a queue of commands. Function return values are also represented by a placeholder so you can continue making calls on them. This means so long as you don't need information back from the DOM (i.e. a `get()` call), you can make an arbitrary number of calls and it will only take a single postMessage to the main thread.
+JavaScript's [Proxy](https://developer.mozilla.org/en-US/doc/Web/JavaScript/Reference/Global_Objects/Proxy) objects allow object sets, gets, calls etc. to be intercepted. Via.js uses an arrangement of Proxy objects that simply records all operations and builds a queue of commands. Function return values are also represented by a placeholder so you can continue making calls on them. This means so long as you don't need information back from the DOM (i.e. a `get()` call), you can make an arbitrary number of calls and it will only take a single postMessage to the main thread.
 
 This approach is notable in that it doesn't post strings of JavaScript code and `eval()` them (which is a pretty ugly hack), and is also relatively low-overhead. In particular it doesn't create lots of MessageChannels like ComLink does.
 

@@ -1,16 +1,15 @@
-// Simple JSX test
+/// @jsxImportSource woby/ssr
+
 import { renderToString } from 'woby/ssr'
 
-// Simple component with one child
-const SimpleComponent = () => {
+const SimpleJSXTest = () => {
     return (
         <div>
-            <h1>Hello World</h1>
+            <h1>Simple JSX Child</h1>
         </div>
     )
 }
 
-console.log('Testing simple JSX rendering...')
-const result = renderToString(<SimpleComponent />)
+console.log('Simple JSX Test:')
+const result = renderToString(<SimpleJSXTest />)
 console.log('Result:', result)
-console.log('--- End of test ---')

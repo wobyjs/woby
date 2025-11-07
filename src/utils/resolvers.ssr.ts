@@ -13,9 +13,14 @@ import { Stack } from '../soby'
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
 
   if (isArray(value)) {
-    console.log('resolveChild: handling array', value)
+    // console.log('resolveChild: handling array', value)
+    // console.log('resolveChild: array length', value.length)
 
     const [values, hasObservables] = resolveArraysAndStatics(value)
+
+    // console.log('resolveChild: resolved array values', values)
+    // console.log('resolveChild: hasObservables', hasObservables)
+    // console.log('resolveChild: values length', values.length)
 
     values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED] // Preserving this special symbol
 
@@ -23,9 +28,9 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
 
   }
   else if (isFunction(value)) {
-    console.log('resolveChild: handling function', value)
-    console.log('resolveChild: function has SYMBOL_UNTRACKED_UNWRAPPED:', SYMBOL_UNTRACKED_UNWRAPPED in value)
-    console.log('resolveChild: function has SYMBOL_CLONE:', SYMBOL_CLONE in value)
+    // console.log('resolveChild: handling function', value)
+    // console.log('resolveChild: function has SYMBOL_UNTRACKED_UNWRAPPED:', SYMBOL_UNTRACKED_UNWRAPPED in value)
+    // console.log('resolveChild: function has SYMBOL_CLONE:', SYMBOL_CLONE in value)
 
     if (SYMBOL_UNTRACKED_UNWRAPPED in value || SYMBOL_OBSERVABLE_FROZEN in value || value[SYMBOL_OBSERVABLE_READABLE]?.parent?.disposed) {
 
@@ -33,7 +38,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
         (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
       const resolvedValue = value()
-      console.log('resolveChild: resolved function to', resolvedValue)
+      // console.log('resolveChild: resolved function to', resolvedValue)
       resolveChild(resolvedValue, setter, _dynamic, stack)
 
     } else {
@@ -44,6 +49,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
           (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
         const resolvedValue = value()
+        // console.log('resolveChild: resolved function in render effect to', resolvedValue)
         resolveChild(resolvedValue, setter, true, stack)
 
       }, stack)
@@ -51,7 +57,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
     }
   }
   else {
-    console.log('resolveChild: handling value', value)
+    // console.log('resolveChild: handling value', value)
     setter(value, _dynamic, stack)
 
   }
@@ -143,11 +149,14 @@ export const resolveArraysAndStatics = (() => {
   const DUMMY_RESOLVED = []
 
   const resolveArraysAndStaticsInner = (values: any[], resolved: any[], hasObservables: boolean): [any[], boolean] => {
+    // console.log('resolveArraysAndStaticsInner: processing values', values)
+    // console.log('resolveArraysAndStaticsInner: values length', values.length)
 
     for (let i = 0, l = values.length; i < l; i++) {
 
       const value = values[i]
       const type = typeof value
+      // console.log('resolveArraysAndStaticsInner: processing value', value, 'type', type)
 
       if (type === 'string' || type === 'number' || type === 'bigint') { // Static
 
@@ -177,12 +186,13 @@ export const resolveArraysAndStatics = (() => {
 
     if (resolved === DUMMY_RESOLVED) resolved = values
 
+    // console.log('resolveArraysAndStaticsInner: returning resolved', resolved, 'hasObservables', hasObservables)
     return [resolved, hasObservables]
 
   }
 
   return (values: any[]): [any[], boolean] => {
-
+    // console.log('resolveArraysAndStatics: called with values', values)
     return resolveArraysAndStaticsInner(values, DUMMY_RESOLVED, false)
 
   }

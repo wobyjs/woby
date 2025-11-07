@@ -7,8 +7,8 @@
 - [use_mounted](file://src/hooks/use_mounted.ts)
 - [soby.ts](file://src/soby.ts)
 - [methods/soby.ts](file://src/methods/soby.ts)
-- [Reactivity-System.md](file://docs/Reactivity-System.md)
-- [Custom-Element-Practical-Guide.md](file://docs/demos/Custom-Element-Practical-Guide.md)
+- [Reactivity-System.md](file://doc/Reactivity-System.md)
+- [Custom-Element-Practical-Guide.md](file://doc/demos/Custom-Element-Practical-Guide.md)
 </cite>
 
 ## Table of Contents
@@ -26,8 +26,8 @@
 Woby provides a modern, signal-based reactivity system that eliminates the need for virtual DOM diffing through fine-grained updates and automatic dependency tracking. This documentation details the core state management hooks—`use_state`, `use_cheap_disposed`, and `use_mounted`—that enable efficient, reactive component development. These hooks integrate seamlessly with soby observables to deliver high-performance updates directly to the DOM, while automatically managing subscriptions and cleanup.
 
 **Section sources**
-- [Reactivity-System.md](file://docs/Reactivity-System.md#L20-L77)
-- [Custom-Element-Practical-Guide.md](file://docs/demos/Custom-Element-Practical-Guide.md#L0-L617)
+- [Reactivity-System.md](file://doc/Reactivity-System.md#L20-L77)
+- [Custom-Element-Practical-Guide.md](file://doc/demos/Custom-Element-Practical-Guide.md#L0-L617)
 
 ## Core State Management with use_state
 The `use_state` hook in Woby is implemented through soby's observable system, providing automatic dependency tracking and fine-grained reactivity. Unlike traditional React hooks, it does not require dependency arrays, as reactivity is tracked at the signal level during execution.
@@ -50,8 +50,8 @@ E --> F["Update Only Affected DOM Nodes"]
 - [methods/soby.ts](file://src/methods/soby.ts#L7-L8)
 
 **Section sources**
-- [Reactivity-System.md](file://docs/Reactivity-System.md#L20-L77)
-- [Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
+- [Reactivity-System.md](file://doc/Reactivity-System.md#L20-L77)
+- [Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
 
 ## Resource Management with use_cheap_disposed
 The `use_cheap_disposed` hook provides efficient resource cleanup tied to component lifecycle. It leverages Woby's reactivity system to automatically dispose of resources when components are unmounted, preventing memory leaks and ensuring proper cleanup.
@@ -81,7 +81,7 @@ Resource-->>Hook : Resource Released
 
 **Section sources**
 - [use_cheap_disposed.ts](file://src/hooks/use_cheap_disposed.ts)
-- [Reactivity-System.md](file://docs/Reactivity-System.md#L242-L371)
+- [Reactivity-System.md](file://doc/Reactivity-System.md#L242-L371)
 
 ## Component Lifecycle Detection with use_mounted
 The `use_mounted` hook provides a reliable way to detect when components are mounted in the DOM, enabling safe asynchronous operations and side effects. It returns a function that checks the current mounted status of the component, preventing updates on unmounted components.
@@ -107,7 +107,7 @@ H["Component Unmounts"] --> I["use_mounted updates status"]
 
 **Section sources**
 - [use_mounted.ts](file://src/hooks/use_mounted.ts)
-- [Context.md](file://docs/Context.md#L14-L64)
+- [Context.md](file://doc/Context.md#L14-L64)
 
 ## Integration with Soby Observables
 Woby's state management hooks are built on top of soby observables, providing a signal-based reactivity system that eliminates the need for virtual DOM diffing. This integration enables direct DOM updates and automatic dependency tracking without dependency arrays.
@@ -157,8 +157,8 @@ useMounted --> Observable : "integrates"
 - [hooks/soby.ts](file://src/hooks/soby.ts#L1-L11)
 
 **Section sources**
-- [Reactivity-System.md](file://docs/Reactivity-System.md#L20-L77)
-- [Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
+- [Reactivity-System.md](file://doc/Reactivity-System.md#L20-L77)
+- [Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
 - [hooks/soby.ts](file://src/hooks/soby.ts#L1-L11)
 
 ## State Initialization and Synchronization
@@ -183,12 +183,12 @@ I --> J["Sync with External Store"]
 ```
 
 **Diagram sources**
-- [Reactivity-System.md](file://docs/Reactivity-System.md#L20-L77)
-- [Custom-Element-Practical-Guide.md](file://docs/demos/Custom-Element-Practical-Guide.md#L0-L617)
+- [Reactivity-System.md](file://doc/Reactivity-System.md#L20-L77)
+- [Custom-Element-Practical-Guide.md](file://doc/demos/Custom-Element-Practical-Guide.md#L0-L617)
 
 **Section sources**
-- [Reactivity-System.md](file://docs/Reactivity-System.md#L20-L77)
-- [Custom-Element-Practical-Guide.md](file://docs/demos/Custom-Element-Practical-Guide.md#L0-L617)
+- [Reactivity-System.md](file://doc/Reactivity-System.md#L20-L77)
+- [Custom-Element-Practical-Guide.md](file://doc/demos/Custom-Element-Practical-Guide.md#L0-L617)
 
 ## Common Issues and Solutions
 Woby's reactivity system addresses several common issues found in traditional state management approaches:
@@ -206,8 +206,8 @@ Woby's reactivity system addresses several common issues found in traditional st
 The system also provides utilities like `$$` for safe value unwrapping and `untracked` for reading signals without creating dependencies, giving developers fine-grained control over reactivity behavior.
 
 **Section sources**
-- [Best-Practices.md](file://docs/Best-Practices.md#L14-L61)
-- [Reactivity-System.md](file://docs/Reactivity-System.md#L20-L77)
+- [Best-Practices.md](file://doc/Best-Practices.md#L14-L61)
+- [Reactivity-System.md](file://doc/Reactivity-System.md#L20-L77)
 - [use_mounted.ts](file://src/hooks/use_mounted.ts)
 
 ## Performance Benefits of Woby's Reactivity
@@ -237,8 +237,8 @@ F --> G["Optimal Performance"]
 - [methods/soby.ts](file://src/methods/soby.ts#L7-L8)
 
 **Section sources**
-- [Reactivity-System.md](file://docs/Reactivity-System.md#L20-L77)
-- [Core-Methods.md](file://docs/Core-Methods.md#L18-L54)
+- [Reactivity-System.md](file://doc/Reactivity-System.md#L20-L77)
+- [Core-Methods.md](file://doc/Core-Methods.md#L18-L54)
 
 ## Conclusion
 Woby's state management hooks provide a modern, efficient approach to reactive programming that eliminates many of the pain points associated with traditional React hooks. By leveraging soby observables and signal-based reactivity, these hooks deliver automatic dependency tracking, fine-grained updates, and automatic cleanup without the need for dependency arrays.

@@ -5,10 +5,10 @@
 - [readme.md](file://readme.md)
 - [src/index.ts](file://src/index.ts)
 - [src/soby.ts](file://src/soby.ts)
-- [docs/Class-Management.md](file://docs/Class-Management.md)
-- [docs/Woby-vs-React.md](file://docs/Woby-vs-React.md)
-- [docs/Reactivity-System.md](file://docs/Reactivity-System.md)
-- [docs/demos/Counter-Demo.md](file://docs/demos/Counter-Demo.md)
+- [doc/Class-Management.md](file://doc/Class-Management.md)
+- [doc/Woby-vs-React.md](file://doc/Woby-vs-React.md)
+- [doc/Reactivity-System.md](file://doc/Reactivity-System.md)
+- [doc/demos/Counter-Demo.md](file://doc/demos/Counter-Demo.md)
 </cite>
 
 ## Table of Contents
@@ -73,7 +73,7 @@ Woby's reactivity model includes several key components:
 The system also includes enhanced observable functions with automatic `valueOf()` and `toString()` methods, allowing observables to behave more naturally in JavaScript contexts where primitives are expected. This enhancement enables automatic resolution in template literals, mathematical operations, and DOM attribute binding.
 
 **Section sources**
-- [docs/Reactivity-System.md](file://docs/Reactivity-System.md#L1-L100)
+- [doc/Reactivity-System.md](file://doc/Reactivity-System.md#L1-L100)
 - [src/soby.ts](file://src/soby.ts#L1)
 
 ## Key Differentiators from React-like Frameworks
@@ -99,7 +99,7 @@ The framework's approach to reactivity and component composition provides a stre
 
 **Section sources**
 - [readme.md](file://readme.md#L201-L300)
-- [docs/Woby-vs-React.md](file://docs/Woby-vs-React.md#L1-L100)
+- [doc/Woby-vs-React.md](file://doc/Woby-vs-React.md#L1-L100)
 
 ## Built-in Features
 
@@ -136,7 +136,7 @@ The framework offers a powerful context system that works seamlessly with both J
 
 **Section sources**
 - [readme.md](file://readme.md#L301-L400)
-- [docs/Class-Management.md](file://docs/Class-Management.md#L1-L50)
+- [doc/Class-Management.md](file://doc/Class-Management.md#L1-L50)
 
 ## Relationship with Soby
 
@@ -225,5 +225,5 @@ customElement('counter-element', Counter)
 The framework's rendering patterns emphasize direct observable passing for simple reactive content and function expressions for complex computations, ensuring optimal performance and reactivity.
 
 **Section sources**
-- [docs/demos/Counter-Demo.md](file://docs/demos/Counter-Demo.md#L1-L100)
+- [doc/demos/Counter-Demo.md](file://doc/demos/Counter-Demo.md#L1-L100)
 - [readme.md](file://readme.md#L501-L600)

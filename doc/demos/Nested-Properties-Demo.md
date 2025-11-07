@@ -1,6 +1,6 @@
 # Nested Properties Demo
 
-**Location**: `docs/demos/Nested-Properties-Demo.md`  
+**Location**: `doc/demos/Nested-Properties-Demo.md`  
 **Run**: Create a new demo file with the code below
 
 ## Overview

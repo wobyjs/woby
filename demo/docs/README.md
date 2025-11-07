@@ -122,7 +122,7 @@ The `demos/` folder contains detailed documentation for each demo application:
 ## 📁 File Organization
 
 ```
-docs/
+doc/
 ├── Home.md                    # Main landing page
 ├── Installation.md            # Setup guide
 ├── Basic-Demos.md            # Overview of learning demos
@@ -214,7 +214,7 @@ docs/
 
 - **[Woby Framework](https://github.com/wobyjs/woby)** - Main framework repository
 - **[Live Demos](https://codesandbox.io/@woby)** - CodeSandbox collection
-- **[Framework Docs](../woby/docs/)** - Core framework documentation
+- **[Framework Docs](../woby/doc/)** - Core framework documentation
 - **[Community Discussions](https://github.com/wobyjs/woby/discussions)** - Ask questions and share ideas
 
 ## 📊 Documentation Metrics

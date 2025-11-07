@@ -7,7 +7,7 @@
 - [ternary.ts](file://src/components/ternary.ts)
 - [use_guarded.ts](file://src/hooks/use_guarded.ts)
 - [lang.ts](file://src/utils/lang.ts)
-- [Built-in-Components.md](file://docs/Built-in-Components.md)
+- [Built-in-Components.md](file://doc/Built-in-Components.md)
 </cite>
 
 ## Table of Contents
@@ -25,7 +25,7 @@
 Woby provides a set of conditional rendering components—If, Switch, and Ternary—that enable developers to create dynamic user interfaces with fine-grained reactivity. These components are designed to work seamlessly with Woby's observable-based reactivity system, ensuring efficient DOM updates and optimal performance. This document details the use cases, props, reactivity behavior, and integration patterns for each conditional rendering component, along with guidance on selecting the appropriate component for different scenarios.
 
 **Section sources**
-- [Built-in-Components.md](file://docs/Built-in-Components.md#L1-L50)
+- [Built-in-Components.md](file://doc/Built-in-Components.md#L1-L50)
 
 ## If Component
 
@@ -51,7 +51,7 @@ RenderNothing --> End
 
 **Section sources**
 - [if.ts](file://src/components/if.ts#L12-L26)
-- [Built-in-Components.md](file://docs/Built-in-Components.md#L48-L92)
+- [Built-in-Components.md](file://doc/Built-in-Components.md#L48-L92)
 
 ## Switch Component
 
@@ -79,7 +79,7 @@ RenderNothing --> End
 
 **Section sources**
 - [switch.ts](file://src/components/switch.ts#L10-L34)
-- [Built-in-Components.md](file://docs/Built-in-Components.md#L93-L126)
+- [Built-in-Components.md](file://doc/Built-in-Components.md#L93-L126)
 
 ## Ternary Component
 
@@ -102,7 +102,7 @@ RenderFalsy --> End
 
 **Section sources**
 - [ternary.ts](file://src/components/ternary.ts#L3-L7)
-- [Built-in-Components.md](file://docs/Built-in-Components.md#L127-L150)
+- [Built-in-Components.md](file://doc/Built-in-Components.md#L127-L150)
 
 ## Reactivity and DOM Update Strategies
 

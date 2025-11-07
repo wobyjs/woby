@@ -390,7 +390,7 @@ Many demos include visual verification:
 4. **Test thoroughly** across different browsers
 5. **Submit pull request** with detailed description
 
-For detailed guidelines, see [Contributing to Woby Demo](https://github.com/wobyjs/demo/blob/main/docs/Contributing.md).
+For detailed guidelines, see [Contributing to Woby Demo](https://github.com/wobyjs/demo/blob/main/doc/Contributing.md).
 
 ## 🔗 Additional Resources
 

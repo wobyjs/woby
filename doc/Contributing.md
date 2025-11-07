@@ -65,7 +65,7 @@ woby/
 │   ├── types/         # TypeScript definitions
 │   └── utils/         # Utility functions
 ├── dist/              # Built files
-├── docs/              # Documentation
+├── doc/              # Documentation
 ├── demo/              # Demo applications
 └── package.json
 ```

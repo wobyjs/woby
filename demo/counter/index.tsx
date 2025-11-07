@@ -16,7 +16,7 @@
  */
 
 /* IMPORT */
-import { $, $$, useMemo, render, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe } from 'woby'
+import { $, $$, useMemo, render, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe, HtmlString, HtmlFunction, HtmlDate, HtmlBoolean } from 'woby'
 
 DEBUGGER.verboseComment = true
 
@@ -31,17 +31,17 @@ const useNestedContext = (ref?: ObservableMaybe<Node>) => useMountedContext(Nest
 const def = () => {
     const value: ObservableMaybe<number> | undefined = $(0, { type: 'number' } as const)
     return {
-        title: $('Counter') as (ObservableMaybe<string> | undefined),
+        title: $('Counter', HtmlString) as (ObservableMaybe<string> | undefined),
         // Store function in observable array to hide it from HTML attributes
-        increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }) as ObservableMaybe<Function> | undefined, //hide this from html attributes
+        increment: $([() => { value($$(value) + 10) }], HtmlFunction) as ObservableMaybe<Function> | undefined, //hide this from html attributes
         decrement: undefined as (ObservableMaybe<Function> | undefined), //hide this from html attributes
         value,
         nested: { nested: { text: $('abc') } } as ObservableMaybe<{ nested: { text: ObservableMaybe<string> } }> | undefined,
         // Object with custom serialization
         obj: $({ nested: { text: 'abc' } }, { toHtml: o => JSON.stringify(o), fromHtml: o => JSON.parse(o) }) as ObservableMaybe<{ nested: { text: ObservableMaybe<string> } }> | undefined,
         // Date with custom serialization
-        date: $(new Date(), { toHtml: o => o.toISOString(), fromHtml: o => new Date(o) }) as ObservableMaybe<Date> | undefined,
-        disabled: $(false, { type: 'boolean' } as const) as ObservableMaybe<boolean> | undefined
+        date: $(new Date(), HtmlDate) as ObservableMaybe<Date> | undefined,
+        disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined
         // Note: children is handled separately by the framework, not included in defaults
     }
 }

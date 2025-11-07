@@ -2,14 +2,14 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [Woby-vs-React.md](file://docs/Woby-vs-React.md)
+- [Woby-vs-React.md](file://doc/Woby-vs-React.md)
 - [readme.md](file://readme.md)
 - [hooks/use_render_effect.ts](file://src/hooks/use_render_effect.ts)
 - [hooks/use_attached.ts](file://src/hooks/use_attached.ts)
 - [utils/resolvers.via.ts](file://src/utils/resolvers.via.ts)
 - [components/for.ts](file://src/components/for.ts)
-- [docs/Hooks.md](file://docs/Hooks.md)
-- [docs/Custom-Element-Practical-Guide.md](file://docs/demos/Custom-Element-Practical-Guide.md)
+- [doc/Hooks.md](file://doc/Hooks.md)
+- [doc/Custom-Element-Practical-Guide.md](file://doc/demos/Custom-Element-Practical-Guide.md)
 </cite>
 
 ## Table of Contents
@@ -65,7 +65,7 @@ For complex state structures, Woby supports nested property access through HTML 
 The framework automatically converts kebab-case attributes to camelCase properties and handles type conversion between HTML strings and JavaScript values.
 
 **Section sources**
-- [Woby-vs-React.md](file://docs/Woby-vs-React.md#L280-L320)
+- [Woby-vs-React.md](file://doc/Woby-vs-React.md#L280-L320)
 - [readme.md](file://readme.md#L28-L35)
 
 ## Effect Handling
@@ -113,7 +113,7 @@ useRenderEffect(() => {
 
 **Section sources**
 - [hooks/use_render_effect.ts](file://src/hooks/use_render_effect.ts#L1-L20)
-- [docs/Hooks.md](file://docs/Hooks.md#L119-L130)
+- [doc/Hooks.md](file://doc/Hooks.md#L119-L130)
 
 ## Component Design
 
@@ -160,7 +160,7 @@ This provides better performance and reactivity compared to native mapping.
 
 **Section sources**
 - [components/for.ts](file://src/components/for.ts#L8-L12)
-- [docs/Custom-Element-Practical-Guide.md](file://docs/demos/Custom-Element-Practical-Guide.md#L0-L100)
+- [doc/Custom-Element-Practical-Guide.md](file://doc/demos/Custom-Element-Practical-Guide.md#L0-L100)
 
 ## Performance Optimization
 
@@ -239,7 +239,7 @@ useEffect(() => {
 ```
 
 **Section sources**
-- [docs/Hooks.md](file://docs/Hooks.md#L119-L180)
+- [doc/Hooks.md](file://doc/Hooks.md#L119-L180)
 - [readme.md](file://readme.md#L428-L440)
 
 ## Anti-Patterns to Avoid
@@ -313,7 +313,7 @@ useEffect(() => {
 ```
 
 **Section sources**
-- [Woby-vs-React.md](file://docs/Woby-vs-React.md#L147-L190)
+- [Woby-vs-React.md](file://doc/Woby-vs-React.md#L147-L190)
 - [readme.md](file://readme.md#L147-L190)
 
 ## Code Organization
@@ -395,8 +395,8 @@ const Counter = () => {
 ```
 
 **Section sources**
-- [docs/Custom-Element-Practical-Guide.md](file://docs/demos/Custom-Element-Practical-Guide.md#L0-L617)
-- [docs/CUSTOM_ELEMENTS.md](file://docs/CUSTOM_ELEMENTS.md#L0-L239)
+- [doc/Custom-Element-Practical-Guide.md](file://doc/demos/Custom-Element-Practical-Guide.md#L0-L617)
+- [doc/CUSTOM_ELEMENTS.md](file://doc/CUSTOM_ELEMENTS.md#L0-L239)
 
 ## Testing Strategies
 
@@ -565,7 +565,7 @@ const FancyButton = ({ ref }) => <button ref={ref} />
 ```
 
 **Section sources**
-- [Woby-vs-React.md](file://docs/Woby-vs-React.md#L1-L480)
+- [Woby-vs-React.md](file://doc/Woby-vs-React.md#L1-L480)
 - [readme.md](file://readme.md#L327-L377)
 
 ## Real-World Examples
@@ -662,5 +662,5 @@ customElement('themed-button', ThemedButton)
 These examples demonstrate Woby's observable-based reactivity, automatic dependency tracking, and direct DOM manipulation patterns.
 
 **Section sources**
-- [docs/Custom-Element-Practical-Guide.md](file://docs/demos/Custom-Element-Practical-Guide.md#L0-L617)
+- [doc/Custom-Element-Practical-Guide.md](file://doc/demos/Custom-Element-Practical-Guide.md#L0-L617)
 - [utils/resolvers.via.ts](file://src/utils/resolvers.via.ts#L92-L126)
