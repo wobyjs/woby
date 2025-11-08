@@ -1,1 +1,0 @@
-export { createElement as h } from '../methods/create_element.ssr'

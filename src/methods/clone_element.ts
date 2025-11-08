@@ -1,13 +1,15 @@
-
-
-import type { Child, Props } from '../types';;
+import type { Child, Props } from '../types';
+import { isSSR } from '../constants'
 import { isArray, isFunction, isPrimitive } from '../utils/lang'
 import { SYMBOL_CLONE } from '../constants'
-import { createElement } from '../methods/create_element'
+import { createElement as createElementSSR } from './create_element.ssr'
+import { createElement as createElementClient } from '../methods/create_element'
 import { CloneableType, wrapCloneElement } from '../methods/wrap_clone_element'
 
 
 export const cloneElement = <P extends Props>(element: Child | Element, props: P, ...children: Child[]): Child => {
+  const createElement = isSSR ? createElementSSR : createElementClient;
+  
   if (isPrimitive(element))
     return element
   else if (isFunction(element)) {
