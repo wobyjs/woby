@@ -1,3 +1,5 @@
+
+
 import { isSSR } from '../constants'
 import { useMemo } from '../hooks/soby'
 import { createElement } from '../methods/create_element'
@@ -9,20 +11,18 @@ import type { Child, Component, FunctionMaybe } from '../types'
 
 export const Dynamic = <P = {}>({ component, props, children }: { component: Component<P>, props?: FunctionMaybe<P | null>, children?: Child }): Child => {
 
-    // In SSR mode, we don't pass children to avoid duplication issues
-    const resolvedChildren = isSSR ? undefined : children;
-
     if (isFunction(component) || isFunction(props)) {
 
         return useMemo(() => {
 
-            return resolve(createElement<P>($$(component, false), $$(props), resolvedChildren))
+            return resolve(createElement<P>($$(component, false), $$(props), children))
 
         })
 
     } else {
 
-        return createElement<P>(component, props, resolvedChildren)
+        return createElement<P>(component, props, children)
 
     }
+
 }
