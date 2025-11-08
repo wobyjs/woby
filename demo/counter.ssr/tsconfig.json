@@ -15,7 +15,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "jsx": "react-jsx",
-        "jsxImportSource": "woby/ssr",
+        "jsxImportSource": "woby",
         "allowSyntheticDefaultImports": true,
         "declaration": true,
         "declarationMap": true,

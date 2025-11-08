@@ -67,7 +67,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         throw new Error('Providing "children" both as a prop and as rest arguments is forbidden')
 
     }
-    const props = hasChildren ? Object.assign(rest, { children }) : _props
+    const props = _props ?? {}
 
     if (isFunction(component)) {
         return wrapElement(() => {
@@ -108,11 +108,10 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                         setProps(child, props as any, stack)
                 }
 
-                // //already in prop
-                // if (hasChildren || ce?.__component__) {
-                //     // setChild(child, !!ce ? createElement(ce.__component__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
-                //     setChild(child, children ?? props.children, FragmentUtils.make(), stack)
-                // }
+                //already in prop
+                if (hasChildren) {
+                    setChild(child, children, FragmentUtils.make(), stack)
+                }
 
             })
 

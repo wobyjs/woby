@@ -1,4 +1,4 @@
-/// @jsxImportSource woby
+/// @jsxImportSource woby/ssr
 
 /**
  * Test to compare JSX syntax vs direct jsx() calls
@@ -18,6 +18,13 @@ const JSXTest = () => {
         <div>
             <h1>JSX Child 1</h1>
             <h2>JSX Child 2</h2>
+            <div>
+                <p>Nested child 1</p>
+                <p>Nested child 2</p>
+                <span>
+                    <strong>Deeply nested child</strong>
+                </span>
+            </div>
         </div>
     )
 }
@@ -26,7 +33,14 @@ const JSXTest = () => {
 const DirectTest16 = () => {
     return jsx('div', null,
         jsx('h1', null, 'Direct Child 1'),
-        jsx('h2', null, 'Direct Child 2')
+        jsx('h2', null, 'Direct Child 2'),
+        jsx('div', null,
+            jsx('p', null, 'Nested child 1'),
+            jsx('p', null, 'Nested child 2'),
+            jsx('span', null,
+                jsx('strong', null, 'Deeply nested child')
+            )
+        )
     )
 }
 
@@ -35,7 +49,16 @@ const DirectTest17 = () => {
     return jsx('div', {
         children: [
             jsx('h1', { children: 'Direct Child 1' }),
-            jsx('h2', { children: 'Direct Child 2' })
+            jsx('h2', { children: 'Direct Child 2' }),
+            jsx('div', {
+                children: [
+                    jsx('p', { children: 'Nested child 1' }),
+                    jsx('p', { children: 'Nested child 2' }),
+                    jsx('span', {
+                        children: jsx('strong', { children: 'Deeply nested child' })
+                    })
+                ]
+            })
         ]
     })
 }

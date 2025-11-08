@@ -11,31 +11,29 @@ import { SYMBOL_CLONE, createElement, wrapCloneElement } from '../ssr'
 /* MAIN */
 
 // React 16
-export function jsx<P extends {} = {}>(component: Component<P>, props?: P, ...children: Child[]): Element
-//React 17
-export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, key?: string): Element
-export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, ...children: (string | Child)[]): Element {
-  // Handle React 16 case where children are passed as separate arguments
+export function jsx<P extends {} = {}>(component: Component<P>, props?: P | null, ...children: Child[]): Element {
+  // Always handle children first - this is the most common case
   if (children.length > 0) {
     // If props is null or undefined, create an empty object
     if (!props) props = {} as any
 
-    // For React 16, pass children as separate arguments to createElement
-    return wrapCloneElement(createElement<P>(component as any, props, ...children), component, props)
+
+    // Pass props and children separately to createElement to avoid duplication
+    const { children: propsChildren, ...restProps } = props as any
+    return wrapCloneElement(createElement<P>(component as any, restProps as any, ...children), component, restProps as any)
   }
 
   // Handle React 17 case where children might be in props
-  // Check if props contains children and no separate children were passed
   if (props && 'children' in props) {
     // Extract children from props and pass them as separate arguments to avoid duplication
     const { children: propsChildren, ...restProps } = props as any
     return wrapCloneElement(createElement<P>(component as any, restProps as any, propsChildren), component, props)
   }
 
-  // Handle React 17 case where key might be passed as third parameter
+  // Handle case where key might be passed as third parameter (React 17)
   if (!props) props = {} as any
 
-  // Pass props to createElement (without key as separate param since createElement handles it differently)
+  // Pass props to createElement
   return wrapCloneElement(createElement<P>(component as any, props), component, props)
 };
 

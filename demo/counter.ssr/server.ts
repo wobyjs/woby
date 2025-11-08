@@ -2,7 +2,7 @@
 // Import polyfills first
 import './happy-dom-polyfills.ts'
 import { createServer } from 'http'
-import renderApp from './index.js'
+import renderApp from './index.tsx'
 
 /* MAIN */
 

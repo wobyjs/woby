@@ -26,7 +26,7 @@ const App: Component = () => {
         <h1>SSR Custom Element Test</h1>
         {/* In SSR mode, we can't use custom elements directly in JSX */}
         {/* We'll test the component directly instead */}
-        <Counter value={5} title="SSR Counter" />
+        <Counter value={$(5)} title={$('SSR Counter')} />
     </div>
 }
 
@@ -34,4 +34,4 @@ const App: Component = () => {
 const htmlString = renderToString(<App />)
 
 // Export the rendered string for server-side usage
-export default () => htmlString
+export default () => Promise.resolve(htmlString)
