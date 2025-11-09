@@ -12,7 +12,7 @@ export {
 } from './soby'
 export * from './create_context'
 export * from './create_directive'
-export * from './create_element.ssr'
+export * from './create_element'
 export * from './clone_element'
 export * from './h'
 export * from './hmr'

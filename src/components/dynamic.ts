@@ -1,7 +1,6 @@
 import { isSSR } from '../constants'
 import { useMemo } from '../hooks/soby'
-import { createElement as createElementSSR } from '../methods/create_element.ssr'
-import { createElement as createElementClient } from '../methods/create_element'
+import { createElement } from '../methods/create_element'
 import { resolve } from '../methods/soby'
 import { $$ } from '../methods/soby'
 import { isFunction } from '../utils/lang'
@@ -12,7 +11,6 @@ export const Dynamic = <P = {}>({ component, props, children }: { component: Com
 
     // In SSR mode, we don't pass children to avoid duplication issues
     const resolvedChildren = isSSR ? undefined : children
-    const createElement = isSSR ? createElementSSR : createElementClient
 
     if (isFunction(component) || isFunction(props)) {
 
@@ -27,4 +25,5 @@ export const Dynamic = <P = {}>({ component, props, children }: { component: Com
         return createElement<P>(component, props, resolvedChildren)
 
     }
+
 }

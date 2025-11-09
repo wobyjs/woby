@@ -1,6 +1,5 @@
 import { isSSR } from '../constants'
-import { createElement as createElementSSR } from '../methods/create_element.ssr'
-import { createElement as createElementClient } from '../methods/create_element'
+import { createElement } from '../methods/create_element'
 import { isArray, isObject } from '../utils/lang'
 import type { Child, Component, Element } from '../types'
 
@@ -10,7 +9,6 @@ export function h<P extends { children?: Child } = {}>(component: Component<P>, 
 export function h<P extends { children?: Child } = {}>(component: Component<P>, props?: Child | P | null, ...children: Child[]): Element {
 
   // return createElement(component, props, key, isStatic, source, self); //TSC
-  const createElement = isSSR ? createElementSSR : createElementClient
 
   if (children.length || (isObject(props) && !isArray(props))) {
     if (!props) props = { children } as any
@@ -22,4 +20,5 @@ export function h<P extends { children?: Child } = {}>(component: Component<P>, 
     return createElement(component, null, props as Child) //TSC
 
   }
+
 }
