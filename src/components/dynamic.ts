@@ -11,8 +11,8 @@ import type { Child, Component, FunctionMaybe } from '../types'
 export const Dynamic = <P = {}>({ component, props, children }: { component: Component<P>, props?: FunctionMaybe<P | null>, children?: Child }): Child => {
 
     // In SSR mode, we don't pass children to avoid duplication issues
-    const resolvedChildren = isSSR ? undefined : children;
-    const createElement = isSSR ? createElementSSR : createElementClient;
+    const resolvedChildren = isSSR ? undefined : children
+    const createElement = isSSR ? createElementSSR : createElementClient
 
     if (isFunction(component) || isFunction(props)) {
 

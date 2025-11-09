@@ -1,4 +1,4 @@
-import { renderToString } from './render_to_string.ssr'
+import { renderToString } from './render_to_string'
 import { createElement } from './create_element.ssr'
 
 // Simple test component

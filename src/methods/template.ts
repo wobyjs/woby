@@ -1,9 +1,9 @@
-
-
+import { isSSR } from '../constants'
 import { SYMBOL_TEMPLATE_ACCESSOR } from '../constants'
 import { wrapElement } from '../methods/wrap_element'
 import { assign, indexOf, isFunction, isString } from '../utils/lang'
 import { setAttribute, setChildReplacement, setClasses, setEvent, setHTML, setProperty, setRef, setStyles } from '../utils/setters'
+import { setAttribute as setAttributeSSR, setChildReplacement as setChildReplacementSSR, setClasses as setClassesSSR, setEvent as setEventSSR, setHTML as setHTMLSSR, setProperty as setPropertySSR, setRef as setRefSSR, setStyles as setStylesSSR } from '../utils/setters.ssr'
 import type { Child, TemplateActionPath, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap } from '../types'
 
 
@@ -281,8 +281,29 @@ export const template = <P = {}>(fn: ((props: P) => Child)): ((props: P) => () =
 
     const { assignments, map } = makeReviverVariables(actionsWithPaths)
     const actions = makeReviverActions(actionsWithPaths, map)
+    
+    // Use different setters based on SSR mode
+    const apis = isSSR ? { 
+      setAttribute: setAttributeSSR, 
+      setChildReplacement: setChildReplacementSSR, 
+      setClasses: setClassesSSR, 
+      setEvent: setEventSSR, 
+      setHTML: setHTMLSSR, 
+      setProperty: setPropertySSR, 
+      setRef: setRefSSR, 
+      setStyles: setStylesSSR 
+    } : { 
+      setAttribute, 
+      setChildReplacement, 
+      setClasses, 
+      setEvent, 
+      setHTML, 
+      setProperty, 
+      setRef, 
+      setStyles 
+    }
+    
     const fn = new Function('root', 'props', `${assignments.join('')}${actions.join('')}return root;`)
-    const apis = { setAttribute, setChildReplacement, setClasses, setEvent, setHTML, setProperty, setRef, setStyles }
     const reviver = fn.bind(apis)
 
     return reviver
