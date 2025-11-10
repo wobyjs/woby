@@ -121,14 +121,14 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                     if (_props) {
                         // For custom elements, remove children from props to avoid duplication
                         if (!!ce) {
-                            const { children, ...np } = _props as any;
-                            setPropsSSR(child, np as any, stack);
+                            const { children, ...np } = _props as any
+                            setPropsSSR(child, np as any, stack)
                         } else {
                             // For regular elements, remove children from props if we have separate children arguments
-                            const propsToSet = hasChildren && isObject(_props) && 'children' in _props 
+                            const propsToSet = hasChildren && isObject(_props) && 'children' in _props
                                 ? Object.fromEntries(Object.entries(_props).filter(([key]) => key !== 'children'))
-                                : _props;
-                            setPropsSSR(child, propsToSet as any, stack);
+                                : _props
+                            setPropsSSR(child, propsToSet as any, stack)
                         }
                     }
 

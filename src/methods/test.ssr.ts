@@ -1,5 +1,5 @@
 import { renderToString } from './render_to_string'
-import { createElement } from './create_element.ssr'
+import { createElement } from './create_element'
 
 // Simple test component
 const App = () => {

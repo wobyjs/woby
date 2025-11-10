@@ -56,49 +56,49 @@ export function jsx<P extends {} = {}>(component: Component<P>, props?: P, ...ch
 //React 17
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, key?: string): Element
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, ...children: (string | Child)[]): Element {
-  // Handle React 17 style where children might be in props
-  let normalizedProps = props ?? {} as P;
-  
+  // Normalize props
+  let normalizedProps = props ?? ({} as P)
+
   // Check if we have children in props
-  const hasChildrenInProps = normalizedProps && isObject(normalizedProps) && 'children' in normalizedProps;
-  
-  // Handle React 16 style - children passed as separate arguments
-  if (children.length > 0) {
-    // If we also have children in props, we need to be careful
-    // In React, when both are present, it's an error, but let's handle it gracefully
-    if (hasChildrenInProps) {
-      // Remove children from props to avoid duplication
-      const { children: propsChildren, ...restProps } = normalizedProps as any;
-      normalizedProps = restProps as P;
-    }
-    
-    normalizedProps = getProps<P>(component, normalizedProps);
-    
-    // Handle the special case where children is a single string (could be a key)
-    if (children.length === 1 && typeof children[0] === 'string') {
-      // If this is actually a key (not content), we should put it in props
-      // But if it's content, we should pass it as children
-      // For now, let's assume it's content and pass it as children
-      return wrapCloneElement(createElement<P>(component as any, normalizedProps, children[0]), component, normalizedProps);
-    }
-    
-    return wrapCloneElement(createElement<P>(component as any, normalizedProps, ...children), component, normalizedProps);
-  } 
-  // Handle React 17 style - children in props only
-  else if (hasChildrenInProps) {
-    const { children: propsChildren, ...restProps } = normalizedProps as any;
-    normalizedProps = restProps as P;
-    normalizedProps = getProps<P>(component, normalizedProps);
-    
-    // Add the children back but pass them as arguments to createElement
-    return wrapCloneElement(createElement<P>(component as any, normalizedProps, propsChildren), component, normalizedProps);
-  } 
-  // No children at all
-  else {
-    normalizedProps = getProps<P>(component, normalizedProps);
-    return wrapCloneElement(createElement<P>(component as any, normalizedProps), component, normalizedProps);
+  const hasChildrenInProps = normalizedProps && isObject(normalizedProps) && 'children' in normalizedProps
+  let propsChildren: any = undefined
+
+  if (hasChildrenInProps) {
+    propsChildren = (normalizedProps as any).children
+    // Remove children from props to avoid duplication
+    const { children: _, ...restProps } = normalizedProps as any
+    normalizedProps = restProps as P
   }
-};
+
+  // Get final props with defaults
+  normalizedProps = getProps<P>(component, normalizedProps)
+
+  // Handle different cases:
+  // 1. Children passed as separate arguments (React 16 style)
+  if (children.length > 0) {
+    return wrapCloneElement(
+      createElement<P>(component as any, normalizedProps, ...children),
+      component,
+      normalizedProps
+    )
+  }
+  // 2. Children in props (React 17 style)
+  else if (hasChildrenInProps && propsChildren !== undefined) {
+    return wrapCloneElement(
+      createElement<P>(component as any, normalizedProps, propsChildren),
+      component,
+      normalizedProps
+    )
+  }
+  // 3. No children at all
+  else {
+    return wrapCloneElement(
+      createElement<P>(component as any, normalizedProps),
+      component,
+      normalizedProps
+    )
+  }
+}
 
 //React 17 only
 export const jsxDEV = <P extends {} = {}>(component: Component<P>, props: P | null, key: string, isStatic: boolean, source: { fileName: string, lineNumber: number, columnNumber: number }, self: any): Element => {

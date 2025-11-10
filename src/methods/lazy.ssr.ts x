@@ -2,7 +2,7 @@
 import { useMemo } from '../hooks/soby'
 import { useResolved } from '../hooks/use_resolved'
 import { useResource } from '../hooks/use_resource'
-import { createElement as creatElement } from '../methods/create_element.ssr'
+import { createElement as creatElement } from '../methods/create_element'
 import { resolve } from '../methods/soby'
 import { once } from '../utils/lang'
 import type { Child, LazyFetcher, LazyResult, ObservableReadonly } from '../types'
