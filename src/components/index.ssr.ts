@@ -1,10 +1,9 @@
-/* IMPORT */
-
 export * from './dynamic'
 export * from './error_boundary'
 export * from './for'
 export * from './fragment'
 export * from './if'
+export * from './keep_alive'
 export * from './portal'
 export * from './suspense'
 export * from './switch'

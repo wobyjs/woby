@@ -1,4 +1,20 @@
 import { renderToString, jsx } from 'woby/ssr'
+/// @jsxImportSource woby
+/// @jsxRuntime automatic
+
+import { renderToString } from 'woby'
+
+// Simple test to see what JSX transpiles to
+const SimpleTest = () => {
+    return (
+        <div>
+            <h1>Test</h1>
+        </div>
+    )
+}
+
+console.log('Simple JSX Test:')
+console.log(renderToString(<SimpleTest />))
 
 // Test with JSX syntax
 const JSXTest = () => {

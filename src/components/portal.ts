@@ -4,13 +4,14 @@ import { useRenderEffect } from '../hooks/use_render_effect'
 import { render } from '../methods/render'
 import { $$ } from '../methods/soby'
 import { createHTMLNode } from '../utils/creators'
+import { createHTMLNode as createHTMLNodeSSR } from '../utils/creators.ssr'
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 
 
 export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children?: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
 
-    const portal = $$(wrapper) || createHTMLNode('div')
+    const portal = $$(wrapper) || (isSSR ? createHTMLNodeSSR('div') : createHTMLNode('div'))
 
     // Use different validation based on environment
     if (isSSR) {
@@ -29,7 +30,7 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
 
         // Use different parent selection based on environment
         const parent: any = isSSR ?
-            ($$(mount) as any || createHTMLNode('div')) :
+            ($$(mount) as any || createHTMLNodeSSR('div')) :
             ($$(mount) || document.body)
 
         // Use different validation based on environment

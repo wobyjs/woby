@@ -1,4 +1,5 @@
-/// @jsxImportSource woby/ssr
+/// @jsxImportSource woby
+/// @jsxRuntime automatic
 
 /**
  * Test to compare JSX syntax vs direct jsx() calls
@@ -10,7 +11,7 @@
  * jsx(component, props, ...children)
  */
 
-import { renderToString, jsx } from 'woby/ssr'
+import { renderToString, jsx } from 'woby'
 
 // Test with JSX syntax
 const JSXTest = () => {

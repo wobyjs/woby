@@ -1,9 +1,8 @@
-import { isSSR } from '../constants'
+
 import { useMemo } from '../hooks/soby'
 import { useResolved } from '../hooks/use_resolved'
 import { useResource } from '../hooks/use_resource'
-import { createElement as createElementSSR } from './create_element.ssr'
-import { createElement as createElementClient } from '../methods/create_element'
+import { createElement as creatElement } from '../methods/create_element.ssr'
 import { resolve } from '../methods/soby'
 import { once } from '../utils/lang'
 import type { Child, LazyFetcher, LazyResult, ObservableReadonly } from '../types'
@@ -26,9 +25,8 @@ export const lazy = <P = {}>(fetcher: LazyFetcher<P>): LazyResult<P> => {
         if (error) throw error
 
         const component = ('default' in value) ? value.default : value
-        const createElement = isSSR ? createElementSSR : createElementClient
 
-        return resolve(createElement<P>(component, props))
+        return resolve(creatElement<P>(component, props))
 
       })
 

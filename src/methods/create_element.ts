@@ -76,7 +76,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
         if (isFunction(component)) {
 
-            const props = hasChildren ? { ..._props, children } : _props
+            const props = _props ?? {}
 
             return wrapElement(() => {
 
@@ -118,14 +118,24 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                 const stack = new Error()
 
                 untrack(() => {
-
                     if (_props) {
-                        setPropsSSR(child, _props as any, stack)
+                        // For custom elements, remove children from props to avoid duplication
+                        if (!!ce) {
+                            const { children, ...np } = _props as any;
+                            setPropsSSR(child, np as any, stack);
+                        } else {
+                            // For regular elements, remove children from props if we have separate children arguments
+                            const propsToSet = hasChildren && isObject(_props) && 'children' in _props 
+                                ? Object.fromEntries(Object.entries(_props).filter(([key]) => key !== 'children'))
+                                : _props;
+                            setPropsSSR(child, propsToSet as any, stack);
+                        }
                     }
 
                     // Set children for both regular HTML elements and custom elements
+                    // Only process children once - either from separate arguments or from props, not both
                     if (hasChildren) {
-                        // For SSR custom elements, we need to handle them differently
+                        // Process children passed as separate arguments (preferred method)
                         if (ce && typeof ce === 'function' && (ce as any).__component__) {
                             setChildSSR(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
                         } else {
@@ -133,6 +143,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                             setChildSSR(child, children, FragmentUtils.make(), stack)
                         }
                     } else if (_props && isObject(_props) && 'children' in _props && !isVoidChild((_props as any).children)) {
+                        // Only process children from props if no separate children were passed
                         // Handle children from props
                         const propsChildren = (_props as any).children as Child
                         // For SSR custom elements, we need to handle them differently
@@ -143,7 +154,6 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                             setChildSSR(child, propsChildren, FragmentUtils.make(), stack)
                         }
                     }
-
                 })
 
                 return child
@@ -180,7 +190,8 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
             const create = isComment ? () => createComment((props as any).data ?? '') : isText ? () => createText((props as any).data ?? '') : createNode
 
             return wrapElement((): Child => {
-                const ce = customElements.get(component) as ReturnType<typeof customElement>
+                // Check if this is a custom element
+                const ce = isSSR ? ces.get(component) : customElements.get(component) as ReturnType<typeof customElement>
 
                 const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
 
