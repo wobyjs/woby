@@ -4,7 +4,7 @@ import { useRenderEffect } from '../hooks/use_render_effect'
 import { render } from '../methods/render'
 import { $$ } from '../methods/soby'
 import { createHTMLNode } from '../utils/creators'
-import { createHTMLNode as createHTMLNodeSSR } from '../utils/creators.ssr'
+import { createHTMLNode as createHTMLNodeSSR } from '../utils/creators'
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 

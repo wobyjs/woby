@@ -13,8 +13,7 @@ import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isObject, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
-import { kebabToCamelCase } from '../utils/string'
-import { normalizePropertyPath, setNestedAttribute } from '../utils/nested'
+import { setNestedAttribute } from '../utils/nested'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
 import { isJsx } from '../jsx-runtime'
@@ -651,7 +650,9 @@ export const setEventStatic = (() => {
         const key = `_${event}`
 
         document.addEventListener(event.slice(2), event => {
+
             const targets = event.composedPath()
+
             let target: EventTarget | null = null
 
             Object.defineProperty(event, 'currentTarget', {
@@ -662,7 +663,9 @@ export const setEventStatic = (() => {
             })
 
             for (let i = 0, l = targets.length; i < l; i++) {
+
                 target = targets[i]
+
                 const handler = target[key]
 
                 if (!handler) continue
@@ -673,6 +676,7 @@ export const setEventStatic = (() => {
             }
 
             target = null
+
         })
     }
 

@@ -91,7 +91,7 @@ export const setAttribute = (element: HTMLElement, key: string, value: FunctionM
         setAttributeStatic(element, key, $$(value))
 }
 
-export const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, child: (() => Child), stack: Stack): void => {
+export const setChildReplacementFunction = (parent: HTMLElement | Node, fragment: Fragment, child: (() => Child), stack: Stack): void => {
 
     useRenderEffect((stack) => {
 
@@ -119,7 +119,7 @@ export const setChildReplacementText = (child: string, childPrev: any): any => {
 
     } else {
 
-        const parent = childPrev.parentElement
+        const parent = childPrev.parentElement ?? childPrev.parentNode
 
         if (!parent) throw new Error('Invalid child replacement')
 
@@ -163,6 +163,37 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
 
 }
 
+/**
+ * Sets child nodes on a parent element with static (non-reactive) values.
+ * 
+ * This function efficiently updates the DOM by comparing the current children (in the fragment)
+ * with the new children and applying the minimal set of DOM operations needed.
+ * 
+ * The function handles several optimization cases:
+ * 1. Fast path for appending a node the first time
+ * 2. Fast path for single text child replacement
+ * 3. Fast path for removing all children or replacing placeholders
+ * 4. General diffing algorithm for complex changes
+ * 
+ * @param parent - The parent DOM element to update
+ * @param fragment - A fragment representing the current children state
+ * @param fragmentOnly - Whether to only update the fragment without touching the actual DOM
+ * @param child - The new child or children to set
+ * @param dynamic - Whether the child is dynamic (reactive) or static
+ * @param stack - The stack trace for debugging purposes
+ * 
+ * @example
+ * ```ts
+ * // Set a simple text child
+ * setChildStatic(parent, fragment, false, "Hello World", false, stack)
+ * 
+ * // Set multiple children
+ * setChildStatic(parent, fragment, false, [node1, node2, "text"], false, stack)
+ * 
+ * // Set a function child (will be resolved)
+ * setChildStatic(parent, fragment, false, () => "Dynamic content", true, stack)
+ * ```
+ */
 export const setChildStatic = (parent: any, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, stack: Stack): void => {
 
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
@@ -352,7 +383,9 @@ export const setChildStatic = (parent: any, fragment: Fragment, fragmentOnly: bo
 
 export const setChild = (parent: HTMLElement, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
 
-    resolveChild(child, setChildStatic.bind(undefined, parent, fragment, false), false, stack)
+    //    resolveChild(child, setChildStatic.bind(undefined, parent, fragment, false), false, stack)
+    const cd = child
+    resolveChild(cd, (child, dynamic, stack) => setChildStatic(parent, fragment, false, child, dynamic, stack), false, stack)
 
 }
 
@@ -579,9 +612,9 @@ export const setDirective = <T extends unknown[]>(element: HTMLElement, directiv
 
 export const setEventStatic = (() => {
 
-    //TODO: Maybe delete event delegation
-    //TODO: Maybe delegate more events: [onmousemove, onmouseout, onmouseover, onpointerdown, onpointermove, onpointerout, onpointerover, onpointerup, ontouchend, ontouchmove, ontouchstart]
-
+    // Expanded event delegation for better memory efficiency
+    // Added more events: mouse events, pointer events, and touch events for improved performance
+    // TODO: Implement proper cleanup mechanism for event delegation
     const delegatedEvents = <const>{
         onauxclick: ['_onauxclick', false],
         onbeforeinput: ['_onbeforeinput', false],
@@ -593,7 +626,20 @@ export const setEventStatic = (() => {
         onkeydown: ['_onkeydown', false],
         onkeyup: ['_onkeyup', false],
         onmousedown: ['_onmousedown', false],
-        onmouseup: ['_onmouseup', false]
+        onmouseenter: ['_onmouseenter', false],
+        onmouseleave: ['_onmouseleave', false],
+        onmousemove: ['_onmousemove', false],
+        onmouseout: ['_onmouseout', false],
+        onmouseover: ['_onmouseover', false],
+        onmouseup: ['_onmouseup', false],
+        onpointerdown: ['_onpointerdown', false],
+        onpointermove: ['_onpointermove', false],
+        onpointerout: ['_onpointerout', false],
+        onpointerover: ['_onpointerover', false],
+        onpointerup: ['_onpointerup', false],
+        ontouchend: ['_ontouchend', false],
+        ontouchmove: ['_ontouchmove', false],
+        ontouchstart: ['_ontouchstart', false]
     }
 
     const delegate = (event: string): void => {
@@ -718,6 +764,7 @@ export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: Fun
 }
 
 export const setPropertyStatic = (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
+    const isComment = (element instanceof Comment)
 
     if (key === 'tabIndex' && isBoolean(value)) {
 
@@ -725,7 +772,7 @@ export const setPropertyStatic = (element: HTMLElement, key: string, value: null
 
     }
 
-    if (key === 'value') {
+    if (key === 'value' && !isComment) {
 
         if (element.tagName === 'PROGRESS') {
 
@@ -986,53 +1033,59 @@ export const setTemplateAccessor = (element: HTMLElement, key: string, value: Te
 }
 
 export const setProp = (element: HTMLElement, key: string, value: any, stack: Stack): void => {
-
-    if (isTemplateAccessor(value)) {
-
-        setTemplateAccessor(element, key, value)
-
-    } else if (key === 'children') {
-
-        setChild(element, value, FragmentUtils.make(), stack)
-
-    } else if (key === 'ref') {
-
-        setRef(element, value)
-
-    } else if (key === 'style') {
-
-        setStyles(element, value, stack)
-
-    } else if (key === 'class') {
-
-        setClasses(element, value, stack)
-
-    } else if (key === 'dangerouslySetInnerHTML') {
-
-        setHTML(element, value, stack)
-
-    } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
-
-        setEvent(element, key.toLowerCase(), value)
-
-    } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
-
-        setDirective(element, key.slice(4), value)
-
-    } else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' || key === 'className') {
-
-        // Forbidden props
-
-    } else if (key in element && !isSVG(element)) {
-
-        setProperty(element, key, value, stack)
-
-    } else {
-
-        setAttribute(element, key, value, stack)
-
+    if (element instanceof Comment || element instanceof Text) {
+        if (key === 'ref')
+            setRef(element, value)
+        else if (key in element)
+            setProperty(element, key, value, stack)
     }
+    else {
+        if (isTemplateAccessor(value)) {
 
+            setTemplateAccessor(element, key, value)
+
+        } else if (key === 'children') {
+
+            setChild(element, value, FragmentUtils.make(), stack)
+
+        } else if (key === 'ref') {
+
+            setRef(element, value)
+
+        } else if (key === 'style') {
+
+            setStyles(element, value, stack)
+
+        } else if (key === 'class') {
+
+            setClasses(element, value, stack)
+
+        } else if (key === 'dangerouslySetInnerHTML') {
+
+            setHTML(element, value, stack)
+
+        } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
+
+            setEvent(element, key.toLowerCase(), value)
+
+        } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
+
+            setDirective(element, key.slice(4), value)
+
+        } else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' || key === 'className') {
+
+            // Forbidden props
+
+        } else if (key in element && !isSVG(element)) {
+
+            setProperty(element, key, value, stack)
+
+        } else {
+
+            setAttribute(element, key, value, stack)
+
+        }
+    }
 }
 
 export const setProps = (element: HTMLElement, object: Record<string, unknown>, stack: Stack): void => {

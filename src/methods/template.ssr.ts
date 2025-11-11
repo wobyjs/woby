@@ -1,7 +1,7 @@
 import { SYMBOL_TEMPLATE_ACCESSOR } from '../constants'
 import { wrapElement } from './wrap_element'
 import { assign, indexOf, isFunction, isString } from '../utils/lang'
-import { setAttribute, setChildReplacement, setClasses, setEvent, setHTML, setProperty, setRef, setStyles } from '../utils/setters.ssr'
+import { setAttribute, setChildReplacement, setClasses, setEvent, setHTML, setProperty, setRef, setStyles } from '../utils/setters'
 import type { Child, TemplateActionPath, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap } from '../types'
 
 

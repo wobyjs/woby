@@ -1,26 +1,6 @@
-
-/* IMPORT */
-//console.log('ssr.ts')
-
-// import './jsx/types'
-//  * from './jsx/jsx'
-//  * from './jsx/types.ts'
-// import type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component } from './types';
-
-/*  */
-
-//  * from './components/index.ssr';
-//  * from './jsx/jsx-runtime.ssr'
-//  * from './hooks';
-//  * from './methods/index.ssr';
-//  type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component };
-//  * from './constants';
-
-//  { render } from './methods/render.testing'
 export { }
 
 import * as J from '../types'
-import { FunctionMaybe, ArrayMaybe, ObservableMaybe } from '../types'
 
 declare global {
   namespace JSX {
@@ -79,91 +59,91 @@ declare global {
     type Props = J.Props
     type Ref<T = unknown> = J.Ref<T>
     type ResourceStaticPending<T = unknown> = J.ResourceStaticPending<T>
-    type ResourceStaticRejected = J.ResourceStaticRejected;
-    type ResourceStaticResolved<T = unknown> = J.ResourceStaticResolved<T>;
-    type ResourceStatic<T = unknown> = J.ResourceStatic<T>;
-    type ResourceFunction<T = unknown> = J.ResourceFunction<T>;
-    type Resource<T = unknown> = J.Resource<T>;
-    type StoreOptions = J.StoreOptions;
-    type SuspenseCollectorData = J.SuspenseCollectorData;
-    type SuspenseData = J.SuspenseData;
-    type TemplateActionPath = J.TemplateActionPath;
-    type TemplateActionProxy = J.TemplateActionProxy;
-    type TemplateActionWithNodes = J.TemplateActionWithNodes;
-    type TemplateActionWithPaths = J.TemplateActionWithPaths;
-    type TemplateVariableProperties = J.TemplateVariableProperties;
-    type TemplateVariableData = J.TemplateVariableData;
-    type TemplateVariablesMap = J.TemplateVariablesMap;
-    type Truthy<T = unknown> = J.Truthy<T>;
+    type ResourceStaticRejected = J.ResourceStaticRejected
+    type ResourceStaticResolved<T = unknown> = J.ResourceStaticResolved<T>
+    type ResourceStatic<T = unknown> = J.ResourceStatic<T>
+    type ResourceFunction<T = unknown> = J.ResourceFunction<T>
+    type Resource<T = unknown> = J.Resource<T>
+    type StoreOptions = J.StoreOptions
+    type SuspenseCollectorData = J.SuspenseCollectorData
+    type SuspenseData = J.SuspenseData
+    type TemplateActionPath = J.TemplateActionPath
+    type TemplateActionProxy = J.TemplateActionProxy
+    type TemplateActionWithNodes = J.TemplateActionWithNodes
+    type TemplateActionWithPaths = J.TemplateActionWithPaths
+    type TemplateVariableProperties = J.TemplateVariableProperties
+    type TemplateVariableData = J.TemplateVariableData
+    type TemplateVariablesMap = J.TemplateVariablesMap
+    type Truthy<T = unknown> = J.Truthy<T>
     type CSSProperties = J.CSSProperties
 
     /* MAIN */
 
-    type Nullable<T = unknown> = J.Nullable<T>;
-    type AllClassProperties = J.AllClassProperties;
-    type DOMCSSProperties = J.DOMCSSProperties;
-    type DOMCSSVariables = J.DOMCSSVariables;
-    type HTMLAttributeReferrerPolicy = J.HTMLAttributeReferrerPolicy;
-    type Children = J.Child;
-    type Class = J.FunctionMaybe<Nullable<string | J.ClassProperties | (J.FunctionMaybe<null | undefined | boolean | string> | J.Class)[]>>;
-    type Refs<T = unknown> = J.Refs<T>;
-    type Style = J.FunctionMaybe<Nullable<string | J.StyleProperties>>;
-    type IntrinsicElement<T extends keyof J.IntrinsicElements> = J.IntrinsicElements[T];
+    type Nullable<T = unknown> = J.Nullable<T>
+    type AllClassProperties = J.AllClassProperties
+    type DOMCSSProperties = J.DOMCSSProperties
+    type DOMCSSVariables = J.DOMCSSVariables
+    type HTMLAttributeReferrerPolicy = J.HTMLAttributeReferrerPolicy
+    type Children = J.Child
+    type Class = J.FunctionMaybe<Nullable<string | J.ClassProperties | (J.FunctionMaybe<null | undefined | boolean | string> | J.Class)[]>>
+    type Refs<T = unknown> = J.Refs<T>
+    type Style = J.FunctionMaybe<Nullable<string | J.StyleProperties>>
+    type IntrinsicElement<T extends keyof J.IntrinsicElements> = J.IntrinsicElements[T]
     type ClassProperties = J.ClassProperties
 
     type StyleProperties = J.StyleProperties
-    type TargetedEvent<T extends EventTarget = EventTarget, TypedEvent extends Event = Event> = J.TargetedEvent<T, TypedEvent>;
-    type TargetedAnimationEvent<T extends EventTarget> = J.TargetedAnimationEvent<T>;
-    type TargetedClipboardEvent<T extends EventTarget> = J.TargetedClipboardEvent<T>;
-    type TargetedChangeEvent<T extends EventTarget> = J.TargetedChangeEvent<T>;
-    type TargetedCompositionEvent<T extends EventTarget> = J.TargetedCompositionEvent<T>;
-    type TargetedDragEvent<T extends EventTarget> = J.TargetedDragEvent<T>;
-    type TargetedFocusEvent<T extends EventTarget> = J.TargetedFocusEvent<T>;
-    type TargetedInputEvent<T extends EventTarget> = J.TargetedInputEvent<T>;
-    type TargetedKeyboardEvent<T extends EventTarget> = J.TargetedKeyboardEvent<T>;
-    type TargetedMouseEvent<T extends EventTarget> = J.TargetedMouseEvent<T>;
-    type TargetedPointerEvent<T extends EventTarget> = J.TargetedPointerEvent<T>;
-    type TargetedSubmitEvent<T extends EventTarget> = J.TargetedSubmitEvent<T>;
-    type TargetedTouchEvent<T extends EventTarget> = J.TargetedTouchEvent<T>;
-    type TargetedTransitionEvent<T extends EventTarget> = J.TargetedTransitionEvent<T>;
-    type TargetedUIEvent<T extends EventTarget> = J.TargetedUIEvent<T>;
-    type TargetedWheelEvent<T extends EventTarget> = J.TargetedWheelEvent<T>;
+    type TargetedEvent<T extends EventTarget = EventTarget, TypedEvent extends Event = Event> = J.TargetedEvent<T, TypedEvent>
+    type TargetedAnimationEvent<T extends EventTarget> = J.TargetedAnimationEvent<T>
+    type TargetedClipboardEvent<T extends EventTarget> = J.TargetedClipboardEvent<T>
+    type TargetedChangeEvent<T extends EventTarget> = J.TargetedChangeEvent<T>
+    type TargetedCompositionEvent<T extends EventTarget> = J.TargetedCompositionEvent<T>
+    type TargetedDragEvent<T extends EventTarget> = J.TargetedDragEvent<T>
+    type TargetedFocusEvent<T extends EventTarget> = J.TargetedFocusEvent<T>
+    type TargetedInputEvent<T extends EventTarget> = J.TargetedInputEvent<T>
+    type TargetedKeyboardEvent<T extends EventTarget> = J.TargetedKeyboardEvent<T>
+    type TargetedMouseEvent<T extends EventTarget> = J.TargetedMouseEvent<T>
+    type TargetedPointerEvent<T extends EventTarget> = J.TargetedPointerEvent<T>
+    type TargetedSubmitEvent<T extends EventTarget> = J.TargetedSubmitEvent<T>
+    type TargetedTouchEvent<T extends EventTarget> = J.TargetedTouchEvent<T>
+    type TargetedTransitionEvent<T extends EventTarget> = J.TargetedTransitionEvent<T>
+    type TargetedUIEvent<T extends EventTarget> = J.TargetedUIEvent<T>
+    type TargetedWheelEvent<T extends EventTarget> = J.TargetedWheelEvent<T>
 
-    type EventHandler<Event extends TargetedEvent> = J.EventHandler<Event>;
-    type AnimationEventHandler<T extends EventTarget> = J.AnimationEventHandler<T>;
-    type ClipboardEventHandler<T extends EventTarget> = J.ClipboardEventHandler<T>;
-    type ChangeEventHandler<T extends EventTarget> = J.ChangeEventHandler<T>;
-    type CompositionEventHandler<T extends EventTarget> = J.CompositionEventHandler<T>;
-    type DragEventHandler<T extends EventTarget> = J.DragEventHandler<T>;
-    type FocusEventHandler<T extends EventTarget> = J.FocusEventHandler<T>;
-    type GenericEventHandler<T extends EventTarget> = J.GenericEventHandler<T>;
-    type InputEventHandler<T extends EventTarget> = J.InputEventHandler<T>;
-    type KeyboardEventHandler<T extends EventTarget> = J.KeyboardEventHandler<T>;
-    type MouseEventHandler<T extends EventTarget> = J.MouseEventHandler<T>;
-    type PointerEventHandler<T extends EventTarget> = J.PointerEventHandler<T>;
-    type SubmitEventHandler<T extends EventTarget> = J.SubmitEventHandler<T>;
-    type TouchEventHandler<T extends EventTarget> = J.TouchEventHandler<T>;
-    type TransitionEventHandler<T extends EventTarget> = J.TransitionEventHandler<T>;
-    type UIEventHandler<T extends EventTarget> = J.UIEventHandler<T>;
-    type WheelEventHandler<T extends EventTarget> = J.WheelEventHandler<T>;
+    type EventHandler<Event extends TargetedEvent> = J.EventHandler<Event>
+    type AnimationEventHandler<T extends EventTarget> = J.AnimationEventHandler<T>
+    type ClipboardEventHandler<T extends EventTarget> = J.ClipboardEventHandler<T>
+    type ChangeEventHandler<T extends EventTarget> = J.ChangeEventHandler<T>
+    type CompositionEventHandler<T extends EventTarget> = J.CompositionEventHandler<T>
+    type DragEventHandler<T extends EventTarget> = J.DragEventHandler<T>
+    type FocusEventHandler<T extends EventTarget> = J.FocusEventHandler<T>
+    type GenericEventHandler<T extends EventTarget> = J.GenericEventHandler<T>
+    type InputEventHandler<T extends EventTarget> = J.InputEventHandler<T>
+    type KeyboardEventHandler<T extends EventTarget> = J.KeyboardEventHandler<T>
+    type MouseEventHandler<T extends EventTarget> = J.MouseEventHandler<T>
+    type PointerEventHandler<T extends EventTarget> = J.PointerEventHandler<T>
+    type SubmitEventHandler<T extends EventTarget> = J.SubmitEventHandler<T>
+    type TouchEventHandler<T extends EventTarget> = J.TouchEventHandler<T>
+    type TransitionEventHandler<T extends EventTarget> = J.TransitionEventHandler<T>
+    type UIEventHandler<T extends EventTarget> = J.UIEventHandler<T>
+    type WheelEventHandler<T extends EventTarget> = J.WheelEventHandler<T>
 
-    type ElementAttributesProperty = J.ElementAttributesProperty;
-    type ElementChildrenAttribute = J.ElementChildrenAttribute;
-    type IntrinsicAttributes = J.IntrinsicAttributes;
-    type AriaAttributes = J.AriaAttributes;
-    type Directives = J.Directives;
-    type DirectiveAttributes = J.DirectiveAttributes;
-    type EventAttributes<T extends EventTarget> = J.EventAttributes<T>;
-    type ViewAttributes = J.ViewAttributes;
-    type DOMAttributes<T extends EventTarget> = J.DOMAttributes<T>;
-    type VoidHTMLAttributes<T extends EventTarget> = J.VoidHTMLAttributes<T>;
-    type HTMLAttributes<T extends EventTarget> = J.VoidHTMLAttributes<T> & ViewAttributes;
-    type SVGAttributes<T extends EventTarget = SVGElement> = J.HTMLAttributes<T> & DirectiveAttributes;
-    type AnchorHTMLAttributes<T extends EventTarget> = J.HTMLAttributes<T>;
-    type AudioHTMLAttributes<T extends EventTarget> = J.MediaHTMLAttributes<T>;
-    type AreaHTMLAttributes<T extends EventTarget> = J.VoidHTMLAttributes<T>;
-    type BaseHTMLAttributes<T extends EventTarget> = J.VoidHTMLAttributes<T>;
-    type BlockquoteHTMLAttributes<T extends EventTarget> = J.HTMLAttributes<T>;
+    type ElementAttributesProperty = J.ElementAttributesProperty
+    type ElementChildrenAttribute = J.ElementChildrenAttribute
+    type IntrinsicAttributes = J.IntrinsicAttributes
+    type AriaAttributes = J.AriaAttributes
+    type Directives = J.Directives
+    type DirectiveAttributes = J.DirectiveAttributes
+    type EventAttributes<T extends EventTarget> = J.EventAttributes<T>
+    type ViewAttributes = J.ViewAttributes
+    type DOMAttributes<T extends EventTarget> = J.DOMAttributes<T>
+    type VoidHTMLAttributes<T extends EventTarget> = J.VoidHTMLAttributes<T>
+    type HTMLAttributes<T extends EventTarget> = J.VoidHTMLAttributes<T> & ViewAttributes
+    type SVGAttributes<T extends EventTarget = SVGElement> = J.HTMLAttributes<T> & DirectiveAttributes
+    type AnchorHTMLAttributes<T extends EventTarget> = J.HTMLAttributes<T>
+    type AudioHTMLAttributes<T extends EventTarget> = J.MediaHTMLAttributes<T>
+    type AreaHTMLAttributes<T extends EventTarget> = J.VoidHTMLAttributes<T>
+    type BaseHTMLAttributes<T extends EventTarget> = J.VoidHTMLAttributes<T>
+    type BlockquoteHTMLAttributes<T extends EventTarget> = J.HTMLAttributes<T>
     type BrHTMLAttributes<T extends EventTarget> = J.BrHTMLAttributes<T>
     type ButtonHTMLAttributes<T extends EventTarget> = J.ButtonHTMLAttributes<T>
     type CanvasHTMLAttributes<T extends EventTarget> = J.CanvasHTMLAttributes<T>
