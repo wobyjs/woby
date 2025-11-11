@@ -164,10 +164,6 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
 }
 
 export const setChildStatic = (parent: any, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, stack: Stack): void => {
-    // console.log('setChildStatic: called with child', child)
-    // console.log('setChildStatic: fragmentOnly', fragmentOnly)
-    // console.log('setChildStatic: dynamic', dynamic)
-    // console.log('setChildStatic: parent tagName', parent.tagName)
 
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 

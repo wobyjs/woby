@@ -279,15 +279,15 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
             const fragment = FragmentUtils.make()
 
-            let childFragmentOnly = !fragmentOnly // Avoiding mutating the DOM immediately, letting the parent handle it
+            // let childFragmentOnly = !fragmentOnly // Avoiding mutating the DOM immediately, letting the parent handle it
 
             FragmentUtils.pushFragment(fragmentNext, fragment)
 
             resolveChild(child, (child, dynamic, stack) => {
 
-                const fragmentOnly = childFragmentOnly
+                // const fragmentOnly = childFragmentOnly
 
-                childFragmentOnly = false
+                // childFragmentOnly = false
 
                 setChildStatic(parent, fragment, fragmentOnly, child, dynamic, children[i] as any, stack)
 
