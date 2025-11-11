@@ -7,14 +7,15 @@ import { store } from '../methods/soby'
 import { untrack } from '../methods/soby'
 import { context, with as _with, SYMBOL_OBSERVABLE_WRITABLE } from 'soby'
 import { SYMBOL_STORE_OBSERVABLE } from 'soby'
-import { classesToggle } from '../utils/classlist'
-import { createTextSSR as createText, createCommentSSR as createComment } from '../utils/creators'
-import { diff } from '../utils/diff'
-import { FragmentUtils } from '../utils/fragment'
-import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
-import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
+import { classesToggle } from './classlist'
+import { createTextSSR as createText, createCommentSSR as createComment } from './creators'
+import { diff } from './diff'
+import { FragmentUtils } from './fragment'
+import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from './lang'
+import { resolveChild, resolveClass, resolveStyle } from './resolvers'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
+import { setNestedAttribute } from './nested'
 
 export const setAttributeStatic = (() => {
 
@@ -30,6 +31,11 @@ export const setAttributeStatic = (() => {
     }
 
     return (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
+        // Handle nested properties with "." or "$" syntax
+        if (key.includes('.') || key.includes('$')) {
+            setNestedAttribute(element, key, value)
+            return
+        }
 
         if (isSVG(element)) {
 
@@ -81,12 +87,8 @@ export const setAttribute = (element: HTMLElement, key: string, value: FunctionM
                 setAttributeStatic(element, key, value())
             }, stack)
         }
-    } else {
-
+    } else
         setAttributeStatic(element, key, $$(value))
-
-    }
-
 }
 
 export const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, child: (() => Child), stack: Stack): void => {

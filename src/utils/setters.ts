@@ -33,7 +33,6 @@ export const setAttributeStatic = (() => {
     }
 
     return (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
-
         // Handle nested properties with "." or "$" syntax
         if (key.includes('.') || key.includes('$')) {
             setNestedAttribute(element, key, value)
@@ -77,14 +76,20 @@ export const setAttributeStatic = (() => {
 export const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
 
     if (isFunction(value) && isFunctionReactive(value))
-        useRenderEffect(() => {
-            const unwrappedValue = value()
-            const { toHtml } = value[SYMBOL_OBSERVABLE_WRITABLE]?.options ?? {}
-            setAttributeStatic(element, key, toHtml ? toHtml(unwrappedValue) : unwrappedValue)
-        }, stack)
+        if (isObservable(value) && value[SYMBOL_OBSERVABLE_WRITABLE]?.options?.toHtml) {
+            useRenderEffect(() => {
+                const unwrappedValue = value()
+                const options = value[SYMBOL_OBSERVABLE_WRITABLE].options
+                const htmlValue = options.toHtml(unwrappedValue)
+                setAttributeStatic(element, key, htmlValue)
+            }, stack)
+        } else {
+            useRenderEffect(() => {
+                setAttributeStatic(element, key, value())
+            }, stack)
+        }
     else
         setAttributeStatic(element, key, $$(value))
-
 }
 
 export const setChildReplacementFunction = (parent: HTMLElement | Node, fragment: Fragment, child: (() => Child), stack: Stack): void => {
