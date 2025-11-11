@@ -1,8 +1,10 @@
 
 
 import { switch as _switch } from '../soby'
-import { assign, castArray } from '../utils/lang'
+import { castArray } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe, ObservableReadonly } from '../types'
+
+const assign = Object.assign
 
 /* MAIN */
 

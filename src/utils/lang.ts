@@ -6,7 +6,7 @@ import { isObservable } from 'soby'
 
 /* MAIN */
 
-export const assign = Object.assign
+// export const assign = Object.assign
 
 export const castArray = <T>(value: T[] | T): T[] => {
 

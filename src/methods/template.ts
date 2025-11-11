@@ -2,10 +2,11 @@
 
 import { SYMBOL_TEMPLATE_ACCESSOR } from '../constants'
 import { wrapElement } from '../methods/wrap_element'
-import { assign, indexOf, isFunction, isString } from '../utils/lang'
+import { indexOf, isFunction, isString } from '../utils/lang'
 import { setAttribute, setChildReplacement, setClasses, setEvent, setHTML, setProperty, setRef, setStyles } from '../utils/setters'
 import type { Child, TemplateActionPath, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap } from '../types'
 
+const assign = Object.assign
 
 //TODO: Avoid using "Function" and "eval", while still keeping similar performance, if possible
 //TODO: Support complex children in the template function

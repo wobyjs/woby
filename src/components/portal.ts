@@ -5,9 +5,9 @@ import { render } from '../methods/render'
 import { $$ } from '../methods/soby'
 import { createHTMLNode } from '../utils/creators'
 import { createHTMLNode as createHTMLNodeSSR } from '../utils/creators'
-import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 
+const assign = Object.assign
 
 export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children?: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
 

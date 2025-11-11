@@ -13,12 +13,9 @@ const config = defineConfig({
             entry: {
                 index: "./src/index.ts",
                 runtime: "./src/jsx/runtime.ts",
-                "ssr-runtime": "./src/ssr/ssr-runtime.ts",
                 "via-runtime": "./src/via/via-runtime.ts",
-                ssr: './src/ssr.ts',
                 via: './src/via.ts',
                 testing: './src/testing.ts',
-                "jsx-runtime-ssr": './src/ssr/jsx-runtime/index.ts'
             },
             name: 'woby',
             formats: ['cjs', 'es'],
@@ -63,10 +60,6 @@ const config = defineConfig({
         // Provide polyfills for Node.js globals that happy-dom might need
         global: 'globalThis',
     },
-    ssr: {
-        // Don't externalize happy-dom for SSR builds
-        noExternal: ['happy-dom']
-    }
 })
 
 export default config

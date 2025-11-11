@@ -7,8 +7,10 @@ import { useReadonly } from '../hooks/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { $ } from '../methods/soby'
 import { $$ } from '../methods/soby'
-import { assign, castError, isPromise } from '../utils/lang'
+import { castError, isPromise } from '../utils/lang'
 import type { ObservableMaybe, PromiseMaybe, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource } from '../types'
+
+const assign = Object.assign
 
 /* MAIN */
 

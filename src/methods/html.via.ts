@@ -2,8 +2,9 @@
 
 import htm from 'htm'
 import { createElement } from '../methods/create_element.via'
-import { assign } from '../utils/lang'
 import type { Child, ComponentsMap, Element, Props } from '../types'
+
+const assign = Object.assign
 
 const registry: ComponentsMap = {}
 const h = (type: string, props?: Props | null, ...children: Child[]): Element => createElement((registry[type] || type) as any, props, ...children)

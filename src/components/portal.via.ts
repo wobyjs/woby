@@ -4,8 +4,9 @@ import { useRenderEffect } from '../hooks/use_render_effect'
 import { render } from '../methods/render.via'
 import { $$ } from '../methods/soby'
 import { createHTMLNode } from '../utils/creators.via'
-import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
+
+const assign = Object.assign
 
 export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
 
