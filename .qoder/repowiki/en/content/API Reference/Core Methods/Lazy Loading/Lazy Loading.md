@@ -3,7 +3,7 @@
 <cite>
 **Referenced Files in This Document**   
 - [lazy.ts](file://src/methods/lazy.ts)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts)
+- [lazy.ts](file://src/methods/lazy.ts)
 - [lazy.via.ts](file://src/methods/lazy.via.ts)
 - [use_resource.ts](file://src/hooks/use_resource.ts)
 - [suspense.ts](file://src/components/suspense.ts)
@@ -176,7 +176,7 @@ F[use_resource.ts]
 G[suspense.ts]
 end
 subgraph "SSR Environment"
-H[lazy.ssr.ts]
+H[lazy.ts]
 I[use_resource.ts]
 J[suspense.ts]
 end
@@ -198,14 +198,14 @@ D --> M
 
 **Diagram sources**
 - [lazy.ts](file://src/methods/lazy.ts#L11-L59)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [lazy.via.ts](file://src/methods/lazy.via.ts#L10-L58)
 - [use_resource.ts](file://src/hooks/use_resource.ts#L18-L104)
 - [suspense.ts](file://src/components/suspense.ts#L0-L25)
 
 **Section sources**
 - [lazy.ts](file://src/methods/lazy.ts#L11-L59)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [lazy.via.ts](file://src/methods/lazy.via.ts#L10-L58)
 
 ## Performance Considerations

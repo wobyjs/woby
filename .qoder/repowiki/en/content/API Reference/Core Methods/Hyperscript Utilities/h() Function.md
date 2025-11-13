@@ -4,10 +4,10 @@
 **Referenced Files in This Document**   
 - [h.ts](file://src/methods/h.ts)
 - [h.via.ts](file://src/methods/h.via.ts)
-- [h.ssr.ts](file://src/methods/h.ssr.ts)
+- [h.ts](file://src/methods/h.ts)
 - [create_element.ts](file://src/methods/create_element.ts)
 - [create_element.via.ts](file://src/methods/create_element.via.ts)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts)
+- [create_element.ts](file://src/methods/create_element.ts)
 - [jsx-runtime.ts](file://src/jsx-runtime.ts)
 </cite>
 
@@ -30,7 +30,7 @@ The `h()` function is designed to be compatible with standard JSX tooling config
 **Section sources**
 - [h.ts](file://src/methods/h.ts#L7-L23)
 - [h.via.ts](file://src/methods/h.via.ts#L7-L35)
-- [h.ssr.ts](file://src/methods/h.ssr.ts#L1)
+- [h.ts](file://src/methods/h.ts#L1)
 
 ## Function Signatures and Overloads
 The `h()` function features multiple overloads to accommodate different usage patterns while maintaining type safety. The primary signature accepts a component, optional props, and rest parameters for children:
@@ -117,7 +117,7 @@ Woby provides specialized implementations of the `h()` function for different ru
 ### Standard Environment (h.ts)
 The standard implementation in `h.ts` serves as the primary version for browser-based applications. It imports `createElement` from the main implementation and applies the argument normalization logic described earlier. This version is optimized for client-side rendering with full DOM access and reactive updates.
 
-### SSR Environment (h.ssr.ts)
+### SSR Environment (h.ts)
 The SSR implementation takes a different approach by directly re-exporting `createElement` as `h`:
 ```typescript
 export { createElement as h } from '../methods/create_element.ssr'
@@ -138,10 +138,10 @@ Despite these implementation differences, all versions maintain the same public 
 **Section sources**
 - [h.ts](file://src/methods/h.ts#L8-L23)
 - [h.via.ts](file://src/methods/h.via.ts#L8-L35)
-- [h.ssr.ts](file://src/methods/h.ssr.ts#L1)
+- [h.ts](file://src/methods/h.ts#L1)
 - [create_element.ts](file://src/methods/create_element.ts#L53-L129)
 - [create_element.via.ts](file://src/methods/create_element.via.ts#L19-L80)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
 
 ## Performance Implications
 The argument normalization performed by the `h()` function has several performance implications that affect both runtime efficiency and bundle size. Understanding these implications is crucial for optimizing Woby applications.
@@ -170,7 +170,7 @@ The framework's modular design allows for environment-specific optimizations whi
 
 **Section sources**
 - [h.ts](file://src/methods/h.ts#L8-L23)
-- [h.ssr.ts](file://src/methods/h.ssr.ts#L1)
+- [h.ts](file://src/methods/h.ts#L1)
 - [create_element.ts](file://src/methods/create_element.ts#L53-L129)
 
 ## JSX Tooling Integration
@@ -285,4 +285,4 @@ The consistent API across environments ensures that components remain portable w
 **Section sources**
 - [h.ts](file://src/methods/h.ts#L7-L23)
 - [h.via.ts](file://src/methods/h.via.ts#L7-L35)
-- [h.ssr.ts](file://src/methods/h.ssr.ts#L1)
+- [h.ts](file://src/methods/h.ts#L1)

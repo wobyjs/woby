@@ -4,10 +4,10 @@
 **Referenced Files in This Document**   
 - [dynamic.ts](file://src/components/dynamic.ts)
 - [lazy.ts](file://src/methods/lazy.ts)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts)
+- [dynamic.ts](file://src/components/dynamic.ts)
 - [dynamic.via.ts](file://src/components/dynamic.via.ts)
 - [create_element.ts](file://src/methods/create_element.ts)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts)
+- [create_element.ts](file://src/methods/create_element.ts)
 - [create_element.via.ts](file://src/methods/create_element.via.ts)
 - [use_resolved.ts](file://src/hooks/use_resolved.ts)
 - [soby.ts](file://src/methods/soby.ts)
@@ -167,7 +167,7 @@ Dynamic->>App : Render loaded component
 ## SSR and Platform Compatibility
 The Dynamic component is designed with server-side rendering (SSR) and platform compatibility in mind. It has dedicated implementations for different environments, ensuring consistent behavior across server, client, and specialized platforms like Via.js.
 
-The SSR implementation in `dynamic.ssr.ts` is optimized for server rendering, handling the creation of elements in a way that produces proper HTML output without requiring browser-specific APIs. Similarly, the Via.js implementation in `dynamic.via.ts` is tailored for that specific runtime environment.
+The SSR implementation in `dynamic.ts` is optimized for server rendering, handling the creation of elements in a way that produces proper HTML output without requiring browser-specific APIs. Similarly, the Via.js implementation in `dynamic.via.ts` is tailored for that specific runtime environment.
 
 All implementations share the same core logic but use platform-appropriate versions of supporting functions like `createElement`, ensuring that the Dynamic component works seamlessly across different execution environments.
 
@@ -177,7 +177,7 @@ subgraph "Core Logic"
 Dynamic[Dynamic Component Logic]
 end
 subgraph "Platform Implementations"
-SSR[dynamic.ssr.ts]
+SSR[dynamic.ts]
 Client[dynamic.ts]
 Via[dynamic.via.ts]
 end
@@ -202,15 +202,15 @@ Via --> Lang
 
 **Diagram sources**
 - [dynamic.ts](file://src/components/dynamic.ts#L10-L26)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L8-L23)
+- [dynamic.ts](file://src/components/dynamic.ts#L8-L23)
 - [dynamic.via.ts](file://src/components/dynamic.via.ts#L8-L24)
 - [create_element.ts](file://src/methods/create_element.ts#L53-L129)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
 - [create_element.via.ts](file://src/methods/create_element.via.ts#L19-L80)
 
 **Section sources**
 - [dynamic.ts](file://src/components/dynamic.ts#L10-L26)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L8-L23)
+- [dynamic.ts](file://src/components/dynamic.ts#L8-L23)
 - [dynamic.via.ts](file://src/components/dynamic.via.ts#L8-L24)
 
 ## Performance Characteristics
@@ -343,7 +343,7 @@ Dynamic --> Theming
 
 **Diagram sources**
 - [dynamic.ts](file://src/components/dynamic.ts#L10-L26)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L8-L23)
+- [dynamic.ts](file://src/components/dynamic.ts#L8-L23)
 - [dynamic.via.ts](file://src/components/dynamic.via.ts#L8-L24)
 - [create_element.ts](file://src/methods/create_element.ts#L53-L129)
 - [soby.ts](file://src/methods/soby.ts#L7-L8)
@@ -351,7 +351,7 @@ Dynamic --> Theming
 
 **Section sources**
 - [dynamic.ts](file://src/components/dynamic.ts#L10-L26)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L8-L23)
+- [dynamic.ts](file://src/components/dynamic.ts#L8-L23)
 - [dynamic.via.ts](file://src/components/dynamic.via.ts#L8-L24)
 - [create_element.ts](file://src/methods/create_element.ts#L53-L129)
 - [soby.ts](file://src/methods/soby.ts#L7-L8)

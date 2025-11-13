@@ -3,17 +3,17 @@
 <cite>
 **Referenced Files in This Document**  
 - [portal.ts](file://src/components/portal.ts)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts)
+- [portal.ts](file://src/components/portal.ts)
 - [portal.via.ts](file://src/components/portal.via.ts)
 - [use_render_effect.ts](file://src/hooks/use_render_effect.ts)
 - [render.ts](file://src/methods/render.ts)
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
 - [render.via.ts](file://src/methods/render.via.ts)
 - [creators.ts](file://src/utils/creators.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
+- [creators.ts](file://src/utils/creators.ts)
 - [creators.via.ts](file://src/utils/creators.via.ts)
 - [setters.ts](file://src/utils/setters.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
+- [setters.ts](file://src/utils/setters.ts)
 - [setters.via.ts](file://src/utils/setters.via.ts)
 - [soby.ts](file://src/soby.ts)
 - [hooks/soby.ts](file://src/hooks/soby.ts)
@@ -36,7 +36,7 @@ The Portal component in Woby enables rendering children into a DOM node that exi
 
 **Section sources**
 - [portal.ts](file://src/components/portal.ts#L11-L49)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
 - [portal.via.ts](file://src/components/portal.via.ts#L9-L47)
 
 ## Core Implementation
@@ -74,8 +74,8 @@ Woby provides specialized Portal implementations for different execution environ
 ### Client-Side Implementation (portal.ts)
 The client-side variant uses the standard DOM API to create and manipulate elements. It leverages `createHTMLNode` from `creators.ts` to create the portal element and relies on the browser's native `insertBefore` and `removeChild` methods for DOM manipulation.
 
-### Server-Side Implementation (portal.ssr.ts)
-The SSR variant uses environment-specific creators (`creators.ssr.ts`) and has a different `render` implementation that returns a string representation of the rendered content rather than manipulating the DOM. This allows portals to be properly serialized during server-side rendering.
+### Server-Side Implementation (portal.ts)
+The SSR variant uses environment-specific creators (`creators.ts`) and has a different `render` implementation that returns a string representation of the rendered content rather than manipulating the DOM. This allows portals to be properly serialized during server-side rendering.
 
 ### Via.js Implementation (portal.via.ts)
 The via.js variant uses `creators.via.ts` and `render.via.ts` to interface with the via.js runtime, ensuring compatibility with this specialized execution environment.
@@ -98,22 +98,22 @@ class PortalVia {
 }
 PortalClient --> PortalSSR : "shares core logic"
 PortalClient --> PortalVia : "shares core logic"
-PortalSSR --> "creators.ssr.ts" : "uses"
+PortalSSR --> "creators.ts" : "uses"
 PortalVia --> "creators.via.ts" : "uses"
 PortalClient --> "creators.ts" : "uses"
 ```
 
 **Diagram sources**
 - [portal.ts](file://src/components/portal.ts#L11-L49)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
 - [portal.via.ts](file://src/components/portal.via.ts#L9-L47)
 - [creators.ts](file://src/utils/creators.ts#L1-L32)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
+- [creators.ts](file://src/utils/creators.ts)
 - [creators.via.ts](file://src/utils/creators.via.ts)
 
 **Section sources**
 - [portal.ts](file://src/components/portal.ts#L11-L49)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
 - [portal.via.ts](file://src/components/portal.via.ts#L9-L47)
 - [creators.ts](file://src/utils/creators.ts#L1-L32)
 
@@ -197,12 +197,12 @@ Client->>DOM : Insert portal content
 ```
 
 **Diagram sources**
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 **Section sources**
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 ## Cleanup and Memory Management
 

@@ -2,16 +2,16 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts)
+- [lazy.ts](file://src/methods/lazy.ts)
+- [create_element.ts](file://src/methods/create_element.ts)
+- [resolvers.ts](file://src/utils/resolvers.ts)
 - [suspense.context.ts](file://src/components/suspense.context.ts)
 - [suspense.manager.ts](file://src/components/suspense.manager.ts)
 - [suspense.collector.ts](file://src/components/suspense.collector.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx)
+- [diff.ts](file://src/utils/diff.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
 - [use_resource.ts](file://src/hooks/use_resource.ts)
 </cite>
 
@@ -33,10 +33,10 @@
 This document provides a comprehensive analysis of the `lazy()` function within server-side rendering (SSR) contexts in the Woby framework. It details how lazy-loaded components are resolved asynchronously during string serialization, their integration with the SSR rendering pipeline via `create_element.ssr`, and the handling of Suspense boundaries. The document also covers hydration alignment, best practices for code splitting, and common issues such as async waterfalls and hydration mismatches.
 
 **Section sources**
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 
 ## Lazy Function in SSR Context
-The `lazy()` function enables dynamic component loading by accepting a fetcher function that returns a promise resolving to a component module. In SSR, this function is implemented in `lazy.ssr.ts` and integrates with Woby’s reactive system to suspend rendering until the component is resolved.
+The `lazy()` function enables dynamic component loading by accepting a fetcher function that returns a promise resolving to a component module. In SSR, this function is implemented in `lazy.ts` and integrates with Woby’s reactive system to suspend rendering until the component is resolved.
 
 During SSR, the `lazy()` function wraps the asynchronous import in a resource observable using `useResource()`, which tracks pending, error, and resolved states. When the component is not yet loaded, the renderer suspends execution and queues the resolution task.
 
@@ -53,11 +53,11 @@ Suspend --> ResolveComponent
 ```
 
 **Diagram sources**
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [use_resource.ts](file://src/hooks/use_resource.ts#L10-L105)
 
 **Section sources**
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [use_resource.ts](file://src/hooks/use_resource.ts#L10-L105)
 
 ## Integration with create_element.ssr
@@ -83,16 +83,16 @@ lazy --> createElement : "resolves to"
 ```
 
 **Diagram sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L1-L80)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [create_element.ts](file://src/methods/create_element.ts#L1-L80)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 
 **Section sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L1-L80)
+- [create_element.ts](file://src/methods/create_element.ts#L1-L80)
 
 ## Asynchronous Component Resolution During Serialization
 During SSR, when `renderToString()` processes a component tree containing a `lazy()` component, the system detects unresolved promises and suspends rendering. The `SuspenseManager` tracks active suspensions and prevents premature output.
 
-The `resolveChild` utility in `resolvers.ssr.ts` recursively processes children, detecting observables and functions. If a child is pending (e.g., from a lazy component), it triggers suspension via `useRenderEffect` and `SuspenseManager.suspend()`.
+The `resolveChild` utility in `resolvers.ts` recursively processes children, detecting observables and functions. If a child is pending (e.g., from a lazy component), it triggers suspension via `useRenderEffect` and `SuspenseManager.suspend()`.
 
 Once all pending resources are resolved, the final HTML string is assembled from the fragment buffer.
 
@@ -115,13 +115,13 @@ Renderer->>Renderer : Generate final HTML
 ```
 
 **Diagram sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L1-L42)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L1-L182)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L1-L42)
+- [resolvers.ts](file://src/utils/resolvers.ts#L1-L182)
 - [suspense.manager.ts](file://src/components/suspense.manager.ts#L1-L67)
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L1-L42)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L1-L182)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L1-L42)
+- [resolvers.ts](file://src/utils/resolvers.ts#L1-L182)
 
 ## Differences from Browser Implementation
 While the API surface of `lazy()` remains consistent between SSR and browser environments, the underlying behavior differs significantly:
@@ -137,7 +137,7 @@ While the API surface of `lazy()` remains consistent between SSR and browser env
 The SSR version avoids microtask queuing and instead relies on synchronous suspension tracking to ensure all async dependencies are resolved before output.
 
 **Section sources**
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [lazy.ts](file://src/methods/lazy.ts#L11-L59)
 
 ## Suspense Boundaries in SSR
@@ -182,7 +182,7 @@ const DashboardWidget = lazy(() => import('./widgets/dashboard'))
 ```
 
 **Section sources**
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 
 ## Critical CSS Extraction
 During SSR, critical CSS should be extracted and inlined in the `<head>` to avoid flash-of-unstyled-content (FOUC). Since lazy components may introduce new styles, consider:
@@ -193,7 +193,7 @@ During SSR, critical CSS should be extracted and inlined in the `<head>` to avoi
 The framework does not currently provide built-in CSS extraction, so external tools or manual registration are required.
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L1-L42)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L1-L42)
 
 ## Hydration Alignment
 For successful hydration:
@@ -214,12 +214,12 @@ Match --> |No| Mismatch[Hydration Error]
 ```
 
 **Diagram sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L1-L42)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L27)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L1-L42)
+- [render.ts](file://src/methods/render.ts#L1-L27)
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L1-L42)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L27)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L1-L42)
+- [render.ts](file://src/methods/render.ts#L1-L27)
 
 ## Implementation Examples
 ### Basic Lazy Component
@@ -250,7 +250,7 @@ const Parent = () => {
 ```
 
 **Section sources**
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [suspense.ts](file://src/components/suspense.ts#L1-L25)
 
 ## Common Pitfalls
@@ -282,7 +282,7 @@ Always wrap lazy components in `<Suspense>`:
 ```
 
 **Section sources**
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [suspense.ts](file://src/components/suspense.ts#L1-L25)
 
 ## Conclusion

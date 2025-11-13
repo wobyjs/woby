@@ -7,7 +7,7 @@
 - [h.ts](file://src/methods/h.ts)
 - [resolvers.ts](file://src/utils/resolvers.ts)
 - [index.ts](file://src/methods/index.ts)
-- [html.ssr.ts](file://src/methods/html.ssr.ts)
+- [htm.ts](file://src/methods/html.ts)
 - [html.via.ts](file://src/methods/html.via.ts)
 - [creators.ts](file://src/utils/creators.ts)
 </cite>
@@ -132,12 +132,12 @@ style Core fill:#f9f,stroke:#333,stroke-width:2px
 
 **Diagram sources**
 - [html.ts](file://src/methods/html.ts#L1-L15)
-- [html.ssr.ts](file://src/methods/html.ssr.ts#L1-L15)
+- [html.ts](file://src/methods/html.ts#L1-L15)
 - [html.via.ts](file://src/methods/html.via.ts#L1-L15)
 
 **Section sources**
 - [html.ts](file://src/methods/html.ts#L1-L15)
-- [html.ssr.ts](file://src/methods/html.ssr.ts#L1-L15)
+- [html.ts](file://src/methods/html.ts#L1-L15)
 - [html.via.ts](file://src/methods/html.via.ts#L1-L15)
 
 ## Usage Patterns

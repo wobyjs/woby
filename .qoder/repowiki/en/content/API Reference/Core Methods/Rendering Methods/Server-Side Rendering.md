@@ -2,12 +2,12 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [creators.ts](file://src/utils/creators.ts)
+- [resolvers.ts](file://src/utils/resolvers.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 </cite>
 
 ## Table of Contents
@@ -24,7 +24,7 @@
 11. [Common SSR Pitfalls](#common-ssr-pitfalls)
 
 ## Introduction
-Woby's server-side rendering (SSR) implementation provides a robust mechanism for rendering components on the server using a virtual DOM environment. The framework leverages happy-dom or similar DOM implementations to create a browser-like environment in Node.js, enabling consistent rendering behavior between server and client. This documentation details the inner workings of Woby's SSR rendering method, focusing on the `render()` function in `render.ssr.ts` and its supporting utilities.
+Woby's server-side rendering (SSR) implementation provides a robust mechanism for rendering components on the server using a virtual DOM environment. The framework leverages happy-dom or similar DOM implementations to create a browser-like environment in Node.js, enabling consistent rendering behavior between server and client. This documentation details the inner workings of Woby's SSR rendering method, focusing on the `render()` function in `render.ts` and its supporting utilities.
 
 ## SSR Rendering Method Overview
 
@@ -46,10 +46,10 @@ J --> K["Return HTML string"]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 ## Virtual Container and Fragment Management
 
@@ -79,11 +79,11 @@ FragmentUtils --> Fragment : "creates and manages"
 ```
 
 **Diagram sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
 
 **Section sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 ## String-Based Output Generation
 
@@ -105,12 +105,12 @@ I --> J["Return Final HTML"]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 ## FragmentUtils and Render Tree Construction
 
@@ -136,13 +136,13 @@ Render->>Render : Convert children to HTML string
 ```
 
 **Diagram sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 **Section sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 ## Node Conversion and HTML String Extraction
 
@@ -178,12 +178,12 @@ T --> U["Return HTML"]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L7-L41)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L7-L41)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L7-L41)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L7-L41)
 
 ## Server-Side Rendering Example
 
@@ -207,11 +207,11 @@ Server->>Client : HTTP Response with HTML
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 ## Integration with Server Frameworks
 
@@ -231,10 +231,10 @@ G --> H["HTTP Response"]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 ## Hydration Considerations
 
@@ -256,10 +256,10 @@ Hydration-->>Client : Interactive application
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 ## Performance Implications
 
@@ -284,12 +284,12 @@ E --> M["Cons: Memory usage, cache invalidation"]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L8-L18)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [creators.ts](file://src/utils/creators.ts#L8-L18)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L8-L18)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [creators.ts](file://src/utils/creators.ts#L8-L18)
 
 ## Common SSR Pitfalls
 
@@ -314,9 +314,9 @@ E --> M["Solution: Proper cleanup and caching"]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L7-L182)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [resolvers.ts](file://src/utils/resolvers.ts#L7-L182)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L7-L182)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [resolvers.ts](file://src/utils/resolvers.ts#L7-L182)

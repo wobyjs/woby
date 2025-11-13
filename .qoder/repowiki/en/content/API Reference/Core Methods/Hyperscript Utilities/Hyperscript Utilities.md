@@ -4,9 +4,9 @@
 **Referenced Files in This Document**   
 - [h.ts](file://src/methods/h.ts)
 - [html.ts](file://src/methods/html.ts)
-- [h.ssr.ts](file://src/methods/h.ssr.ts)
+- [h.ts](file://src/methods/h.ts)
 - [h.via.ts](file://src/methods/h.via.ts)
-- [html.ssr.ts](file://src/methods/html.ssr.ts)
+- [html.ts](file://src/methods/html.ts)
 - [html.via.ts](file://src/methods/html.via.ts)
 - [jsx-runtime.ts](file://src/jsx-runtime.ts)
 - [ssr/jsx-runtime.ts](file://src/ssr/jsx-runtime.ts)
@@ -50,7 +50,7 @@ BoundH --> RegistryLookup["Component Registry Lookup"]
 RegistryLookup --> CreateElement
 subgraph "Rendering Targets"
 Client["Client-Side h.ts"]
-SSR["SSR h.ssr.ts"]
+SSR["SSR h.ts"]
 Via["Via.js h.via.ts"]
 end
 Normalization --> Client
@@ -120,7 +120,7 @@ htm --> h : "invokes"
 
 ### Multi-Target Implementations
 
-The framework provides distinct implementations of `h()` and `html` for different rendering targets: client-side, server-side rendering (SSR), and Via.js. The SSR versions (`h.ssr.ts`, `html.ssr.ts`) export `createElement` directly as `h`, bypassing argument normalization for performance in server contexts where JSX transformations are pre-compiled. The Via.js versions mirror the standard implementation but use `create_element.via.ts` for platform-specific behavior. All variants maintain identical interfaces, ensuring code portability across environments.
+The framework provides distinct implementations of `h()` and `html` for different rendering targets: client-side, server-side rendering (SSR), and Via.js. The SSR versions (`h.ts`, `html.ts`) export `createElement` directly as `h`, bypassing argument normalization for performance in server contexts where JSX transformations are pre-compiled. The Via.js versions mirror the standard implementation but use `create_element.via.ts` for platform-specific behavior. All variants maintain identical interfaces, ensuring code portability across environments.
 
 ```mermaid
 graph TB
@@ -129,8 +129,8 @@ HClient[h.ts]
 HtmlClient[html.ts]
 end
 subgraph "SSR"
-HSsr[h.ssr.ts]
-HtmlSsr[html.ssr.ts]
+HSsr[h.ts]
+HtmlSsr[html.ts]
 end
 subgraph "Via.js"
 HVia[h.via.ts]
@@ -138,7 +138,7 @@ HtmlVia[html.via.ts]
 end
 HClient --> CreateElementClient["create_element.ts"]
 HtmlClient --> CreateElementClient
-HSsr --> CreateElementSsr["create_element.ssr.ts"]
+HSsr --> CreateElementSsr["create_element.ts"]
 HtmlSsr --> CreateElementSsr
 HVia --> CreateElementVia["create_element.via.ts"]
 HtmlVia --> CreateElementVia
@@ -148,14 +148,14 @@ HVia -.-> Normalization
 ```
 
 **Diagram sources**
-- [h.ssr.ts](file://src/methods/h.ssr.ts#L1)
-- [html.ssr.ts](file://src/methods/html.ssr.ts#L1-L12)
+- [h.ts](file://src/methods/h.ts#L1)
+- [html.ts](file://src/methods/html.ts#L1-L12)
 - [h.via.ts](file://src/methods/h.via.ts#L1-L37)
 - [html.via.ts](file://src/methods/html.via.ts#L1-L14)
 
 **Section sources**
-- [h.ssr.ts](file://src/methods/h.ssr.ts#L1)
-- [html.ssr.ts](file://src/methods/html.ssr.ts#L1-L12)
+- [h.ts](file://src/methods/h.ts#L1)
+- [html.ts](file://src/methods/html.ts#L1-L12)
 - [h.via.ts](file://src/methods/h.via.ts#L1-L37)
 - [html.via.ts](file://src/methods/html.via.ts#L1-L14)
 
@@ -189,18 +189,18 @@ The standard `h()` function incurs minimal overhead due to argument normalizatio
 
 **Section sources**
 - [h.ts](file://src/methods/h.ts#L1-L25)
-- [h.ssr.ts](file://src/methods/h.ssr.ts#L1)
+- [h.ts](file://src/methods/h.ts#L1)
 - [html.ts](file://src/methods/html.ts#L1-L16)
 
 ## Troubleshooting Guide
 
-Common issues include incorrect JSX pragma configuration, leading to calls to the wrong `h()` function. Ensure the correct JSX runtime is specified in compiler settings (e.g., `jsxImportSource` in TypeScript). Missing component registrations in `html` templates result in unrecognized custom elements being treated as native tags. Verify that all shorthand components are registered via `html.register()`. Type errors may occur when mixing children in props and rest parameters; follow the documented calling conventions. In SSR environments, ensure that `h.ssr.ts` is used to avoid unnecessary normalization overhead.
+Common issues include incorrect JSX pragma configuration, leading to calls to the wrong `h()` function. Ensure the correct JSX runtime is specified in compiler settings (e.g., `jsxImportSource` in TypeScript). Missing component registrations in `html` templates result in unrecognized custom elements being treated as native tags. Verify that all shorthand components are registered via `html.register()`. Type errors may occur when mixing children in props and rest parameters; follow the documented calling conventions. In SSR environments, ensure that `h.ts` is used to avoid unnecessary normalization overhead.
 
 **Section sources**
 - [h.ts](file://src/methods/h.ts#L1-L25)
 - [html.ts](file://src/methods/html.ts#L1-L16)
-- [h.ssr.ts](file://src/methods/h.ssr.ts#L1)
-- [html.ssr.ts](file://src/methods/html.ssr.ts#L1-L12)
+- [h.ts](file://src/methods/h.ts#L1)
+- [html.ts](file://src/methods/html.ts#L1-L12)
 
 ## Conclusion
 

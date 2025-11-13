@@ -281,7 +281,7 @@ Client->>Client : Hydrate and update
 
 **Section sources**
 - [suspense.collector.ts](file://src/components/suspense.collector.ts#L9-L42)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L27)
+- [render.ts](file://src/methods/render.ts#L1-L27)
 
 ## Usage Patterns and Examples
 

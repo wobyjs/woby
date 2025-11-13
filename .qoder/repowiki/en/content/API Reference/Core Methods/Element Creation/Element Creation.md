@@ -3,11 +3,11 @@
 <cite>
 **Referenced Files in This Document**   
 - [create_element.ts](file://src/methods/create_element.ts)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts)
+- [create_element.ts](file://src/methods/create_element.ts)
 - [create_element.via.ts](file://src/methods/create_element.via.ts)
 - [runtime.ts](file://src/jsx/runtime.ts)
 - [creators.ts](file://src/utils/creators.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
+- [creators.ts](file://src/utils/creators.ts)
 - [creators.via.ts](file://src/utils/creators.via.ts)
 - [setters.ts](file://src/utils/setters.ts)
 - [jsx-runtime.ts](file://src/jsx-runtime.ts)
@@ -70,7 +70,7 @@ H --> K[Via.js: Proxy-Aware]
 
 **Diagram sources**
 - [create_element.ts](file://src/methods/create_element.ts#L1-L130)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L1-L81)
+- [create_element.ts](file://src/methods/create_element.ts#L1-L81)
 - [create_element.via.ts](file://src/methods/create_element.via.ts#L1-L81)
 
 ## JSX Transformation and Runtime
@@ -124,7 +124,7 @@ class ViaCreator {
 
 **Diagram sources**
 - [creators.ts](file://src/utils/creators.ts#L1-L32)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L19)
+- [creators.ts](file://src/utils/creators.ts#L1-L19)
 - [creators.via.ts](file://src/utils/creators.via.ts#L1-L15)
 
 ## Property and Child Handling
@@ -145,7 +145,7 @@ Children are processed through a multi-stage resolution system that handles func
 
 ## Server-Side Rendering Behavior
 
-The SSR implementation in `create_element.ssr.ts` adapts the core creation logic for server environments:
+The SSR implementation in `create_element.ts` adapts the core creation logic for server environments:
 
 - Uses `happy-dom` instead of native DOM
 - Maintains stack traces as `Error` objects rather than `Stack`
@@ -173,7 +173,7 @@ Runtime-->>Output : Rendered HTML
 ```
 
 **Diagram sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L1-L81)
+- [create_element.ts](file://src/methods/create_element.ts#L1-L81)
 - [ssr/jsx-runtime.ts](file://src/ssr/jsx-runtime.ts#L1)
 
 ## Via.js Integration for Proxy-Based Rendering

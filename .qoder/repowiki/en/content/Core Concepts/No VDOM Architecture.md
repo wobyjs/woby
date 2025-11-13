@@ -5,7 +5,7 @@
 - [render.ts](file://src/methods/render.ts)
 - [setters.ts](file://src/utils/setters.ts)
 - [diff.ts](file://src/utils/diff.ts)
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
 - [soby.ts](file://src/hooks/soby.ts)
 - [fragment.ts](file://src/utils/fragment.ts)
 - [types.ts](file://src/types.ts)
@@ -44,7 +44,7 @@ K --> L[No VDOM on Server]
 **Diagram sources**
 - [render.ts](file://src/methods/render.ts)
 - [setters.ts](file://src/utils/setters.ts)
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
 
 ## Direct DOM Manipulation
 The foundation of Woby's no VDOM architecture lies in its direct DOM manipulation capabilities, which eliminate the overhead of virtual DOM diffing. Instead of creating virtual representations of UI elements, Woby creates and manipulates actual DOM nodes directly. The `setChild` utility in `setters.ts` serves as the primary mechanism for DOM manipulation, handling the insertion, update, and removal of child nodes. When a component's state changes, Woby doesn't create a new virtual tree for comparison; instead, it directly updates the affected DOM nodes through reactive bindings. This approach enables fine-grained updates where only the specific elements impacted by state changes are modified, rather than re-rendering entire component subtrees. The framework uses a fragment system to track groups of related DOM nodes, allowing for efficient batch operations when necessary. By operating directly on the DOM, Woby reduces memory usage and eliminates the computational cost of diffing virtual trees, resulting in faster updates and improved performance, especially for applications with frequent state changes.
@@ -110,12 +110,12 @@ I --> J[UI Updated]
 - [soby.ts](file://src/hooks/soby.ts)
 
 ## Server-Side Rendering Implementation
-Woby's server-side rendering implementation demonstrates the consistency of its no VDOM architecture across environments. The `render.ssr.ts` file provides a server-compatible version of the render function that generates HTML without relying on a virtual DOM. Instead of creating DOM nodes, the SSR implementation builds a string representation of the HTML by traversing the component tree and serializing the output. The `setChild` function in the SSR utilities handles the rendering of components to strings, using the same fragment system as the client-side implementation but targeting string concatenation instead of DOM manipulation. This approach ensures that the same rendering logic can be used on both client and server, with only the final output mechanism differing. The SSR implementation maintains the framework's reactive principles by resolving observable values during rendering, allowing for dynamic content generation on the server. By avoiding a virtual DOM on the server, Woby reduces memory usage and improves rendering performance, making it well-suited for server-side applications with high throughput requirements.
+Woby's server-side rendering implementation demonstrates the consistency of its no VDOM architecture across environments. The `render.ts` file provides a server-compatible version of the render function that generates HTML without relying on a virtual DOM. Instead of creating DOM nodes, the SSR implementation builds a string representation of the HTML by traversing the component tree and serializing the output. The `setChild` function in the SSR utilities handles the rendering of components to strings, using the same fragment system as the client-side implementation but targeting string concatenation instead of DOM manipulation. This approach ensures that the same rendering logic can be used on both client and server, with only the final output mechanism differing. The SSR implementation maintains the framework's reactive principles by resolving observable values during rendering, allowing for dynamic content generation on the server. By avoiding a virtual DOM on the server, Woby reduces memory usage and improves rendering performance, making it well-suited for server-side applications with high throughput requirements.
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
 
 ## Performance Benefits and Considerations
 Woby's no VDOM architecture offers significant performance benefits by eliminating the memory and computational overhead associated with virtual DOM diffing. The direct DOM manipulation approach reduces memory usage by avoiding the creation of intermediate virtual node representations and eliminates the CPU cost of tree diffing operations. This results in faster initial rendering and more efficient updates, particularly for applications with frequent state changes. The fine-grained update mechanism ensures that only the specific DOM nodes affected by state changes are updated, minimizing layout thrashing and improving overall performance. However, this architecture requires careful consideration in certain scenarios. Complex UI updates involving significant structural changes may benefit from batched operations to avoid excessive DOM mutations. Additionally, developers should be mindful of creating too many fine-grained reactive bindings, as this can lead to a large number of individual DOM updates. The architecture excels in applications with predictable data flows and components that update independently, making it particularly well-suited for data-driven interfaces and real-time applications.

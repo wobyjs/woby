@@ -3,18 +3,18 @@
 <cite>
 **Referenced Files in This Document**   
 - [dynamic.ts](file://src/components/dynamic.ts)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts)
+- [dynamic.ts](file://src/components/dynamic.ts)
 - [if.ts](file://src/components/if.ts)
 - [for.ts](file://src/components/for.ts)
 - [portal.ts](file://src/components/portal.ts)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts)
+- [portal.ts](file://src/components/portal.ts)
 - [suspense.ts](file://src/components/suspense.ts)
 - [error_boundary.ts](file://src/components/error_boundary.ts)
 - [keep_alive.ts](file://src/components/keep_alive.ts)
 - [ternary.ts](file://src/components/ternary.ts)
 - [switch.ts](file://src/components/switch.ts)
 - [index.ts](file://src/components/index.ts)
-- [index.ssr.ts](file://src/components/index.ssr.ts)
+- [index.ts](file://src/components/index.ts)
 - [use_guarded.ts](file://src/hooks/use_guarded.ts)
 - [soby.ts](file://src/soby.ts)
 </cite>
@@ -44,7 +44,7 @@ Woby provides a comprehensive set of built-in UI components designed to handle c
 
 Woby's component system is built around functional components that leverage reactive programming patterns. The core components provide abstractions for common UI patterns including conditional rendering, list rendering, dynamic component loading, and error handling. These components are designed to work seamlessly with Woby's reactivity system and can be used in both client and server-side rendering contexts.
 
-The components are exported through index files that provide different implementations for different environments (client, SSR). The main entry point `index.ts` exports the client-side implementations, while `index.ssr.ts` provides server-side compatible versions.
+The components are exported through index files that provide different implementations for different environments (client, SSR). The main entry point `index.ts` exports the client-side implementations, while `index.ts` provides server-side compatible versions.
 
 ```mermaid
 graph TB
@@ -61,9 +61,9 @@ Switch["Switch Component"]
 end
 subgraph "Environment Variants"
 DynamicClient["dynamic.ts"]
-DynamicSSR["dynamic.ssr.ts"]
+DynamicSSR["dynamic.ts"]
 PortalClient["portal.ts"]
-PortalSSR["portal.ssr.ts"]
+PortalSSR["portal.ts"]
 end
 Dynamic --> DynamicClient
 Dynamic --> DynamicSSR
@@ -73,11 +73,11 @@ Portal --> PortalSSR
 
 **Diagram sources**
 - [index.ts](file://src/components/index.ts#L1-L11)
-- [index.ssr.ts](file://src/components/index.ssr.ts#L1-L13)
+- [index.ts](file://src/components/index.ts#L1-L13)
 
 **Section sources**
 - [index.ts](file://src/components/index.ts#L1-L11)
-- [index.ssr.ts](file://src/components/index.ssr.ts#L1-L13)
+- [index.ts](file://src/components/index.ts#L1-L13)
 
 ## Conditional Rendering Components
 
@@ -164,7 +164,7 @@ The `Dynamic` component enables runtime component selection and rendering. It ac
 
 When either the `component` or `props` are functions (potentially reactive), the component uses `useMemo` to memoize the result, ensuring efficient re-renders. Otherwise, it directly creates the element.
 
-The SSR version (`dynamic.ssr.ts`) uses SSR-specific methods for element creation, demonstrating Woby's approach to environment-specific implementations.
+The SSR version (`dynamic.ts`) uses SSR-specific methods for element creation, demonstrating Woby's approach to environment-specific implementations.
 
 ```mermaid
 flowchart TD
@@ -180,11 +180,11 @@ ReturnResult --> End([Render component])
 
 **Diagram sources**
 - [dynamic.ts](file://src/components/dynamic.ts#L15-L27)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L15-L26)
+- [dynamic.ts](file://src/components/dynamic.ts#L15-L26)
 
 **Section sources**
 - [dynamic.ts](file://src/components/dynamic.ts#L15-L27)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L15-L26)
+- [dynamic.ts](file://src/components/dynamic.ts#L15-L26)
 
 ## Portal Component
 
@@ -200,7 +200,7 @@ Key features:
 
 The component uses `useRenderEffect` to manage the DOM insertion and removal, ensuring proper cleanup. It returns a metadata object containing a reference to the portal element, enabling parent components to interact with it.
 
-The SSR implementation (`portal.ssr.ts`) uses SSR-compatible node creation methods, maintaining the same API while adapting to server-side constraints.
+The SSR implementation (`portal.ts`) uses SSR-compatible node creation methods, maintaining the same API while adapting to server-side constraints.
 
 ```mermaid
 sequenceDiagram
@@ -225,11 +225,11 @@ end
 
 **Diagram sources**
 - [portal.ts](file://src/components/portal.ts#L15-L50)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L15-L49)
+- [portal.ts](file://src/components/portal.ts#L15-L49)
 
 **Section sources**
 - [portal.ts](file://src/components/portal.ts#L15-L50)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L15-L49)
+- [portal.ts](file://src/components/portal.ts#L15-L49)
 
 ## Suspense and Error Handling
 
@@ -331,21 +331,21 @@ Woby provides different implementations of certain components for client and ser
 
 | Component | Client File | SSR File | Key Differences |
 |---------|-----------|--------|----------------|
-| Dynamic | dynamic.ts | dynamic.ssr.ts | Uses different createElement methods |
-| Portal | portal.ts | portal.ssr.ts | Uses different node creation methods |
-| Index | index.ts | index.ssr.ts | Different portal import |
+| Dynamic | dynamic.ts | dynamic.ts | Uses different createElement methods |
+| Portal | portal.ts | portal.ts | Uses different node creation methods |
+| Index | index.ts | index.ts | Different portal import |
 
 The SSR implementations avoid DOM-specific operations where possible and use server-compatible methods for node creation and manipulation. This ensures that components can be rendered on the server while maintaining the same API surface.
 
-The pattern of having separate `.ts` and `.ssr.ts` files allows Woby to optimize for each environment while providing a consistent developer experience.
+The pattern of having separate `.ts` and `.ts` files allows Woby to optimize for each environment while providing a consistent developer experience.
 
 **Section sources**
 - [dynamic.ts](file://src/components/dynamic.ts#L15-L27)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L15-L26)
+- [dynamic.ts](file://src/components/dynamic.ts#L15-L26)
 - [portal.ts](file://src/components/portal.ts#L15-L50)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L15-L49)
+- [portal.ts](file://src/components/portal.ts#L15-L49)
 - [index.ts](file://src/components/index.ts#L1-L11)
-- [index.ssr.ts](file://src/components/index.ssr.ts#L1-L13)
+- [index.ts](file://src/components/index.ts#L1-L13)
 
 ## Performance Considerations
 

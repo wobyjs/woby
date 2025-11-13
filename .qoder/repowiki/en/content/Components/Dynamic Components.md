@@ -3,13 +3,13 @@
 <cite>
 **Referenced Files in This Document**   
 - [dynamic.ts](file://src/components/dynamic.ts)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts)
+- [dynamic.ts](file://src/components/dynamic.ts)
 - [dynamic.via.ts](file://src/components/dynamic.via.ts)
 - [lazy.ts](file://src/methods/lazy.ts)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts)
+- [lazy.ts](file://src/methods/lazy.ts)
 - [lazy.via.ts](file://src/methods/lazy.via.ts)
 - [resolvers.ts](file://src/utils/resolvers.ts)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts)
+- [resolvers.ts](file://src/utils/resolvers.ts)
 - [resolvers.via.ts](file://src/utils/resolvers.via.ts)
 </cite>
 
@@ -24,11 +24,11 @@
 8. [Conclusion](#conclusion)
 
 ## Introduction
-The Dynamic component in Woby enables runtime component resolution and lazy loading, allowing for flexible and efficient rendering across different environments. This document details the implementation differences between client-side (dynamic.ts), server-side rendering (dynamic.ssr.ts), and via.js (dynamic.via.ts) contexts. It covers interface definitions, props such as 'component' and 'props', hydration behavior, integration with `lazy()`, error handling, performance implications, and best practices for code-splitting. Common issues like SSR hydration mismatches are also addressed.
+The Dynamic component in Woby enables runtime component resolution and lazy loading, allowing for flexible and efficient rendering across different environments. This document details the implementation differences between client-side (dynamic.ts), server-side rendering (dynamic.ts), and via.js (dynamic.via.ts) contexts. It covers interface definitions, props such as 'component' and 'props', hydration behavior, integration with `lazy()`, error handling, performance implications, and best practices for code-splitting. Common issues like SSR hydration mismatches are also addressed.
 
 **Section sources**
 - [dynamic.ts](file://src/components/dynamic.ts#L10-L26)
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L8-L23)
+- [dynamic.ts](file://src/components/dynamic.ts#L8-L23)
 - [dynamic.via.ts](file://src/components/dynamic.via.ts#L8-L24)
 
 ## Core Components
@@ -38,7 +38,7 @@ The `lazy()` function enables asynchronous component loading by wrapping a fetch
 
 **Section sources**
 - [lazy.ts](file://src/methods/lazy.ts#L11-L59)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [lazy.via.ts](file://src/methods/lazy.via.ts#L10-L58)
 
 ## Architecture Overview
@@ -50,9 +50,9 @@ LazyClient[lazy.ts]
 ResolversClient[resolvers.ts]
 end
 subgraph "Server-Side Rendering"
-DynamicSSR[Dynamic.ssr.ts]
-LazySSR[lazy.ssr.ts]
-ResolversSSR[resolvers.ssr.ts]
+DynamicSSR[Dynamic.ts]
+LazySSR[lazy.ts]
+ResolversSSR[resolvers.ts]
 end
 subgraph "Via.js Environment"
 DynamicVia[Dynamic.via.ts]
@@ -105,13 +105,13 @@ class DynamicSSR {
 -resolveChild() : void
 -createElement() : Child
 }
-DynamicSSR --> resolvers.ssr.ts : uses
+DynamicSSR --> resolvers.ts : uses
 DynamicSSR --> create_element.ssr : uses
 ```
 
 **Diagram sources**
-- [dynamic.ssr.ts](file://src/components/dynamic.ssr.ts#L8-L23)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L11-L50)
+- [dynamic.ts](file://src/components/dynamic.ts#L8-L23)
+- [resolvers.ts](file://src/utils/resolvers.ts#L11-L50)
 
 #### Via.js Environment Specifics
 In the Via.js environment, the Dynamic component leverages proxy-based DOM manipulation. The `resolveChild` function includes special handling for proxies, symbols, and HTML value tracking, enabling fine-grained updates without full re-renders.
@@ -156,7 +156,7 @@ Create --> Return[Return resolved element]
 
 **Diagram sources**
 - [lazy.ts](file://src/methods/lazy.ts#L11-L59)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [lazy.via.ts](file://src/methods/lazy.via.ts#L10-L58)
 
 ## Dependency Analysis
@@ -205,7 +205,7 @@ Common issues include:
 Ensure children are properly handled in client vs SSR environments, as some implementations omit children from parameters.
 
 **Section sources**
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L11-L50)
+- [resolvers.ts](file://src/utils/resolvers.ts#L11-L50)
 - [resolvers.via.ts](file://src/utils/resolvers.via.ts#L13-L142)
 
 ## Conclusion

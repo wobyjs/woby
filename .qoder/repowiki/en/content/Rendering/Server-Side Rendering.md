@@ -2,15 +2,15 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 - [ssr-runtime.ts](file://src/ssr/ssr-runtime.ts)
 - [jsx-runtime.ts](file://src/ssr/jsx-runtime.ts)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [resolvers.ts](file://src/utils/resolvers.ts)
+- [creators.ts](file://src/utils/creators.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [diff.ts](file://src/utils/diff.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
 </cite>
 
 ## Table of Contents
@@ -31,7 +31,7 @@ Woby's server-side rendering (SSR) system provides a comprehensive solution for 
 
 ## Core SSR Implementation
 
-The core SSR functionality is implemented in `render.ssr.ts` and `render_to_string.ssr.ts`, which provide the primary interfaces for server-side rendering. These functions work together to transform Woby components into static HTML strings that can be sent to the client.
+The core SSR functionality is implemented in `render.ts` and `render_to_string.ts`, which provide the primary interfaces for server-side rendering. These functions work together to transform Woby components into static HTML strings that can be sent to the client.
 
 ```mermaid
 flowchart TD
@@ -47,13 +47,13 @@ Join --> Output([Return HTML String])
 ```
 
 **Diagram sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L11-L50)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [resolvers.ts](file://src/utils/resolvers.ts#L11-L50)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
 
 ## SSR Runtime Environment
 
@@ -64,11 +64,11 @@ graph TB
 SSR[SSR Runtime]
 SSR --> JSX[SSR JSX Runtime]
 SSR --> Utils[SSR Utilities]
-JSX --> creators["creators.ssr.ts"]
-JSX --> resolvers["resolvers.ssr.ts"]
-JSX --> setters["setters.ssr.ts"]
-Utils --> fragment["fragment.ssr.ts"]
-Utils --> diff["diff.ssr.ts"]
+JSX --> creators["creators.ts"]
+JSX --> resolvers["resolvers.ts"]
+JSX --> setters["setters.ts"]
+Utils --> fragment["fragment.ts"]
+Utils --> diff["diff.ts"]
 Utils --> resolvers
 creators --> happydom["happy-dom Window/Document"]
 setters --> fragment
@@ -79,16 +79,16 @@ resolvers --> creators
 **Diagram sources**
 - [ssr-runtime.ts](file://src/ssr/ssr-runtime.ts#L1)
 - [jsx-runtime.ts](file://src/ssr/jsx-runtime.ts#L1)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1)
+- [creators.ts](file://src/utils/creators.ts#L1)
 
 **Section sources**
 - [ssr-runtime.ts](file://src/ssr/ssr-runtime.ts#L1)
 - [jsx-runtime.ts](file://src/ssr/jsx-runtime.ts#L1)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L18)
+- [creators.ts](file://src/utils/creators.ts#L1-L18)
 
 ## DOM Serialization and HTML Generation
 
-The SSR system handles DOM serialization through a combination of fragment management and node serialization utilities. The `FragmentUtils` from `fragment.ssr.ts` manages collections of rendered nodes, while the rendering functions convert these fragments into HTML strings.
+The SSR system handles DOM serialization through a combination of fragment management and node serialization utilities. The `FragmentUtils` from `fragment.ts` manages collections of rendered nodes, while the rendering functions convert these fragments into HTML strings.
 
 ```mermaid
 classDiagram
@@ -118,12 +118,12 @@ The serialization process follows these steps:
 5. Join the HTML strings into a complete document
 
 **Diagram sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
 
 **Section sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
 
 ## Hydration Strategies
 
@@ -137,8 +137,8 @@ The hydration process would typically:
 5. Initialize any remaining client-only components
 
 **Section sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L11-L50)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [resolvers.ts](file://src/utils/resolvers.ts#L11-L50)
 
 ## SSR-Specific JSX Runtime
 
@@ -173,13 +173,13 @@ Runtime-->>JSX : Rendered Element
 
 **Diagram sources**
 - [jsx-runtime.ts](file://src/ssr/jsx-runtime.ts#L1)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L18)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [creators.ts](file://src/utils/creators.ts#L1-L18)
 
 **Section sources**
 - [jsx-runtime.ts](file://src/ssr/jsx-runtime.ts#L1)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L1051)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L18)
+- [setters.ts](file://src/utils/setters.ts#L1-L1051)
+- [creators.ts](file://src/utils/creators.ts#L1-L18)
 
 ## Streaming SSR and Progressive Rendering
 
@@ -195,8 +195,8 @@ Potential streaming implementation:
 The `useRenderEffect` and microtask scheduling in the setters system already provide mechanisms that could be extended for streaming scenarios.
 
 **Section sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L11-L50)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [resolvers.ts](file://src/utils/resolvers.ts#L11-L50)
 
 ## Integration with Node.js Environments
 
@@ -222,12 +222,12 @@ Resolvers --> Setters
 ```
 
 **Diagram sources**
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L18)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L1051)
+- [creators.ts](file://src/utils/creators.ts#L1-L18)
+- [setters.ts](file://src/utils/setters.ts#L1-L1051)
 
 **Section sources**
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L18)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L1051)
+- [creators.ts](file://src/utils/creators.ts#L1-L18)
+- [setters.ts](file://src/utils/setters.ts#L1-L1051)
 
 ## Practical SSR Setup with Express
 
@@ -258,13 +258,13 @@ app.get('*', async (req, res) => {
 ```
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 
 ## Common Challenges and Solutions
 
 ### Style Injection
-The SSR system handles CSS classes and styles through the `setClasses` and `setStyles` functions in `setters.ssr.ts`. These functions ensure consistent class and style application during server rendering.
+The SSR system handles CSS classes and styles through the `setClasses` and `setStyles` functions in `setters.ts`. These functions ensure consistent class and style application during server rendering.
 
 ### Script Placement
 Scripts are not directly managed by the SSR system, but the generated HTML can include script tags in the appropriate locations. The client-side hydration script should be placed at the end of the body.
@@ -273,8 +273,8 @@ Scripts are not directly managed by the SSR system, but the generated HTML can i
 The fragment-based rendering approach minimizes hydration mismatches by ensuring the server and client produce identical DOM structures. The use of happy-dom provides a consistent environment for both server and client rendering.
 
 **Section sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L18)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [creators.ts](file://src/utils/creators.ts#L1-L18)
 
 ## Performance Optimization
 
@@ -312,9 +312,9 @@ D --> D4[Batched Updates]
 ```
 
 **Diagram sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L1051)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts#L1-L202)
+- [setters.ts](file://src/utils/setters.ts#L1-L1051)
+- [diff.ts](file://src/utils/diff.ts#L1-L202)
 
 **Section sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L1051)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts#L1-L202)
+- [setters.ts](file://src/utils/setters.ts#L1-L1051)
+- [diff.ts](file://src/utils/diff.ts#L1-L202)

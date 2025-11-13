@@ -3,7 +3,7 @@
 <cite>
 **Referenced Files in This Document**   
 - [portal.ts](file://src/components/portal.ts)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts)
+- [portal.ts](file://src/components/portal.ts)
 - [portal.via.ts](file://src/components/portal.via.ts)
 - [render.ts](file://src/methods/render.ts)
 - [creators.ts](file://src/utils/creators.ts)
@@ -93,13 +93,13 @@ The implementation leverages Woby's event handling system, which properly manage
 - [setters.ts](file://src/utils/setters.ts#L624-L674)
 
 ## SSR Considerations
-The Portal component includes specialized handling for server-side rendering (SSR) through the `portal.ssr.ts` implementation. This version maintains the same API and behavior as the client-side version but adapts to the constraints of SSR environments.
+The Portal component includes specialized handling for server-side rendering (SSR) through the `portal.ts` implementation. This version maintains the same API and behavior as the client-side version but adapts to the constraints of SSR environments.
 
 During SSR, the portal content is rendered in place rather than being teleported to a different location in the DOM. This approach ensures that the initial HTML output contains all content in a logical order, improving accessibility and SEO. The server-rendered markup includes the portal content at its original position in the component tree.
 
 When the application hydrates on the client side, the portal functionality activates and moves the content to its designated mount target. This transition is handled seamlessly by the client-side Portal implementation, which detects the existing server-rendered content and properly attaches it to the specified mount point.
 
-The SSR implementation uses `creators.ssr.ts` for DOM node creation, ensuring compatibility with server environments that may not have access to the full browser DOM API. This allows the component to function correctly in various SSR setups while maintaining consistency with the client-side behavior.
+The SSR implementation uses `creators.ts` for DOM node creation, ensuring compatibility with server environments that may not have access to the full browser DOM API. This allows the component to function correctly in various SSR setups while maintaining consistency with the client-side behavior.
 
 ```mermaid
 sequenceDiagram
@@ -114,11 +114,11 @@ DOM-->>Client : Confirm portal activation
 ```
 
 **Diagram sources**
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L31)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
+- [creators.ts](file://src/utils/creators.ts#L1-L31)
 
 **Section sources**
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
 - [portal.ts](file://src/components/portal.ts#L11-L49)
 
 ## Via.js Integration
@@ -212,5 +212,5 @@ By following the patterns demonstrated in this documentation, developers can eff
 
 **Section sources**
 - [portal.ts](file://src/components/portal.ts#L11-L49)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
 - [portal.via.ts](file://src/components/portal.via.ts#L9-L47)

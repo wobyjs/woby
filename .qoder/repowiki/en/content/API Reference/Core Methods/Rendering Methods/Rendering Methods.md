@@ -3,21 +3,21 @@
 <cite>
 **Referenced Files in This Document**   
 - [render.ts](file://src/methods/render.ts)
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
 - [render.via.ts](file://src/methods/render.via.ts)
 - [render.testing.ts](file://src/methods/render.testing.ts)
 - [setters.ts](file://src/utils/setters.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
+- [setters.ts](file://src/utils/setters.ts)
 - [setters.via.ts](file://src/utils/setters.via.ts)
 - [fragment.ts](file://src/utils/fragment.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
 - [types.ts](file://src/types.ts)
 </cite>
 
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Browser Rendering with render()](#browser-rendering-with-render)
-3. [Server-Side Rendering with render.ssr.ts](#server-side-rendering-with-renderssrts)
+3. [Server-Side Rendering with render.ts](#server-side-rendering-with-renderssrts)
 4. [Via.js Integration with render.via.ts](#viajs-integration-with-renderviats)
 5. [Testing with render.testing.ts](#testing-with-rendertestingts)
 6. [Rendering Targets Comparison](#rendering-targets-comparison)
@@ -62,8 +62,8 @@ Cleanup --> End([Component unmounted])
 - [types.ts](file://src/types.ts#L15)
 - [types.ts](file://src/types.ts#L57)
 
-## Server-Side Rendering with render.ssr.ts
-The server-side rendering implementation in `render.ssr.ts` generates HTML strings for SSR scenarios without DOM manipulation.
+## Server-Side Rendering with render.ts
+The server-side rendering implementation in `render.ts` generates HTML strings for SSR scenarios without DOM manipulation.
 
 The SSR `render()` function signature is:
 ```typescript
@@ -103,9 +103,9 @@ ReturnString --> End([Return HTML string])
 ```
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
 
 ## Via.js Integration with render.via.ts
 The Via.js rendering implementation in `render.via.ts` provides a specialized rendering pipeline for the Via.js environment.
@@ -246,7 +246,7 @@ end
 
 **Section sources**
 - [render.ts](file://src/methods/render.ts#L8-L29)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 - [render.via.ts](file://src/methods/render.via.ts#L4-L24)
 - [render.testing.ts](file://src/methods/render.testing.ts#L8-L80)
 
@@ -352,7 +352,7 @@ These examples demonstrate the consistent API patterns across different renderin
 
 **Section sources**
 - [render.ts](file://src/methods/render.ts#L8-L29)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 - [render.via.ts](file://src/methods/render.via.ts#L4-L24)
 - [render.testing.ts](file://src/methods/render.testing.ts#L8-L80)
 
@@ -369,6 +369,6 @@ All implementations include robust lifecycle management and memory cleanup mecha
 
 **Section sources**
 - [render.ts](file://src/methods/render.ts#L8-L29)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 - [render.via.ts](file://src/methods/render.via.ts#L4-L24)
 - [render.testing.ts](file://src/methods/render.testing.ts#L8-L80)

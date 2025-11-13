@@ -20,11 +20,6 @@
             "require": "./dist/via.cjs.js",
             "import": "./dist/via.es.js"
         },
-        "./ssr": {
-            "types": "./dist/types/ssr.d.ts",
-            "require": "./dist/ssr.cjs.js",
-            "import": "./dist/ssr.es.js"
-        },
         "./testing": {
             "types": "./dist/types/testing.d.ts",
             "require": "./dist/testing.cjs.js",
@@ -44,16 +39,6 @@
             "types": "./dist/via/via-runtime.d.ts",
             "require": "./dist/via-runtime.cjs.js",
             "import": "./dist/via-runtime.es.js"
-        },
-        "./ssr/jsx-runtime": {
-            "types": "./dist/types/ssr/jsx-runtime/index.d.ts",
-            "require": "./dist/jsx-runtime-ssr.cjs.js",
-            "import": "./dist/jsx-runtime-ssr.es.js"
-        },
-        "./ssr/jsx-dev-runtime": {
-            "types": "./dist/types/ssr/jsx-runtime/index.d.ts",
-            "require": "./dist/jsx-runtime-ssr.cjs.js",
-            "import": "./dist/jsx-runtime-ssr.es.js"
         }
     },
     "typesVersions": {
@@ -69,9 +54,6 @@
             ],
             "via/jsx-runtime": [
                 "./dist/via/via-runtime.d.ts"
-            ],
-            "ssr/jsx-runtime": [
-                "./dist/ssr/jsx-runtime/index.d.ts"
             ]
         }
     },
@@ -172,7 +154,6 @@
         "docs",
         "*.d.ts",
         "jsx-runtime.js",
-        "ssr.js",
         "via.js",
         "testing.js"
     ]

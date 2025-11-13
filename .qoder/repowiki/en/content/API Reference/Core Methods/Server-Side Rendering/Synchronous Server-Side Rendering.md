@@ -2,10 +2,10 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
 - [fragment.ts](file://src/components/fragment.ts)
 - [suspense.ts](file://src/components/suspense.ts)
 - [suspense.manager.ts](file://src/components/suspense.manager.ts)
@@ -26,8 +26,8 @@
 Woby's synchronous server-side rendering (SSR) implementation provides a direct string rendering pipeline optimized for immediate HTML generation without asynchronous overhead. This system leverages FragmentUtils and setters.ssr to efficiently serialize virtual DOM structures into HTML strings during server execution. The implementation is specifically designed for high-throughput scenarios where minimal latency and predictable performance are critical.
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L26)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L1-L41)
+- [render.ts](file://src/methods/render.ts#L1-L26)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L1-L41)
 
 ## Core Rendering Pipeline
 
@@ -45,12 +45,12 @@ Join --> Output["Return HTML String"]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L26)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L253-L296)
+- [render.ts](file://src/methods/render.ts#L1-L26)
+- [setters.ts](file://src/utils/setters.ts#L253-L296)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L26)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L799)
+- [render.ts](file://src/methods/render.ts#L1-L26)
+- [setters.ts](file://src/utils/setters.ts#L1-L799)
 
 ## Fragment Management System
 
@@ -77,10 +77,10 @@ FragmentUtils --> Fragment : "manipulates"
 ```
 
 **Diagram sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L1-L144)
+- [fragment.ts](file://src/utils/fragment.ts#L1-L144)
 
 **Section sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L1-L144)
+- [fragment.ts](file://src/utils/fragment.ts#L1-L144)
 - [fragment.ts](file://src/components/fragment.ts#L1-L7)
 
 ## Node Serialization Logic
@@ -103,12 +103,12 @@ HandleOther --> PushNode
 ```
 
 **Diagram sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L227-L269)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L1-L144)
+- [setters.ts](file://src/utils/setters.ts#L227-L269)
+- [fragment.ts](file://src/utils/fragment.ts#L1-L144)
 
 **Section sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L799)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L1-L144)
+- [setters.ts](file://src/utils/setters.ts#L1-L799)
+- [fragment.ts](file://src/utils/fragment.ts#L1-L144)
 
 ## Usage Scenarios
 
@@ -122,8 +122,8 @@ For static site generation (SSG), the synchronous pipeline provides predictable 
 During build-time rendering, the synchronous nature ensures that all pages are rendered in a single execution context without requiring event loop management or async coordination.
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L26)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L1-L41)
+- [render.ts](file://src/methods/render.ts#L1-L26)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L1-L41)
 
 ## Performance Characteristics
 
@@ -137,8 +137,8 @@ The synchronous SSR implementation offers significant performance advantages for
 These characteristics make the implementation particularly suitable for applications requiring high request-per-second rates and low-latency responses.
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L26)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L799)
+- [render.ts](file://src/methods/render.ts#L1-L26)
+- [setters.ts](file://src/utils/setters.ts#L1-L799)
 
 ## Limitations and Constraints
 
@@ -177,8 +177,8 @@ Nested fragments are flattened during the serialization process using the getChi
 Empty arrays are treated as void children and result in placeholder comments in the output, maintaining the structural integrity of the DOM tree.
 
 **Section sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L799)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L1-L144)
+- [setters.ts](file://src/utils/setters.ts#L1-L799)
+- [fragment.ts](file://src/utils/fragment.ts#L1-L144)
 
 ## Hydration Requirements
 
@@ -192,5 +192,5 @@ For successful client-side hydration, the synchronous SSR output must match the 
 The synchronous nature of the SSR implementation helps ensure consistency between server and client renders by eliminating timing-related variations.
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L1-L26)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L1-L799)
+- [render.ts](file://src/methods/render.ts#L1-L26)
+- [setters.ts](file://src/utils/setters.ts#L1-L799)

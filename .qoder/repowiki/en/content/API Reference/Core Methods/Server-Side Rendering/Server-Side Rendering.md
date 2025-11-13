@@ -2,15 +2,15 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 - [render_to_string.ts](file://src/methods/render_to_string.ts)
 - [suspense.collector.ts](file://src/components/suspense.collector.ts)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
+- [resolvers.ts](file://src/utils/resolvers.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [portal.ts](file://src/components/portal.ts)
+- [creators.ts](file://src/utils/creators.ts)
 - [ssr-runtime.ts](file://src/ssr/ssr-runtime.ts)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx)
 - [ssr.ts](file://src/ssr.ts)
 </cite>
 
@@ -31,7 +31,7 @@
 Woby provides robust server-side rendering (SSR) capabilities through its `renderToString()` function, enabling efficient generation of HTML on the server for improved performance, SEO, and initial load experience. This documentation details both synchronous and asynchronous rendering approaches, the underlying rendering pipeline, portal handling, hydration considerations, and advanced patterns such as resource tracking via `SuspenseCollector` and cleanup using the disposer pattern.
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
 
 ## Synchronous SSR with renderToString
@@ -50,13 +50,13 @@ Serialize --> Output([Return HTML String])
 ```
 
 **Diagram sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L750-L799)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L1-L182)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
+- [setters.ts](file://src/utils/setters.ts#L750-L799)
+- [resolvers.ts](file://src/utils/resolvers.ts#L1-L182)
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L1-L182)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
+- [resolvers.ts](file://src/utils/resolvers.ts#L1-L182)
 
 ## Asynchronous SSR and Suspense Support
 The asynchronous `renderToString` function supports Suspense-enabled components by leveraging `useRoot`, `SuspenseCollector`, and `useEffect` to track pending resources. It wraps the rendering process in a suspense-aware context, allowing components to suspend during rendering when waiting for async data (e.g., resource loading).
@@ -89,7 +89,7 @@ renderToString-->>Client : Return HTML String
 **Diagram sources**
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
 - [suspense.collector.ts](file://src/components/suspense.collector.ts#L1-L42)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L6-L48)
+- [portal.ts](file://src/components/portal.ts#L6-L48)
 
 **Section sources**
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
@@ -107,9 +107,9 @@ Key components include:
 The final output is a concatenated string of HTML content derived from either `outerHTML` (for elements) or `textContent` (for text nodes), ensuring compatibility with standard HTML delivery.
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L750-L799)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L1-L182)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
+- [setters.ts](file://src/utils/setters.ts#L750-L799)
+- [resolvers.ts](file://src/utils/resolvers.ts#L1-L182)
 
 ## Portal Handling in SSR
 Portals in Woby allow rendering components into DOM nodes outside the parent hierarchy, even during SSR. The `Portal` component accepts a `mount` target and an optional `wrapper`, creating a virtual `div` element if none is provided. During SSR, it inserts the portal node into the specified mount point (defaulting to `document.body`) and renders children into it.
@@ -140,11 +140,11 @@ useRenderEffect --> Portal : "manages lifecycle"
 ```
 
 **Diagram sources**
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L6-L48)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L18)
+- [portal.ts](file://src/components/portal.ts#L6-L48)
+- [creators.ts](file://src/utils/creators.ts#L1-L18)
 
 **Section sources**
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L6-L48)
+- [portal.ts](file://src/components/portal.ts#L6-L48)
 
 ## SuspenseCollector and Resource Tracking
 `SuspenseCollector` is responsible for tracking all active Suspense instances within a rendering scope. It maintains a list of suspense objects and exposes an `active()` method that returns `true` if any suspense is still pending. This enables the asynchronous `renderToString` to delay resolution until all async dependencies are resolved.
@@ -190,7 +190,7 @@ Woby's SSR capabilities support multiple production use cases:
 The synchronous API is preferred for SSG due to its simplicity and determinism, while the asynchronous version suits dynamic server environments with data fetching requirements.
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
 
 ## Streaming SSR Possibilities
@@ -221,6 +221,6 @@ To optimize SSR performance in high-throughput environments:
 The use of `happy-dom` for virtual DOM operations ensures fast node creation and serialization without browser dependencies.
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L1-L18)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L1-L182)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
+- [creators.ts](file://src/utils/creators.ts#L1-L18)
+- [resolvers.ts](file://src/utils/resolvers.ts#L1-L182)

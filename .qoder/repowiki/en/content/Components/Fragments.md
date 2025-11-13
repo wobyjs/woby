@@ -4,9 +4,9 @@
 **Referenced Files in This Document**   
 - [fragment.ts](file://src/components/fragment.ts)
 - [fragment.ts](file://src/utils/fragment.ts)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts)
+- [create_element.ts](file://src/methods/create_element.ts)
 - [types.ts](file://src/types.ts)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx)
 </cite>
 
 ## Table of Contents
@@ -89,11 +89,11 @@ Loop --> |Complete| ReturnChildren["Return children array"]
 
 **Diagram sources**
 - [utils/fragment.ts](file://src/utils/fragment.ts#L8-L147)
-- [utils/fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
+- [utils/fragment.ts](file://src/utils/fragment.ts#L8-L144)
 
 **Section sources**
 - [utils/fragment.ts](file://src/utils/fragment.ts#L8-L147)
-- [utils/fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
+- [utils/fragment.ts](file://src/utils/fragment.ts#L8-L144)
 
 ## JSX Integration
 Fragments integrate seamlessly with Woby's JSX transformer and rendering engine through the jsx function implementation. The JSX runtime handles fragment elements by recognizing the Fragment component and processing its children appropriately during element creation. When the jsx function encounters a Fragment component, it processes the children without creating any additional DOM nodes, maintaining the fragment's lightweight nature. This integration ensures that both the short syntax (`<>`) and explicit Fragment tags work identically in terms of functionality and performance.
@@ -115,15 +115,15 @@ Runtime-->>JSX : Rendered output without wrapper node
 ```
 
 **Diagram sources**
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx#L15-L40)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L10-L80)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx#L15-L40)
+- [create_element.ts](file://src/methods/create_element.ts#L10-L80)
 
 **Section sources**
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx#L15-L40)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L10-L80)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx#L15-L40)
+- [create_element.ts](file://src/methods/create_element.ts#L10-L80)
 
 ## Server-Side Rendering
-During server-side rendering, fragments are handled through specialized SSR implementations that maintain the same semantics as client-side rendering. The SSR version of fragment utilities ensures proper handling of text nodes, comments, and adjacent elements while generating HTML output. The create_element.ssr.ts implementation processes fragments by directly including their children in the output stream without adding any wrapper elements, preserving the intended markup structure. This approach ensures consistent behavior between server-rendered and client-rendered content, enabling seamless hydration.
+During server-side rendering, fragments are handled through specialized SSR implementations that maintain the same semantics as client-side rendering. The SSR version of fragment utilities ensures proper handling of text nodes, comments, and adjacent elements while generating HTML output. The create_element.ts implementation processes fragments by directly including their children in the output stream without adding any wrapper elements, preserving the intended markup structure. This approach ensures consistent behavior between server-rendered and client-rendered content, enabling seamless hydration.
 
 ```mermaid
 graph TD
@@ -144,19 +144,19 @@ Match --> |No| Warning["Emit hydration warning"]
 ```
 
 **Diagram sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L10-L80)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
+- [create_element.ts](file://src/methods/create_element.ts#L10-L80)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
 
 **Section sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L10-L80)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts#L8-L144)
+- [create_element.ts](file://src/methods/create_element.ts#L10-L80)
+- [fragment.ts](file://src/utils/fragment.ts#L8-L144)
 
 ## Usage Patterns
 Fragments support two primary usage patterns: the short syntax (`<>...</>`) and the explicit `<Fragment>...</Fragment>` tag. Both patterns are functionally equivalent and compile to the same underlying implementation. The short syntax is preferred for its brevity when grouping elements, while the explicit tag may be used when additional clarity is needed or when working with tools that require explicit component names. Fragments are commonly used in scenarios such as returning multiple elements from a component, grouping list items, or conditionally rendering content without introducing extra DOM nodes.
 
 **Section sources**
 - [fragment.ts](file://src/components/fragment.ts#L2-L6)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx#L15-L40)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx#L15-L40)
 
 ## Limitations and Workarounds
 Fragments cannot have attributes or keys applied directly, as they do not represent actual DOM nodes. This limitation means that fragments cannot be used as targets for event listeners or directives that require a DOM element reference. When attributes or keys are needed, a wrapper div or other appropriate container element should be used instead. For cases where a key is required for list items, the key should be applied to the individual elements within the fragment rather than the fragment itself. Event listeners and directives should be attached to specific child elements rather than the fragment container.
@@ -178,4 +178,4 @@ Use fragments when grouping elements that don't require styling, layout, or DOM 
 **Section sources**
 - [fragment.ts](file://src/components/fragment.ts#L2-L6)
 - [utils/fragment.ts](file://src/utils/fragment.ts#L8-L147)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L10-L80)
+- [create_element.ts](file://src/methods/create_element.ts#L10-L80)

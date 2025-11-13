@@ -4,7 +4,7 @@
  * This module provides a mock implementation of custom elements for server-side rendering
  * environments where browser APIs like customElements, window, and document are not available.
  * 
- * @module customElement.ssr
+ * @module customElement
  */
 
 import $ from "soby"

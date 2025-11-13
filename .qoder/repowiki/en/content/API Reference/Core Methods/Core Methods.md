@@ -3,17 +3,17 @@
 <cite>
 **Referenced Files in This Document**   
 - [render.ts](file://src/methods/render.ts)
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
 - [render_to_string.ts](file://src/methods/render_to_string.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 - [create_element.ts](file://src/methods/create_element.ts)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts)
+- [create_element.ts](file://src/methods/create_element.ts)
 - [create_element.via.ts](file://src/methods/create_element.via.ts)
 - [h.ts](file://src/methods/h.ts)
 - [h.via.ts](file://src/methods/h.via.ts)
 - [custom_element.ts](file://src/methods/custom_element.ts)
 - [lazy.ts](file://src/methods/lazy.ts)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts)
+- [lazy.ts](file://src/methods/lazy.ts)
 - [lazy.via.ts](file://src/methods/lazy.via.ts)
 </cite>
 
@@ -33,13 +33,13 @@ When rendering to a DOM element or ShadowRoot, the function first validates that
 
 The framework provides different implementations for various environments:
 - Client-side rendering in `render.ts`
-- Server-side rendering in `render.ssr.ts` which returns a string representation
+- Server-side rendering in `render.ts` which returns a string representation
 - Testing environment rendering in `render.testing.ts`
 - VIA environment rendering in `render.via.ts`
 
 **Section sources**
 - [render.ts](file://src/methods/render.ts#L8-L29)
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
+- [render.ts](file://src/methods/render.ts#L7-L25)
 - [render.testing.ts](file://src/methods/render.testing.ts#L8-L80)
 - [render.via.ts](file://src/methods/render.via.ts#L4-L24)
 
@@ -55,7 +55,7 @@ A key feature is the validation that prevents providing children both as a prop 
 
 **Section sources**
 - [create_element.ts](file://src/methods/create_element.ts#L53-L129)
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
 - [create_element.via.ts](file://src/methods/create_element.via.ts#L19-L80)
 
 ## h() Function
@@ -68,7 +68,7 @@ The function has multiple overloads to handle different parameter patterns:
 
 This flexibility allows developers to use the function in various coding styles while maintaining compatibility with JSX transpilation.
 
-The framework provides environment-specific implementations in `h.ts`, `h.ssr.ts`, and `h.via.ts`, with the SSR version simply re-exporting `createElement` from the SSR module.
+The framework provides environment-specific implementations in `h.ts`, `h.ts`, and `h.via.ts`, with the SSR version simply re-exporting `createElement` from the SSR module.
 
 **Section sources**
 - [h.ts](file://src/methods/h.ts#L8-L23)
@@ -109,7 +109,7 @@ The function uses `once()` to ensure the fetcher is only called once, even if mu
 
 **Section sources**
 - [lazy.ts](file://src/methods/lazy.ts#L11-L59)
-- [lazy.ssr.ts](file://src/methods/lazy.ssr.ts#L10-L58)
+- [lazy.ts](file://src/methods/lazy.ts#L10-L58)
 - [lazy.via.ts](file://src/methods/lazy.via.ts#L10-L58)
 
 ## renderToString() Function
@@ -118,10 +118,10 @@ The `renderToString()` function provides server-side rendering capabilities by c
 
 The client-side implementation returns a Promise that resolves when all suspense boundaries have been resolved, ensuring that asynchronous components are fully loaded before serialization. It uses a Portal component to capture the rendered content and waits for all pending suspenses before resolving.
 
-The server-side implementation (`render_to_string.ssr.ts`) directly renders the component to a string without the asynchronous handling, as it operates in a synchronous context. It creates a container, sets the child content, and then extracts the HTML representation from the rendered elements.
+The server-side implementation (`render_to_string.ts`) directly renders the component to a string without the asynchronous handling, as it operates in a synchronous context. It creates a container, sets the child content, and then extracts the HTML representation from the rendered elements.
 
 Both implementations handle various node types, extracting `outerHTML` for DOM elements, `textContent` for text nodes, and converting other values to strings, ensuring comprehensive serialization of the component tree.
 
 **Section sources**
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)

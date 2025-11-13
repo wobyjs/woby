@@ -8,10 +8,10 @@ export * from './jsx/types'
 
 /* EXPORT */
 
-// export * from './components/index.ssr';
-// export * from './jsx/jsx-runtime.ssr'
+// export * from './components/index';
+// export * from './jsx/jsx-runtime'
 // export * from './hooks';
-// export * from './methods/index.ssr';
+// export * from './methods/index';
 // export type { Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, Component };
 // export * from './constants';
 

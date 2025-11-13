@@ -2,14 +2,14 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx)
+- [create_element.ts](file://src/methods/create_element.ts)
+- [creators.ts](file://src/utils/creators.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx)
 - [custom_element.ts](file://src/methods/custom_element.ts)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts)
+- [resolvers.ts](file://src/utils/resolvers.ts)
+- [diff.ts](file://src/utils/diff.ts)
 </cite>
 
 ## Table of Contents
@@ -41,7 +41,7 @@ The SSR implementation of `createElement()` handles three primary types of compo
 When processing string-based components, the function determines whether to use `createHTMLNode` or `createSVGNode` based on the element type, ensuring proper namespace handling for SVG elements.
 
 **Section sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
 
 ## Virtual DOM Construction
 
@@ -72,7 +72,7 @@ creators.ssr --> Document : "calls"
 ```
 
 **Diagram sources**
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
 
 The virtual DOM construction process involves:
 1. Creating a happy-dom window instance for SSR
@@ -83,7 +83,7 @@ The virtual DOM construction process involves:
 This approach allows the framework to maintain DOM API compatibility while running in a server environment without a real browser DOM.
 
 **Section sources**
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
 
 ## SSR vs Browser Implementation Differences
 
@@ -109,8 +109,8 @@ createElement-->>Component : Return wrapped element
 ```
 
 **Diagram sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 ### Node Creation Functions
 The SSR implementation uses specialized node creation functions that are compatible with happy-dom, while the browser version can use native DOM APIs directly.
@@ -119,7 +119,7 @@ The SSR implementation uses specialized node creation functions that are compati
 The SSR version has specific optimizations for handling observables in a server context, where reactivity needs to be preserved without relying on browser-specific features.
 
 **Section sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
 - [create_element.ts](file://src/methods/create_element.ts#L53-L129)
 
 ## Custom Elements and Props Handling
@@ -142,7 +142,7 @@ StandardElement --> SetIsSVG
 ```
 
 **Diagram sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
 - [custom_element.ts](file://src/methods/custom_element.ts#L600-L642)
 
 Key aspects of custom elements handling in SSR:
@@ -155,7 +155,7 @@ Key aspects of custom elements handling in SSR:
 The framework also handles nested properties and style properties in custom elements, converting kebab-case attribute names to camelCase property names automatically.
 
 **Section sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
 - [custom_element.ts](file://src/methods/custom_element.ts#L1-L642)
 
 ## Recursive Children Population
@@ -183,8 +183,8 @@ setChild --> FragmentUtils : "calls"
 ```
 
 **Diagram sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [fragment.ts](file://src/utils/fragment.ts)
 
 The recursive population process involves:
 1. Creating a fragment to manage the children
@@ -196,8 +196,8 @@ The recursive population process involves:
 The implementation includes optimizations for common cases, such as single text children or void children, to minimize unnecessary DOM operations.
 
 **Section sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L0-L182)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [resolvers.ts](file://src/utils/resolvers.ts#L0-L182)
 
 ## Observable Children and Reactivity
 
@@ -225,8 +225,8 @@ resolveChild-->>Parent : Complete child resolution
 ```
 
 **Diagram sources**
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L0-L182)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [resolvers.ts](file://src/utils/resolvers.ts#L0-L182)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 Key aspects of observable handling:
 - Observable values are detected and processed appropriately
@@ -238,8 +238,8 @@ Key aspects of observable handling:
 The implementation ensures that reactivity is preserved during server rendering, allowing components to respond to changes in observable values even in the SSR context.
 
 **Section sources**
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L0-L182)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [resolvers.ts](file://src/utils/resolvers.ts#L0-L182)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 ## SSR-Safe Component Creation
 
@@ -258,8 +258,8 @@ UseBrowserAPIs --> ReturnElement
 ```
 
 **Diagram sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
 
 Best practices for SSR-safe component creation:
 - Use the SSR-specific createElement implementation
@@ -272,8 +272,8 @@ Best practices for SSR-safe component creation:
 Components should be designed to work in both server and client environments, with appropriate fallbacks and conditional logic where necessary.
 
 **Section sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
 
 ## Integration with renderToString()
 
@@ -300,8 +300,8 @@ renderToString-->>HTML : Return HTML output
 ```
 
 **Diagram sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L0-L42)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L0-L42)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 The integration process involves:
 1. Creating a container object to hold the rendered content
@@ -314,8 +314,8 @@ The integration process involves:
 The implementation handles various content types, including text nodes, elements with outerHTML, and textContent, ensuring proper serialization to HTML.
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L0-L42)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L0-L42)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 ## Common SSR Issues
 
@@ -346,8 +346,8 @@ ResolveIssue --> CompleteRendering["Complete rendering safely"]
 ```
 
 **Diagram sources**
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 Additional considerations:
 - Proper error handling and stack traces
@@ -356,8 +356,8 @@ Additional considerations:
 - Compatibility with various server environments
 
 **Section sources**
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 ## Performance Considerations
 
@@ -390,8 +390,8 @@ F --> F2["Minimize DOM operations"]
 ```
 
 **Diagram sources**
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts#L0-L202)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
+- [diff.ts](file://src/utils/diff.ts#L0-L202)
 
 ### Optimization Strategies
 1. **Fragment reuse**: Reusing fragment objects to reduce memory allocation
@@ -407,9 +407,9 @@ The implementation includes several performance optimizations:
 - Minimal stack operations for non-reactive content
 
 **Section sources**
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts#L0-L202)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
+- [diff.ts](file://src/utils/diff.ts#L0-L202)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
 
 ## Architecture Overview
 
@@ -418,15 +418,15 @@ The SSR element creation system follows a modular architecture with clear separa
 ```mermaid
 graph TB
 subgraph "Core Components"
-createElement["createElement.ssr.ts"]
-creators["creators.ssr.ts"]
-setters["setters.ssr.ts"]
-resolvers["resolvers.ssr.ts"]
-diff["diff.ssr.ts"]
+createElement["createElement.ts"]
+creators["creators.ts"]
+setters["setters.ts"]
+resolvers["resolvers.ts"]
+diff["diff.ts"]
 end
 subgraph "Integration Points"
-renderToString["render_to_string.ssr.ts"]
-jsxRuntime["jsx-runtime.ssr.tsx"]
+renderToString["render_to_string.ts"]
+jsxRuntime["jsx-runtime.tsx"]
 customElement["custom_element.ts"]
 end
 createElement --> creators : "Uses node creation"
@@ -449,13 +449,13 @@ style customElement fill:#f96,stroke:#333
 ```
 
 **Diagram sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L0-L182)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts#L0-L202)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L0-L42)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx#L0-L40)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [resolvers.ts](file://src/utils/resolvers.ts#L0-L182)
+- [diff.ts](file://src/utils/diff.ts#L0-L202)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L0-L42)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx#L0-L40)
 - [custom_element.ts](file://src/methods/custom_element.ts#L1-L642)
 
 The architecture is designed to be:
@@ -468,11 +468,11 @@ The architecture is designed to be:
 This architecture enables efficient server-side rendering while maintaining compatibility with client-side rendering and hydration.
 
 **Section sources**
-- [create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L15-L79)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts#L0-L182)
-- [diff.ssr.ts](file://src/utils/diff.ssr.ts#L0-L202)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L0-L42)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx#L0-L40)
+- [create_element.ts](file://src/methods/create_element.ts#L15-L79)
+- [creators.ts](file://src/utils/creators.ts#L9-L18)
+- [setters.ts](file://src/utils/setters.ts#L356-L360)
+- [resolvers.ts](file://src/utils/resolvers.ts#L0-L182)
+- [diff.ts](file://src/utils/diff.ts#L0-L202)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L0-L42)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx#L0-L40)
 - [custom_element.ts](file://src/methods/custom_element.ts#L1-L642)

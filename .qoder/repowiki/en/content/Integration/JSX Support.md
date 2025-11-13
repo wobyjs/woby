@@ -4,17 +4,17 @@
 **Referenced Files in This Document**   
 - [jsx-runtime.js](file://jsx-runtime.js)
 - [tsconfig.json](file://tsconfig.json)
-- [src/jsx/jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx)
+- [src/jsx/jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx)
 - [src/jsx/jsx-runtime.via.tsx](file://src/jsx/jsx-runtime.via.tsx)
 - [src/jsx/types.ts](file://src/jsx/types.ts)
-- [src/methods/h.ssr.ts](file://src/methods/h.ssr.ts)
+- [src/methods/h.ts](file://src/methods/h.ts)
 - [src/methods/h.ts](file://src/methods/h.ts)
 - [src/methods/h.via.ts](file://src/methods/h.via.ts)
-- [src/methods/create_element.ssr.ts](file://src/methods/create_element.ssr.ts)
+- [src/methods/create_element.ts](file://src/methods/create_element.ts)
 - [src/methods/create_element.ts](file://src/methods/create_element.ts)
 - [src/methods/create_element.via.ts](file://src/methods/create_element.via.ts)
 - [src/jsx/runtime.ts](file://src/jsx/runtime.ts)
-- [src/components/index.ssr.ts](file://src/components/index.ssr.ts)
+- [src/components/index.ts](file://src/components/index.ts)
 - [src/components/index.ts](file://src/components/index.ts)
 </cite>
 
@@ -147,7 +147,7 @@ Element --> Child : "contains"
 ## Runtime Variants and Use Cases
 Woby provides multiple JSX runtime variants to support different environments and use cases. These variants are implemented as separate files in the jsx directory with specific suffixes indicating their target environment.
 
-The `.ssr.tsx` variant is optimized for server-side rendering, with implementations in `jsx-runtime.ssr.tsx` and corresponding `create_element.ssr.ts`. This variant includes special handling for SSR-specific concerns like proper element creation on the server and metadata tracking for hydration.
+The `.tsx` variant is optimized for server-side rendering, with implementations in `jsx-runtime.tsx` and corresponding `create_element.ts`. This variant includes special handling for SSR-specific concerns like proper element creation on the server and metadata tracking for hydration.
 
 The `.via.tsx` variant is designed for use with the Via.js framework, with implementations in `jsx-runtime.via.tsx` and `create_element.via.ts`. This variant includes integration with Via.js's proxy system and special symbols for property tracking.
 
@@ -155,7 +155,7 @@ Each variant exports the same core functions (`jsx`, `jsxDEV`, `getMeta`) but wi
 
 ```mermaid
 graph TB
-Runtime["JSX Runtime"] --> SSR["SSR Variant (.ssr.tsx)"]
+Runtime["JSX Runtime"] --> SSR["SSR Variant (.tsx)"]
 Runtime --> Default["Default Variant (.ts)"]
 Runtime --> Via["Via.js Variant (.via.tsx)"]
 SSR --> |Use Case| ServerSideRendering["Server-Side Rendering"]
@@ -171,15 +171,15 @@ Common --> |Shared| ErrorHandling["Consistent error reporting"]
 ```
 
 **Diagram sources**
-- [src/jsx/jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx#L1-L41)
+- [src/jsx/jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx#L1-L41)
 - [src/jsx/jsx-runtime.via.tsx](file://src/jsx/jsx-runtime.via.tsx#L1-L48)
-- [src/methods/create_element.ssr.ts](file://src/methods/create_element.ssr.ts#L1-L81)
+- [src/methods/create_element.ts](file://src/methods/create_element.ts#L1-L81)
 - [src/methods/create_element.via.ts](file://src/methods/create_element.via.ts#L1-L81)
 
 **Section sources**
-- [src/jsx/jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx#L1-L41)
+- [src/jsx/jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx#L1-L41)
 - [src/jsx/jsx-runtime.via.tsx](file://src/jsx/jsx-runtime.via.tsx#L1-L48)
-- [src/components/index.ssr.ts](file://src/components/index.ssr.ts#L1-L13)
+- [src/components/index.ts](file://src/components/index.ts#L1-L13)
 
 ## Configuration Options
 Woby's JSX support can be configured through several mechanisms. The primary configuration is through TypeScript's compiler options in `tsconfig.json`, particularly the `jsx` and `jsxImportSource` settings.

@@ -41,7 +41,7 @@ jsx('div', null,
 
 ## Technical Details
 
-Looking at the `createElement` function in `create_element.ssr.ts`:
+Looking at the `createElement` function in `create_element.ts`:
 
 ```ts
 export const createElement = <P = { children?: Observable<Child> }>(

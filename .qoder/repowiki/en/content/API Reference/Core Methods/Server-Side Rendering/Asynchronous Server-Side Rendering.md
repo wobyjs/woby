@@ -2,10 +2,10 @@
 
 <cite>
 **Referenced Files in This Document**  
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 - [render_to_string.ts](file://src/methods/render_to_string.ts)
 - [suspense.collector.ts](file://src/components/suspense.collector.ts)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts)
+- [portal.ts](file://src/components/portal.ts)
 - [ssr-runtime.ts](file://src/ssr/ssr-runtime.ts)
 </cite>
 
@@ -51,7 +51,7 @@ Dispose --> End([HTML string returned])
 
 **Diagram sources**
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
 
 **Section sources**
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
@@ -119,11 +119,11 @@ R-->>R : Return HTML string
 ```
 
 **Diagram sources**
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
 
 **Section sources**
-- [portal.ssr.ts](file://src/components/portal.ssr.ts#L9-L47)
+- [portal.ts](file://src/components/portal.ts#L9-L47)
 
 ## Memory Management with Disposer Pattern
 
@@ -212,7 +212,7 @@ However, full streaming would require coordination between the renderer and HTTP
 Woby's approach is superior for modern applications with async data dependencies.
 
 **Section sources**
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
 
 ## Use Cases in Serverless and Edge Functions

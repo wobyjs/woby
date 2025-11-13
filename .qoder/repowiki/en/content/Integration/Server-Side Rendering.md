@@ -2,15 +2,15 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
-- [resolvers.ssr.ts](file://src/utils/resolvers.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [creators.ts](file://src/utils/creators.ts)
+- [resolvers.ts](file://src/utils/resolvers.ts)
 - [ssr.js](file://ssr.js)
 - [ssr-runtime.ts](file://src/ssr/ssr-runtime.ts)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx)
 </cite>
 
 ## Table of Contents
@@ -30,11 +30,11 @@
 
 Server-Side Rendering (SSR) in Woby provides a mechanism for rendering components on the server and generating static HTML output. This approach enhances performance by delivering fully rendered content to clients, improving initial load times and search engine optimization. The SSR implementation in Woby is designed to be efficient and flexible, leveraging specialized utilities and patterns to handle server-side rendering requirements.
 
-The framework distinguishes between client and server implementations through dedicated files with the `.ssr.ts` suffix, ensuring optimal performance and appropriate feature availability for each environment. This documentation explores the SSR architecture, implementation details, and practical usage patterns within the Woby framework.
+The framework distinguishes between client and server implementations through dedicated files with the `.ts` suffix, ensuring optimal performance and appropriate feature availability for each environment. This documentation explores the SSR architecture, implementation details, and practical usage patterns within the Woby framework.
 
 ## SSR Implementation Overview
 
-The SSR implementation in Woby centers around the `src/ssr/` directory and associated `.ssr.ts` files throughout the codebase. The system is designed to create server-rendered HTML output without relying on a full DOM environment, instead using lightweight node creation and manipulation utilities.
+The SSR implementation in Woby centers around the `src/ssr/` directory and associated `.ts` files throughout the codebase. The system is designed to create server-rendered HTML output without relying on a full DOM environment, instead using lightweight node creation and manipulation utilities.
 
 The core SSR process involves several key components working together:
 - **Container creation** for holding rendered content
@@ -56,19 +56,19 @@ F --> G[Return String Response]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [creators.ts](file://src/utils/creators.ts)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
 - [ssr-runtime.ts](file://src/ssr/ssr-runtime.ts)
 
 ## Core SSR Functions
 
-The Woby SSR system provides two primary functions for server-side rendering: `render` and `renderToString`. These functions are implemented in dedicated `.ssr.ts` files and are specifically optimized for server environments.
+The Woby SSR system provides two primary functions for server-side rendering: `render` and `renderToString`. These functions are implemented in dedicated `.ts` files and are specifically optimized for server environments.
 
-The `render` function in `render.ssr.ts` generates a string representation of the rendered component tree. It creates a container object and uses a fragment to manage the component hierarchy. The function processes the child components through the `setChild` utility, then extracts the final HTML content from the fragment.
+The `render` function in `render.ts` generates a string representation of the rendered component tree. It creates a container object and uses a fragment to manage the component hierarchy. The function processes the child components through the `setChild` utility, then extracts the final HTML content from the fragment.
 
 Similarly, the `renderToString` function follows a nearly identical pattern but includes additional type checking and handling for object nodes. Both functions use the same underlying mechanisms for fragment management and HTML serialization, ensuring consistency across the SSR implementation.
 
@@ -92,17 +92,17 @@ Render-->>Client : Return rendered string
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts#L7-L25)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
+- [render.ts](file://src/methods/render.ts#L7-L25)
+- [render_to_string.ts](file://src/methods/render_to_string.ts#L6-L40)
+- [setters.ts](file://src/utils/setters.ts)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 
 ## Fragment Management
 
-Fragment management is a critical aspect of Woby's SSR implementation, handled by the `FragmentUtils` object in `fragment.ssr.ts`. Fragments serve as containers for component trees, allowing the framework to efficiently manage and manipulate groups of nodes during the rendering process.
+Fragment management is a critical aspect of Woby's SSR implementation, handled by the `FragmentUtils` object in `fragment.ts`. Fragments serve as containers for component trees, allowing the framework to efficiently manage and manipulate groups of nodes during the rendering process.
 
 The `FragmentUtils` provides several key methods:
 - `make()` - Creates a new empty fragment
@@ -137,11 +137,11 @@ FragmentUtils --> Fragment : "manipulates"
 ```
 
 **Diagram sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
 - [types.ts](file://src/types.ts)
 
 **Section sources**
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
 
 ## Container Creation and Management
 
@@ -151,7 +151,7 @@ In the SSR implementation, containers are created as simple JavaScript objects w
 
 The container creation process is integrated with the fragment system, where the container serves as the parent for the root fragment. This design allows the framework to maintain a clear separation between the container (which holds the overall structure) and the fragment (which manages the component hierarchy).
 
-The `setChild` function in `setters.ssr.ts` plays a crucial role in container management, handling the assignment of child components to containers. This function processes various types of children, including strings, numbers, objects, and functions, ensuring proper handling of dynamic content during SSR.
+The `setChild` function in `setters.ts` plays a crucial role in container management, handling the assignment of child components to containers. This function processes various types of children, including strings, numbers, objects, and functions, ensuring proper handling of dynamic content during SSR.
 
 ```mermaid
 flowchart TD
@@ -166,13 +166,13 @@ H --> I[Return HTML String]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [creators.ts](file://src/utils/creators.ts)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [setters.ts](file://src/utils/setters.ts)
 
 ## HTML Serialization Process
 
@@ -220,16 +220,16 @@ T --> U[Return HTML String]
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 
 ## Client vs Server Implementation Differences
 
-Woby distinguishes between client and server implementations through dedicated files with specific naming conventions. The framework uses `.ssr.ts` suffixes for server-side implementations and maintains separate files for client-side functionality.
+Woby distinguishes between client and server implementations through dedicated files with specific naming conventions. The framework uses `.ts` suffixes for server-side implementations and maintains separate files for client-side functionality.
 
 Key differences between client and server implementations include:
 
@@ -243,12 +243,12 @@ Key differences between client and server implementations include:
 
 5. **Performance Optimizations**: Server implementations are optimized for throughput and memory efficiency, while client implementations prioritize interactivity and responsiveness.
 
-The `setters.ssr.ts` file contains server-specific implementations of setter functions that handle attribute assignment, class management, and event handling without requiring a full DOM environment. These setters are designed to work with the virtual nodes created during SSR, producing the appropriate HTML attributes and properties in the serialized output.
+The `setters.ts` file contains server-specific implementations of setter functions that handle attribute assignment, class management, and event handling without requiring a full DOM environment. These setters are designed to work with the virtual nodes created during SSR, producing the appropriate HTML attributes and properties in the serialized output.
 
 ```mermaid
 graph TD
 A[Implementation Type] --> B{Server or Client?}
-B --> |Server| C[Use .ssr.ts files]
+B --> |Server| C[Use .ts files]
 B --> |Client| D[Use standard .ts files]
 C --> E[Lightweight containers]
 C --> F[Virtual node creation]
@@ -265,18 +265,18 @@ J --> L
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
 - [render.ts](file://src/methods/render.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [setters.ts](file://src/utils/setters.ts)
 - [setters.ts](file://src/utils/setters.ts)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
 - [render.ts](file://src/methods/render.ts)
 
 ## Practical SSR Usage Examples
 
-The SSR implementation in Woby can be used through the `render.ssr.ts` and `render_to_string.ssr.ts` files, which provide practical examples of server-side rendering in action. These implementations demonstrate how to render components to HTML strings for server responses.
+The SSR implementation in Woby can be used through the `render.ts` and `render_to_string.ts` files, which provide practical examples of server-side rendering in action. These implementations demonstrate how to render components to HTML strings for server responses.
 
 To use SSR in Woby, developers can import the appropriate functions and call them with their component trees:
 
@@ -290,7 +290,7 @@ The framework handles the entire rendering process, from creating the initial co
 
 For more complex scenarios, developers can use the `renderToString` function, which provides additional type checking and handling for edge cases. Both functions follow the same basic pattern of creating a container, processing the component tree, and serializing the result.
 
-The SSR system also integrates with Woby's JSX runtime, allowing developers to use familiar JSX syntax in server environments. The `jsx-runtime.ssr.tsx` file provides the necessary runtime support for JSX compilation in server contexts.
+The SSR system also integrates with Woby's JSX runtime, allowing developers to use familiar JSX syntax in server environments. The `jsx-runtime.tsx` file provides the necessary runtime support for JSX compilation in server contexts.
 
 ```mermaid
 sequenceDiagram
@@ -309,13 +309,13 @@ Response-->>Client : Send rendered page
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
-- [jsx-runtime.ssr.tsx](file://src/jsx/jsx-runtime.ssr.tsx)
+- [render.ts](file://src/methods/render.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
+- [jsx-runtime.tsx](file://src/jsx/jsx-runtime.tsx)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [render_to_string.ts](file://src/methods/render_to_string.ts)
 
 ## Performance Considerations
 
@@ -355,23 +355,23 @@ J --> M
 ```
 
 **Diagram sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
+- [setters.ts](file://src/utils/setters.ts)
 
 **Section sources**
-- [render.ssr.ts](file://src/methods/render.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
+- [render.ts](file://src/methods/render.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
 
 ## Configuration Options
 
 The SSR system in Woby provides several configuration options through the framework's architecture and implementation patterns. While there are no explicit configuration files, developers can influence SSR behavior through various mechanisms:
 
-1. **Custom Setters**: The `setters.ssr.ts` file provides extensible setter functions that can be customized for specific attribute handling requirements.
+1. **Custom Setters**: The `setters.ts` file provides extensible setter functions that can be customized for specific attribute handling requirements.
 
 2. **Fragment Behavior**: The `FragmentUtils` implementation can be extended or modified to change how component trees are managed during rendering.
 
-3. **Node Creation**: The `creators.ssr.ts` file defines how nodes are created in the server environment, allowing for customization of the virtual DOM implementation.
+3. **Node Creation**: The `creators.ts` file defines how nodes are created in the server environment, allowing for customization of the virtual DOM implementation.
 
 4. **Serialization Rules**: The HTML serialization process can be modified to handle special cases or custom element types.
 
@@ -380,9 +380,9 @@ The SSR system in Woby provides several configuration options through the framew
 These configuration options are primarily available through the framework's modular architecture, allowing developers to customize SSR behavior to meet specific application requirements.
 
 **Section sources**
-- [setters.ssr.ts](file://src/utils/setters.ssr.ts)
-- [fragment.ssr.ts](file://src/utils/fragment.ssr.ts)
-- [creators.ssr.ts](file://src/utils/creators.ssr.ts)
+- [setters.ts](file://src/utils/setters.ts)
+- [fragment.ts](file://src/utils/fragment.ts)
+- [creators.ts](file://src/utils/creators.ts)
 
 ## Conclusion
 
@@ -395,4 +395,4 @@ Key aspects of the SSR system include:
 - Clear distinction between client and server code paths
 - Integration with JSX and component architecture
 
-The implementation demonstrates a thoughtful approach to server-side rendering, balancing performance, maintainability, and developer experience. By using dedicated `.ssr.ts` files and specialized utilities, Woby provides a cohesive SSR solution that integrates seamlessly with the rest of the framework.
+The implementation demonstrates a thoughtful approach to server-side rendering, balancing performance, maintainability, and developer experience. By using dedicated `.ts` files and specialized utilities, Woby provides a cohesive SSR solution that integrates seamlessly with the rest of the framework.
