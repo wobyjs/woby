@@ -56,48 +56,15 @@ export function jsx<P extends {} = {}>(component: Component<P>, props?: P, ...ch
 //React 17
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, key?: string): Element
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, ...children: (string | Child)[]): Element {
-  // Normalize props
-  let normalizedProps = props ?? ({} as P)
+  if (typeof children === 'string') // React 16, key
+    return wrapCloneElement(createElement<P>(component as any, props ?? {} as P, children as string), component, props)
 
-  // Check if we have children in props
-  const hasChildrenInProps = normalizedProps && isObject(normalizedProps) && 'children' in normalizedProps
-  let propsChildren: any = undefined
+  props = getProps<P>(component, props)
 
-  if (hasChildrenInProps) {
-    propsChildren = (normalizedProps as any).children
-    // Remove children from props to avoid duplication
-    const { children: _, ...restProps } = normalizedProps as any
-    normalizedProps = restProps as P
-  }
+  if (typeof children === 'string') // React 16, key
+    Object.assign(props as any, { children })
 
-  // Get final props with defaults
-  normalizedProps = getProps<P>(component, normalizedProps)
-
-  // Handle different cases:
-  // 1. Children passed as separate arguments (React 16 style)
-  if (children.length > 0) {
-    return wrapCloneElement(
-      createElement<P>(component as any, normalizedProps, ...children),
-      component,
-      normalizedProps
-    )
-  }
-  // 2. Children in props (React 17 style)
-  else if (hasChildrenInProps && propsChildren !== undefined) {
-    return wrapCloneElement(
-      createElement<P>(component as any, normalizedProps, propsChildren),
-      component,
-      normalizedProps
-    )
-  }
-  // 3. No children at all
-  else {
-    return wrapCloneElement(
-      createElement<P>(component as any, normalizedProps),
-      component,
-      normalizedProps
-    )
-  }
+  return wrapCloneElement(createElement<P>(component as any, props, (props as any)?.key as string), component, props)
 }
 
 //React 17 only

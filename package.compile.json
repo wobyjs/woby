@@ -33,10 +33,6 @@
         "./via/jsx-runtime": {
             "import": "./dist/via/jsx-runtime/index.js",
             "types": "./dist/via/jsx-runtime/index.d.ts"
-        },
-        "./ssr/jsx-runtime": {
-            "import": "./dist/ssr/jsx-runtime/index.js",
-            "types": "./dist/ssr/jsx-runtime/index.d.ts"
         }
     },
     "typesVersions": {
@@ -52,9 +48,6 @@
             ],
             "via/jsx-runtime": [
                 "./dist/via/runtime.d.ts"
-            ],
-            "ssr/jsx-runtime": [
-                "./dist/ssr/runtime.d.ts"
             ]
         }
     },
