@@ -1,16 +1,32 @@
-import type { FN } from '../types'
-import { BaseNode } from '../methods/ssr.obj'
+/**
+ * Mock document object for SSR
+ */
+
+import { isSSR } from "../constants"
+import { BaseNode } from "./base_node"
+import type { FN } from "../types"
+
+type EventListener = (evt: Event) => void
+type EventListenerObject = {
+    handleEvent(object: Event): void
+}
+type EventListenerOrEventListenerObject = EventListener | EventListenerObject
+type AddEventListenerOptions = boolean | {
+    capture?: boolean
+    once?: boolean
+    passive?: boolean
+}
 
 // Enhanced mock implementations for SSR without happy-dom
 // These implementations better support the html`` template pattern from index.tsx
 
-export const createComment = ((content: string) => ({
+const createComment = ((content: string) => ({
     nodeType: 8,
     textContent: content,
     toString: () => `<!--${content}-->`
 })) as any as FN<[string], Comment>
 
-export const createHTMLNode = ((tagName: string) => {
+const createHTMLNode = ((tagName: string) => {
     class HTMLNode extends BaseNode {
         tagName: string
         style: any
@@ -93,7 +109,7 @@ export const createHTMLNode = ((tagName: string) => {
     return new HTMLNode()
 }) as any as FN<[string], HTMLElement>
 
-export const createSVGNode = ((tagName: string) => {
+const createSVGNode = ((tagName: string) => {
     class SVGNode extends BaseNode {
         tagName: string
         isSVG: boolean
@@ -133,13 +149,13 @@ export const createSVGNode = ((tagName: string) => {
     return new SVGNode()
 }) as any as FN<[string], SVGElement>
 
-export const createText = ((text: string) => ({
+const createText = ((text: string) => ({
     nodeType: 3,
     textContent: String(text),
     toString: () => String(text)
 })) as any as FN<[string], Text>
 
-export const createDocumentFragment = (() => {
+const createDocumentFragment = (() => {
     class DocumentFragmentNode extends BaseNode {
         constructor() {
             super(11)
@@ -148,3 +164,58 @@ export const createDocumentFragment = (() => {
 
     return new DocumentFragmentNode()
 }) as any as FN<[], DocumentFragment>
+
+// Mock body element for SSR
+const body = createHTMLNode('body')
+
+export const document = {
+    // Map to store event listeners for better tracking
+    _eventListeners: new Map<string, Array<{
+        listener: EventListenerOrEventListenerObject
+        options?: boolean | AddEventListenerOptions
+    }>>(),
+
+    addEventListener: function (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
+        // Mock implementation for SSR - store listeners in map
+        if (!this._eventListeners.has(type)) {
+            this._eventListeners.set(type, [])
+        }
+        this._eventListeners.get(type)!.push({ listener, options })
+    },
+
+    removeEventListener: function (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
+        // Mock implementation for SSR - remove listeners from map
+        if (this._eventListeners.has(type)) {
+            const listeners = this._eventListeners.get(type)!
+            const index = listeners.findIndex(item => item.listener === listener)
+            if (index !== -1) {
+                listeners.splice(index, 1)
+            }
+        }
+    },
+
+    // Helper method to get listeners for testing/debugging
+    _getEventListeners: function (type: string) {
+        return this._eventListeners.get(type) || []
+    },
+
+    // Creator functions as methods on document
+    createComment,
+    createElement: createHTMLNode,
+    createElementNS: ((namespaceURI: string, qualifiedName: string) => {
+        if (namespaceURI === 'http://www.w3.org/2000/svg') {
+            return createSVGNode(qualifiedName)
+        }
+        return createHTMLNode(qualifiedName)
+    }) as any as FN<[string, string], Element>,
+    createTextNode: createText,
+    createDocumentFragment,
+
+    // Body property for portal component
+    body
+}
+
+// Assign to globalThis if in SSR environment
+if (isSSR) {
+    globalThis.document = document as any
+}

@@ -1,5 +1,7 @@
 // Simple test to debug renderToString issue
-import { createHTMLNode, createText } from 'woby/ssr'
+import { getEnv } from 'woby/ssr'
+
+const { createHTMLNode, createText } = getEnv()
 
 // Test the HTMLNode creation
 const container = createHTMLNode('div')

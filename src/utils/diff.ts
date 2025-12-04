@@ -34,7 +34,9 @@
  * @module diff
  */
 
-import { createComment } from "./creators"
+import { getEnv } from "./creators"
+
+const { createComment } = getEnv()
 
 // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
 

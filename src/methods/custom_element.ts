@@ -39,11 +39,11 @@ import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from 
 import { ObservableMaybe, Child, Component } from "../types"
 import { useLightDom } from "../hooks/use_attached"
 import { mark } from "../utils/mark"
-import { customElements as ces, document as doc } from './ssr.obj'
+import { customElements } from '../ssr/custom_elements'
+import { document } from '../ssr/document'
 
 if (isSSR) {
-    globalThis.customElements = ces as any
-    globalThis.document = doc as any
+    globalThis.customElements = customElements as any
 }
 
 /**
@@ -99,7 +99,7 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
     (SSRCustomElement as any).__component__ = component
 
     // Register the component in our dictionary
-    ces.define(tagName, SSRCustomElement as any)
+    customElements.define(tagName, SSRCustomElement as any)
 
     // Return the mock class for SSR
     return SSRCustomElement as unknown as typeof HTMLElement
@@ -508,7 +508,7 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
             if (!isJsx(this.props)) {
                 const shadowRoot = this.attachShadow({ mode: 'open', serializable: true })
                 if (!($$(this.props.children) instanceof HTMLSlotElement)) {
-                    this.slots = document.createElement('slot')
+                    this.slots = document.createElement('slot') as unknown as HTMLSlotElement
                     // this.slots.onslotchange = () => {
                     //     console.log('slotchange', this.slots.assignedElements())
                     // }

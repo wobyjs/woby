@@ -11,7 +11,7 @@ import { wrapCloneElement, CloneableType } from '../methods/wrap_clone_element'
 import { createElement } from '../index'
 import { isObject, isString } from '../utils/lang'
 import { isSSR, SYMBOL_CLONE, SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
-import { customElements as ces } from '../methods/ssr.obj'
+import { customElements } from '../ssr/custom_elements'
 
 const wrapJsx = <P>(props: P) => {
   if (props[SYMBOL_JSX]) return props
@@ -24,7 +24,7 @@ export const unwrapJsx = <P>(props: P) => {
   return props
 }
 
-const CES = isSSR ? ces : customElements
+const CES = isSSR ? customElements : customElements
 
 export const isJsx = <P>(props: P) => !!props[SYMBOL_JSX]
 

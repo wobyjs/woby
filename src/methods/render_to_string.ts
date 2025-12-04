@@ -1,16 +1,16 @@
 import { FragmentUtils } from '../utils/fragment'
 import type { Child } from '../types'
-import { setChild } from '../utils/setters.ssr'
+import { setChild } from '../utils/setters'
 // import { isArray } from '../utils/lang'
-import { BaseNode } from './ssr.obj'
-import { createHTMLNode } from '../utils/creators.ssr'
+import { BaseNode } from '../ssr/base_node'
+
 import { $$, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'
 import { isFunction } from '../utils/lang'
 
 export const renderToString = (child: Child): string => {
     // Create a container for SSR using HTMLNode
-    const container = createHTMLNode('div')
+    const container = document.createElement('div')
     const stack = new Error()
 
     // Use a fragment for the root

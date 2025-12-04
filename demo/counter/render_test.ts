@@ -1,5 +1,7 @@
 // Test to mimic what happens in renderToString
-import { createHTMLNode, createText } from 'woby/ssr'
+import { getEnv } from 'woby/ssr'
+
+const { createHTMLNode, createText } = getEnv()
 
 // Create a container
 const container = createHTMLNode('div')

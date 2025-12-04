@@ -10,16 +10,18 @@
 
 import { untrack } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
-import { createComment, createHTMLNode, createSVGNode, createText } from '../utils/creators'
-import { createHTMLNode as createHTMLNodeSSR, createSVGNode as createSVGNodeSSR } from '../utils/creators.ssr'
+import { getEnv } from '../utils/creators'
+
+const { createComment, createHTMLNode, createSVGNode, createText } = getEnv()
+import { document } from '../ssr/document'
 import { isClass, isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters'
-import { setChild as setChildSSR, setProps as setPropsSSR } from '../utils/setters.ssr'
+import { setChild as setChildSSR, setProps as setPropsSSR } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { customElement } from './custom_element'
 import { Stack } from 'soby'
-import { customElements as ces } from './ssr.obj'
+import { customElements as ces } from '../ssr/custom_elements'
 import { isSSR } from '../constants'
 
 if (isSSR) globalThis.customElements = ces as any
@@ -87,7 +89,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         } else if (isString(component)) {
 
             const isSVG = isSVGElement(component)
-            const createNode = isSVG ? createSVGNodeSSR : createHTMLNodeSSR
+            const createNode = isSVG ? ((tagName: string) => document.createElementNS('http://www.w3.org/2000/svg', tagName)) : document.createElement
 
             return wrapElement((): Child => {
                 // Check if we're in SSR mode (no customElements API)

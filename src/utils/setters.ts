@@ -8,7 +8,9 @@ import { untrack } from '../methods/soby'
 import { context, with as _with, batch, Observable, SYMBOL_OBSERVABLE_WRITABLE } from '../soby'
 import { SYMBOL_STORE_OBSERVABLE } from '../soby'
 import { classesToggle } from '../utils/classlist'
-import { createText, createComment } from '../utils/creators'
+import { getEnv } from '../utils/creators'
+
+const { createText, createComment } = getEnv()
 import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isObject, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'

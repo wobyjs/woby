@@ -1,5 +1,7 @@
 // Test to understand how resolver works with multiple children
-import { createHTMLNode, createText } from 'woby/ssr'
+import { getEnv } from 'woby/ssr'
+
+const { createHTMLNode, createText } = getEnv()
 
 // Create a simple setter function to see what gets passed to it
 const testSetter = (value: any, dynamic: boolean, stack: any) => {

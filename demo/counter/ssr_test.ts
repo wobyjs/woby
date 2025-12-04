@@ -1,6 +1,8 @@
 // Test using SSR-specific files directly
-import { createHTMLNode, createText } from 'woby/ssr'
+import { getEnv } from 'woby/ssr'
 import { renderToString } from 'woby/ssr'
+
+const { createHTMLNode, createText } = getEnv()
 
 // Test renderToString with a simple component
 const testComponent = () => {
