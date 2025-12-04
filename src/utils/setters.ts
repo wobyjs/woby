@@ -306,7 +306,7 @@ export const getSetters = (env?: Env) => {
 
                     setChildStatic(parent, fragment, fragmentOnly, child, dynamic, children[i] as any, stack)
 
-                }, false, stack)
+                }, false, stack, env)
 
             }
 
@@ -396,7 +396,7 @@ export const getSetters = (env?: Env) => {
 
         if (!fragmentOnly) {
 
-            diff(parent, prev, next, prevSibling)
+            diff(parent, prev, next, prevSibling, env)
 
         }
 
@@ -406,7 +406,7 @@ export const getSetters = (env?: Env) => {
 
     const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
         const cd = child
-        resolveChild(cd, (child, dynamic, stack) => setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack), false, stack)
+        resolveChild(cd, (child, dynamic, stack) => setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack), false, stack, env)
     }
 
     const setClassStatic = classesToggle
@@ -663,9 +663,11 @@ export const getSetters = (env?: Env) => {
         }
 
         const delegate = (event: string): void => {
+
             const key = `_${event}`
 
             document.addEventListener(event.slice(2), event => {
+
                 const targets = event.composedPath()
                 let target: EventTarget | null = null
 
@@ -677,6 +679,7 @@ export const getSetters = (env?: Env) => {
                 })
 
                 for (let i = 0, l = targets.length; i < l; i++) {
+
                     target = targets[i]
                     const handler = target[key]
 
@@ -685,10 +688,13 @@ export const getSetters = (env?: Env) => {
                     handler(event)
 
                     if (event.cancelBubble) break
+
                 }
 
                 target = null
+
             })
+
         }
 
         return (element: HTMLElement, event: string, value: null | undefined | EventListener): void => {
@@ -836,7 +842,6 @@ export const getSetters = (env?: Env) => {
         }
 
     }
-
 
 
     const setStyleStatic = (() => {
@@ -1091,6 +1096,7 @@ export const getSetters = (env?: Env) => {
                 setAttribute(element, key, value, stack)
 
             }
+
         }
 
     }
@@ -1110,4 +1116,5 @@ export const getSetters = (env?: Env) => {
         setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective,
         setEvent, setHTML, setProperty, setStyles, setTemplateAccessor, setProp, setProps
     }
+
 }

@@ -16,15 +16,15 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { getEnv } from "./creators"
+import { Env, getEnv } from "./creators"
 
 /* MAIN */
 
 // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
 
 
-const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null): void => {
-  const { createComment } = getEnv('via')
+const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null, env?: Env): void => {
+  const { createComment } = getEnv(env || 'via')
 
   const dummyNode = createComment('')
   const beforeDummyWrapper: [Node] = [dummyNode]

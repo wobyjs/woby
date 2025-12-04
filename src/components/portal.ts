@@ -3,15 +3,15 @@ import { useBoolean } from '../hooks/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { render } from '../methods/render'
 import { $$ } from '../methods/soby'
-import { getEnv } from '../utils/creators'
+import { Env, getEnv } from '../utils/creators'
 
 import { document } from '../ssr/document'
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 
 
-export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children?: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
-    const { createHTMLNode } = getEnv()
+export const Portal = ({ when = true, mount, wrapper, children, env }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children?: Child, env?: Env }): ChildWithMetadata<{ portal: HTMLElement }> => {
+    const { createHTMLNode } = getEnv(env)
 
     const portal = $$(wrapper) || (isSSR ? document.createElement('div') : createHTMLNode('div'))
 

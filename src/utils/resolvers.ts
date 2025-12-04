@@ -2,7 +2,7 @@ import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE
 import { isObservable } from '../methods/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { $$ } from '../methods/soby'
-import { getEnv } from '../utils/creators'
+import { Env, getEnv } from '../utils/creators'
 
 import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
@@ -26,10 +26,10 @@ import { Observable, Stack } from '../soby'
 //   return true
 // }
 
-export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
+export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack, env: Env = 'browser'): void => {
   if (isArray(value)) {
 
-    const [values, hasObservables] = resolveArraysAndStatics(value)
+    const [values, hasObservables] = resolveArraysAndStatics(env)(value)
 
     values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED] // Preserving this special symbol
 
@@ -44,7 +44,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
 
       const newValue = $$(value)
       // if (!replaceSelf(value as any, newValue as any))
-      resolveChild(newValue, setter, _dynamic, stack)
+      resolveChild(newValue, setter, _dynamic, stack, env)
 
     } else {
 
@@ -55,7 +55,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
 
         const newValue = $$(value)
         // if (!replaceSelf(value as any, newValue as any))
-        resolveChild(newValue, setter, true, stack)
+        resolveChild(newValue, setter, true, stack, env)
 
       }, stack)
 
@@ -144,8 +144,8 @@ export const resolveStyle = (styles: Styles, resolved: Record<string, null | und
 
 }
 
-export const resolveArraysAndStatics = (() => {
-  const { createText } = getEnv()
+export const resolveArraysAndStatics = (env: Env) => {
+  const { createText } = getEnv(env)
 
   // This function does 3 things:
   // 1. It deeply flattens the array, only if actually needed though (!)
@@ -199,4 +199,4 @@ export const resolveArraysAndStatics = (() => {
 
   }
 
-})()
+}

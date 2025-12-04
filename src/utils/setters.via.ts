@@ -8,8 +8,7 @@ import { untrack } from '../methods/soby'
 import { context, with as _with, isObservable, SYMBOL_OBSERVABLE_WRITABLE } from 'soby'
 import { SYMBOL_STORE_OBSERVABLE } from 'soby'
 import { classesToggle } from '../utils/classlist'
-import { createText } from '../utils/creators.via'
-import diff from '../utils/diff.via'
+import { getEnv } from '../utils/creators'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers.via'
@@ -21,7 +20,8 @@ import { Stack } from '../soby'
 type Env = 'ssr' | 'browser' | 'via'
 
 export const getSetters = (env?: Env) => {
-    // For via environment, we use the imported createText directly
+    const { createText } = getEnv(env)
+
 
     const setAttributeStatic = (() => {
 

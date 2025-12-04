@@ -34,7 +34,7 @@
  * @module diff
  */
 
-import { getEnv } from "./creators"
+import { Env, getEnv } from "./creators"
 
 
 /**
@@ -59,8 +59,8 @@ import { getEnv } from "./creators"
  * // This will efficiently insert nodeC before nodeA, and append nodeD
  * ```
  */
-export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null): void => {
-  const { createComment } = getEnv()
+export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null, env: Env): void => {
+  const { createComment } = getEnv(env)
 
   // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
 
