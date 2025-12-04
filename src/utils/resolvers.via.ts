@@ -5,7 +5,6 @@ import { $$ } from '../methods/soby'
 import { isArray, isFunction, isString, isProxy, fixBigInt, toArray } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { getEnv } from '../utils/creators'
-const { createText, createComment, createHTMLNode } = getEnv('via')
 import { IgnoreSymbols } from 'via.js'
 import { Stack } from '../soby'
 
@@ -13,6 +12,8 @@ const HTMLValue = Symbol('HtmlValue')
 IgnoreSymbols[HTMLValue] = HTMLValue
 
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic?: boolean, stack?: Error): T | T[] => {
+    const { createText, createComment, createHTMLNode } = getEnv('via')
+
     const updateElement = (/** null placeholder */e: Text, f: boolean, v: any, pv: HTMLElement[] /** in proxy */) => {
         e.textContent = ''
 
@@ -219,6 +220,7 @@ export const resolveStyle = (styles: Styles, resolved: Record<string, null | und
 }
 
 export const resolveArraysAndStatics = (() => {
+    const { createText, createComment, createHTMLNode } = getEnv('via')
 
     // This function does 3 things:
     // 1. It deeply flattens the array, only if actually needed though (!)

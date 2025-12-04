@@ -17,17 +17,19 @@
  */
 
 import { getEnv } from "./creators"
-const { createComment } = getEnv('via')
 
 /* MAIN */
 
 // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
 
-const dummyNode = createComment('')
-const beforeDummyWrapper: [Node] = [dummyNode]
-const afterDummyWrapper: [Node] = [dummyNode]
 
 const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null): void => {
+  const { createComment } = getEnv('via')
+
+  const dummyNode = createComment('')
+  const beforeDummyWrapper: [Node] = [dummyNode]
+  const afterDummyWrapper: [Node] = [dummyNode]
+
   if (before === after) return
   if (before instanceof Node) {
     if (after instanceof Node) {

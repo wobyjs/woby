@@ -3,11 +3,11 @@ import { useRenderEffect } from '../hooks/use_render_effect'
 import { render } from '../methods/render.via'
 import { $$ } from '../methods/soby'
 import { getEnv } from '../utils/creators'
-const { createHTMLNode } = getEnv('via')
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 
 export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
+  const { createHTMLNode } = getEnv('via')
 
   const portal = $$(wrapper) || createHTMLNode('div')
 
