@@ -74,7 +74,7 @@ export {
     once,
     fixBigInt,
     toArray,
-    setProp,
+    // setProp,
     resolveArraysAndStatics
 } from './utils'
 export * from "./constants"

@@ -5,13 +5,13 @@ import { render } from '../methods/render'
 import { $$ } from '../methods/soby'
 import { getEnv } from '../utils/creators'
 
-const { createHTMLNode } = getEnv()
 import { document } from '../ssr/document'
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 
 
 export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children?: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
+    const { createHTMLNode } = getEnv()
 
     const portal = $$(wrapper) || (isSSR ? document.createElement('div') : createHTMLNode('div'))
 

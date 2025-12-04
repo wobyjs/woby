@@ -1,7 +1,6 @@
 import { FragmentUtils } from '../utils/fragment'
 import type { Child } from '../types'
-import { setChild } from '../utils/setters'
-// import { isArray } from '../utils/lang'
+import { getSetters } from '../utils/setters'
 import { BaseNode } from '../ssr/base_node'
 
 import { $$, resolve } from './soby'
@@ -9,6 +8,7 @@ import { SYMBOL_CLONE } from '../constants'
 import { isFunction } from '../utils/lang'
 
 export const renderToString = (child: Child): string => {
+    const { setChild } = getSetters('ssr')
     // Create a container for SSR using HTMLNode
     const container = document.createElement('div')
     const stack = new Error()

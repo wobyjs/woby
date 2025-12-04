@@ -2,7 +2,6 @@
  * Mock document object for SSR
  */
 
-import { isSSR } from "../constants"
 import { BaseNode } from "./base_node"
 import type { FN } from "../types"
 
@@ -199,7 +198,6 @@ export const document = {
         return this._eventListeners.get(type) || []
     },
 
-    // Creator functions as methods on document
     createComment,
     createElement: createHTMLNode,
     createElementNS: ((namespaceURI: string, qualifiedName: string) => {
@@ -215,7 +213,3 @@ export const document = {
     body
 }
 
-// Assign to globalThis if in SSR environment
-if (isSSR) {
-    globalThis.document = document as any
-}

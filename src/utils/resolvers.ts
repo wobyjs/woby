@@ -4,7 +4,6 @@ import { useRenderEffect } from '../hooks/use_render_effect'
 import { $$ } from '../methods/soby'
 import { getEnv } from '../utils/creators'
 
-const { createText } = getEnv()
 import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { Observable, Stack } from '../soby'
@@ -146,6 +145,7 @@ export const resolveStyle = (styles: Styles, resolved: Record<string, null | und
 }
 
 export const resolveArraysAndStatics = (() => {
+  const { createText } = getEnv()
 
   // This function does 3 things:
   // 1. It deeply flattens the array, only if actually needed though (!)

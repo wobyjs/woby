@@ -3,7 +3,7 @@
 import { SYMBOL_TEMPLATE_ACCESSOR } from '../constants'
 import { wrapElement } from '../methods/wrap_element'
 import { assign, indexOf, isFunction, isString } from '../utils/lang'
-import { setAttribute, setChildReplacement, setClasses, setEvent, setHTML, setProperty, setRef, setStyles } from '../utils/setters'
+import { getSetters, setRef, } from '../utils/setters'
 import type { Child, TemplateActionPath, TemplateActionWithNodes, TemplateActionWithPaths, TemplateVariableProperties, TemplateVariableData, TemplateVariablesMap } from '../types'
 
 
@@ -12,6 +12,7 @@ import type { Child, TemplateActionPath, TemplateActionWithNodes, TemplateAction
 //TODO: Support argumentless calls on props, like props.foo.bar()
 
 export const template = <P = {}>(fn: ((props: P) => Child)): ((props: P) => () => Child) => {
+  const { setAttribute, setChildReplacement, setClasses, setEvent, setHTML, setProperty, setStyles } = getSetters()
 
   const safePropertyRe = /^[a-z0-9-_]+$/i
 

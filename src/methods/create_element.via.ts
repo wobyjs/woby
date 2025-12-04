@@ -1,10 +1,9 @@
-
-
 import { untrack } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
-import { createHTMLNode, createSVGNode } from '../utils/creators.via'
+import { getEnv } from '../utils/creators'
 import { isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
-import { setChild, setProps } from '../utils/setters.via'
+import { getSetters } from '../utils/setters.via'
+const { setChild, setProps } = getSetters('via')
 import type { Child, Component, Element, Props } from '../types'
 import { IgnoreSymbols } from 'via.js'
 import { FragmentUtils } from '../utils/fragment'
@@ -18,6 +17,8 @@ IgnoreSymbols[IsSvgSymbol] = IsSvgSymbol
 // It's important to wrap components, so that they can be executed in the right order, from parent to child, rather than from child to parent in some cases
 
 export const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]): Element => {
+    const { createHTMLNode, createSVGNode } = getEnv('via')
+
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)
 

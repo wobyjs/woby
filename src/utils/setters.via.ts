@@ -18,296 +18,295 @@ import { __ArgsSymbol } from 'via.js'
 import { IsSvgSymbol } from '../methods/create_element.via'
 import { Stack } from '../soby'
 
+type Env = 'ssr' | 'browser' | 'via'
 
-// import createElement from '../methods/create_element.via'
+export const getSetters = (env?: Env) => {
+    // For via environment, we use the imported createText directly
 
+    const setAttributeStatic = (() => {
 
-export const debugHTML = (p: HTMLElement, name: string) => {
-    if (p)
-        (async () => {
-            const nn = await get(p.nodeName)
-            const nt = await get(p.nodeType)
-            const html = await get(p.outerHTML)
-            console.log(name, p, nn, nt, html)
-        })()
-}
+        const attributesBoolean = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls', 'default', 'disabled', 'formnovalidate', 'hidden', 'indeterminate', 'ismap', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open', 'playsinline', 'readonly', 'required', 'reversed', 'seamless', 'selected'])
+        // const attributeCamelCasedRe = /e(r[HRWrv]|[Vawy])|Con|l(e[Tcs]|c)|s(eP|y)|a(t[rt]|u|v)|Of|Ex|f[XYa]|gt|hR|d[Pg]|t[TXYd]|[UZq]/ //URL: https://regex101.com/r/I8Wm4S/1
+        // const attributesCache: Record<string, string> = {}
+        // const uppercaseRe = /[A-Z]/g
 
-export const setAttributeStatic = (() => {
+        // const normalizeKeySvg = (key: string): string => {
 
-    const attributesBoolean = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls', 'default', 'disabled', 'formnovalidate', 'hidden', 'indeterminate', 'ismap', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open', 'playsinline', 'readonly', 'required', 'reversed', 'seamless', 'selected'])
-    // const attributeCamelCasedRe = /e(r[HRWrv]|[Vawy])|Con|l(e[Tcs]|c)|s(eP|y)|a(t[rt]|u|v)|Of|Ex|f[XYa]|gt|hR|d[Pg]|t[TXYd]|[UZq]/ //URL: https://regex101.com/r/I8Wm4S/1
-    // const attributesCache: Record<string, string> = {}
-    // const uppercaseRe = /[A-Z]/g
+        //     return attributesCache[key] || (attributesCache[key] = attributeCamelCasedRe.test(key) ? key : key.replace(uppercaseRe, char => `-${char.toLowerCase()}`))
 
-    // const normalizeKeySvg = (key: string): string => {
-
-    //     return attributesCache[key] || (attributesCache[key] = attributeCamelCasedRe.test(key) ? key : key.replace(uppercaseRe, char => `-${char.toLowerCase()}`))
-
-    // }
-
-    return (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
-
-        // put in via
-        // if (isSVG(element) && !isProxy(element)) {
-
-        //     key = (key === 'xlinkHref' || key === 'xlink:href') ? 'href' : normalizeKeySvg(key)
-
-        //     if (isNil(value) || ((value === false) && attributesBoolean.has(key))) {
-
-        //         element.removeAttribute(key)
-
-        //     } else {
-        //         element.setAttribute(key, String(value))
-        //     }
-
-        // } else {
-
-        if (isNil(value) || (value === false && attributesBoolean.has(key))) {
-
-            element.removeAttribute(key)
-
-        } else {
-            value = (value === true) ? '' : String(value)
-            element.setAttribute(key, value)
-        }
         // }
-    }
 
-})()
+        return (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
 
-export const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
+            // put in via
+            // if (isSVG(element) && !isProxy(element)) {
 
-    if (isFunction(value)) {
+            //     key = (key === 'xlinkHref' || key === 'xlink:href') ? 'href' : normalizeKeySvg(key)
 
-        if (isObservable(value)) {
-            // Check if value is an observable with toHtml option
-            if (isObservable(value) && value[SYMBOL_OBSERVABLE_WRITABLE]?.options?.toHtml) {
-                useRenderEffect(() => {
-                    const unwrappedValue = value()
-                    const options = value[SYMBOL_OBSERVABLE_WRITABLE].options
-                    const htmlValue = options.toHtml(unwrappedValue)
-                    setAttributeStatic(element, key, htmlValue)
-                }, stack)
+            //     if (isNil(value) || ((value === false) && attributesBoolean.has(key))) {
+
+            //         element.removeAttribute(key)
+
+            //     } else {
+
+            //         element.setAttribute(key, String(value))
+
+            //     }
+
+            // } else {
+
+            if (isNil(value) || (value === false && attributesBoolean.has(key))) {
+
+                element.removeAttribute(key)
+
             } else {
-                useRenderEffect(() => {
-                    setAttributeStatic(element, key, value())
-                }, stack)
-            }
-        } else {
 
-            setAttributeStatic(element, key, value())
+                value = (value === true) ? '' : String(value)
+                element.setAttribute(key, value)
+
+            }
+            // }
 
         }
 
-    } else {
+    })()
 
-        setAttributeStatic(element, key, value)
+    const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
+
+        if (isFunction(value)) {
+
+            if (isObservable(value)) {
+                // Check if value is an observable with toHtml option
+                if (isObservable(value) && value[SYMBOL_OBSERVABLE_WRITABLE]?.options?.toHtml) {
+                    useRenderEffect(() => {
+                        const unwrappedValue = value()
+                        const options = value[SYMBOL_OBSERVABLE_WRITABLE].options
+                        const htmlValue = options.toHtml(unwrappedValue)
+                        setAttributeStatic(element, key, htmlValue)
+                    }, stack)
+                } else {
+                    useRenderEffect(() => {
+                        setAttributeStatic(element, key, value())
+                    }, stack)
+                }
+            } else {
+
+                setAttributeStatic(element, key, value())
+
+            }
+
+        } else {
+
+            setAttributeStatic(element, key, value)
+
+        }
 
     }
 
-}
+    const setChildStatic = (parent: HTMLElement, child: Child, dynamic: boolean, stack: Stack) => {
 
-export const setChildStatic = (parent: HTMLElement, child: Child, dynamic: boolean, stack: Stack) => {
+        if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
-    if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
+        if (isArray(child)) {
+            const children = (isArray(child) ? child : [child]) as Node[] //TSC
 
-    if (isArray(child)) {
-        const children = (isArray(child) ? child : [child]) as Node[] //TSC
-
-        const cs: any[] = children.map(c => resolveChild(c, null, false, stack)).flat(Infinity)
-        parent.replaceChildren(...cs)
+            const cs: any[] = children.map(c => resolveChild(c, null, false, stack)).flat(Infinity)
+            parent.replaceChildren(...cs)
+        }
+        else {
+            const c = resolveChild(child, null, false, stack)
+            // debugHTML(parent, "setChildStatic")
+            //@ts-ignore
+            parent.replaceChildren(...[c].flat(Infinity) as any)
+        }
     }
-    else {
-        const c = resolveChild(child, null, false, stack)
-        // debugHTML(parent, "setChildStatic")
-        //@ts-ignore
-        parent.replaceChildren(...[c].flat(Infinity) as any)
+
+    const setChild = (parent: HTMLElement, child: Child, stack: Stack) => {
+        setChildStatic(parent, child, false, stack)
     }
-}
 
-export const setChild = (parent: HTMLElement, child: Child, stack: Stack) => {
-    setChildStatic(parent, child, false, stack)
-}
+    const setClassStatic = classesToggle
 
-export const setClassStatic = classesToggle
+    const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>, stack: Stack): void => {
 
-export const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>, stack: Stack): void => {
+        if (isFunction(value)) {
 
-    if (isFunction(value)) {
+            if (isObservable(value)) {
 
-        if (isObservable(value)) {
+                useRenderEffect(() => {
 
-            useRenderEffect(() => {
+                    setClassStatic(element, key, value())
+
+                }, stack)
+
+            } else {
 
                 setClassStatic(element, key, value())
 
-            }, stack)
+            }
 
         } else {
 
-            setClassStatic(element, key, value())
+            setClassStatic(element, key, value)
 
         }
 
-    } else {
+    }
 
-        setClassStatic(element, key, value)
+    const setClassBooleanStatic = (element: HTMLElement, value: boolean, key: null | undefined | boolean | string, keyPrev?: null | undefined | boolean | string): void => {
+
+        if (keyPrev && keyPrev !== true) {
+
+            setClassStatic(element, keyPrev, false)
+
+        }
+
+        if (key && key !== true) {
+
+            setClassStatic(element, key, value)
+
+        }
 
     }
 
-}
+    const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>, stack: Stack): void => {
 
-export const setClassBooleanStatic = (element: HTMLElement, value: boolean, key: null | undefined | boolean | string, keyPrev?: null | undefined | boolean | string): void => {
+        if (isFunction(key)) {
 
-    if (keyPrev && keyPrev !== true) {
+            if (isObservable(key)) {
 
-        setClassStatic(element, keyPrev, false)
+                let keyPrev: null | undefined | boolean | string
 
-    }
+                useRenderEffect(() => {
 
-    if (key && key !== true) {
+                    const keyNext = (key as Function)()
 
-        setClassStatic(element, key, value)
+                    setClassBooleanStatic(element, value, keyNext, keyPrev)
 
-    }
+                    keyPrev = keyNext
 
-}
+                }, stack)
 
-export const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>, stack: Stack): void => {
+            } else {
 
-    if (isFunction(key)) {
+                setClassBooleanStatic(element, value, key())
 
-        if (isObservable(key)) {
-
-            let keyPrev: null | undefined | boolean | string
-
-            useRenderEffect(() => {
-
-                const keyNext = (key as Function)()
-
-                setClassBooleanStatic(element, value, keyNext, keyPrev)
-
-                keyPrev = keyNext
-
-            }, stack)
+            }
 
         } else {
 
-            setClassBooleanStatic(element, value, key())
+            setClassBooleanStatic(element, value, key)
 
         }
-    } else {
-
-        setClassBooleanStatic(element, value, key)
 
     }
 
-}
+    const setClassesStatic = (element: HTMLElement, object: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, objectPrev: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, stack: Stack): void => {
 
-export const setClassesStatic = (element: HTMLElement, object: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, objectPrev: null | undefined | string | FunctionMaybe<null | undefined | boolean | string>[] | Record<string, FunctionMaybe<null | undefined | boolean>>, stack: Stack): void => {
+        if (isString(object)) {
 
-    if (isString(object)) {
+            if (isSVG(element)) {
 
-        if (isSVG(element)) {
+                element.setAttribute('class', object as string)
 
-            element.setAttribute('class', object as string)
+            } else {
+
+                element.className = object
+
+            }
 
         } else {
 
-            element.className = object
+            if (objectPrev) {
 
-        }
+                if (isString(objectPrev)) {
 
-    } else {
+                    if (objectPrev) {
 
-        if (objectPrev) {
+                        if (isSVG(element)) {
 
-            if (isString(objectPrev)) {
+                            element.setAttribute('class', '')
 
-                if (objectPrev) {
+                        } else {
 
-                    if (isSVG(element)) {
+                            element.className = ''
 
-                        element.setAttribute('class', '')
+                        }
 
-                    } else {
+                    }
 
-                        element.className = ''
+                } else if (isArray(objectPrev)) {
+
+                    objectPrev = store(objectPrev, { unwrap: true } as any)
+
+                    for (let i = 0, l = objectPrev.length as number; i < l; i++) {
+
+                        if (!objectPrev[i]) continue
+
+                        setClassBoolean(element, false, objectPrev[i], stack)
+
+                    }
+
+                } else {
+
+                    objectPrev = store(objectPrev, { unwrap: true } as any)
+
+                    for (const key in objectPrev as any) {
+
+                        if (object && key in (object as any)) continue
+
+                        setClass(element, key, false, stack)
 
                     }
 
                 }
 
-            } else if (isArray(objectPrev)) {
-
-                objectPrev = store(objectPrev, { unwrap: true } as any)
-
-                for (let i = 0, l = objectPrev.length as number; i < l; i++) {
-
-                    if (!objectPrev[i]) continue
-
-                    setClassBoolean(element, false, objectPrev[i], stack)
-
-                }
-
-            } else {
-
-                objectPrev = store(objectPrev, { unwrap: true } as any)
-
-                for (const key in objectPrev as any) {
-
-                    if (object && key in (object as any)) continue
-
-                    setClass(element, key, false, stack)
-
-                }
-
             }
 
-        }
+            if (isArray(object)) {
 
-        if (isArray(object)) {
+                if (isStore(object)) {
 
-            if (isStore(object)) {
+                    for (let i = 0, l = object.length; i < l; i++) {
 
-                for (let i = 0, l = object.length; i < l; i++) {
+                        const fn = untrack(() => isFunction(object[i]) ? object[i] : (object[SYMBOL_STORE_OBSERVABLE] as Function)(String(i))) as (() => string | boolean | null | undefined) //TSC
 
-                    const fn = untrack(() => isFunction(object[i]) ? object[i] : (object[SYMBOL_STORE_OBSERVABLE] as Function)(String(i))) as (() => string | boolean | null | undefined) //TSC
+                        setClassBoolean(element, true, fn, stack)
 
-                    setClassBoolean(element, true, fn, stack)
+                    }
 
-                }
+                } else {
 
-            } else {
+                    //@ts-ignore
+                    for (let i = 0, l = object.length; i < l; i++) {
 
-                //@ts-ignore
-                for (let i = 0, l = object.length; i < l; i++) {
+                        if (!object[i]) continue
 
-                    if (!object[i]) continue
+                        setClassBoolean(element, true, object[i], stack)
 
-                    setClassBoolean(element, true, object[i], stack)
-
-                }
-
-            }
-
-        } else {
-
-            if (isStore(object)) {
-
-                for (const key in object as any) {
-
-                    const fn = untrack(() => isFunction(object[key]) ? object[key] : (object as any)[SYMBOL_STORE_OBSERVABLE](key)) as (() => boolean | null | undefined) //TSC
-
-                    setClass(element, key, fn, stack)
+                    }
 
                 }
 
             } else {
 
-                for (const key in object as any) {
+                if (isStore(object)) {
 
-                    setClass(element, key, object[key], stack)
+                    for (const key in object as any) {
+
+                        const fn = untrack(() => isFunction(object[key]) ? object[key] : (object as any)[SYMBOL_STORE_OBSERVABLE](key)) as (() => boolean | null | undefined) //TSC
+
+                        setClass(element, key, fn, stack)
+
+                    }
+
+                } else {
+
+                    for (const key in object as any) {
+
+                        setClass(element, key, object[key], stack)
+
+                    }
 
                 }
 
@@ -317,263 +316,295 @@ export const setClassesStatic = (element: HTMLElement, object: null | undefined 
 
     }
 
-}
+    const setClasses = (element: HTMLElement, object: Classes, stack: Stack): void => {
 
-export const setClasses = (element: HTMLElement, object: Classes, stack: Stack): void => {
+        /* RECURSIVE IMPLEMENTATION */
 
-    /* RECURSIVE IMPLEMENTATION */
+        if (isFunction(object) || isArray(object)) {
 
-    if (isFunction(object) || isArray(object)) {
-
-        let objectPrev: Record<string, boolean> | undefined
-
-        useRenderEffect(() => {
-
-            const objectNext = resolveClass(object)
-
-            setClassesStatic(element, objectNext, objectPrev, stack)
-
-            objectPrev = objectNext
-
-        }, stack)
-
-    } else {
-
-        setClassesStatic(element, object, null, stack)
-
-    }
-
-}
-
-
-export const setDirective = <T extends unknown[]>(element: HTMLElement, directive: string, args: T): void => {
-
-    const symbol = SYMBOLS_DIRECTIVES[directive] || Symbol()
-    const data = context<DirectiveData<T>>(symbol) || DIRECTIVES[symbol]
-
-    if (!data) throw new Error(`Directive "${directive}" not found`)
-
-    const call = () => data.fn(element, ...castArray(args) as any) //TSC
-
-    const stack = new Error()
-
-    if (data.immediate) {
-
-        call()
-
-    } else {
-
-        useMicrotask(call, stack)
-
-    }
-
-}
-
-
-export const setEventStatic = (() => {
-
-    //TODO: Maybe delegate more events: [onmousemove, onmouseout, onmouseover, onpointerdown, onpointermove, onpointerout, onpointerover, onpointerup, ontouchend, ontouchmove, ontouchstart]
-
-    // const delegatedEvents = <const>{
-    //     onauxclick: ['_onauxclick', false],
-    //     onbeforeinput: ['_onbeforeinput', false],
-    //     onclick: ['_onclick', false],
-    //     ondblclick: ['_ondblclick', false],
-    //     onfocusin: ['_onfocusin', false],
-    //     onfocusout: ['_onfocusout', false],
-    //     oninput: ['_oninput', false],
-    //     onkeydown: ['_onkeydown', false],
-    //     onkeyup: ['_onkeyup', false],
-    //     onmousedown: ['_onmousedown', false],
-    //     onmouseup: ['_onmouseup', false]
-    // }
-
-    // const delegate = (event: string): void => {
-
-    //     const key = `_${event}`
-
-    //     via.document.addEventListener(event.slice(2), async event => {
-
-    //         const targets = event.composedPath()
-    //         const target = targets[0] || document
-
-    //         Object.defineProperty(event, 'currentTarget', {
-    //             configurable: true,
-    //             get() {
-    //                 return target
-    //             }
-    //         })
-
-    //         for (let i = 0, l = targets.length; i < l; i++) {
-
-    //             const handler = targets[i][key]
-
-    //             if (!handler) continue
-
-    //             handler(event)
-
-    //             if (event.cancelBubble) break
-    //         }
-    //     })
-    // }
-
-    return (element: HTMLElement, event: string, value: null | undefined | EventListener): void => {
-
-        // const delegated = delegatedEvents[event]
-
-        // if (delegated) {
-
-        //     if (!delegated[1]) { // Not actually delegating yet
-
-        //         delegated[1] = true
-
-        //         delegate(event)
-
-        //     }
-
-        //     element[delegated[0]] = value
-
-        // } else
-        // if (event.endsWith('passive')) {
-
-        //     const isCapture = event.endsWith('capturepassive')
-        //     const type = event.slice(0, -7 - (isCapture ? 7 : 0)) //on already chopped
-        //     const key = `_${event}`
-
-        //     if (preId) {
-        //         const valuePrev = self.Via.getIdToCallback(preId)
-        //         element.removeEventListener(type, valuePrev as any, { capture: isCapture })
-        //     }
-
-        //     if (value) {
-        //         const f = element.addEventListener
-        //         f(type, value, { passive: true, capture: isCapture })
-        //         preId = f[__ArgsSymbol][1]
-        //     }
-
-        //     element[key] = value
-
-        // } else if (event.endsWith('capture')) {
-
-        //     const type = event.slice(0, -7) //on already chopped
-        //     const key = `_${event}`
-
-        //     if (preId) {
-        //         console.log('removeEventListener preId ', preId)
-        //         const valuePrev = self.Via.getIdToCallback(preId)
-        //         element.removeEventListener(type, valuePrev as any, { capture: true })
-        //     }
-
-        //     if (value) {
-        //         const f = element.addEventListener
-        //         f(type, value, { capture: true })
-        //         preId = f[__ArgsSymbol][1]
-        //     }
-
-        //     element[key] = value
-
-        // } else {
-        //     if (preId) {
-        //         const valuePrev = self.Via.getIdToCallback(preId)
-        //         element.removeEventListener(event, valuePrev as any)
-        //     }
-
-        //     if (value) {
-        //         const f = element.addEventListener
-        //         f(event, value)
-        //         preId = f[__ArgsSymbol][1]
-        //     }
-
-        //     element[event] = value
-        // }
-
-        // const valuePrev = element[event]
-
-        // if (valuePrev) element.removeEventListener(event, valuePrev)
-
-        // if (value) element.addEventListener(event, value)
-
-        element[event] = value
-    }
-
-})()
-
-
-export const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>): void => {
-
-    setEventStatic(element, event, value as any)
-
-}
-
-export const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | string): void => {
-
-    element.innerHTML = String(isNil(value) ? '' : value)
-
-}
-
-export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
-
-    useRenderEffect(() => {
-
-        setHTMLStatic(element, $$($$(value).__html))
-
-    }, stack)
-
-}
-
-export const setPropertyStatic = (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
-
-    if (key === 'tabIndex' && isBoolean(value)) {
-
-        value = value ? 0 : undefined
-
-    }
-
-    if (key === 'value') {
-
-        if (element.tagName === 'PROGRESS') {
-
-            value ??= null
-
-        } else if (element.tagName === 'SELECT' && !element['_$inited']) {
-
-            element['_$inited'] = true
-
-            queueMicrotask(() => element[key] = value)
-
-        }
-
-    }
-
-    try { // Trying setting the property
-
-        element[key] = value
-
-        // if ( isNil ( value ) ) {
-
-        //   setAttributeStatic ( element, key, null );
-
-        // }
-
-    } catch { // If it fails, maybe because like HTMLInputElement.form there's only a getter, we try as an attribute instead //TODO: Figure out something better than this
-
-        setAttributeStatic(element, key, value)
-
-    }
-
-}
-
-export const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
-
-    if (isFunction(value) && isFunctionReactive(value)) {
-
-        if (isObservable(value)) {
+            let objectPrev: Record<string, boolean> | undefined
 
             useRenderEffect(() => {
 
-                setPropertyStatic(element, key, value())
+                const objectNext = resolveClass(object)
+
+                setClassesStatic(element, objectNext, objectPrev, stack)
+
+                objectPrev = objectNext
 
             }, stack)
+
+        } else {
+
+            setClassesStatic(element, object, null, stack)
+
+        }
+
+    }
+
+
+    const setDirective = <T extends unknown[]>(element: HTMLElement, directive: string, args: T): void => {
+
+        const symbol = SYMBOLS_DIRECTIVES[directive] || Symbol()
+        const data = context<DirectiveData<T>>(symbol) || DIRECTIVES[symbol]
+
+        if (!data) throw new Error(`Directive "${directive}" not found`)
+
+        const call = () => data.fn(element, ...castArray(args) as any) //TSC
+
+        const stack = new Error()
+
+        if (data.immediate) {
+
+            call()
+
+        } else {
+
+            useMicrotask(call, stack)
+
+        }
+
+    }
+
+
+    const setEventStatic = (() => {
+
+        //TODO: Maybe delegate more events: [onmousemove, onmouseout, onmouseover, onpointerdown, onpointermove, onpointerout, onpointerover, onpointerup, ontouchend, ontouchmove, ontouchstart]
+
+        // const delegatedEvents = <const>{
+        //     onauxclick: ['_onauxclick', false],
+        //     onbeforeinput: ['_onbeforeinput', false],
+        //     onclick: ['_onclick', false],
+        //     ondblclick: ['_ondblclick', false],
+        //     onfocusin: ['_onfocusin', false],
+        //     onfocusout: ['_onfocusout', false],
+        //     oninput: ['_oninput', false],
+        //     onkeydown: ['_onkeydown', false],
+        //     onkeyup: ['_onkeyup', false],
+        //     onmousedown: ['_onmousedown', false],
+        //     onmouseup: ['_onmouseup', false]
+        // }
+
+        // const delegate = (event: string): void => {
+
+        //     const key = `_${event}`
+
+        //     via.document.addEventListener(event.slice(2), async event => {
+
+        //         const targets = event.composedPath()
+        //         const target = targets[0] || document
+
+        //         Object.defineProperty(event, 'currentTarget', {
+        //             configurable: true,
+        //             get() {
+        //                 return target
+        //             }
+        //         })
+
+        //         for (let i = 0, l = targets.length; i < l; i++) {
+
+        //             const handler = targets[i][key]
+
+        //             if (!handler) continue
+
+        //             handler(event)
+
+        //             if (event.cancelBubble) break
+
+        //         }
+
+        //     })
+
+        // }
+
+        return (element: HTMLElement, event: string, value: null | undefined | EventListener): void => {
+
+            // const delegated = delegatedEvents[event]
+
+            // if (delegated) {
+
+            //     if (!delegated[1]) { // Not actually delegating yet
+
+            //         delegated[1] = true
+
+            //         delegate(event)
+
+            //     }
+
+            //     element[delegated[0]] = value
+
+            // } else
+            // if (event.endsWith('passive')) {
+
+            //     const isCapture = event.endsWith('capturepassive')
+            //     const type = event.slice(0, -7 - (isCapture ? 7 : 0)) //on already chopped
+            //     const key = `_${event}`
+
+            //     if (preId) {
+
+            //         const valuePrev = self.Via.getIdToCallback(preId)
+
+            //         element.removeEventListener(type, valuePrev as any, { capture: isCapture })
+
+            //     }
+
+            //     if (value) {
+
+            //         const f = element.addEventListener
+
+            //         f(type, value, { passive: true, capture: isCapture })
+
+            //         preId = f[__ArgsSymbol][1]
+
+            //     }
+
+            //     element[key] = value
+
+            // } else if (event.endsWith('capture')) {
+
+            //     const type = event.slice(0, -7) //on already chopped
+            //     const key = `_${event}`
+
+            //     if (preId) {
+
+            //         console.log('removeEventListener preId ', preId)
+
+            //         const valuePrev = self.Via.getIdToCallback(preId)
+
+            //         element.removeEventListener(type, valuePrev as any, { capture: true })
+
+            //     }
+
+            //     if (value) {
+
+            //         const f = element.addEventListener
+
+            //         f(type, value, { capture: true })
+
+            //         preId = f[__ArgsSymbol][1]
+
+            //     }
+
+            //     element[key] = value
+
+            // } else {
+
+            //     if (preId) {
+
+            //         const valuePrev = self.Via.getIdToCallback(preId)
+
+            //         element.removeEventListener(event, valuePrev as any)
+
+            //     }
+
+            //     if (value) {
+
+            //         const f = element.addEventListener
+
+            //         f(event, value)
+
+            //         preId = f[__ArgsSymbol][1]
+
+            //     }
+
+            //     element[event] = value
+
+            // }
+
+            // const valuePrev = element[event]
+
+            // if (valuePrev) element.removeEventListener(event, valuePrev)
+
+            // if (value) element.addEventListener(event, value)
+
+            element[event] = value
+
+        }
+
+    })()
+
+
+    const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>): void => {
+
+        setEventStatic(element, event, value as any)
+
+    }
+
+    const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | string): void => {
+
+        element.innerHTML = String(isNil(value) ? '' : value)
+
+    }
+
+    const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
+
+        useRenderEffect(() => {
+
+            setHTMLStatic(element, $$($$(value).__html))
+
+        }, stack)
+
+    }
+
+    const setPropertyStatic = (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
+
+        if (key === 'tabIndex' && isBoolean(value)) {
+
+            value = value ? 0 : undefined
+
+        }
+
+        if (key === 'value') {
+
+            if (element.tagName === 'PROGRESS') {
+
+                value ??= null
+
+            } else if (element.tagName === 'SELECT' && !element['_$inited']) {
+
+                element['_$inited'] = true
+
+                queueMicrotask(() => element[key] = value)
+
+            }
+
+        }
+
+        try { // Trying setting the property
+
+            element[key] = value
+
+            // if ( isNil ( value ) ) {
+
+            //   setAttributeStatic ( element, key, null );
+
+            // }
+
+        } catch { // If it fails, maybe because like HTMLInputElement.form there's only a getter, we try as an attribute instead //TODO: Figure out something better than this
+
+            setAttributeStatic(element, key, value)
+
+        }
+
+    }
+
+    const setProperty = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
+
+        if (isFunction(value) && isFunctionReactive(value)) {
+
+            if (isObservable(value)) {
+
+                useRenderEffect(() => {
+
+                    setPropertyStatic(element, key, value())
+
+                }, stack)
+
+            } else {
+
+                setPropertyStatic(element, key, $$(value))
+
+            }
 
         } else {
 
@@ -581,75 +612,75 @@ export const setProperty = (element: HTMLElement, key: string, value: FunctionMa
 
         }
 
-    } else {
+    }
 
-        setPropertyStatic(element, key, $$(value))
+    const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null | undefined | Ref<T>)[]): void => { // Scheduling a microtask to dramatically increase the probability that the element will get connected to the DOM in the meantime, which would be more convenient
+
+        if (isNil(value)) return
+
+        const values = flatten(castArray(value)).filter(Boolean)
+
+        if (!values.length) return
+
+        const stack = new Error()
+
+        useMicrotask(() => untrack(() => values.forEach(value => value?.(element))), stack)
 
     }
 
-}
+    const setStyleStatic = (() => {
 
-export const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null | undefined | Ref<T>)[]): void => { // Scheduling a microtask to dramatically increase the probability that the element will get connected to the DOM in the meantime, which would be more convenient
+        // From Preact: https://github.com/preactjs/preact/blob/e703a62b77c9de45e886d8a7f59bd0db658318f9/src/constants.js#L3
+        // const propertyNonDimensionalRe = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
+        // From this Preact issue: https://github.com/preactjs/preact/issues/2607
+        const propertyNonDimensionalRe = /^(-|f[lo].*[^se]$|g.{5,}[^ps]$|z|o[pr]|(W.{5})?[lL]i.*(t|mp)$|an|(bo|s).{4}Im|sca|m.{6}[ds]|ta|c.*[st]$|wido|ini)/i
+        const propertyNonDimensionalCache: Partial<Record<string, boolean>> = {}
 
-    if (isNil(value)) return
+        return (element: HTMLElement, key: string, value: null | undefined | number | string): void => {
 
-    const values = flatten(castArray(value)).filter(Boolean)
+            if (key.charCodeAt(0) === 45) { // /^-/
 
-    if (!values.length) return
+                if (isNil(value)) {
 
-    const stack = new Error()
+                    element.style.removeProperty(key)
 
-    useMicrotask(() => untrack(() => values.forEach(value => value?.(element))), stack)
+                } else {
 
-}
+                    element.style.setProperty(key, String(value))
 
-export const setStyleStatic = (() => {
+                }
 
-    // From Preact: https://github.com/preactjs/preact/blob/e703a62b77c9de45e886d8a7f59bd0db658318f9/src/constants.js#L3
-    // const propertyNonDimensionalRe = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
-    // From this Preact issue: https://github.com/preactjs/preact/issues/2607
-    const propertyNonDimensionalRe = /^(-|f[lo].*[^se]$|g.{5,}[^ps]$|z|o[pr]|(W.{5})?[lL]i.*(t|mp)$|an|(bo|s).{4}Im|sca|m.{6}[ds]|ta|c.*[st]$|wido|ini)/i
-    const propertyNonDimensionalCache: Partial<Record<string, boolean>> = {}
+            } else if (isNil(value)) {
 
-    return (element: HTMLElement, key: string, value: null | undefined | number | string): void => {
-
-        if (key.charCodeAt(0) === 45) { // /^-/
-
-            if (isNil(value)) {
-
-                element.style.removeProperty(key)
+                element.style[key] = null
 
             } else {
 
-                element.style.setProperty(key, String(value))
+                element.style[key] = (isString(value) || (propertyNonDimensionalCache[key] ||= propertyNonDimensionalRe.test(key)) ? value : `${value}px`)
 
             }
 
-        } else if (isNil(value)) {
-
-            element.style[key] = null
-
-        } else {
-
-            element.style[key] = (isString(value) || (propertyNonDimensionalCache[key] ||= propertyNonDimensionalRe.test(key)) ? value : `${value}px`)
-
         }
 
-    }
+    })()
 
-})()
+    const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>, stack: Stack): void => {
 
-export const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>, stack: Stack): void => {
+        if (isFunction(value) && isFunctionReactive(value)) {
 
-    if (isFunction(value) && isFunctionReactive(value)) {
+            if (isObservable(value)) {
 
-        if (isObservable(value)) {
+                useRenderEffect(() => {
 
-            useRenderEffect(() => {
+                    setStyleStatic(element, key, value())
 
-                setStyleStatic(element, key, value())
+                }, stack)
 
-            }, stack)
+            } else {
+
+                setStyleStatic(element, key, $$(value))
+
+            }
 
         } else {
 
@@ -657,41 +688,57 @@ export const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe
 
         }
 
-    } else {
-
-        setStyleStatic(element, key, $$(value))
-
     }
 
-}
+    const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, stack: Stack): void => {
 
-export const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, stack: Stack): void => {
+        if (isString(object)) {
 
-    if (isString(object)) {
+            element.setAttribute('style', object)
 
-        element.setAttribute('style', object)
+        } else {
 
-    } else {
+            if (objectPrev) {
 
-        if (objectPrev) {
+                if (isString(objectPrev)) {
 
-            if (isString(objectPrev)) {
+                    if (objectPrev) {
 
-                if (objectPrev) {
+                        element.style.cssText = ''
 
-                    element.style.cssText = ''
+                    }
+
+                } else {
+
+                    objectPrev = store.unwrap(objectPrev)
+
+                    for (const key in objectPrev) {
+
+                        if (object && key in object) continue
+
+                        setStyleStatic(element, key, null)
+
+                    }
+
+                }
+
+            }
+
+            if (isStore(object)) {
+
+                for (const key in object) {
+
+                    const fn = untrack(() => isFunction(object[key]) ? object[key] : (object as any)[SYMBOL_STORE_OBSERVABLE](key)) as (() => number | string | null | undefined) //TSC
+
+                    setStyle(element, key, fn, stack)
 
                 }
 
             } else {
+                //@ts-ignore
+                for (const key in object) {
 
-                objectPrev = store.unwrap(objectPrev)
-
-                for (const key in objectPrev) {
-
-                    if (object && key in object) continue
-
-                    setStyleStatic(element, key, null)
+                    setStyle(element, key, object[key], stack)
 
                 }
 
@@ -699,162 +746,213 @@ export const setStylesStatic = (element: HTMLElement, object: null | undefined |
 
         }
 
-        if (isStore(object)) {
+    }
 
-            for (const key in object) {
 
-                const fn = untrack(() => isFunction(object[key]) ? object[key] : (object as any)[SYMBOL_STORE_OBSERVABLE](key)) as (() => number | string | null | undefined) //TSC
+    const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Stack): void => {
 
-                setStyle(element, key, fn, stack)
+        if (isFunction(object) || isArray(object)) {
+
+            if (isObservable(object)) {
+
+                let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
+
+                useRenderEffect(() => {
+
+                    const objectNext = resolveStyle(object)
+
+                    setStylesStatic(element, objectNext, objectPrev, stack)
+
+                    objectPrev = objectNext
+
+                }, stack)
+
+            } else {
+
+                let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
+
+                useRenderEffect(() => {
+
+                    const objectNext = resolveStyle(object)
+
+                    setStylesStatic(element, objectNext, objectPrev, stack)
+
+                    objectPrev = objectNext
+
+                }, stack)
 
             }
 
         } else {
-            //@ts-ignore
-            for (const key in object) {
 
-                setStyle(element, key, object[key], stack)
+            setStylesStatic(element, $$(object), null, stack)
+
+        }
+
+    }
+
+    const setTemplateAccessor = async (element: HTMLElement, key: string, value: TemplateActionProxy): Promise<void> => {
+
+        if (key === 'children') {
+
+            const placeholder = createText('') // Using a Text node rather than a Comment as the former may be what we actually want ultimately
+
+            element.insertBefore(placeholder, null)
+
+            value(element, 'setChildReplacement', undefined, placeholder)
+
+        } else if (key === 'ref') {
+
+            value(element, 'setRef')
+
+        } else if (key === 'style') {
+
+            value(element, 'setStyles')
+
+        } else if (key === 'class' || key === 'className') {
+
+            if (!isSVG(element)) {
+
+                element.className = '' // Ensuring the attribute is present
 
             }
 
-        }
+            value(element, 'setClasses')
 
-    }
+        } else if (key === 'dangerouslySetInnerHTML') {
 
-}
+            value(element, 'setHTML')
 
+        } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
 
-export const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Stack): void => {
+            value(element, 'setEvent', key.toLowerCase())
 
-    if (isFunction(object) || isArray(object)) {
+        } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
 
-        if (isObservable(object)) {
+            value(element, 'setDirective', key.slice(4))
 
-            let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
+        } else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' /* || key === 'className' */) {
 
-            useRenderEffect(() => {
+            // Forbidden props
 
-                const objectNext = resolveStyle(object)
+        } else if (key in element && !isSVG(element)) {
 
-                setStylesStatic(element, objectNext, objectPrev, stack)
-
-                objectPrev = objectNext
-
-            }, stack)
+            value(element, 'setProperty', key)
 
         } else {
 
-            let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
+            element.setAttribute(key, '') // Ensuring the attribute is present
 
-            useRenderEffect(() => {
-
-                const objectNext = resolveStyle(object)
-
-                setStylesStatic(element, objectNext, objectPrev, stack)
-
-                objectPrev = objectNext
-
-            }, stack)
+            value(element, 'setAttribute', key)
 
         }
 
-    } else {
-
-        setStylesStatic(element, $$(object), null, stack)
-
     }
 
-}
+    const setProp = <T>(element: HTMLElement, key: string, value: T, stack: Stack): void => {
 
-export const setTemplateAccessor = async (element: HTMLElement, key: string, value: TemplateActionProxy): Promise<void> => {
+        if (isTemplateAccessor(value))
+            setTemplateAccessor(element, key, value)
 
-    if (key === 'children') {
+        else if (key === 'children')
+            setChild(element, value as any, stack)
+        else if (key === 'ref')
+            setRef(element, value as any)
+        else if (key === 'style')
+            setStyles(element, value as any, stack)
+        else if (key === 'class' || key === 'className')
+            setClasses(element, value as any, stack)
+        else if (key === 'dangerouslySetInnerHTML')
+            setHTML(element, value as any, stack)
+        else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110)  // /^on/
+            setEvent(element, key.toLowerCase(), value as any)
+        // $.root(() => element.addEventListener(key.substring(2).toLowerCase(), value as any))
+        else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58)  // /^u..:/
+            setDirective(element, key.slice(4), value as any)
+        else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' /* || key === 'className' */) {
 
-        const placeholder = createText('') // Using a Text node rather than a Comment as the former may be what we actually want ultimately
+            // Forbidden props
 
-        element.insertBefore(placeholder, null)
+        } else {//if (key in element && !isSVG(element))
 
-        value(element, 'setChildReplacement', undefined, placeholder)
+            setProperty(element, key, value as any, stack)
 
-    } else if (key === 'ref') {
+            // else
 
-        value(element, 'setRef')
-
-    } else if (key === 'style') {
-
-        value(element, 'setStyles')
-
-    } else if (key === 'class' || key === 'className') {
-
-        if (!isSVG(element)) {
-
-            element.className = '' // Ensuring the attribute is present
+            setAttribute(element, key, value as any, stack)
 
         }
 
-        value(element, 'setClasses')
+    }
 
-    } else if (key === 'dangerouslySetInnerHTML') {
+    const setProps = (element: HTMLElement, object: Record<string, unknown>, stack: Stack): void => {
 
-        value(element, 'setHTML')
+        const { children, ...pp } = object
 
-    } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
+        //set children 1st, in case value refer to children
+        // if (typeof children !== 'undefined')
+        setProp(element, 'children', children, stack)
 
-        value(element, 'setEvent', key.toLowerCase())
+        for (const key in pp)
+            setProp(element, key, object[key], stack)
 
-    } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
+    }
 
-        value(element, 'setDirective', key.slice(4))
-
-    } else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' /* || key === 'className' */) {
-
-        // Forbidden props
-
-    } else if (key in element && !isSVG(element)) {
-
-        value(element, 'setProperty', key)
-
-    } else {
-        element.setAttribute(key, '') // Ensuring the attribute is present
-        value(element, 'setAttribute', key)
+    return {
+        setAttributeStatic,
+        setAttribute,
+        setChildStatic,
+        setChild,
+        setClassStatic,
+        setClass,
+        setClassBooleanStatic,
+        setClassBoolean,
+        setClassesStatic,
+        setClasses,
+        setDirective,
+        setEventStatic,
+        setEvent,
+        setHTMLStatic,
+        setHTML,
+        setPropertyStatic,
+        setProperty,
+        setRef,
+        setStyleStatic,
+        setStyle,
+        setStylesStatic,
+        setStyles,
+        setTemplateAccessor,
+        setProp,
+        setProps
     }
 }
 
-export const setProp = <T>(element: HTMLElement, key: string, value: T, stack: Stack): void => {
-    if (isTemplateAccessor(value))
-        setTemplateAccessor(element, key, value)
-
-    else if (key === 'children')
-        setChild(element, value as any, stack)
-    else if (key === 'ref')
-        setRef(element, value as any)
-    else if (key === 'style')
-        setStyles(element, value as any, stack)
-    else if (key === 'class' || key === 'className')
-        setClasses(element, value as any, stack)
-    else if (key === 'dangerouslySetInnerHTML')
-        setHTML(element, value as any, stack)
-    else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110)  // /^on/
-        setEvent(element, key.toLowerCase(), value as any)
-    // $.root(() => element.addEventListener(key.substring(2).toLowerCase(), value as any))
-    else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58)  // /^u..:/
-        setDirective(element, key.slice(4), value as any)
-    else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' /* || key === 'className' */) {
-        // Forbidden props
-    } else {//if (key in element && !isSVG(element))
-        setProperty(element, key, value as any, stack)
-        // else
-        setAttribute(element, key, value as any, stack)
-    }
-}
-
-export const setProps = (element: HTMLElement, object: Record<string, unknown>, stack: Stack): void => {
-    const { children, ...pp } = object
-
-    //set children 1st, in case value refer to children
-    // if (typeof children !== 'undefined')
-    setProp(element, 'children', children, stack)
-
-    for (const key in pp)
-        setProp(element, key, object[key], stack)
-}
+// Export the default setters for backward compatibility
+const defaultSetters = getSetters('via')
+export const {
+    setAttributeStatic,
+    setAttribute,
+    setChildStatic,
+    setChild,
+    setClassStatic,
+    setClass,
+    setClassBooleanStatic,
+    setClassBoolean,
+    setClassesStatic,
+    setClasses,
+    setDirective,
+    setEventStatic,
+    setEvent,
+    setHTMLStatic,
+    setHTML,
+    setPropertyStatic,
+    setProperty,
+    setRef,
+    setStyleStatic,
+    setStyle,
+    setStylesStatic,
+    setStyles,
+    setTemplateAccessor,
+    setProp,
+    setProps
+} = defaultSetters

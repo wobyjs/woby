@@ -3,13 +3,13 @@ import type { ComponentIntrinsicElement, FN } from '../types'
 import { document as doc } from '../ssr/document'
 import { customElements } from '../ssr/custom_elements'
 import { MutationObserver } from '../ssr/mutation_observer'
-import type { MutationObserverInit } from '../ssr/mutation_observer_init'
-import type { MutationRecord } from '../ssr/mutation_record'
 import type { MutationCallback } from '../ssr/mutation_callback'
 
 declare const via
 
-export function getEnv(type = 'browser' as 'ssr' | 'browser' | 'via') {
+export type Env = 'ssr' | 'browser' | 'via'
+
+export function getEnv(type = 'browser' as Env) {
     const isSSR = type === 'ssr'
     // Return all necessary exports for SSR environment
     if (isSSR) {

@@ -36,18 +36,6 @@
 
 import { getEnv } from "./creators"
 
-const { createComment } = getEnv()
-
-// This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
-
-/** Dummy comment node used as a placeholder for wrapping single nodes */
-const dummyNode = createComment('')
-
-/** Wrapper array for single "before" nodes to normalize them as arrays */
-const beforeDummyWrapper: [Node] = [dummyNode]
-
-/** Wrapper array for single "after" nodes to normalize them as arrays */
-const afterDummyWrapper: [Node] = [dummyNode]
 
 /**
  * Efficiently diffs and updates the children of a parent node.
@@ -72,6 +60,21 @@ const afterDummyWrapper: [Node] = [dummyNode]
  * ```
  */
 export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null): void => {
+  const { createComment } = getEnv()
+
+  // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
+
+  /** Dummy comment node used as a placeholder for wrapping single nodes */
+  const dummyNode = createComment('')
+
+  /** Wrapper array for single "before" nodes to normalize them as arrays */
+  const beforeDummyWrapper: [Node] = [dummyNode]
+
+  /** Wrapper array for single "after" nodes to normalize them as arrays */
+  const afterDummyWrapper: [Node] = [dummyNode]
+
+
+
   if (before === after) return
   if (before instanceof Node) {
     if (after instanceof Node) {

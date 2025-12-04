@@ -1,5 +1,6 @@
 import { useRoot } from '../hooks/soby'
-import { setChild } from '../utils/setters.via'
+import { getSetters } from '../utils/setters.via'
+const { setChild } = getSetters('via')
 import type { Child, Disposer } from '../types'
 
 export const render = (child: Child, parent?: Element | null): Disposer => {

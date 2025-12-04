@@ -24,7 +24,7 @@
 
 import { $, $$, isObservable } from "./soby"
 import { isSSR, SYMBOL_DEFAULT } from '../constants'
-import { setChild, setProp, } from "../utils/setters"
+import { getSetters } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
 import { callStack, isObservableWritable, Observable, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
@@ -465,6 +465,7 @@ const isLightDom = (node: Node): boolean => {
  * ```
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
+    const { setChild, setProp } = getSetters()
     // Check if we're in an SSR environment
     // We need to check both window and document to ensure we're in a browser environment
 

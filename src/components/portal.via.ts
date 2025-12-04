@@ -1,9 +1,9 @@
-
 import { useBoolean } from '../hooks/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { render } from '../methods/render.via'
 import { $$ } from '../methods/soby'
-import { createHTMLNode } from '../utils/creators.via'
+import { getEnv } from '../utils/creators'
+const { createHTMLNode } = getEnv('via')
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 

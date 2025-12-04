@@ -1,12 +1,11 @@
-
 import { useRoot } from '../hooks/soby'
-import { setChild } from '../utils/setters'
+import { getSetters } from '../utils/setters'
 import type { Child, Disposer, IntrinsicElementsMap } from '../types'
-import { $ } from './soby'
 import { FragmentUtils } from '../utils/fragment'
+import { document } from '../ssr/document'
 // import { JSX } from 'src/jsx/types';
 
-export const render = (child: JSX.Child) => {
+export const render = (child: Child) => {
     const fragment = document.createElement('div')
     const renderDiv = document.createElement("div")
     // const buildTable = (div)=>{
@@ -24,7 +23,7 @@ export const render = (child: JSX.Child) => {
 
     let disposer
     let unmount = useRoot((stack, dispose) => {
-        setChild(fragment as any, child, FragmentUtils.make(), stack)
+        getSetters().setChild(fragment as any, child, FragmentUtils.make(), stack)
         // fragment.appendChild(child);
 
         renderDiv.append(fragment)
@@ -78,6 +77,4 @@ export const render = (child: JSX.Child) => {
         }
     }
     return { fragment, unmount, getByRole, getByTestId, getByText }
-};
-
-
+}

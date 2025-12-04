@@ -16,7 +16,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { createComment } from "./creators.via"
+import { getEnv } from "./creators"
+const { createComment } = getEnv('via')
 
 /* MAIN */
 

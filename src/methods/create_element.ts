@@ -12,11 +12,9 @@ import { untrack } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
 import { getEnv } from '../utils/creators'
 
-const { createComment, createHTMLNode, createSVGNode, createText } = getEnv()
 import { document } from '../ssr/document'
 import { isClass, isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
-import { setChild, setProps } from '../utils/setters'
-import { setChild as setChildSSR, setProps as setPropsSSR } from '../utils/setters'
+import { getSetters } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { customElement } from './custom_element'
@@ -60,6 +58,8 @@ if (isSSR) globalThis.customElements = ces as any
  * ```
  */
 export const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]) => {
+    const { createComment, createHTMLNode, createSVGNode, createText } = getEnv()
+    const { setChild, setProps } = getSetters()
 
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)
@@ -124,13 +124,13 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                         // For custom elements, remove children from props to avoid duplication
                         if (!!ce) {
                             const { children, ...np } = _props as any
-                            setPropsSSR(child, np as any, stack)
+                            setProps(child, np as any, stack)
                         } else {
                             // For regular elements, remove children from props if we have separate children arguments
                             const propsToSet = hasChildren && isObject(_props) && 'children' in _props
                                 ? Object.fromEntries(Object.entries(_props).filter(([key]) => key !== 'children'))
                                 : _props
-                            setPropsSSR(child, propsToSet as any, stack)
+                            setProps(child, propsToSet as any, stack)
                         }
                     }
 
@@ -139,10 +139,10 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                     if (hasChildren) {
                         // Process children passed as separate arguments (preferred method)
                         if (ce && typeof ce === 'function' && (ce as any).__component__) {
-                            setChildSSR(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
+                            setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
                         } else {
                             // For regular HTML elements, just set the children directly
-                            setChildSSR(child, children, FragmentUtils.make(), stack)
+                            setChild(child, children, FragmentUtils.make(), stack)
                         }
                     } else if (_props && isObject(_props) && 'children' in _props && !isVoidChild((_props as any).children)) {
                         // Only process children from props if no separate children were passed
@@ -150,10 +150,10 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                         const propsChildren = (_props as any).children as Child
                         // For SSR custom elements, we need to handle them differently
                         if (ce && typeof ce === 'function' && (ce as any).__component__) {
-                            setChildSSR(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : propsChildren, FragmentUtils.make(), stack)
+                            setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : propsChildren, FragmentUtils.make(), stack)
                         } else {
                             // For regular HTML elements, just set the children directly
-                            setChildSSR(child, propsChildren, FragmentUtils.make(), stack)
+                            setChild(child, propsChildren, FragmentUtils.make(), stack)
                         }
                     }
                 })
