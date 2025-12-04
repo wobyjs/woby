@@ -31,7 +31,7 @@ export function getEnv(type = 'browser' as 'ssr' | 'browser' | 'via') {
     }
 }
 
-export function getCreators(type = 'browser' as 'ssr' | 'browser' | 'via') {
+function getCreators(type = 'browser' as 'ssr' | 'browser' | 'via') {
     // Browser environment
     if (typeof via !== 'undefined' && type === 'via') {
         const document = via.document

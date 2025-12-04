@@ -10,7 +10,7 @@ export * from './methods/index' /* exclude assign to avoid conflict */
 export * from "./constants"
 export * from './ssr'
 export { assign as assignUtil } from "./utils/lang"
-export { getCreators, getEnv } from "./utils/creators"
+export { getEnv } from "./utils/creators"
 
 //export type {Context, Directive, DirectiveOptions, FunctionMaybe, Observable, ObservableReadonly, ObservableMaybe, ObservableOptions, Resource, StoreOptions, CSSProperties, Component, JSX.Element} from './types';
 
