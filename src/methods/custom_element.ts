@@ -31,7 +31,7 @@ import { callStack, isObservableWritable, Observable, SYMBOL_OBSERVABLE_WRITABLE
 import type { ObservableOptions } from "soby"
 import { isObject, isPureFunction } from "../utils"
 import { useEffect } from "../hooks"
-import { isJsx } from "../jsx-runtime"
+import { isJsx } from "../jsx/runtime"
 import { camelToKebabCase, kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
@@ -465,7 +465,6 @@ const isLightDom = (node: Node): boolean => {
  * ```
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
-    const { setChild, setProp } = getSetters()
     // Check if we're in an SSR environment
     // We need to check both window and document to ensure we're in a browser environment
 
@@ -475,6 +474,8 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
         // This approach works better with TypeScript and bundlers
         return createSSRCustomElement(tagName, component)
     }
+
+    const { setChild, setProp } = getSetters()
     // Browser environment - use the original implementation
     const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
     if (!defaultPropsFn) {

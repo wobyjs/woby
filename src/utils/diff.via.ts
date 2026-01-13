@@ -27,8 +27,8 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
   const { createComment } = getEnv(env || 'via')
 
   const dummyNode = createComment('')
-  const beforeDummyWrapper: [Node] = [dummyNode]
-  const afterDummyWrapper: [Node] = [dummyNode]
+  const beforeDummyWrapper: [Node] = [dummyNode as any]
+  const afterDummyWrapper: [Node] = [dummyNode as any]
 
   if (before === after) return
   if (before instanceof Node) {
@@ -197,8 +197,8 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
       }
     }
   }
-  beforeDummyWrapper[0] = dummyNode
-  afterDummyWrapper[0] = dummyNode
+  beforeDummyWrapper[0] = dummyNode as any
+  afterDummyWrapper[0] = dummyNode as any
 }
 
 /* EXPORT */

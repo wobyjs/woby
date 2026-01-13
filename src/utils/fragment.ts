@@ -1,6 +1,7 @@
 
 /* IMPORT */
 
+import { BaseNode } from '../ssr/base_node'
 import { isSSR } from '../constants'
 import type { FragmentNode, FragmentFragment, Fragment } from '../types'
 
@@ -131,9 +132,9 @@ export const FragmentUtils = {
 
   },
 
-  replaceWithNode: (thiz: Fragment, node: Node): void => {
+  replaceWithNode: (thiz: Fragment, node: Node | BaseNode): void => {
 
-    thiz.values = node
+    thiz.values = node as any
     delete thiz.fragmented
     thiz.length = 1
 

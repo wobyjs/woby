@@ -797,9 +797,9 @@ export const getSetters = (env?: Env) => {
 
             const placeholder = createText('') // Using a Text node rather than a Comment as the former may be what we actually want ultimately
 
-            element.insertBefore(placeholder, null)
+            element.insertBefore(placeholder as any, null)
 
-            value(element, 'setChildReplacement', undefined, placeholder)
+            value(element, 'setChildReplacement', undefined, placeholder as any)
 
         } else if (key === 'ref') {
 

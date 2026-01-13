@@ -106,7 +106,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T |
             useRenderEffect(() => {
                 const pv = v
                 v = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined') //, true)
-                v = updateElement(e, f, v, pv)
+                v = updateElement(e as any, f, v, pv)
                 f = false
             }, stack)
             return v //[...v] as any
@@ -133,7 +133,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T |
                 (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
                 v = resolveChild(value(), null, false, stack) as any
-                v = updateElement(e, f, v, pv)
+                v = updateElement(e as any, f, v, pv)
                 f = false
             }, stack)
             return v as any // [e, ...[v].flat(Infinity)] as any

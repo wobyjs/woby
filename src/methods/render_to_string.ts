@@ -2,6 +2,7 @@ import { FragmentUtils } from '../utils/fragment'
 import type { Child } from '../types'
 import { getSetters } from '../utils/setters'
 import { BaseNode } from '../ssr/base_node'
+import { getEnv } from '../utils/creators'
 
 import { $$, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'
@@ -9,8 +10,10 @@ import { isFunction } from '../utils/lang'
 
 export const renderToString = (child: Child): string => {
     const { setChild } = getSetters('ssr')
+    // Get the SSR environment
+    const env = getEnv('ssr')
     // Create a container for SSR using HTMLNode
-    const container = document.createElement('div')
+    const container = env.createHTMLNode('div')
     const stack = new Error()
 
     // Use a fragment for the root
@@ -58,6 +61,11 @@ function getNodeContent(node: any): string {
 
     // Handle objects
     if (typeof node === 'object') {
+        // Check for text nodes first
+        if (node.nodeType === 3 && 'textContent' in node) {
+            return node.textContent
+        }
+
         // Check for outerHTML property (HTMLNode, SVGNode, etc.)
         if ('outerHTML' in node) {
             return node.outerHTML

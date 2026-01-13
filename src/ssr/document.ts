@@ -148,11 +148,54 @@ const createSVGNode = ((tagName: string) => {
     return new SVGNode()
 }) as any as FN<[string], SVGElement>
 
-const createText = ((text: string) => ({
-    nodeType: 3,
-    textContent: String(text),
-    toString: () => String(text)
-})) as any as FN<[string], Text>
+const createText = ((text: string) => {
+    // Define TextNode dynamically to ensure it extends the proper Node class
+    const TextNode = class extends (globalThis.Node || Object) {
+        nodeType: number
+        textContent: string
+        parentNode: any | null
+
+        constructor(text: string) {
+            super()
+            this.nodeType = 3 // nodeType 3 for text
+            this.textContent = String(text)
+            this.parentNode = null
+        }
+
+        // Getter for text representation
+        toString() {
+            return this.textContent
+        }
+
+        // Property to get text as string for rendering
+        get nodeValue() {
+            return this.textContent
+        }
+
+        set nodeValue(value: string) {
+            this.textContent = value
+        }
+
+        // DOM-like properties that may be needed by diff algorithm
+        get nextSibling() {
+            if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
+                const index = this.parentNode.childNodes.indexOf(this)
+                return index !== -1 ? this.parentNode.childNodes[index + 1] : null
+            }
+            return null
+        }
+
+        get previousSibling() {
+            if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
+                const index = this.parentNode.childNodes.indexOf(this)
+                return index > 0 ? this.parentNode.childNodes[index - 1] : null
+            }
+            return null
+        }
+    }
+
+    return new TextNode(text) as any
+}) as any as FN<[string], Text>
 
 const createDocumentFragment = (() => {
     class DocumentFragmentNode extends BaseNode {

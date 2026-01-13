@@ -32,7 +32,7 @@ export const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null |
 }
 
 export const getSetters = (env?: Env) => {
-    const { createText, createComment } = getEnv(env)
+    const { createText, createComment, Comment, Text } = getEnv(env)
 
     const setAttributeStatic = (() => {
 
@@ -141,9 +141,9 @@ export const getSetters = (env?: Env) => {
 
             const textNode = createText(child)
 
-            parent.replaceChild(textNode, childPrev)
+            parent.replaceChild(textNode as any, childPrev)
 
-            return textNode
+            return textNode as any
 
         }
 
@@ -231,7 +231,7 @@ export const getSetters = (env?: Env) => {
 
                 if (!fragmentOnly) {
 
-                    parent.appendChild(textNode)
+                    parent.appendChild(textNode as any)
 
                 }
 
@@ -284,7 +284,7 @@ export const getSetters = (env?: Env) => {
 
             if (type === 'string' || type === 'number' || type === 'bigint') {
 
-                FragmentUtils.pushNode(fragmentNext, createText(child as any))
+                FragmentUtils.pushNode(fragmentNext, createText(child as any) as any)
 
             } else if (type === 'object' && child !== null && typeof child.nodeType === 'number') {
 
@@ -333,11 +333,11 @@ export const getSetters = (env?: Env) => {
 
                     const placeholder = /* childComp[SYMBOL_DOM] = */ createComment('')
 
-                    FragmentUtils.pushNode(fragmentNext, placeholder)
+                    FragmentUtils.pushNode(fragmentNext, placeholder as any)
 
                     if (next !== fragmentNext.values) {
 
-                        next = placeholder
+                        next = placeholder as any
                         nextLength += 1
 
                     }
@@ -383,11 +383,11 @@ export const getSetters = (env?: Env) => {
 
             const placeholder = /* childComp[SYMBOL_DOM] = */ createComment('')
 
-            FragmentUtils.pushNode(fragmentNext, placeholder)
+            FragmentUtils.pushNode(fragmentNext, placeholder as any)
 
             if (next !== fragmentNext.values) {
 
-                next = placeholder
+                next = placeholder as any
                 nextLength += 1
 
             }
@@ -636,30 +636,30 @@ export const getSetters = (env?: Env) => {
         // Added more events: mouse events, pointer events, and touch events for improved performance
         // TODO: Implement proper cleanup mechanism for event delegation
         const delegatedEvents = <const>{
-            onauxclick: ['_onauxclick', false],
-            onbeforeinput: ['_onbeforeinput', false],
-            onclick: ['_onclick', false],
-            ondblclick: ['_ondblclick', false],
-            onfocusin: ['_onfocusin', false],
-            onfocusout: ['_onfocusout', false],
-            oninput: ['_oninput', false],
-            onkeydown: ['_onkeydown', false],
-            onkeyup: ['_onkeyup', false],
-            onmousedown: ['_onmousedown', false],
-            onmouseenter: ['_onmouseenter', false],
-            onmouseleave: ['_onmouseleave', false],
-            onmousemove: ['_onmousemove', false],
-            onmouseout: ['_onmouseout', false],
-            onmouseover: ['_onmouseover', false],
-            onmouseup: ['_onmouseup', false],
-            onpointerdown: ['_onpointerdown', false],
-            onpointermove: ['_onpointermove', false],
-            onpointerout: ['_onpointerout', false],
-            onpointerover: ['_onpointerover', false],
-            onpointerup: ['_onpointerup', false],
-            ontouchend: ['_ontouchend', false],
-            ontouchmove: ['_ontouchmove', false],
-            ontouchstart: ['_ontouchstart', false]
+            // onauxclick: ['_onauxclick', false],
+            // onbeforeinput: ['_onbeforeinput', false],
+            // onclick: ['_onclick', false],
+            // ondblclick: ['_ondblclick', false],
+            // onfocusin: ['_onfocusin', false],
+            // onfocusout: ['_onfocusout', false],
+            // oninput: ['_oninput', false],
+            // onkeydown: ['_onkeydown', false],
+            // onkeyup: ['_onkeyup', false],
+            // onmousedown: ['_onmousedown', false],
+            // onmouseenter: ['_onmouseenter', false],
+            // onmouseleave: ['_onmouseleave', false],
+            // onmousemove: ['_onmousemove', false],
+            // onmouseout: ['_onmouseout', false],
+            // onmouseover: ['_onmouseover', false],
+            // onmouseup: ['_onmouseup', false],
+            // onpointerdown: ['_onpointerdown', false],
+            // onpointermove: ['_onpointermove', false],
+            // onpointerout: ['_onpointerout', false],
+            // onpointerover: ['_onpointerover', false],
+            // onpointerup: ['_onpointerup', false],
+            // ontouchend: ['_ontouchend', false],
+            // ontouchmove: ['_ontouchmove', false],
+            // ontouchstart: ['_ontouchstart', false]
         }
 
         const delegate = (event: string): void => {
@@ -792,11 +792,11 @@ export const getSetters = (env?: Env) => {
 
         if (key === 'value' && !isComment) {
 
-            if (element.tagName === 'PROGRESS') {
+            if ((element as HTMLElement)?.tagName === 'PROGRESS') {
 
                 value ??= null
 
-            } else if (element.tagName === 'SELECT' && !element['_$inited']) {
+            } else if ((element as HTMLElement)?.tagName === 'SELECT' && !element['_$inited']) {
 
                 element['_$inited'] = true
 
@@ -812,14 +812,14 @@ export const getSetters = (env?: Env) => {
 
             if (isNil(value) && !isComment) {
 
-                setAttributeStatic(element, key, null)
+                setAttributeStatic(element as any, key, null)
 
             }
 
         } catch { // If it fails, maybe because like HTMLInputElement.form there's only a getter, we try as an attribute instead //TODO: Figure out something better than this
 
             if (!isComment)
-                setAttributeStatic(element, key, value)
+                setAttributeStatic(element as any, key, value)
 
         }
 
@@ -987,9 +987,9 @@ export const getSetters = (env?: Env) => {
 
             const placeholder = createText('') // Using a Text node rather than a Comment as the former may be what we actually want ultimately
 
-            element.insertBefore(placeholder, null)
+            element.insertBefore(placeholder as any, null as any)
 
-            value(element, 'setChildReplacement', undefined, placeholder)
+            value(element, 'setChildReplacement', undefined, placeholder as any)
 
         } else if (key === 'ref') {
 
@@ -1042,7 +1042,7 @@ export const getSetters = (env?: Env) => {
     // if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
 
     const setProp = (element: HTMLElement | Comment, key: string, value: any, stack: Stack): void => {
-        if (element instanceof Comment || element instanceof Text) {
+        if (element.nodeType === 8 || element.nodeType === 3) {
             if (key === 'ref')
                 setRef(element, value)
             else if (key in element)
@@ -1053,7 +1053,7 @@ export const getSetters = (env?: Env) => {
 
             if (isTemplateAccessor(value)) {
 
-                setTemplateAccessor(element, key, value)
+                setTemplateAccessor(element as any, key, value)
 
             } else if (key === 'children') {
 
@@ -1065,23 +1065,23 @@ export const getSetters = (env?: Env) => {
 
             } else if (key === 'style') {
 
-                setStyles(element, value, stack)
+                setStyles(element as any, value, stack)
 
             } else if (key === 'class' || key === 'className') {
 
-                setClasses(element, value, stack)
+                setClasses(element as any, value, stack)
 
             } else if (key === 'dangerouslySetInnerHTML') {
 
-                setHTML(element, value, stack)
+                setHTML(element as any, value, stack)
 
             } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
 
-                setEvent(element, key.toLowerCase(), value)
+                setEvent(element as any, key.toLowerCase(), value)
 
             } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
 
-                setDirective(element, key.slice(4), value)
+                setDirective(element as any, key.slice(4), value)
 
             } else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' || key === 'className') {
 
@@ -1093,7 +1093,7 @@ export const getSetters = (env?: Env) => {
 
             } else {
 
-                setAttribute(element, key, value, stack)
+                setAttribute(element as any, key, value, stack)
 
             }
 

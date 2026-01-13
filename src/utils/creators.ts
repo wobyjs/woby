@@ -3,6 +3,8 @@ import type { ComponentIntrinsicElement, FN } from '../types'
 import { document as doc } from '../ssr/document'
 import { customElements } from '../ssr/custom_elements'
 import { MutationObserver } from '../ssr/mutation_observer'
+import { Comment } from '../ssr/comment'
+import { Text } from '../ssr/text'
 import type { MutationCallback } from '../ssr/mutation_callback'
 
 declare const via
@@ -15,6 +17,8 @@ export function getEnv(type = 'browser' as Env) {
     if (isSSR) {
         return {
             document: doc,
+            Comment,
+            Text,
             customElements,
             MutationObserver,
             isSSR: isSSR,
@@ -23,6 +27,8 @@ export function getEnv(type = 'browser' as Env) {
     } else {
         return {
             document: globalThis.document,
+            Comment: globalThis.Comment,
+            Text: globalThis.Text,
             customElements: globalThis.customElements,
             MutationObserver: globalThis.MutationObserver,
             isSSR: false,
@@ -36,20 +42,20 @@ function getCreators(type = 'browser' as 'ssr' | 'browser' | 'via') {
     if (typeof via !== 'undefined' && type === 'via') {
         const document = via.document
         return {
-            createComment: document.createComment as any as FN<[any], Comment>,
+            createComment: document.createComment.bind(document) as FN<[any], Comment>,
             createHTMLNode: document.createElement as any as FN<[ComponentIntrinsicElement], HTMLElement>,
             createSVGNode: ((name: string) => document.createElementNS('http://www.w3.org/2000/svg', name)) as any as FN<[ComponentIntrinsicElement], SVGElement>,
             createText: document.createTextNode as any as FN<[any], Text>,
             createDocumentFragment: document.createDocumentFragment as any as FN<[], DocumentFragment>
         }
     } else {
-        const document = type === 'ssr' ? doc : globalThis.document
+        const document = type === 'ssr' ? doc : (globalThis.document || doc) // Fallback to SSR doc if browser doc is unavailable
         // Fallback to SSR versions if document is not available or binding fails
         return {
-            createComment: document.createComment.bind(document, '') as FN<[any], Comment>,
+            createComment: document.createComment.bind(document) as any as FN<[any], Comment>,
             createHTMLNode: document.createElement.bind(document) as FN<[ComponentIntrinsicElement], HTMLElement>,
             createSVGNode: document.createElementNS.bind(document, 'http://www.w3.org/2000/svg') as FN<[ComponentIntrinsicElement], Element>,
-            createText: document.createTextNode.bind(document) as FN<[any], Text>,
+            createText: document.createTextNode.bind(document) as any as FN<[any], Text>,
             createDocumentFragment: document.createDocumentFragment.bind(document) as FN<[], DocumentFragment>
         }
     }

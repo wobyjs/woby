@@ -68,10 +68,10 @@ export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], 
   const dummyNode = createComment('')
 
   /** Wrapper array for single "before" nodes to normalize them as arrays */
-  const beforeDummyWrapper: [Node] = [dummyNode]
+  const beforeDummyWrapper: [Node] = [dummyNode as any]
 
   /** Wrapper array for single "after" nodes to normalize them as arrays */
-  const afterDummyWrapper: [Node] = [dummyNode]
+  const afterDummyWrapper: [Node] = [dummyNode as any]
 
 
 
@@ -242,6 +242,6 @@ export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], 
       }
     }
   }
-  beforeDummyWrapper[0] = dummyNode
-  afterDummyWrapper[0] = dummyNode
+  beforeDummyWrapper[0] = dummyNode as any
+  afterDummyWrapper[0] = dummyNode as any
 }
