@@ -10,7 +10,7 @@
 
 import { untrack } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
-import { getEnv } from '../utils/creators'
+import { Env, getEnv } from '../utils/creators'
 
 import { document } from '../ssr/document'
 import { isClass, isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
@@ -58,8 +58,9 @@ if (isSSR) globalThis.customElements = ces as any
  * ```
  */
 export const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]) => {
-    const { createComment, createHTMLNode, createSVGNode, createText } = getEnv()
-    const { setChild, setProps } = getSetters()
+    console.log('createElement called with:', { component, _props, _children })
+    // const { createComment, createHTMLNode, createSVGNode, createText } = getEnv()
+    // const { setChild, setProps } = getSetters()
 
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)
@@ -80,7 +81,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
             const props = _props ?? {}
 
-            return wrapElement(() => {
+            return wrapElement((env: Env) => {
 
                 return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
 
@@ -89,15 +90,20 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         } else if (isString(component)) {
 
             const isSVG = isSVGElement(component)
-            const createNode = isSVG ? ((tagName: string) => document.createElementNS('http://www.w3.org/2000/svg', tagName)) : document.createElement
 
-            return wrapElement((): Child => {
+            return wrapElement((env: Env): Child => {
+                const { createHTMLNode, createSVGNode, customElements } = getEnv(env)
+                const { setChild, setProps } = getSetters(env)
+
+                // const createNode = isSVG ? ((tagName: string) => document.createElementNS('http://www.w3.org/2000/svg', tagName)) : document.createElement
+                const createNode = isSVG ? createSVGNode : createHTMLNode
+
                 // Check if we're in SSR mode (no customElements API)
-                const isSSRMode = typeof customElements === 'undefined'
+                // const isSSR = typeof customElements === 'undefined'
                 let ce = null
 
                 // Only try to get custom element if we're not in SSR mode
-                if (!isSSRMode) {
+                if (env !== 'ssr') {
                     ce = customElements.get(component) as ReturnType<typeof customElement>
                 }
 
@@ -136,20 +142,28 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
                     // Set children for both regular HTML elements and custom elements
                     // Only process children once - either from separate arguments or from props, not both
+                    console.log('Processing children for element:', component)
+                    console.log('Children:', children)
+                    console.log('Has children:', hasChildren)
+
                     if (hasChildren) {
                         // Process children passed as separate arguments (preferred method)
                         if (ce && typeof ce === 'function' && (ce as any).__component__) {
+                            //@ts-ignore
                             setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
                         } else {
                             // For regular HTML elements, just set the children directly
+                            console.log('Calling setChild with children:', children)
                             setChild(child, children, FragmentUtils.make(), stack)
                         }
                     } else if (_props && isObject(_props) && 'children' in _props && !isVoidChild((_props as any).children)) {
                         // Only process children from props if no separate children were passed
                         // Handle children from props
                         const propsChildren = (_props as any).children as Child
+                        console.log('Processing children from props:', propsChildren)
                         // For SSR custom elements, we need to handle them differently
                         if (ce && typeof ce === 'function' && (ce as any).__component__) {
+                            //@ts-ignore
                             setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : propsChildren, FragmentUtils.make(), stack)
                         } else {
                             // For regular HTML elements, just set the children directly
@@ -164,7 +178,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
         } else if (isNode(component)) {
 
-            return wrapElement(() => component)
+            return wrapElement((env: Env) => component)
 
         } else {
 
@@ -188,12 +202,16 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
             const isComment = component === 'comment'
             const isText = component === 'text'
 
-            const createNode = isSVG ? createSVGNode : createHTMLNode
-            const create = isComment ? () => createComment((props as any).data ?? '') : isText ? () => createText((props as any).data ?? '') : createNode
 
-            return wrapElement((): Child => {
+            return wrapElement((env: Env): Child => {
+                const { createHTMLNode, createSVGNode, customElements, createComment, createText } = getEnv(env)
+                const { setChild, setProps } = getSetters(env)
+
+                const createNode = isSVG ? createSVGNode : createHTMLNode
+                const create = isComment ? () => createComment((props as any).data ?? '') : isText ? () => createText((props as any).data ?? '') : createNode
+
                 // Check if this is a custom element
-                const ce = isSSR ? ces.get(component) : customElements.get(component) as ReturnType<typeof customElement>
+                const ce = env === 'ssr' ? ces.get(component) : customElements.get(component) as ReturnType<typeof customElement>
 
                 const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
 

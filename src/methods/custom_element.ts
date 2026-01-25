@@ -542,11 +542,11 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
                 // render(createElement(component, this.props), shadowRoot) 
 
                 //creating the child in tsx
-                setChild(shadowRoot, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
+                setChild(shadowRoot, createElement(component, this.props) as any, FragmentUtils.make(), callStack('Custom element'))
             }
             else {
                 //never happen
-                setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
+                setChild(this, createElement(component, this.props) as any, FragmentUtils.make(), callStack('Custom element'))
             }
 
             if (!this.propDict) {

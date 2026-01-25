@@ -1,4 +1,4 @@
-/// @jsxImportSource woby/ssr
+/// @jsxImportSource ../../src
 
 /**
  * Counter Component Demo
@@ -18,7 +18,7 @@
  */
 
 /* IMPORT */
-import { $, $$, useMemo, render, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe, renderToString } from 'woby'
+import { $, $$, useMemo, render, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe, renderToString } from '../../src'
 
 DEBUGGER.verboseComment = true
 
@@ -312,10 +312,20 @@ const App = () => {
  * 
  * Mounts the App component to the element with ID 'app'.
  */
-const result = renderToString(<App />)
+// render(<App />, document.getElementById('app'))
 
 console.log('Rendered HTML:')
-console.log(result)
+
+// Debug the renderToString process
+const testElement = <h1>Custom element<br /></h1>
+console.log('Test element:', testElement)
+console.log('Test element type:', typeof testElement)
+console.log('Test element keys:', Object.keys(testElement || {}))
+
+const result = renderToString(testElement)
+console.log('Actual result:', result)
+console.log('Expected: <H1>Custom element<BR /></H1>')
 console.log('--- End of rendered HTML ---')
+
 
 export default Counter

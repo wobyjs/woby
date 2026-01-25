@@ -14,7 +14,7 @@ import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive,
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers.via'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { __ArgsSymbol } from 'via.js'
-import { IsSvgSymbol } from '../methods/create_element.via'
+// import { IsSvgSymbol } from '../methods/create_element.via'
 import { Stack } from '../soby'
 
 type Env = 'ssr' | 'browser' | 'via'
@@ -78,16 +78,16 @@ export const getSetters = (env?: Env) => {
             if (isObservable(value)) {
                 // Check if value is an observable with toHtml option
                 if (isObservable(value) && value[SYMBOL_OBSERVABLE_WRITABLE]?.options?.toHtml) {
-                    useRenderEffect(() => {
+                    useRenderEffect((options) => {
                         const unwrappedValue = value()
-                        const options = value[SYMBOL_OBSERVABLE_WRITABLE].options
-                        const htmlValue = options.toHtml(unwrappedValue)
+                        const opts = value[SYMBOL_OBSERVABLE_WRITABLE].options
+                        const htmlValue = opts.toHtml(unwrappedValue)
                         setAttributeStatic(element, key, htmlValue)
-                    }, stack)
+                    }, 'via', stack)
                 } else {
-                    useRenderEffect(() => {
+                    useRenderEffect((options) => {
                         setAttributeStatic(element, key, value())
-                    }, stack)
+                    }, 'via', stack)
                 }
             } else {
 
@@ -133,11 +133,11 @@ export const getSetters = (env?: Env) => {
 
             if (isObservable(value)) {
 
-                useRenderEffect(() => {
+                useRenderEffect((options) => {
 
                     setClassStatic(element, key, value())
 
-                }, stack)
+                }, 'via', stack)
 
             } else {
 
@@ -177,7 +177,7 @@ export const getSetters = (env?: Env) => {
 
                 let keyPrev: null | undefined | boolean | string
 
-                useRenderEffect(() => {
+                useRenderEffect((options) => {
 
                     const keyNext = (key as Function)()
 
@@ -185,7 +185,7 @@ export const getSetters = (env?: Env) => {
 
                     keyPrev = keyNext
 
-                }, stack)
+                }, 'via', stack)
 
             } else {
 
@@ -324,7 +324,7 @@ export const getSetters = (env?: Env) => {
 
             let objectPrev: Record<string, boolean> | undefined
 
-            useRenderEffect(() => {
+            useRenderEffect((options) => {
 
                 const objectNext = resolveClass(object)
 
@@ -332,7 +332,7 @@ export const getSetters = (env?: Env) => {
 
                 objectPrev = objectNext
 
-            }, stack)
+            }, 'via', stack)
 
         } else {
 
@@ -538,11 +538,11 @@ export const getSetters = (env?: Env) => {
 
     const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
 
-        useRenderEffect(() => {
+        useRenderEffect((options) => {
 
             setHTMLStatic(element, $$($$(value).__html))
 
-        }, stack)
+        }, 'via', stack)
 
     }
 
@@ -594,11 +594,11 @@ export const getSetters = (env?: Env) => {
 
             if (isObservable(value)) {
 
-                useRenderEffect(() => {
+                useRenderEffect((options) => {
 
                     setPropertyStatic(element, key, value())
 
-                }, stack)
+                }, 'via', stack)
 
             } else {
 
@@ -670,11 +670,11 @@ export const getSetters = (env?: Env) => {
 
             if (isObservable(value)) {
 
-                useRenderEffect(() => {
+                useRenderEffect((options) => {
 
                     setStyleStatic(element, key, value())
 
-                }, stack)
+                }, 'via', stack)
 
             } else {
 
@@ -757,7 +757,7 @@ export const getSetters = (env?: Env) => {
 
                 let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
 
-                useRenderEffect(() => {
+                useRenderEffect((options) => {
 
                     const objectNext = resolveStyle(object)
 
@@ -765,13 +765,13 @@ export const getSetters = (env?: Env) => {
 
                     objectPrev = objectNext
 
-                }, stack)
+                }, 'via', stack)
 
             } else {
 
                 let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
 
-                useRenderEffect(() => {
+                useRenderEffect((options) => {
 
                     const objectNext = resolveStyle(object)
 
@@ -779,7 +779,7 @@ export const getSetters = (env?: Env) => {
 
                     objectPrev = objectNext
 
-                }, stack)
+                }, 'via', stack)
 
             }
 

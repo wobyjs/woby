@@ -8,38 +8,73 @@ import { $$, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'
 import { isFunction } from '../utils/lang'
 
+
+
 export const renderToString = (child: Child): string => {
+    console.log('=== RENDER_TO_STRING ENTRY POINT ===')
+    console.log('renderToString called with child:', child)
+
+    // Ensure SSR environment is propagated throughout
     const { setChild } = getSetters('ssr')
-    // Get the SSR environment
     const env = getEnv('ssr')
-    // Create a container for SSR using HTMLNode
+
+    // Create container for SSR - using proper SSR node creation
     const container = env.createHTMLNode('div')
+    console.log('Created SSR container:', container)
+    console.log('Container nodeType:', container?.nodeType)
+
     const stack = new Error()
 
-    // Use a fragment for the root
-    const fragment = FragmentUtils.make()
-
-    // Set the child content
-    setChild(container, child, fragment, stack)
+    // Set child content with SSR environment propagation
+    console.log('Setting child with SSR environment...')
+    setChild(container, child, FragmentUtils.make(), stack)
+    console.log('Container after setChild:', container)
+    console.log('Container childNodes length:', container.childNodes?.length)
+    if (container.childNodes && container.childNodes.length > 0) {
+        const h1Element = container.childNodes[0]
+        console.log('H1 element:', h1Element)
+        console.log('H1 childNodes:', h1Element?.childNodes)
+        if (h1Element?.childNodes) {
+            h1Element.childNodes.forEach((child, index) => {
+                console.log(`H1 child ${index}:`, child)
+                console.log(`  nodeType:`, child?.nodeType)
+                console.log(`  textContent:`, child?.textContent)
+                console.log(`  toString:`, child?.toString?.())
+            })
+        }
+    }
 
     // Get the rendered content from the container's children
     const children = Array.from(container.childNodes || [])
+    console.log('Children to process:', children)
     const childrenContent = children.map((child: any) => {
-        return getNodeContent(child)
+        console.log('Processing child:', child)
+        const content = getNodeContent(child)
+        console.log('Child content:', content)
+        return content
     }).join('')
 
+    console.log('Final childrenContent:', childrenContent)
     return childrenContent
 }
 
 // Helper function to get content from node objects
 function getNodeContent(node: any): string {
+    console.log('getNodeContent called with node:', node)
+    console.log('Node type:', typeof node)
+    console.log('Node nodeType:', node?.nodeType)
+    console.log('Node textContent:', node?.textContent)
+    console.log('Node properties:', Object.keys(node || {}))
+
     // Handle null/undefined
     if (node === null || node === undefined) {
+        console.log('Returning empty string for null/undefined')
         return ''
     }
 
     // Handle primitive types
     if (typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
+        console.log('Returning string for primitive:', String(node))
         return String(node)
     }
 
@@ -121,7 +156,7 @@ function constructNodeHTML(node: BaseNode): string {
         // Handle self-closing tags
         const selfClosingTags = ['BR', 'HR', 'IMG', 'INPUT', 'META', 'LINK']
         if (('tagName' in node) && selfClosingTags.includes((node as any).tagName.toUpperCase())) {
-            return `<${(node as any).tagName}${attrStr}>`
+            return `<${(node as any).tagName}${attrStr} />`
         }
 
         // Build children string

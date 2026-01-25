@@ -6,7 +6,7 @@ import type { Child, ComponentsMap, Element, Props } from '../types'
 /* HELPERS */
 
 const registry: ComponentsMap = {}
-const h = (type: string, props?: Props | null, ...children: Child[]): Element => createElement((registry[type] || type) as any, props, ...children)
+const h = (type: string, props?: Props | null, ...children: Child[]): Element => createElement((registry[type] || type) as any, props, ...children) as any
 const register = (components: ComponentsMap): void => void assign(registry, components)
 
 

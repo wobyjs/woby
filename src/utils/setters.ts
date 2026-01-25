@@ -1,4 +1,4 @@
-import { DIRECTIVES, SYMBOLS_DIRECTIVES, /* SYMBOL_DOM, */ SYMBOL_UNCACHED, isSSR } from '../constants'
+import { DIRECTIVES, SYMBOLS_DIRECTIVES, SYMBOL_DOM, /* SYMBOL_DOM, */ SYMBOL_UNCACHED, isSSR } from '../constants'
 import { useMicrotask } from '../hooks/use_microtask'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { isStore } from '../methods/soby'
@@ -26,7 +26,7 @@ export const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null |
 
     if (!values.length) return
 
-    const stack = new Error()
+    const stack = new Stack()
     useMicrotask(() => untrack(() => values.forEach(value => value?.(element))), stack)
 
 }
@@ -92,16 +92,16 @@ export const getSetters = (env?: Env) => {
 
         if (isFunction(value) && isFunctionReactive(value))
             if (isObservable(value) && value[SYMBOL_OBSERVABLE_WRITABLE]?.options?.toHtml) {
-                useRenderEffect(() => {
+                useRenderEffect((options) => {
                     const unwrappedValue = value()
-                    const options = value[SYMBOL_OBSERVABLE_WRITABLE].options
-                    const htmlValue = options.toHtml(unwrappedValue)
+                    const opts = value[SYMBOL_OBSERVABLE_WRITABLE].options
+                    const htmlValue = opts.toHtml(unwrappedValue)
                     setAttributeStatic(element, key, htmlValue)
-                }, stack)
+                }, env, stack)
             } else {
-                useRenderEffect(() => {
+                useRenderEffect((options) => {
                     setAttributeStatic(element, key, value())
-                }, stack)
+                }, env, stack)
             }
         else
             setAttributeStatic(element, key, $$(value))
@@ -109,7 +109,7 @@ export const getSetters = (env?: Env) => {
 
     const setChildReplacementFunction = (parent: HTMLElement | Node, fragment: Fragment, child: (() => Child), stack: Stack): void => {
 
-        useRenderEffect((stack) => {
+        useRenderEffect((options) => {
 
             let valueNext = child()
 
@@ -119,9 +119,9 @@ export const getSetters = (env?: Env) => {
 
             }
 
-            setChildStatic(parent, fragment, false, valueNext, true, child, stack)
+            setChildStatic(parent, fragment, false, /* child[SYMBOL_DOM] = valueNext */ null, true, child, stack)
 
-        }, stack)
+        }, env, stack)
 
     }
 
@@ -211,15 +211,103 @@ export const getSetters = (env?: Env) => {
      * ```
      */
     const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, childComp: Function, stack: Stack): void => {
+        // Generate unique ID for this call
+        const callId = Math.random().toString(36).substr(2, 9)
+        console.log(`=== SET_CHILD_STATIC CALLED (${callId}) ===`)
+        console.log('Child:', child)
+        console.log('Dynamic:', dynamic)
+        console.log('Child type:', typeof child)
+        console.log('Parent nodeType:', parent?.nodeType)
+
+        if (Array.isArray(child)) {
+            console.log('Child is array, length:', child.length)
+            child.forEach((c, i) => {
+                console.log(`Child[${i}]:`, c)
+                console.log(`  nodeType:`, (c as any)?.nodeType)
+                console.log(`  textContent:`, (c as any)?.textContent)
+            })
+        }
+
+        // Handle placeholder creation for reactive content in SSR
+        if (dynamic && env === 'ssr') {
+            console.log('Creating placeholder for reactive SSR content')
+            const placeholder = FragmentUtils.makePlaceholder('ssr')
+
+            if (!fragmentOnly) {
+                parent.appendChild(placeholder)
+            }
+
+            FragmentUtils.replaceWithNode(fragment, placeholder)
+
+            // Store placeholder reference for later replacement
+            if (childComp) {
+                childComp[SYMBOL_DOM] = placeholder
+                console.log('Stored placeholder in childComp SYMBOL_DOM')
+            }
+
+            // Set up effect to replace placeholder when content is ready
+            useRenderEffect((options) => {
+                console.log('Reactive effect triggered, resolving child:', child)
+                resolveChild(child, (resolvedChild, isDynamic, stack) => {
+                    console.log('Resolved child for replacement:', resolvedChild)
+                    // Replace the placeholder with actual content
+                    FragmentUtils.replacePlaceholder(placeholder, resolvedChild as Node, childComp)
+                }, true, stack, 'ssr')
+            }, 'ssr', stack)
+
+            return
+        }
 
         if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
+        if (childComp) {
+            const e = childComp[SYMBOL_DOM] as HTMLElement
+            if (e) {
+
+                console.log('Element e properties and methods:', {
+                    element: e,
+                    properties: Object.getOwnPropertyNames(e),
+                    methods: Object.getOwnPropertyNames(Object.getPrototypeOf(e)),
+                    nodeType: e.nodeType,
+                    nodeName: e.nodeName,
+                    parentNode: e.parentNode,
+                    parentElement: e.parentElement,
+                    nextSibling: e.nextSibling,
+                    previousSibling: e.previousSibling
+                })
+                e.replaceWith(child as any)
+
+                childComp[SYMBOL_DOM] = child
+                return
+            }
+        }
+
+        // Debug fragment children retrieval
+        console.log('Getting children from fragment...')
         const prev = FragmentUtils.getChildren(fragment)
+        console.log('Fragment children result:', prev)
+        console.log('Fragment children type:', typeof prev)
+        if (Array.isArray(prev)) {
+            prev.forEach((child, i) => {
+                console.log(`Fragment child[${i}]:`, child)
+                console.log(`  nodeType:`, (child as any)?.nodeType)
+                console.log(`  textContent:`, (child as any)?.textContent)
+            })
+        } else if (prev) {
+            console.log('Single fragment child:', prev)
+            console.log('  nodeType:', (prev as any)?.nodeType)
+            console.log('  textContent:', (prev as any)?.textContent)
+        }
+
         const prevIsArray = (prev instanceof Array)
         const prevLength = prevIsArray ? prev.length : 1
         const prevFirst = prevIsArray ? prev[0] : prev
         const prevLast = prevIsArray ? prev[prevLength - 1] : prev
         const prevSibling = prevLast?.nextSibling || null
+
+        console.log('prevIsArray:', prevIsArray)
+        console.log('prevLength:', prevLength)
+        console.log('prevFirst nodeType:', (prevFirst as any)?.nodeType)
 
         if (prevLength === 0) { // Fast path for appending a node the first time
 
@@ -240,14 +328,40 @@ export const getSetters = (env?: Env) => {
                 return
 
             } else if (type === 'object' && child !== null && typeof (child as Node).nodeType === 'number') { //TSC
+                console.log('=== FAST PATH ARRAY LOOP (prevLength === 0) ===')
+                console.log('Original child in fast path:', child)
+                console.log('Child nodeType:', (child as Node).nodeType)
+                console.log('Child textContent:', (child as any).textContent)
+                console.log('Child objectId:', (child as any).objectId)
+                console.log('Child constructor:', child?.constructor?.name)
+
+                // Check if this is our problematic TextNode conversion
+                if ((child as Node).nodeType === 1 && (child as any).textContent === '') {
+                    console.log('🚨 CRITICAL: TextNode converted in fast path!')
+                    console.log('This should be nodeType: 3 with textContent: "Custom element"')
+                }
+
+                console.log('Parent before insert:', parent.childNodes?.length)
 
                 const node = child as Node
+                console.log('Node to insert:', node)
+                console.log('  Node nodeType:', node?.nodeType)
+                console.log('  Node textContent:', node?.textContent)
+                console.log('  Node objectId:', (node as any)?.objectId)
+                console.log('  Parent before insertion:', parent.childNodes?.length)
 
                 if (!fragmentOnly) {
-
+                    console.log('Performing insert...')
                     parent.insertBefore(node, null)
-
+                    console.log('Insert completed')
                 }
+                console.log('  Parent after insertion:', parent.childNodes?.length)
+                const insertedChild = parent.childNodes?.[parent.childNodes?.length - 1]
+                console.log('  Last child after insertion:', insertedChild)
+                console.log('  Inserted child nodeType:', insertedChild?.nodeType)
+                console.log('  Inserted child textContent:', (insertedChild as any)?.textContent)
+                console.log('Parent after insert:', parent.childNodes?.length)
+                console.log('Inserted node:', insertedChild)
 
                 FragmentUtils.replaceWithNode(fragment, node)
 
@@ -274,46 +388,124 @@ export const getSetters = (env?: Env) => {
         }
 
         const fragmentNext = FragmentUtils.make()
+        console.log(`Created fragmentNext (${callId}):`, fragmentNext)
 
         const children = (isArray(child) ? child : [child]) as Node[] //TSC
+        console.log('Array processing - children array:', children)
+        console.log('Children array length:', children.length)
 
-        for (let i = 0, l = children.length; i < l; i++) {
+        // Deep clone children array to prevent mutation issues
+        const clonedChildren = [...children]
+        console.log('Cloned children array:', clonedChildren)
 
-            const child = children[i]
+        for (let i = 0, l = clonedChildren.length; i < l; i++) {
+            console.log(`Processing child[${i}]:`, clonedChildren[i])
+            console.log(`  Before assignment - clonedChildren[${i}] nodeType:`, (clonedChildren[i] as any)?.nodeType)
+            console.log(`  Before assignment - clonedChildren[${i}] textContent:`, (clonedChildren[i] as any)?.textContent)
+
+            const child = clonedChildren[i]
+            console.log(`  After assignment - child nodeType:`, (child as any)?.nodeType)
+            console.log(`  After assignment - child textContent:`, (child as any)?.textContent)
             const type = typeof child
 
             if (type === 'string' || type === 'number' || type === 'bigint') {
 
-                FragmentUtils.pushNode(fragmentNext, createText(child as any) as any)
+                const textNode = createText(child as any) as any
+                console.log('Creating text node in loop:', textNode)
+                console.log('Text node nodeType:', textNode?.nodeType)
+                console.log('Text node textContent:', textNode?.textContent)
+                FragmentUtils.pushNode(fragmentNext, textNode)
+                // parent.appendChild(textNode)
 
             } else if (type === 'object' && child !== null && typeof child.nodeType === 'number') {
 
+                console.log('=== ARRAY LOOP OBJECT PROCESSING ===')
+                console.log('Original child object:', child)
+                console.log('Child nodeType:', child?.nodeType)
+                console.log('Child textContent:', (child as any)?.textContent)
+                console.log('Child objectId:', (child as any)?.objectId)
+                console.log('Child constructor name:', child?.constructor?.name)
+
+                // Check if this is our TextNode that got converted
+                if (child?.nodeType === 1 && (child as any)?.textContent === '') {
+                    console.log('⚠️  WARNING: TextNode converted to Element!')
+                    console.log('Expected nodeType: 3, got:', child?.nodeType)
+                    console.log('Expected textContent: "Custom element", got:', (child as any)?.textContent)
+                }
+
+                console.log('Pushing existing child node:', child)
+                console.log('fragmentNext before push:', fragmentNext)
+                console.log('fragmentNext.length before push:', fragmentNext.length)
                 FragmentUtils.pushNode(fragmentNext, child)
+                console.log('fragmentNext after push:', fragmentNext)
+                console.log('fragmentNext.length after push:', fragmentNext.length)
+                // parent.appendChild(child as any)
 
             } else if (type === 'function') {
 
                 const fragment = FragmentUtils.make()
 
+                // const n = parent.appendChild(createComment('') as any)
+
                 // let childFragmentOnly = !fragmentOnly // Avoiding mutating the DOM immediately, letting the parent handle it
 
                 FragmentUtils.pushFragment(fragmentNext, fragment)
 
+                // parent.appendChild(fragment)
+
                 resolveChild(child, (child, dynamic, stack) => {
-
                     // const fragmentOnly = childFragmentOnly
-
-                    // childFragmentOnly = false
-
-                    setChildStatic(parent, fragment, fragmentOnly, child, dynamic, children[i] as any, stack)
-
+                
+                    // n.replaceWith(child)
+                
+                    // const e = children[i][SYMBOL_DOM]
+                    // parent.replaceChild(child, n)
+                
+                    // children[i][SYMBOL_DOM] = child
+                    // parent.replaceChild(child, children[i])
+                    setChildStatic(parent, fragment, true, child, dynamic, clonedChildren[i] as any, stack)
+                
                 }, false, stack, env)
 
             }
 
         }
 
+        console.log(`=== BEFORE GETTING CHILDREN FROM FRAGMENT_NEXT (${callId}) ===`)
+        console.log('fragmentNext:', fragmentNext)
+        console.log('fragmentNext.length:', fragmentNext.length)
+        console.log('fragmentNext.values:', fragmentNext.values)
+
+        console.log(`=== GETTING CHILDREN FROM FRAGMENT_NEXT (${callId}) ===`)
         let next = FragmentUtils.getChildren(fragmentNext)
+        console.log('Got next from fragmentNext:', next)
+        console.log('next type:', typeof next)
+        console.log('Array.isArray(next):', Array.isArray(next))
+        console.log('next instanceof Array:', next instanceof Array)
+
+        if (Array.isArray(next)) {
+            console.log('next array length:', next.length)
+            next.forEach((child, i) => {
+                console.log(`next[${i}]:`, child)
+                console.log(`  nodeType:`, (child as any)?.nodeType)
+                console.log(`  textContent:`, (child as any)?.textContent)
+                console.log(`  objectId:`, (child as any)?.objectId)
+                console.log(`  constructor:`, child?.constructor?.name)
+            })
+        } else if (next) {
+            console.log('Single next:', next)
+            console.log('  nodeType:', (next as any)?.nodeType)
+            console.log('  textContent:', (next as any)?.textContent)
+            console.log('  objectId:', (next as any)?.objectId)
+            console.log('  constructor:', next?.constructor?.name)
+        }
         let nextLength = fragmentNext.length
+        console.log('=== CALCULATING nextLength ===')
+        console.log('fragmentNext.length:', fragmentNext.length)
+        console.log('Assigned nextLength:', nextLength)
+        console.log('fragmentNext at this point:', fragmentNext)
+        console.log('fragmentNext.values:', fragmentNext.values)
+        console.log('fragmentNext.length (again):', fragmentNext.length)
 
         if (nextLength === 0 && prevLength === 1 && prevFirst.nodeType === 8) { // It's a placeholder already, no need to replace it
 
@@ -358,13 +550,30 @@ export const getSetters = (env?: Env) => {
 
                 } else {
 
-                    if (next instanceof Array) {
+                    console.log('=== FAST PATH INSERTION ===')
+                    console.log('next:', next)
+                    console.log('next type:', typeof next)
+                    console.log('Array.isArray(next):', Array.isArray(next))
+                    console.log('next instanceof Array:', next instanceof Array)
 
+                    if (next instanceof Array) {
+                        console.log('Inserting array of nodes, length:', next.length)
+                        next.forEach((node, i) => {
+                            console.log(`Inserting node[${i}]:`, node)
+                            console.log(`  nodeType:`, (node as any)?.nodeType)
+                            console.log(`  textContent:`, (node as any)?.textContent)
+                            console.log(`  objectId:`, (node as any)?.objectId)
+                            console.log(`  constructor:`, node?.constructor?.name)
+                        })
                         // parent.append.apply(parent, next)
                         for (const node of next) parent.appendChild(node)
 
                     } else {
-
+                        console.log('Inserting single node:', next)
+                        console.log('  nodeType:', (next as any)?.nodeType)
+                        console.log('  textContent:', (next as any)?.textContent)
+                        console.log('  objectId:', (next as any)?.objectId)
+                        console.log('  constructor:', next?.constructor?.name)
                         parent.appendChild(next)
 
                     }
@@ -406,7 +615,19 @@ export const getSetters = (env?: Env) => {
 
     const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
         const cd = child
-        resolveChild(cd, (child, dynamic, stack) => setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack), false, stack, env)
+        console.log('setChild called with child:', child)
+        resolveChild(cd, (child, dynamic, stack) => {
+            console.log('Setter function called with child:', child)
+            console.log('Child type:', typeof child)
+            if (Array.isArray(child)) {
+                child.forEach((c, i) => {
+                    console.log(`Child[${i}]:`, c)
+                    console.log(`  nodeType:`, (c as any)?.nodeType)
+                    console.log(`  textContent:`, (c as any)?.textContent)
+                })
+            }
+            setChildStatic(parent, fragment, false, child, dynamic, /* cd as any */null, stack)
+        }, false, stack, env)
     }
 
     const setClassStatic = classesToggle
@@ -415,11 +636,11 @@ export const getSetters = (env?: Env) => {
 
         if (isFunction(value) && isFunctionReactive(value)) {
 
-            useRenderEffect(() => {
+            useRenderEffect((options) => {
 
                 setClassStatic(element, key, value())
 
-            }, stack)
+            }, env, stack)
 
         } else {
 
@@ -451,7 +672,7 @@ export const getSetters = (env?: Env) => {
 
             let keyPrev: null | undefined | boolean | string
 
-            useRenderEffect(() => {
+            useRenderEffect((options) => {
 
                 const keyNext = key()
 
@@ -459,7 +680,7 @@ export const getSetters = (env?: Env) => {
 
                 keyPrev = keyNext
 
-            }, stack)
+            }, env, stack)
 
         } else {
 
@@ -589,7 +810,7 @@ export const getSetters = (env?: Env) => {
 
             let objectPrev: Record<string, boolean> | undefined
 
-            useRenderEffect(() => {
+            useRenderEffect((options) => {
 
                 const objectNext = resolveClass(object)
 
@@ -597,7 +818,7 @@ export const getSetters = (env?: Env) => {
 
                 objectPrev = objectNext
 
-            }, stack)
+            }, env, stack)
 
         } else {
 
@@ -773,11 +994,11 @@ export const getSetters = (env?: Env) => {
 
     const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
 
-        useRenderEffect(() => {
+        useRenderEffect((options) => {
 
             setHTMLStatic(element, $$($$(value).__html))
 
-        }, stack)
+        }, env, stack)
 
     }
 
@@ -829,11 +1050,11 @@ export const getSetters = (env?: Env) => {
 
         if (isFunction(value) && isFunctionReactive(value)) {
 
-            useRenderEffect(() => {
+            useRenderEffect((options) => {
 
                 setPropertyStatic(element, key, value())
 
-            }, stack)
+            }, env, stack)
 
         } else {
 
@@ -884,11 +1105,11 @@ export const getSetters = (env?: Env) => {
 
         if (isFunction(value) && isFunctionReactive(value)) {
 
-            useRenderEffect(() => {
+            useRenderEffect((options) => {
 
                 setStyleStatic(element, key, value())
 
-            }, stack)
+            }, env, stack)
 
         } else {
 
@@ -962,7 +1183,7 @@ export const getSetters = (env?: Env) => {
 
             let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
 
-            useRenderEffect((stack) => {
+            useRenderEffect((options) => {
 
                 const objectNext = resolveStyle(object)
 
@@ -970,7 +1191,7 @@ export const getSetters = (env?: Env) => {
 
                 objectPrev = objectNext
 
-            }, stack)
+            }, env, stack)
 
         } else {
 

@@ -10,10 +10,14 @@
         "test:ui": "playwright test --ui"
     },
     "dependencies": {
+        "@types/lodash": "^4.17.23",
+        "lodash": "^4.17.23",
         "vite": "^4.4.11",
         "woby": "workspace:*"
     },
     "devDependencies": {
-        "@playwright/test": "^1.56.1"
+        "@ai-capabilities-suite/mcp-debugger-server": "^1.5.23",
+        "@playwright/test": "^1.56.1",
+        "tsx": "^4.1.0"
     }
 }

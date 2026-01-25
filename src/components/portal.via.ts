@@ -17,7 +17,7 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
 
   const stack = new Error()
 
-  useRenderEffect(() => {
+  useRenderEffect((options) => {
 
     if (!$$(condition)) return
 
@@ -33,15 +33,15 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
 
     }
 
-  }, stack)
+  }, 'via', stack)
 
-  useRenderEffect(() => {
+  useRenderEffect((options) => {
 
     if (!$$(condition)) return
 
     return render(children, portal)
 
-  }, stack)
+  }, 'via', stack)
 
   return assign(() => $$(condition) || children, { metadata: { portal } })
 

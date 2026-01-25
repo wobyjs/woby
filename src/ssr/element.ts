@@ -66,4 +66,47 @@ export class Element extends BaseNode {
 
         return cloned as unknown as globalThis.Node
     }
+
+    // Add replaceWith method
+    replaceWith(...nodes: (globalThis.Node | string)[]): void {
+        if (!this.parentNode) {
+            // If no parent, we can't replace this node
+            return
+        }
+
+        // Convert string nodes to text nodes
+        const convertedNodes = nodes.map(node => {
+            if (typeof node === 'string') {
+                // Create a simple text node implementation
+                const textNode = Object.create(null)
+                textNode.nodeType = 3 // TEXT_NODE
+                textNode.textContent = node
+                textNode.data = node
+                textNode.toString = () => node
+                return textNode
+            }
+            return node
+        })
+
+        // Find our index in the parent
+        const parent = this.parentNode as Element
+        const index = parent.childNodes.indexOf(this as any)
+
+        if (index !== -1) {
+            // Remove ourselves
+            parent.removeChild(this as any)
+
+            // Insert new nodes at our position
+            for (let i = 0; i < convertedNodes.length; i++) {
+                const node = convertedNodes[i]
+                if (i === 0) {
+                    // For the first node, use the original position
+                    parent.insertBefore(node as any, parent.childNodes[index] as any)
+                } else {
+                    // For subsequent nodes, insert after the previous one
+                    parent.insertBefore(node as any, parent.childNodes[index + i] as any)
+                }
+            }
+        }
+    }
 }

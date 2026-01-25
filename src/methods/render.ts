@@ -12,13 +12,13 @@ export const render = (child: Child, parent?: Element | null | ShadowRoot): Disp
     // if (!(parent instanceof ShadowRoot))
     parent.textContent = ''
 
-    return useRoot((stack, dispose) => {
+    return useRoot((options, dispose) => {
 
-        setChild(parent, child, FragmentUtils.make(), stack)
+        setChild(parent, child, FragmentUtils.make(), options.stack!)
 
         return (): void => {
 
-            dispose(stack)
+            dispose(options)
 
             parent.textContent = ''
 

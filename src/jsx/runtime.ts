@@ -57,14 +57,14 @@ export function jsx<P extends {} = {}>(component: Component<P>, props?: P, ...ch
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, key?: string): Element
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, ...children: (string | Child)[]): Element {
   if (typeof children === 'string') // React 16, key
-    return wrapCloneElement(createElement<P>(component as any, props ?? {} as P, children as string), component, props)
+    return wrapCloneElement(createElement<P>(component as any, props ?? {} as P, children as string), component, props) as any
 
   props = getProps<P>(component, props)
 
   if (typeof children === 'string') // React 16, key
     Object.assign(props as any, { children })
 
-  return wrapCloneElement(createElement<P>(component as any, props, (props as any)?.key as string), component, props)
+  return wrapCloneElement(createElement<P>(component as any, props, (props as any)?.key as string), component, props) as any
 }
 
 //React 17 only
@@ -74,7 +74,7 @@ export const jsxDEV = <P extends {} = {}>(component: Component<P>, props: P | nu
   if (key)
     Object.assign(props, { key })
 
-  return wrapCloneElement(createElement<P>(component as any, props), component, props)
+  return wrapCloneElement(createElement<P>(component as any, props) as any, component, props)
 }
 
 export const getMeta = (target: Element) => target?.[SYMBOL_CLONE] as CloneableType

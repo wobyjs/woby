@@ -1,7 +1,7 @@
 /**
- * Comment Node Implementation for SSR
+ * Text Node Implementation for SSR
  * 
- * This class provides a mock implementation of the Comment node for server-side rendering
+ * This class provides a mock implementation of the Text node for server-side rendering
  * environments where browser APIs are not available.
  */
 
@@ -16,11 +16,11 @@ export class Text extends BaseNode {
         return this.data
     }
     /**
-     * Returns the string representation of the comment
-     * This is used when rendering the comment in SSR
+     * Returns the string representation of the text node
+     * This is used when rendering the text content in SSR
      */
     toString(): string {
-        return `<!--${this.data}-->`
+        return this.data
     }
 
     /**

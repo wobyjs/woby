@@ -17,7 +17,7 @@ export const useMicrotask = (fn: Callback, stack: Stack): void => {
 
     if (disposed()) return
 
-    runWithOwner(fn, stack)
+    runWithOwner(fn, { stack })
 
   })
 

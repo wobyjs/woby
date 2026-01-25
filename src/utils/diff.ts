@@ -59,7 +59,7 @@ import { Env, getEnv } from "./creators"
  * // This will efficiently insert nodeC before nodeA, and append nodeD
  * ```
  */
-export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null, env: Env): void => {
+export const diff = (parent: any, before: any, after: any, nextSibling: any, env: Env): void => {
   const { createComment } = getEnv(env)
 
   // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
@@ -68,28 +68,28 @@ export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], 
   const dummyNode = createComment('')
 
   /** Wrapper array for single "before" nodes to normalize them as arrays */
-  const beforeDummyWrapper: [Node] = [dummyNode as any]
+  const beforeDummyWrapper: [any] = [dummyNode as any]
 
   /** Wrapper array for single "after" nodes to normalize them as arrays */
-  const afterDummyWrapper: [Node] = [dummyNode as any]
+  const afterDummyWrapper: [any] = [dummyNode as any]
 
 
 
   if (before === after) return
-  if (before instanceof Node) {
-    if (after instanceof Node) {
-      if (before.parentNode === parent) { // Safety check, since setChildStatic may trigger this
-        parent.replaceChild(after, before)
+  if ((typeof Node !== 'undefined' && before instanceof Node) || (before && typeof (before as any).nodeType === 'number')) {
+    if ((typeof Node !== 'undefined' && after instanceof Node) || (after && typeof (after as any).nodeType === 'number')) {
+      if ((before as any).parentNode === parent) { // Safety check, since setChildStatic may trigger this
+        parent.replaceChild(after as any, before as any)
         return
       } else {
         //TODO: Optimize this branch too
       }
     }
-    beforeDummyWrapper[0] = before
+    beforeDummyWrapper[0] = before as any
     before = beforeDummyWrapper
   }
-  if (after instanceof Node) {
-    afterDummyWrapper[0] = after
+  if ((typeof Node !== 'undefined' && after instanceof Node) || (after && typeof (after as any).nodeType === 'number')) {
+    afterDummyWrapper[0] = after as any
     after = afterDummyWrapper
   }
   const bLength = after.length
@@ -98,7 +98,7 @@ export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], 
   let aStart = 0
   let bStart = 0
   let map: Map<any, any> | null = null
-  let removable: Node | undefined
+  let removable: any
   while (aStart < aEnd || bStart < bEnd) {
     // append head, tail, or nodes in between: fast path
     if (aEnd === aStart) {

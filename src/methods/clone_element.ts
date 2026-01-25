@@ -18,7 +18,7 @@ export const cloneElement = <P extends Props>(element: Child | Element, props: P
     if (children.length > 0)
       Object.assign(props, { children })
 
-    return wrapCloneElement(createElement<P>(Component as any, newProps), Component, newProps)
+    return wrapCloneElement(createElement<P>(Component as any, newProps), Component, newProps) as any
   }
   else if (isArray(element))
     return element.map(e => cloneElement(e, props))

@@ -9,6 +9,7 @@ import { resolve } from '../methods/soby'
 import { $ } from '../methods/soby'
 import { with as _with } from 'soby'
 import type { Child, Disposer, FunctionMaybe, Observable, ObservableReadonly } from '../types'
+import { Stack } from '../soby'
 
 /* TYPES */
 
@@ -33,7 +34,8 @@ let lockId = 1
 
 export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, ttl?: FunctionMaybe<number>, children: Child }): ObservableReadonly<Child> => {
 
-  return useMemo((stack) => {
+  return useMemo((options) => {
+    const { stack } = options ?? {} as { stack?: Stack }
 
     return useResolved([id, ttl], (id, ttl) => {
 
@@ -41,7 +43,7 @@ export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, tt
       const item = cache[id] ||= { id, lock }
 
       item.lock = lock
-      item.reset?.(stack)
+      item.reset?.({ stack })
       item.suspended ||= $(false)
       item.suspended(false)
 
@@ -49,13 +51,14 @@ export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, tt
 
         runWithSuperRoot(() => {
 
-          useRoot((stack, dispose) => {
+          useRoot((options, dispose) => {
+            const { stack } = options ?? {} as { stack?: Stack }
 
             item.dispose = () => {
 
               delete cache[id]
 
-              dispose(stack)
+              dispose({ stack })
 
             }
 
@@ -63,11 +66,11 @@ export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, tt
 
               item.result = resolve(children)
 
-            }, stack)
+            }, { stack })
 
           })
 
-        }, stack)
+        }, { stack })
 
       }
 
@@ -81,7 +84,7 @@ export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, tt
 
         if (!ttl || ttl <= 0 || ttl >= Infinity) return
 
-        const dispose = () => hasLock() && item.dispose?.(stack)
+        const dispose = () => hasLock() && item.dispose?.({ stack })
         const timeoutId = setTimeout(dispose, ttl)
         const reset = () => clearTimeout(timeoutId)
 

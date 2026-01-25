@@ -1,6 +1,8 @@
 
 /* IMPORT */
 import type * as CSS from 'csstype'
+import { Env } from './utils/creators'
+import type { Stack } from 'soby'
 
 // import './jsx/types' //import once to make entire project compilable.
 
@@ -11,7 +13,7 @@ declare const ContextWithDefaultSymbol: unique symbol
 
 export type ArrayMaybe<T = unknown> = T[] | T
 
-export type Callback = (stack?: Error) => void
+export type Callback = (options?: { stack?: Stack, env?: Env }) => void
 
 export type Child = null | undefined | boolean | bigint | number | string | symbol | Node | Array<Child> | (() => Child)
 
@@ -55,9 +57,11 @@ export type DirectiveData<Arguments extends unknown[] = []> = { fn: DirectiveFun
 
 export type DirectiveOptions = { immediate?: boolean }
 
-export type Disposer = (stack?: Error) => void
+export type Disposer = (options?: { stack?: Stack, env?: Env }) => void
 
-export type EffectFunction = (stack?: Error) => Disposer | void
+export type EffectFunction = (
+  (options?: { stack?: Stack, env?: Env }) => Disposer | void
+)
 
 export type EffectOptions = import('soby').EffectOptions
 

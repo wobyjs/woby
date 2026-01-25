@@ -103,12 +103,12 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T |
             const e = createText('')
             let f = true  //first time no parent
             let v: any[]
-            useRenderEffect(() => {
+            useRenderEffect((options) => {
                 const pv = v
                 v = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined') //, true)
                 v = updateElement(e as any, f, v, pv)
                 f = false
-            }, stack)
+            }, 'via', stack)
             return v //[...v] as any
         } else {
             const vs: any[] = values.map(v => resolveChild(v, null, false, stack)).filter(v => typeof v !== 'undefined')
@@ -127,7 +127,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T |
             const e = createText('') //('div') as any as HTMLDivElement
             let f = true  //first time no parent
             let v: any[]
-            useRenderEffect((stack) => {
+            useRenderEffect((options) => {
                 const pv = v;
 
                 (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
@@ -135,7 +135,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter?: ((value: T |
                 v = resolveChild(value(), null, false, stack) as any
                 v = updateElement(e as any, f, v, pv)
                 f = false
-            }, stack)
+            }, 'via', stack)
             return v as any // [e, ...[v].flat(Infinity)] as any
         }
     }

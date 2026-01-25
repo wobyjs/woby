@@ -8,7 +8,10 @@ export * from './hooks'
 export { assign as assignMethod } from './methods/assign'
 export * from './methods/index' /* exclude assign to avoid conflict */
 export * from "./constants"
-export * from './ssr'
+// Export methods required for JSX runtime
+export { wrapCloneElement } from './methods/wrap_clone_element'
+export { createElement } from './methods/create_element'
+export { SYMBOL_CLONE } from './constants'
 export { assign as assignUtil } from "./utils/lang"
 export { getEnv } from "./utils/creators"
 

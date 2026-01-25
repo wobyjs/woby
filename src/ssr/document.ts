@@ -3,6 +3,7 @@
  */
 
 import { BaseNode } from "./base_node"
+import { Comment } from "./comment"
 import type { FN } from "../types"
 
 type EventListener = (evt: Event) => void
@@ -19,11 +20,11 @@ type AddEventListenerOptions = boolean | {
 // Enhanced mock implementations for SSR without happy-dom
 // These implementations better support the html`` template pattern from index.tsx
 
-const createComment = ((content: string) => ({
-    nodeType: 8,
-    textContent: content,
-    toString: () => `<!--${content}-->`
-})) as any as FN<[string], Comment>
+const createComment = ((content: string) => {
+    // Create a proper Comment instance that extends BaseNode
+    const comment = new Comment(content)
+    return comment
+}) as any as FN<[string], Comment>
 
 const createHTMLNode = ((tagName: string) => {
     class HTMLNode extends BaseNode {
@@ -86,7 +87,7 @@ const createHTMLNode = ((tagName: string) => {
 
             // Handle self-closing tags
             if (['br', 'hr', 'img', 'input', 'meta', 'link'].includes(this.tagName.toLowerCase())) {
-                return `<${this.tagName}${attrStr}>`
+                return `<${this.tagName}${attrStr} />`
             }
 
             // Build children string
@@ -149,30 +150,35 @@ const createSVGNode = ((tagName: string) => {
 }) as any as FN<[string], SVGElement>
 
 const createText = ((text: string) => {
-    // Define TextNode dynamically to ensure it extends the proper Node class
-    const TextNode = class extends (globalThis.Node || Object) {
-        nodeType: number
+    // Define TextNode that extends BaseNode for SSR compatibility
+    const TextNode = class extends BaseNode {
         textContent: string
-        parentNode: any | null
+        objectId: string
 
         constructor(text: string) {
-            super()
-            this.nodeType = 3 // nodeType 3 for text
+            super(3) // nodeType 3 for text
+            this.objectId = Math.random().toString(36).substr(2, 9) // Unique ID for tracking
             this.textContent = String(text)
-            this.parentNode = null
+            console.log('TextNode constructor called with:', text)
+            console.log('TextNode created with nodeType:', this.nodeType)
+            console.log('TextNode textContent:', this.textContent)
+            console.log('TextNode objectId:', this.objectId)
         }
 
         // Getter for text representation
         toString() {
+            console.log('TextNode toString called, nodeType:', this.nodeType)
             return this.textContent
         }
 
         // Property to get text as string for rendering
         get nodeValue() {
+            console.log('TextNode nodeValue getter called, nodeType:', this.nodeType)
             return this.textContent
         }
 
         set nodeValue(value: string) {
+            console.log('TextNode nodeValue setter called, old nodeType:', this.nodeType, 'new value:', value)
             this.textContent = value
         }
 

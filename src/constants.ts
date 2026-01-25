@@ -18,7 +18,8 @@ export const SYMBOLS_DIRECTIVES: Record<string, symbol> = {}
 
 export const SYMBOL_CLONE = Symbol('CloneElement')
 
-// export const SYMBOL_DOM = Symbol('DOM')
+export const SYMBOL_DOM = Symbol('DOM')
+export const SYMBOL_SSR = Symbol('DOM')
 
 /** This symbol is indicated that the element is created through jsx/jsxDEV
  *  not customElement

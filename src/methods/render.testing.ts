@@ -22,8 +22,8 @@ export const render = (child: Child) => {
     fragment.textContent = ''
 
     let disposer
-    let unmount = useRoot((stack, dispose) => {
-        getSetters().setChild(fragment as any, child, FragmentUtils.make(), stack)
+    let unmount = useRoot((options, dispose) => {
+        getSetters().setChild(fragment as any, child, FragmentUtils.make(), options.stack!)
         // fragment.appendChild(child);
 
         renderDiv.append(fragment)
@@ -31,7 +31,7 @@ export const render = (child: Child) => {
         console.log('c', (fragment.children[0] as any).outerHTML)
 
         return disposer = (): void => {
-            dispose(stack)
+            dispose(options)
             fragment.textContent = ''
             fragment.remove()
 

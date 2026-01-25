@@ -9,6 +9,7 @@ import { $ } from '../methods/soby'
 import { $$ } from '../methods/soby'
 import { assign, castError, isPromise } from '../utils/lang'
 import type { ObservableMaybe, PromiseMaybe, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource } from '../types'
+import { Stack } from '../soby'
 
 /* MAIN */
 
@@ -31,9 +32,9 @@ export const useResource = <T>(fetcher: (() => ObservableMaybe<PromiseMaybe<T>>)
   const resourceFunction: ResourceFunction<T> = { pending: () => pending(), error: () => error(), value: () => resource().value, latest: () => resource().latest }
   const resource = $<ResourceStatic<T>>(resourcePending)
 
-  const stack = new Error()
+  const stack = new Stack()
 
-  useRenderEffect(() => {
+  useRenderEffect((options) => {
 
     const disposed = useCheapDisposed()
 
@@ -98,8 +99,8 @@ export const useResource = <T>(fetcher: (() => ObservableMaybe<PromiseMaybe<T>>)
     }
 
     fetch()
-  }, stack)
+  }, null as any, stack)
 
-  return assign(useReadonly(resource, stack), resourceFunction)
+  return assign(useReadonly(resource, { stack }), resourceFunction)
 
 }

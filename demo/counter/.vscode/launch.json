@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug br_test.js",
+            "program": "d:/Developments/tslib/@woby/woby/demo/counter/br_test.js",
+            "cwd": "d:/Developments/tslib/@woby/woby/demo/counter",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug br_test.tsx",
+            "program": "d:/Developments/tslib/@woby/woby/demo/counter/debug_br_test.tsx",
+            "runtimeExecutable": "tsx",
+            "cwd": "d:/Developments/tslib/@woby/woby/demo/counter",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug bug.ts",
+            "program": "d:/Developments/tslib/@woby/woby/demo/counter/bug.ts",
+            "runtimeExecutable": "tsx",
+            "cwd": "d:/Developments/tslib/@woby/woby/demo/counter",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        }
+    ]
+}

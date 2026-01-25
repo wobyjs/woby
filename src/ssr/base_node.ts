@@ -32,7 +32,13 @@ export class BaseNode {
 
         // Set the parent node
         if (child) {
-            child.parentNode = this
+            try {
+                child.parentNode = this
+            }
+            catch (ex) {
+                console.error(ex)
+                debugger
+            }
         }
 
         this.childNodes.push(child)
@@ -119,6 +125,63 @@ export class BaseNode {
         })
 
         return child
+    }
+
+    replaceWith(...nodes: any[]) {
+        if (!this.parentNode) {
+            return // Nothing to replace if no parent
+        }
+
+        // Convert any text nodes to actual nodes if needed
+        const normalizedNodes = nodes.map(node => {
+            if (typeof node === 'string') {
+                // Create a text node if it's a string
+                // We can't import Text here due to circular dependency, so we'll create a basic text node
+                const textNode = {
+                    nodeType: 3, // Text node type
+                    data: node,
+                    nodeValue: node,
+                    textContent: node,
+                    parentNode: this.parentNode,
+                    toString: () => node,
+                    appendChild: () => { },
+                    insertBefore: () => { },
+                    removeChild: () => { },
+                    replaceWith: () => { },
+                    // Add other required methods/properties as needed
+                }
+                return textNode
+            }
+            // Set parent node for each node being inserted
+            if (node && typeof node === 'object') {
+                node.parentNode = this.parentNode
+            }
+            return node
+        })
+
+        const parent = this.parentNode
+        const index = parent.childNodes.indexOf(this)
+
+        if (index !== -1) {
+            // Replace this node with the new nodes
+            parent.childNodes.splice(index, 1, ...normalizedNodes)
+
+            // Update parent reference for the replaced node
+            this.parentNode = null
+
+            // Notify observers of childList mutation
+            this._notifyMutation({
+                type: 'childList',
+                target: parent,
+                addedNodes: new SimpleNodeList(normalizedNodes),
+                removedNodes: new SimpleNodeList([this]),
+                previousSibling: index > 0 ? parent.childNodes[index - 1] : null,
+                nextSibling: index < parent.childNodes.length ? parent.childNodes[index] : null,
+                attributeName: null,
+                attributeNamespace: null,
+                oldValue: null
+            })
+        }
     }
 
     setAttribute(name: string, value: any) {

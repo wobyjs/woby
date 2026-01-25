@@ -22,7 +22,7 @@ export const Dynamic = <P = {}>({ component, props, children }: { component: Com
 
     } else {
 
-        return createElement<P>(component, props, resolvedChildren)
+        return createElement<P>(component, props, resolvedChildren) as any
 
     }
 

@@ -17,4 +17,9 @@ export * from './mutation_observer'
 export * from './custom_elements'
 export * from './document'
 
+// Export methods required for JSX runtime
+export { wrapCloneElement } from '../methods/wrap_clone_element'
+export { createElement } from '../methods/create_element'
+export { SYMBOL_CLONE } from '../constants'
+
 

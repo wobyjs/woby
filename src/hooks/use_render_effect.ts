@@ -24,6 +24,7 @@
 import { useEffect } from '../hooks/soby'
 import type { Disposer, EffectFunction, EffectOptions } from '../types'
 import { Stack } from '../soby'
+import { Env } from '../utils'
 
 /* HELPERS */
 
@@ -35,8 +36,8 @@ const options: EffectOptions = {
 
 // This function exists for convenience, and to avoid creating unnecessary options objects
 
-export const useRenderEffect = (fn: EffectFunction, stack: Stack): Disposer => {
+export const useRenderEffect = (fn: EffectFunction, env: Env, stack: Stack): Disposer => {
 
-  return useEffect(fn, { ...options, stack })
+  return useEffect(fn as any, { ...options, stack })
 
 }

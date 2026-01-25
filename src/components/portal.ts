@@ -26,7 +26,7 @@ export const Portal = ({ when = true, mount, wrapper, children, env }: { mount?:
 
     const stack = new Error()
 
-    useRenderEffect(() => {
+    useRenderEffect((options) => {
 
         if (!$$(condition)) return
 
@@ -50,16 +50,16 @@ export const Portal = ({ when = true, mount, wrapper, children, env }: { mount?:
 
         }
 
-    }, stack)
+    }, env, stack)
 
-    useRenderEffect(() => {
+    useRenderEffect((options) => {
 
         if (!$$(condition)) return
 
         // In SSR mode, we don't pass the portal to avoid issues
         return isSSR ? render(children, null) : render(children, portal as Element)
 
-    }, stack)
+    }, env, stack)
 
     return assign(() => $$(condition) || children, { metadata: { portal: portal as HTMLElement } })
 

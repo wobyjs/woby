@@ -142,7 +142,7 @@ export class HTMLElement extends Element implements VoidHTMLAttributes<globalThi
 
         // Handle self-closing tags
         if (['BR', 'HR', 'IMG', 'INPUT', 'META', 'LINK'].includes(this.tagName)) {
-            return `<${this.tagName}${attrStr}>`
+            return `<${this.tagName}${attrStr} />`
         }
 
         // Build children string

@@ -13,11 +13,11 @@ export function h<P extends { children?: Child } = {}>(component: Component<P>, 
   if (children.length || (isObject(props) && !isArray(props))) {
     if (!props) props = { children } as any
     else props = { ...(props as object), children } as P
-    return createElement(component, props as any) //TSC
+    return createElement(component, props as any) as any //TSC
 
   } else {
 
-    return createElement(component, null, props as Child) //TSC
+    return createElement(component, null, props as Child) as any //TSC
 
   }
 
