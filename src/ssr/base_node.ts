@@ -127,6 +127,39 @@ export class BaseNode {
         return child
     }
 
+    replaceChild(newChild: any, oldChild: any) {
+        const index = this.childNodes.indexOf(oldChild)
+        if (index === -1) {
+            throw new Error('Old child node not found')
+        }
+
+        // Remove the parent reference from old child
+        oldChild.parentNode = null
+        
+        // Set the parent node for new child
+        if (newChild) {
+            newChild.parentNode = this
+        }
+
+        // Replace the child
+        this.childNodes[index] = newChild
+
+        // Notify observers of childList mutation
+        this._notifyMutation({
+            type: 'childList',
+            target: this,
+            addedNodes: new SimpleNodeList([newChild]),
+            removedNodes: new SimpleNodeList([oldChild]),
+            previousSibling: index > 0 ? this.childNodes[index - 1] : null,
+            nextSibling: index < this.childNodes.length - 1 ? this.childNodes[index + 1] : null,
+            attributeName: null,
+            attributeNamespace: null,
+            oldValue: null
+        })
+
+        return oldChild
+    }
+
     replaceWith(...nodes: any[]) {
         if (!this.parentNode) {
             return // Nothing to replace if no parent

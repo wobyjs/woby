@@ -8,6 +8,7 @@
 
 
 // Export all the individual components
+export * from '../components/fragment'
 export * from './simple_node_list'
 export * from './mutation_observer_init'
 export * from './mutation_record'

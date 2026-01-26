@@ -159,26 +159,19 @@ const createText = ((text: string) => {
             super(3) // nodeType 3 for text
             this.objectId = Math.random().toString(36).substr(2, 9) // Unique ID for tracking
             this.textContent = String(text)
-            console.log('TextNode constructor called with:', text)
-            console.log('TextNode created with nodeType:', this.nodeType)
-            console.log('TextNode textContent:', this.textContent)
-            console.log('TextNode objectId:', this.objectId)
         }
 
         // Getter for text representation
         toString() {
-            console.log('TextNode toString called, nodeType:', this.nodeType)
             return this.textContent
         }
 
         // Property to get text as string for rendering
         get nodeValue() {
-            console.log('TextNode nodeValue getter called, nodeType:', this.nodeType)
             return this.textContent
         }
 
         set nodeValue(value: string) {
-            console.log('TextNode nodeValue setter called, old nodeType:', this.nodeType, 'new value:', value)
             this.textContent = value
         }
 

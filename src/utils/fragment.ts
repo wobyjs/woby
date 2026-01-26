@@ -29,7 +29,6 @@ export const FragmentUtils = {
     const placeholder = createText('') as unknown as Node
       // Mark it as placeholder for identification
       ; (placeholder as any).__isPlaceholder = true
-    console.log('Created placeholder text node:', placeholder)
     return placeholder
   },
 
@@ -43,7 +42,6 @@ export const FragmentUtils = {
 
     const parent = placeholder.parentNode
     if (!parent) {
-      console.warn('Placeholder has no parent, cannot replace')
       return
     }
 

@@ -1,7 +1,7 @@
 /* IMPORT */
 
 import '../types'
-// import Fragment from '../components/fragment';
+import { Fragment } from '../components/fragment'
 // import createElement from '../methods/create_element.ssr';
 // import { wrapCloneElement } from '../methods/wrap_clone_element';
 import type { Child, Component, Element } from '../types'

@@ -1,4 +1,4 @@
-/// @jsxImportSource ../../src
+/// @jsxImportSource ../../src/ssr
 
 /**
  * Counter Component Demo
@@ -18,7 +18,8 @@
  */
 
 /* IMPORT */
-import { $, $$, useMemo, render, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe, renderToString } from '../../src'
+import { $, $$, useMemo, render, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe } from '../../src'
+import { renderToString } from '../../src/ssr'
 
 DEBUGGER.verboseComment = true
 
@@ -231,34 +232,15 @@ const App = () => {
      */
     const decrement = () => value(prev => prev - 1)
 
-    return <>
+    return <div>
 
         <h1>Custom element<br /></h1>
         <h1>&lt;counter-element&gt; - &lt;counter-element&gt;:<br /></h1>
-        {/* <counter-element title={'Custom element in TSX'}
-            style$background-color={'#eee'}
-            style$color={'red'}
-            style$font-size='1.1em'
-            nested$nested$text='xyz'
-            // value={0}
-            // increment={increment}
-            // decrement={decrement}
-            nested={{ nested: { text: $('abc') } }}
-            obj={$({ nested: { text: 'this obj will be serialized and deserialized to html attribute' } }, { toHtml: obj => JSON.stringify(obj), fromHtml: obj => JSON.parse(obj) })} //this obj will be serialized and deserialized to html attribute
-            class={'border-2 border-black border-solid bg-amber-400'}>
+        <counter-element title={'Custom element in TSX'}>
             <context-value />
             <ContextValue />
-            <ProcessedContextValue />
-            <processed-context-value />
-
             <h2>Nested Custom &lt;counter-element&gt;:<br /></h2>
-
-            <counter-element title={'counter-element Nested'}
-                style$color={'orange'}
-                style$font-size='1em'
-                nested$nested$text=' nested context'
-                nested={{ nested: { text: $(' nested context') } }}
-                class={'border-2 border-black border-solid bg-amber-400 m-10'}>
+            <counter-element title={'counter-element Nested'}>
                 <context-value />
                 <ContextValue />
             </counter-element>
@@ -277,12 +259,7 @@ const App = () => {
         <Counter title='TSX - HTML Counter Main' >
             <context-value />
             <ContextValue />
-            <counter-element title={'counter-element Nested'}
-                style$color={'orange'}
-                style$font-size='1em'
-                nested$nested$text=' nested context'
-                nested={{ nested: { text: $(' nested context') } }}
-                class={'border-2 border-black border-solid bg-amber-400 m-10'}>
+            <counter-element title={'counter-element Nested'}>
                 <p>obj attribute not diplay since, it is not explicit defined</p>
                 <context-value />
                 <ContextValue />
@@ -290,21 +267,16 @@ const App = () => {
         </Counter>
 
         <h1>HTML - TSX &lt;counter-element&gt; - &lt;Counter&gt;</h1>
-        <counter-element title={'HTML - TSX main'}
-            style$color={'orange'}
-            style$font-size='1em'
-            nested$nested$text=' nested context'
-            nested={{ nested: { text: $(' nested context') } }}
-            class={'border-2 border-black border-solid bg-amber-400 m-10'}>
+        <counter-element title={'HTML - TSX main'}>
             <context-value />
             <ContextValue />
             <Counter title='TSX Counter nested' >
                 <context-value />
                 <ContextValue />
             </Counter>
-        </counter-element> */}
+        </counter-element>
 
-    </>
+    </div>
 }
 
 /**
@@ -312,20 +284,20 @@ const App = () => {
  * 
  * Mounts the App component to the element with ID 'app'.
  */
-// render(<App />, document.getElementById('app'))
+console.log(renderToString(<App />)) //, document.getElementById('app')) // Main test subject - causes fragment issues in complex components
 
-console.log('Rendered HTML:')
+// // console.log('Rendered HTML:')
 
-// Debug the renderToString process
-const testElement = <h1>Custom element<br /></h1>
-console.log('Test element:', testElement)
-console.log('Test element type:', typeof testElement)
-console.log('Test element keys:', Object.keys(testElement || {}))
+// // Debug the renderToString process
+// const testElement = <h1>Custom element<br /></h1>
+// console.log('Test element:', testElement)
+// console.log('Test element type:', typeof testElement)
+// console.log('Test element keys:', Object.keys(testElement || {}))
 
-const result = renderToString(testElement)
-console.log('Actual result:', result)
-console.log('Expected: <H1>Custom element<BR /></H1>')
-console.log('--- End of rendered HTML ---')
+// const result = renderToString(testElement)
+// console.log('Actual result:', result)
+// console.log('Expected: <H1>Custom element<BR /></H1>')
+// console.log('--- End of rendered HTML ---')
 
 
 export default Counter
