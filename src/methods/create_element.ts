@@ -58,7 +58,6 @@ if (isSSR) globalThis.customElements = ces as any
  * ```
  */
 export const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]) => {
-    console.log('createElement called with:', { component, _props, _children })
     // const { createComment, createHTMLNode, createSVGNode, createText } = getEnv()
     // const { setChild, setProps } = getSetters()
 
@@ -142,9 +141,6 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
                     // Set children for both regular HTML elements and custom elements
                     // Only process children once - either from separate arguments or from props, not both
-                    console.log('Processing children for element:', component)
-                    console.log('Children:', children)
-                    console.log('Has children:', hasChildren)
 
                     if (hasChildren) {
                         // Process children passed as separate arguments (preferred method)
@@ -153,14 +149,12 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                             setChild(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
                         } else {
                             // For regular HTML elements, just set the children directly
-                            console.log('Calling setChild with children:', children)
                             setChild(child, children, FragmentUtils.make(), stack)
                         }
                     } else if (_props && isObject(_props) && 'children' in _props && !isVoidChild((_props as any).children)) {
                         // Only process children from props if no separate children were passed
                         // Handle children from props
                         const propsChildren = (_props as any).children as Child
-                        console.log('Processing children from props:', propsChildren)
                         // For SSR custom elements, we need to handle them differently
                         if (ce && typeof ce === 'function' && (ce as any).__component__) {
                             //@ts-ignore

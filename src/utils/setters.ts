@@ -213,24 +213,9 @@ export const getSetters = (env?: Env) => {
     const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, childComp: Function, stack: Stack): void => {
         // Generate unique ID for this call
         const callId = Math.random().toString(36).substr(2, 9)
-        console.log(`=== SET_CHILD_STATIC CALLED (${callId}) ===`)
-        console.log('Child:', child)
-        console.log('Dynamic:', dynamic)
-        console.log('Child type:', typeof child)
-        console.log('Parent nodeType:', parent?.nodeType)
-
-        if (Array.isArray(child)) {
-            console.log('Child is array, length:', child.length)
-            child.forEach((c, i) => {
-                console.log(`Child[${i}]:`, c)
-                console.log(`  nodeType:`, (c as any)?.nodeType)
-                console.log(`  textContent:`, (c as any)?.textContent)
-            })
-        }
 
         // Handle placeholder creation for reactive content in SSR
         if (dynamic && env === 'ssr') {
-            console.log('Creating placeholder for reactive SSR content')
             const placeholder = FragmentUtils.makePlaceholder('ssr')
 
             if (!fragmentOnly) {
@@ -242,14 +227,11 @@ export const getSetters = (env?: Env) => {
             // Store placeholder reference for later replacement
             if (childComp) {
                 childComp[SYMBOL_DOM] = placeholder
-                console.log('Stored placeholder in childComp SYMBOL_DOM')
             }
 
             // Set up effect to replace placeholder when content is ready
             useRenderEffect((options) => {
-                console.log('Reactive effect triggered, resolving child:', child)
                 resolveChild(child, (resolvedChild, isDynamic, stack) => {
-                    console.log('Resolved child for replacement:', resolvedChild)
                     // Replace the placeholder with actual content
                     FragmentUtils.replacePlaceholder(placeholder, resolvedChild as Node, childComp)
                 }, true, stack, 'ssr')
@@ -264,17 +246,6 @@ export const getSetters = (env?: Env) => {
             const e = childComp[SYMBOL_DOM] as HTMLElement
             if (e) {
 
-                console.log('Element e properties and methods:', {
-                    element: e,
-                    properties: Object.getOwnPropertyNames(e),
-                    methods: Object.getOwnPropertyNames(Object.getPrototypeOf(e)),
-                    nodeType: e.nodeType,
-                    nodeName: e.nodeName,
-                    parentNode: e.parentNode,
-                    parentElement: e.parentElement,
-                    nextSibling: e.nextSibling,
-                    previousSibling: e.previousSibling
-                })
                 e.replaceWith(child as any)
 
                 childComp[SYMBOL_DOM] = child
@@ -282,32 +253,15 @@ export const getSetters = (env?: Env) => {
             }
         }
 
-        // Debug fragment children retrieval
-        console.log('Getting children from fragment...')
+        // Get children from fragment
         const prev = FragmentUtils.getChildren(fragment)
-        console.log('Fragment children result:', prev)
-        console.log('Fragment children type:', typeof prev)
-        if (Array.isArray(prev)) {
-            prev.forEach((child, i) => {
-                console.log(`Fragment child[${i}]:`, child)
-                console.log(`  nodeType:`, (child as any)?.nodeType)
-                console.log(`  textContent:`, (child as any)?.textContent)
-            })
-        } else if (prev) {
-            console.log('Single fragment child:', prev)
-            console.log('  nodeType:', (prev as any)?.nodeType)
-            console.log('  textContent:', (prev as any)?.textContent)
-        }
 
         const prevIsArray = (prev instanceof Array)
         const prevLength = prevIsArray ? prev.length : 1
         const prevFirst = prevIsArray ? prev[0] : prev
         const prevLast = prevIsArray ? prev[prevLength - 1] : prev
-        const prevSibling = prevLast?.nextSibling || null
+        const prevSibling = (prevLast as Node)?.nextSibling || null
 
-        console.log('prevIsArray:', prevIsArray)
-        console.log('prevLength:', prevLength)
-        console.log('prevFirst nodeType:', (prevFirst as any)?.nodeType)
 
         if (prevLength === 0) { // Fast path for appending a node the first time
 
@@ -328,40 +282,15 @@ export const getSetters = (env?: Env) => {
                 return
 
             } else if (type === 'object' && child !== null && typeof (child as Node).nodeType === 'number') { //TSC
-                console.log('=== FAST PATH ARRAY LOOP (prevLength === 0) ===')
-                console.log('Original child in fast path:', child)
-                console.log('Child nodeType:', (child as Node).nodeType)
-                console.log('Child textContent:', (child as any).textContent)
-                console.log('Child objectId:', (child as any).objectId)
-                console.log('Child constructor:', child?.constructor?.name)
 
-                // Check if this is our problematic TextNode conversion
-                if ((child as Node).nodeType === 1 && (child as any).textContent === '') {
-                    console.log('🚨 CRITICAL: TextNode converted in fast path!')
-                    console.log('This should be nodeType: 3 with textContent: "Custom element"')
-                }
-
-                console.log('Parent before insert:', parent.childNodes?.length)
 
                 const node = child as Node
-                console.log('Node to insert:', node)
-                console.log('  Node nodeType:', node?.nodeType)
-                console.log('  Node textContent:', node?.textContent)
-                console.log('  Node objectId:', (node as any)?.objectId)
-                console.log('  Parent before insertion:', parent.childNodes?.length)
+
 
                 if (!fragmentOnly) {
-                    console.log('Performing insert...')
                     parent.insertBefore(node, null)
-                    console.log('Insert completed')
                 }
-                console.log('  Parent after insertion:', parent.childNodes?.length)
-                const insertedChild = parent.childNodes?.[parent.childNodes?.length - 1]
-                console.log('  Last child after insertion:', insertedChild)
-                console.log('  Inserted child nodeType:', insertedChild?.nodeType)
-                console.log('  Inserted child textContent:', (insertedChild as any)?.textContent)
-                console.log('Parent after insert:', parent.childNodes?.length)
-                console.log('Inserted node:', insertedChild)
+
 
                 FragmentUtils.replaceWithNode(fragment, node)
 
@@ -377,7 +306,7 @@ export const getSetters = (env?: Env) => {
 
             if (type === 'string' || type === 'number' || type === 'bigint') {
 
-                const node = setChildReplacementText(String(child), prevFirst) //TODO: maybe "fragmentOnly" should be passed on here, but it seems unnecessary
+                const node = setChildReplacementText(String(child), prevFirst as Node) //TODO: maybe "fragmentOnly" should be passed on here, but it seems unnecessary
 
                 FragmentUtils.replaceWithNode(fragment, node)
 
@@ -388,57 +317,28 @@ export const getSetters = (env?: Env) => {
         }
 
         const fragmentNext = FragmentUtils.make()
-        console.log(`Created fragmentNext (${callId}):`, fragmentNext)
 
         const children = (isArray(child) ? child : [child]) as Node[] //TSC
-        console.log('Array processing - children array:', children)
-        console.log('Children array length:', children.length)
 
         // Deep clone children array to prevent mutation issues
         const clonedChildren = [...children]
-        console.log('Cloned children array:', clonedChildren)
+
 
         for (let i = 0, l = clonedChildren.length; i < l; i++) {
-            console.log(`Processing child[${i}]:`, clonedChildren[i])
-            console.log(`  Before assignment - clonedChildren[${i}] nodeType:`, (clonedChildren[i] as any)?.nodeType)
-            console.log(`  Before assignment - clonedChildren[${i}] textContent:`, (clonedChildren[i] as any)?.textContent)
 
             const child = clonedChildren[i]
-            console.log(`  After assignment - child nodeType:`, (child as any)?.nodeType)
-            console.log(`  After assignment - child textContent:`, (child as any)?.textContent)
             const type = typeof child
 
             if (type === 'string' || type === 'number' || type === 'bigint') {
 
                 const textNode = createText(child as any) as any
-                console.log('Creating text node in loop:', textNode)
-                console.log('Text node nodeType:', textNode?.nodeType)
-                console.log('Text node textContent:', textNode?.textContent)
                 FragmentUtils.pushNode(fragmentNext, textNode)
                 // parent.appendChild(textNode)
 
-            } else if (type === 'object' && child !== null && typeof child.nodeType === 'number') {
+            } else if (type === 'object' && child !== null && typeof (child as Node).nodeType === 'number') { //TSC
 
-                console.log('=== ARRAY LOOP OBJECT PROCESSING ===')
-                console.log('Original child object:', child)
-                console.log('Child nodeType:', child?.nodeType)
-                console.log('Child textContent:', (child as any)?.textContent)
-                console.log('Child objectId:', (child as any)?.objectId)
-                console.log('Child constructor name:', child?.constructor?.name)
 
-                // Check if this is our TextNode that got converted
-                if (child?.nodeType === 1 && (child as any)?.textContent === '') {
-                    console.log('⚠️  WARNING: TextNode converted to Element!')
-                    console.log('Expected nodeType: 3, got:', child?.nodeType)
-                    console.log('Expected textContent: "Custom element", got:', (child as any)?.textContent)
-                }
-
-                console.log('Pushing existing child node:', child)
-                console.log('fragmentNext before push:', fragmentNext)
-                console.log('fragmentNext.length before push:', fragmentNext.length)
-                FragmentUtils.pushNode(fragmentNext, child)
-                console.log('fragmentNext after push:', fragmentNext)
-                console.log('fragmentNext.length after push:', fragmentNext.length)
+                FragmentUtils.pushNode(fragmentNext, child as Node)
                 // parent.appendChild(child as any)
 
             } else if (type === 'function') {
@@ -455,57 +355,29 @@ export const getSetters = (env?: Env) => {
 
                 resolveChild(child, (child, dynamic, stack) => {
                     // const fragmentOnly = childFragmentOnly
-                
+
                     // n.replaceWith(child)
-                
+
                     // const e = children[i][SYMBOL_DOM]
                     // parent.replaceChild(child, n)
-                
+
                     // children[i][SYMBOL_DOM] = child
                     // parent.replaceChild(child, children[i])
                     setChildStatic(parent, fragment, true, child, dynamic, clonedChildren[i] as any, stack)
-                
+
                 }, false, stack, env)
 
             }
 
         }
 
-        console.log(`=== BEFORE GETTING CHILDREN FROM FRAGMENT_NEXT (${callId}) ===`)
-        console.log('fragmentNext:', fragmentNext)
-        console.log('fragmentNext.length:', fragmentNext.length)
-        console.log('fragmentNext.values:', fragmentNext.values)
 
-        console.log(`=== GETTING CHILDREN FROM FRAGMENT_NEXT (${callId}) ===`)
         let next = FragmentUtils.getChildren(fragmentNext)
-        console.log('Got next from fragmentNext:', next)
-        console.log('next type:', typeof next)
-        console.log('Array.isArray(next):', Array.isArray(next))
-        console.log('next instanceof Array:', next instanceof Array)
 
         if (Array.isArray(next)) {
-            console.log('next array length:', next.length)
-            next.forEach((child, i) => {
-                console.log(`next[${i}]:`, child)
-                console.log(`  nodeType:`, (child as any)?.nodeType)
-                console.log(`  textContent:`, (child as any)?.textContent)
-                console.log(`  objectId:`, (child as any)?.objectId)
-                console.log(`  constructor:`, child?.constructor?.name)
-            })
         } else if (next) {
-            console.log('Single next:', next)
-            console.log('  nodeType:', (next as any)?.nodeType)
-            console.log('  textContent:', (next as any)?.textContent)
-            console.log('  objectId:', (next as any)?.objectId)
-            console.log('  constructor:', next?.constructor?.name)
         }
         let nextLength = fragmentNext.length
-        console.log('=== CALCULATING nextLength ===')
-        console.log('fragmentNext.length:', fragmentNext.length)
-        console.log('Assigned nextLength:', nextLength)
-        console.log('fragmentNext at this point:', fragmentNext)
-        console.log('fragmentNext.values:', fragmentNext.values)
-        console.log('fragmentNext.length (again):', fragmentNext.length)
 
         if (nextLength === 0 && prevLength === 1 && prevFirst.nodeType === 8) { // It's a placeholder already, no need to replace it
 
@@ -540,41 +412,23 @@ export const getSetters = (env?: Env) => {
 
                     if (next instanceof Array) {
 
-                        prevSibling.before.apply(prevSibling, next)
+                        prevSibling.before.apply(prevSibling, next as Node[])
 
                     } else {
 
-                        parent.insertBefore(next, prevSibling)
+                        parent.insertBefore(next as Node, prevSibling as Node)
 
                     }
 
                 } else {
 
-                    console.log('=== FAST PATH INSERTION ===')
-                    console.log('next:', next)
-                    console.log('next type:', typeof next)
-                    console.log('Array.isArray(next):', Array.isArray(next))
-                    console.log('next instanceof Array:', next instanceof Array)
 
                     if (next instanceof Array) {
-                        console.log('Inserting array of nodes, length:', next.length)
-                        next.forEach((node, i) => {
-                            console.log(`Inserting node[${i}]:`, node)
-                            console.log(`  nodeType:`, (node as any)?.nodeType)
-                            console.log(`  textContent:`, (node as any)?.textContent)
-                            console.log(`  objectId:`, (node as any)?.objectId)
-                            console.log(`  constructor:`, node?.constructor?.name)
-                        })
                         // parent.append.apply(parent, next)
-                        for (const node of next) parent.appendChild(node)
+                        for (const node of next) parent.appendChild(node as Node)
 
                     } else {
-                        console.log('Inserting single node:', next)
-                        console.log('  nodeType:', (next as any)?.nodeType)
-                        console.log('  textContent:', (next as any)?.textContent)
-                        console.log('  objectId:', (next as any)?.objectId)
-                        console.log('  constructor:', next?.constructor?.name)
-                        parent.appendChild(next)
+                        parent.appendChild(next as Node)
 
                     }
 
@@ -615,17 +469,8 @@ export const getSetters = (env?: Env) => {
 
     const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
         const cd = child
-        console.log('setChild called with child:', child)
         resolveChild(cd, (child, dynamic, stack) => {
-            console.log('Setter function called with child:', child)
-            console.log('Child type:', typeof child)
-            if (Array.isArray(child)) {
-                child.forEach((c, i) => {
-                    console.log(`Child[${i}]:`, c)
-                    console.log(`  nodeType:`, (c as any)?.nodeType)
-                    console.log(`  textContent:`, (c as any)?.textContent)
-                })
-            }
+
             setChildStatic(parent, fragment, false, child, dynamic, /* cd as any */null, stack)
         }, false, stack, env)
     }

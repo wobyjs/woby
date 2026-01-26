@@ -27,13 +27,8 @@ import { Observable, Stack } from '../soby'
 // }
 
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack, env: Env = 'browser'): void => {
-  console.log('=== RESOLVE_CHILD CALLED ===')
-  console.log('Value:', value)
-  console.log('Environment:', env)
-  console.log('Dynamic flag:', _dynamic)
 
   if (isArray(value)) {
-    console.log('Resolving array value')
     const [values, hasObservables] = resolveArraysAndStatics(env)(value)
 
     values[SYMBOL_UNCACHED] = value[SYMBOL_UNCACHED] // Preserving this special symbol
@@ -41,10 +36,8 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
     setter(values, hasObservables || _dynamic, stack)
   }
   else if (isFunction(value)) {
-    console.log('Resolving function value')
 
     if (!isFunctionReactive(value)) {
-      console.log('Non-reactive function')
 
       if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
         (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
@@ -56,10 +49,8 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
       resolveChild(newValue, setter, _dynamic, stack, env)
 
     } else {
-      console.log('Reactive function - setting up effect')
 
       useRenderEffect((options) => {
-        console.log('Reactive effect executing with env:', env)
 
         if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
           (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
@@ -67,7 +58,6 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
         //@ts-ignore
         const newValue = value[SYMBOL_UNTRACKED_UNWRAPPED] ? value(env) : $$(value)
 
-        console.log('Resolved new value:', newValue)
         // if (!replaceSelf(value as any, newValue as any))
         resolveChild(newValue, setter, true, stack, env)
 
@@ -76,7 +66,6 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
     }
 
   } else {
-    console.log('Resolving static value:', value)
     setter(value, _dynamic, stack)
 
   }
@@ -160,9 +149,6 @@ export const resolveStyle = (styles: Styles, resolved: Record<string, null | und
 
 export const resolveArraysAndStatics = (env: Env) => {
   const { createText } = getEnv(env)
-  console.log('=== RESOLVE_ARRAYS_AND_STATICS ===')
-  console.log('Environment:', env)
-  console.log('createText function:', createText)
 
   // This function does 3 things:
   // 1. It deeply flattens the array, only if actually needed though (!)
@@ -179,34 +165,25 @@ export const resolveArraysAndStatics = (env: Env) => {
       const type = typeof value
 
       if (type === 'string' || type === 'number' || type === 'bigint') { // Static
-        console.log(`Processing static value[${i}]:`, value)
-        console.log('Environment for text creation:', env)
         const textNode = createText(value)
-        console.log('Created text node:', textNode)
-        console.log('Text node type:', textNode?.nodeType)
-        console.log('Text node textContent:', textNode?.textContent)
-        console.log('Text node objectId:', (textNode as any)?.objectId)
 
         if (resolved === DUMMY_RESOLVED) resolved = values.slice(0, i)
 
         resolved.push(textNode)
 
       } else if (type === 'object' && isArray(value)) { // Array
-        console.log(`Processing array value[${i}]`)
 
         if (resolved === DUMMY_RESOLVED) resolved = values.slice(0, i)
 
         hasObservables = resolveArraysAndStaticsInner(value, resolved, hasObservables)[1]
 
       } else if (type === 'function' && isObservable(value)) { // Observable
-        console.log(`Processing observable value[${i}]`)
 
         if (resolved !== DUMMY_RESOLVED) resolved.push(value)
 
         hasObservables = true
 
       } else { // Something else
-        console.log(`Processing other value[${i}]:`, value)
 
         if (resolved !== DUMMY_RESOLVED) resolved.push(value)
 

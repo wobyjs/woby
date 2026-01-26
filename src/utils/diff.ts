@@ -76,6 +76,7 @@ export const diff = (parent: any, before: any, after: any, nextSibling: any, env
 
 
   if (before === after) return
+
   if ((typeof Node !== 'undefined' && before instanceof Node) || (before && typeof (before as any).nodeType === 'number')) {
     if ((typeof Node !== 'undefined' && after instanceof Node) || (after && typeof (after as any).nodeType === 'number')) {
       if ((before as any).parentNode === parent) { // Safety check, since setChildStatic may trigger this
@@ -92,6 +93,7 @@ export const diff = (parent: any, before: any, after: any, nextSibling: any, env
     afterDummyWrapper[0] = after as any
     after = afterDummyWrapper
   }
+
   const bLength = after.length
   let aEnd = before.length
   let bEnd = bLength
