@@ -3200,7 +3200,7 @@ const TestContextDynamicContext = () => {
 TestContextDynamicContext.test = {
     static: true,
     snapshots: [
-        '<p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p>'
+        '<context-provider value="context"><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p></context-provider>'
     ]
 }
 
@@ -5543,8 +5543,8 @@ const TestRefContext = (): JSX.Element => {
 TestRefContext.test = {
     static: false,
     snapshots: [
-        '<p></p>',
-        '<p>Got ref - Has parent: true - Is connected: true - Context: 321</p>'
+        '<context-provider value="321"><p></p></context-provider>',
+        '<context-provider value="321"><p>Got ref - Has parent: true - Is connected: true - Context: 321</p></context-provider>'
     ]
 }
 
@@ -6877,35 +6877,31 @@ const Test = (): JSX.Element => {
             <TestSnapshots Component={TestSVGAttributeRemoval} />
             <TestSnapshots Component={TestTemplateExternal} />
             <TestSnapshots Component={TestTemplateSVG} />
-            <TestSnapshots Component={TestContextComponents} />
-            <TestSnapshots Component={TestContextHook} />
             <TestSnapshots Component={TestPortalStatic} />
             <TestSnapshots Component={TestPortalObservable} />
             <TestSnapshots Component={TestPortalRemoval} />
             <TestSnapshots Component={TestPortalMountObservable} />
             <TestSnapshots Component={TestPortalWhenObservable} />
             <TestSnapshots Component={TestPortalWrapperStatic} />
-            {/*
             <TestSnapshots Component={TestResourceFallbackValue} />
             <TestSnapshots Component={TestResourceFallbackLatest} />
             <TestSnapshots Component={TestSuspenseAlwaysValue} />
             <TestSnapshots Component={TestSuspenseAlwaysLatest} />
             <TestSnapshots Component={TestSuspenseNever} />
-            <TestSnapshots Component={TestSuspenseNeverRead} /> */}
-            {/* <TestSnapshots Component={TestSuspenseMiddleman} /> */}
-            {/* <TestSnapshots Component={TestSuspenseObservable} />
+            <TestSnapshots Component={TestSuspenseNeverRead} />
+            <TestSnapshots Component={TestSuspenseObservable} />
             <TestSnapshots Component={TestSuspenseWhen} />
             <TestSnapshots Component={TestSuspenseAlive} />
             <TestSnapshots Component={TestSuspenseChildrenObservableStatic} />
             <TestSnapshots Component={TestSuspenseChildrenFunction} />
             <TestSnapshots Component={TestSuspenseFallbackObservableStatic} />
-            <TestSnapshots Component={TestSuspenseFallbackFunction} /> */}
-            {/* <TestSnapshots Component={TestSuspenseCleanup} /> */}
-            {/* <TestSnapshots Component={TestLazy} />
+            <TestSnapshots Component={TestSuspenseFallbackFunction} />
+            <TestSnapshots Component={TestLazy} />
             <TestSnapshots Component={TestNestedArrays} />
             <TestSnapshots Component={TestNestedIfs} />
             <TestSnapshots Component={TestNestedIfsLazy} />
-            <TestSnapshots Component={TestHMRFor} /> */}
+            <TestSnapshots Component={TestContextDynamicContext} />
+            <TestSnapshots Component={TestRefContext} />
             <hr />
         </>
     )
