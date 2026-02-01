@@ -8,6 +8,10 @@ import { defineConfig } from 'vite'
 /* MAIN */
 
 const config = defineConfig({
+    server: {
+        port: 5176,
+        strictPort: true
+    },
     esbuild: {
         jsx: 'automatic',
     },
