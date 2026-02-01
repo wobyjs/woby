@@ -12,7 +12,7 @@ import { Env, getEnv } from '../utils/creators'
 
 import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
-import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isObject, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
+import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isObject, isString, isSVG, isTemplateAccessor, isVoidChild, fixBigInt } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
 import { setNestedAttribute } from '../utils/nested'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
@@ -155,7 +155,7 @@ export const getSetters = (env?: Env) => {
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 
-            setChildReplacementText(String(child), childPrev)
+            setChildReplacementText(type !== 'bigint' ? String(child) : fixBigInt(child) as string, childPrev)
 
         } else {
 
@@ -227,7 +227,7 @@ export const getSetters = (env?: Env) => {
 
             if (type === 'string' || type === 'number' || type === 'bigint') {
 
-                const textNode = createText(child as any)
+                const textNode = createText(type !== 'bigint' ? child : fixBigInt(child) as any)
 
                 if (!fragmentOnly) {
 
@@ -284,7 +284,7 @@ export const getSetters = (env?: Env) => {
 
             if (type === 'string' || type === 'number' || type === 'bigint') {
 
-                FragmentUtils.pushNode(fragmentNext, createText(child as any))
+                FragmentUtils.pushNode(fragmentNext, createText(type !== 'bigint' ? child : fixBigInt(child) as any))
 
             } else if (type === 'object' && child !== null && typeof child.nodeType === 'number') {
 
