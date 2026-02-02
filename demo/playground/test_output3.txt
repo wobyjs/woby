@@ -1,0 +1,5 @@
+
+Running 2 tests using 2 workers
+
+[1A[2K[1/2] test.playwright\TestStringStatic.spec.js:8:1 ΓÇ║ playground demo should render TestStringStatic component with correct snapshot
+[1A[2K[2/2] test.playwright\TestStringObservable.spec.js:8:1 ΓÇ║ playground demo should render TestStringObservable component with correct snapshot

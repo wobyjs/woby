@@ -5,30 +5,30 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-
 test('playground demo should render TestStringStatic component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
+    
     // Look for TestStringStatic component
-    const stringStaticHeading = page.locator('h3', { hasText: 'String - Static' });
-    const stringStaticCount = await stringStaticHeading.count();
-
-    if (stringStaticCount > 0) {
-        // Get the parent container of the heading
-        const container = stringStaticHeading.locator('..');
+    const componentHeading = page.locator('h3', { hasText: 'String - Static' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    if (componentCount > 0) {
+        // Get the first instance of the component
+        const container = componentHeading.first().locator('..');
         // Get the paragraph element
-        const paragraph = container.locator('p');
+        const paragraph = container.locator('p').first();
         // Get the text content
         const content = await paragraph.textContent();
-        // For string static, should be a non-empty string
-        expect(typeof content).toBe('string');
-        expect(content.length).toBeGreaterThan(0);
+        
+        // Perform assertions based on component type
+        expect(content).toBe('string');
+        
         console.log('Playground demo TestStringStatic component renders correct snapshot');
-    } else {
-        console.log('Playground demo TestStringStatic component not found');
     }
 });

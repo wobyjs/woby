@@ -1,0 +1,34 @@
+
+Running 2 tests using 2 workers
+
+[1A[2K[1/2] test.playwright\TestStringObservable.spec.js:8:1 ΓÇ║ playground demo should render TestStringObservable component with correct snapshot
+[1A[2K[2/2] test.playwright\TestNumberStatic.spec.js:8:1 ΓÇ║ playground demo should render TestNumberStatic component with correct snapshot
+[1A[2Ktest.playwright\TestNumberStatic.spec.js:8:1 ΓÇ║ playground demo should render TestNumberStatic component with correct snapshot
+Playground demo TestNumberStatic component renders correct snapshot
+
+[1A[2K  1) test.playwright\TestStringObservable.spec.js:8:1 ΓÇ║ playground demo should render TestStringObservable component with correct snapshot 
+
+    Error: locator.textContent: Error: strict mode violation: locator('h3').filter({ hasText: 'String - Observable' }).locator('..').locator('p') resolved to 3 elements:
+        1) <p>0.9600705897883623</p> aka getByText('0.9600705897883623')
+        2) <p>0.9995905760972608</p> aka getByText('0.9995905760972608')
+        3) <p>0.1538096877085583</p> aka getByText('0.1538096877085583')
+
+    Call log:
+    [2m  - waiting for locator('h3').filter({ hasText: 'String - Observable' }).locator('..').locator('p')[22m
+
+
+      25 |         const paragraph = container.locator('p');
+      26 |         // Get the text content
+    > 27 |         const content = await paragraph.textContent();
+         |                                         ^
+      28 |         
+      29 |         // Perform assertions based on component type
+      30 |         expect(typeof content).toBe('string');
+        at D:\Developments\tslib\@woby\woby\demo\playground\test.playwright\TestStringObservable.spec.js:27:41
+
+    Error Context: test-results\test.playwright-TestString-73b01-onent-with-correct-snapshot\error-context.md
+
+
+[1A[2K  1 failed
+    test.playwright\TestStringObservable.spec.js:8:1 ΓÇ║ playground demo should render TestStringObservable component with correct snapshot 
+  1 passed (7.3s)

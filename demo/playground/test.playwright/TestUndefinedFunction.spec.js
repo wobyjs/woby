@@ -5,22 +5,18 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-test('TestUndefinedFunction', async ({ page }) => {
+test('playground demo should render TestUndefinedFunction component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
-    // Look for TestUndefinedFunction component heading
-    const heading = page.getByText('Undefined - Function');
-    const headingCount = await heading.count();
-
-    if (headingCount > 0) {
-        // TestUndefinedFunction is wrapped in TestSnapshots, so it won't be directly visible in the DOM
-        // We can only verify that the heading exists
-        console.log('Playground demo TestUndefinedFunction component heading found (component wrapped in TestSnapshots)');
-    } else {
-        console.log('Playground demo TestUndefinedFunction component heading not found (component wrapped in TestSnapshots)');
-    }
+    
+    // Look for TestUndefinedFunction component
+    const componentHeading = page.locator('h3', { hasText: 'Undefined - Function' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    console.log('Playground demo TestUndefinedFunction component renders correctly');
 });

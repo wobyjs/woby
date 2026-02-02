@@ -5,27 +5,18 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-
-test('TestStringObservableStatic', async ({ page }) => {
+test('playground demo should render TestStringObservableStatic component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
+    
     // Look for TestStringObservableStatic component
-    const stringObservableStaticHeading = page.locator('h3', { hasText: 'String - Observable Static' });
-    const stringObservableStaticCount = await stringObservableStaticHeading.count();
-
-    if (stringObservableStaticCount > 0) {
-        // Get the parent container of the heading
-        const container = stringObservableStaticHeading.locator('..');
-        // Check that it has elements
-        const elements = container.locator('*');
-        const elementCount = await elements.count();
-        expect(elementCount).toBeGreaterThan(0);
-        console.log('Playground demo TestStringObservableStatic component renders correctly');
-    } else {
-        console.log('Playground demo TestStringObservableStatic component not found');
-    }
+    const componentHeading = page.locator('h3', { hasText: 'String - Observable Static' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    console.log('Playground demo TestStringObservableStatic component renders correctly');
 });

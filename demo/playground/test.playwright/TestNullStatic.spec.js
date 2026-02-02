@@ -5,29 +5,30 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-
-test('TestNullStatic component with correct snapshot', async ({ page }) => {
+test('playground demo should render TestNullStatic component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
+    
     // Look for TestNullStatic component
-    const nullStaticHeading = page.locator('h3', { hasText: 'Null - Static' });
-    const nullStaticCount = await nullStaticHeading.count();
-
-    if (nullStaticCount > 0) {
-        // Get the parent container of the heading
-        const container = nullStaticHeading.locator('..');
+    const componentHeading = page.locator('h3', { hasText: 'Null - Static' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    if (componentCount > 0) {
+        // Get the first instance of the component
+        const container = componentHeading.first().locator('..');
         // Get the paragraph element
-        const paragraph = container.locator('p');
+        const paragraph = container.locator('p').first();
         // Get the text content
         const content = await paragraph.textContent();
-        // For null static, should be empty
+        
+        // Perform assertions based on component type
         expect(content).toBe('');
+        
         console.log('Playground demo TestNullStatic component renders correct snapshot');
-    } else {
-        console.log('Playground demo TestNullStatic component not found');
     }
 });

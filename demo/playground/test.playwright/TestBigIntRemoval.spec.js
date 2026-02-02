@@ -5,22 +5,18 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-test('TestBigIntRemoval', async ({ page }) => {
+test('playground demo should render TestBigIntRemoval component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
-    // Look for TestBigIntRemoval component heading
-    const heading = page.getByText('BigInt - Removal');
-    const headingCount = await heading.count();
-
-    if (headingCount > 0) {
-        // TestBigIntRemoval is wrapped in TestSnapshots, so it won't be directly visible in the DOM
-        // We can only verify that the heading exists
-        console.log('Playground demo TestBigIntRemoval component heading found (component wrapped in TestSnapshots)');
-    } else {
-        console.log('Playground demo TestBigIntRemoval component heading not found (component wrapped in TestSnapshots)');
-    }
+    
+    // Look for TestBigIntRemoval component
+    const componentHeading = page.locator('h3', { hasText: 'BigInt - Removal' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    console.log('Playground demo TestBigIntRemoval component renders correctly');
 });

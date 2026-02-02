@@ -38,6 +38,7 @@ export {
     setRef,
     customElement,
     wrapCloneElement,
+    getSetters,
     SYMBOL_STACK
 } from './methods'
 export type {

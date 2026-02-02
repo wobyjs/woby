@@ -5,27 +5,18 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-
-test('TestNullFunction', async ({ page }) => {
+test('playground demo should render TestNullFunction component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
+    
     // Look for TestNullFunction component
-    const nullFunctionHeading = page.locator('h3', { hasText: 'Null - Function' });
-    const nullFunctionCount = await nullFunctionHeading.count();
-
-    if (nullFunctionCount > 0) {
-        // Get the parent container of the heading
-        const container = nullFunctionHeading.locator('..');
-        // Check that it has elements
-        const elements = container.locator('*');
-        const elementCount = await elements.count();
-        expect(elementCount).toBeGreaterThan(0);
-        console.log('Playground demo TestNullFunction component renders correctly');
-    } else {
-        console.log('Playground demo TestNullFunction component not found');
-    }
+    const componentHeading = page.locator('h3', { hasText: 'Null - Function' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    console.log('Playground demo TestNullFunction component renders correctly');
 });

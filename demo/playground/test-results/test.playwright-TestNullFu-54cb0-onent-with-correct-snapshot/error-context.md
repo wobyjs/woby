@@ -1,0 +1,319 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Simple Expect Test" [level=3] [ref=e4]
+      - paragraph [ref=e5]: Hello World
+    - generic [ref=e6]:
+      - heading "Null - Static" [level=3] [ref=e7]
+      - paragraph
+    - generic [ref=e8]:
+      - heading "Null - Observable" [level=3] [ref=e9]
+      - paragraph
+    - generic [ref=e10]:
+      - heading "Number - Static" [level=3] [ref=e11]
+      - paragraph [ref=e12]: "123"
+    - generic [ref=e13]:
+      - heading "Number - Observable" [level=3] [ref=e14]
+      - paragraph [ref=e15]: "0.8216341701210998"
+    - generic [ref=e16]:
+      - heading "Number - Function" [level=3] [ref=e17]
+      - paragraph [ref=e18]: "0.31002894331563"
+    - generic [ref=e19]:
+      - heading "Number - Removal" [level=3] [ref=e20]
+      - paragraph [ref=e21]: ()
+    - generic [ref=e22]:
+      - heading "BigInt - Static" [level=3] [ref=e23]
+      - paragraph [ref=e24]: 123123n
+    - generic [ref=e25]:
+      - heading "BigInt - Observable" [level=3] [ref=e26]
+      - paragraph [ref=e27]: "13"
+    - generic [ref=e28]:
+      - heading "BigInt - Function" [level=3] [ref=e29]
+      - paragraph [ref=e30]: "90"
+    - generic [ref=e31]:
+      - heading "BigInt - Removal" [level=3] [ref=e32]
+      - paragraph [ref=e33]: (12)
+    - generic [ref=e34]:
+      - heading "String - Static" [level=3] [ref=e35]
+      - paragraph [ref=e36]: string
+    - generic [ref=e37]:
+      - heading "String - Observable" [level=3] [ref=e38]
+      - paragraph [ref=e39]: "0.9180214541882042"
+    - generic [ref=e40]:
+      - heading "String - Observable Static" [level=3] [ref=e41]
+      - paragraph [ref=e42]: "0.1747767253223611"
+    - generic [ref=e43]:
+      - heading "String - Observable Deep Static" [level=3] [ref=e44]
+      - paragraph [ref=e45]: "0.3203477689299835"
+    - generic [ref=e46]:
+      - heading "String - Function" [level=3] [ref=e47]
+      - paragraph [ref=e48]: "0.03504746627591149"
+    - generic [ref=e49]:
+      - heading "String - Removal" [level=3] [ref=e50]
+      - paragraph [ref=e51]: ()
+    - generic [ref=e52]:
+      - heading "Progress - Indeterminate Toggle" [level=3] [ref=e53]
+      - progressbar [ref=e54]
+    - generic [ref=e55]:
+      - heading "Dynamic - Observable Children" [level=3] [ref=e56]
+      - heading "0.8600212721460714" [level=5] [ref=e57]
+    - generic [ref=e58]:
+      - heading "If - Children Observable" [level=3] [ref=e59]
+      - text: "0.7514028644820756"
+    - generic [ref=e60]:
+      - heading "If - Children Observable Static" [level=3] [ref=e61]
+      - paragraph [ref=e62]: "0.1008585093219665"
+    - generic [ref=e63]:
+      - heading "If - Children Function" [level=3] [ref=e64]
+      - paragraph [ref=e65]: "0.544322010472236"
+    - heading "If - Children Function Observable" [level=3] [ref=e67]
+    - generic [ref=e68]:
+      - heading "ID - Static" [level=3] [ref=e69]
+      - paragraph [ref=e70]: content
+    - generic [ref=e71]:
+      - heading "ID - Observable" [level=3] [ref=e72]
+      - paragraph [ref=e73]: content
+    - generic [ref=e74]:
+      - heading "ID - Function" [level=3] [ref=e75]
+      - paragraph [ref=e76]: content
+    - generic [ref=e77]:
+      - heading "ID - Removal" [level=3] [ref=e78]
+      - paragraph [ref=e79]: content
+    - generic [ref=e80]:
+      - heading "ClassName - Static" [level=3] [ref=e81]
+      - paragraph [ref=e82]: content
+    - generic [ref=e83]:
+      - heading "ClassName - Observable" [level=3] [ref=e84]
+      - paragraph [ref=e85]: content
+    - generic [ref=e86]:
+      - heading "ClassName - Function" [level=3] [ref=e87]
+      - paragraph [ref=e88]: content
+    - generic [ref=e89]:
+      - heading "Class - Static" [level=3] [ref=e90]
+      - paragraph [ref=e91]: content
+    - generic [ref=e92]:
+      - heading "Class - Static String" [level=3] [ref=e93]
+      - paragraph [ref=e94]: content
+    - generic [ref=e95]:
+      - heading "Class - Observable" [level=3] [ref=e96]
+      - paragraph [ref=e97]: content
+    - generic [ref=e98]:
+      - heading "Class - Observable String" [level=3] [ref=e99]
+      - paragraph [ref=e100]: content
+    - generic [ref=e101]:
+      - heading "Class - Function Boolean" [level=3] [ref=e102]
+      - paragraph [ref=e103]: content
+    - generic [ref=e104]:
+      - heading "Class - Function String" [level=3] [ref=e105]
+      - paragraph [ref=e106]: content
+    - generic [ref=e107]:
+      - heading "Class - Removal" [level=3] [ref=e108]
+      - paragraph [ref=e109]: content
+    - generic [ref=e110]:
+      - heading "Class - Removal String" [level=3] [ref=e111]
+      - paragraph [ref=e112]: content
+    - generic [ref=e113]:
+      - heading "Style - Static" [level=3] [ref=e114]
+      - paragraph [ref=e115]: content
+    - generic [ref=e116]:
+      - heading "Style - Static Numeric" [level=3] [ref=e117]
+      - paragraph [ref=e118]: content
+    - generic [ref=e119]:
+      - heading "Style - Static String" [level=3] [ref=e120]
+      - paragraph [ref=e121]: content
+    - generic [ref=e122]:
+      - heading "Style - Static Variable" [level=3] [ref=e123]
+      - paragraph [ref=e124]: content
+    - generic [ref=e125]:
+      - heading "Style - Observable" [level=3] [ref=e126]
+      - paragraph [ref=e127]: content
+    - generic [ref=e128]:
+      - heading "Style - Observable Numeric" [level=3] [ref=e129]
+      - paragraph [ref=e130]: content
+    - generic [ref=e131]:
+      - heading "Style - Observable String" [level=3] [ref=e132]
+      - paragraph [ref=e133]: content
+    - generic [ref=e134]:
+      - heading "Style - Observable Variable" [level=3] [ref=e135]
+      - paragraph [ref=e136]: content
+    - generic [ref=e137]:
+      - heading "Style - Function" [level=3] [ref=e138]
+      - paragraph [ref=e139]: content
+    - generic [ref=e140]:
+      - heading "Style - Function Numeric" [level=3] [ref=e141]
+      - paragraph [ref=e142]: content
+    - generic [ref=e143]:
+      - heading "Style - Function String" [level=3] [ref=e144]
+      - paragraph [ref=e145]: content
+    - generic [ref=e146]:
+      - heading "Style - Function Variable" [level=3] [ref=e147]
+      - paragraph [ref=e148]: content
+    - generic [ref=e149]:
+      - heading "Style - Removal" [level=3] [ref=e150]
+      - paragraph [ref=e151]: content
+    - generic [ref=e152]:
+      - heading "Children - ABCD" [level=3] [ref=e153]
+      - paragraph [ref=e154]: d
+    - generic [ref=e155]:
+      - heading "Children - Boolean" [level=3] [ref=e156]
+      - paragraph [ref=e157]: "1"
+      - paragraph [ref=e158]: "0"
+    - generic [ref=e159]:
+      - heading "Children - Boolean" [level=3] [ref=e160]
+      - paragraph [ref=e161]: symbol
+    - generic [ref=e162]:
+      - heading "Fragment - Static" [level=3] [ref=e163]
+      - paragraph [ref=e164]: content
+    - generic [ref=e165]:
+      - heading "Fragment - Static Component" [level=3] [ref=e166]
+      - paragraph [ref=e167]: content
+    - generic [ref=e168]:
+      - heading "Fragment - Static Deep" [level=3] [ref=e169]
+      - paragraph [ref=e170]: first
+      - paragraph [ref=e171]: second
+      - paragraph [ref=e172]: deep
+    - generic [ref=e173]:
+      - heading "SVG - Static" [level=3] [ref=e174]
+      - img [ref=e175]
+    - heading "SVG - Static Complex" [level=3] [ref=e177]
+    - img [ref=e178]
+    - generic [ref=e198]:
+      - heading "SVG - Static CamelCase" [level=3] [ref=e199]
+      - img [ref=e200]
+    - generic [ref=e202]:
+      - heading "SVG - Observable" [level=3] [ref=e203]
+      - img [ref=e204]
+    - generic [ref=e206]:
+      - heading "SVG - Function" [level=3] [ref=e207]
+      - img [ref=e208]
+    - generic [ref=e210]:
+      - heading "SVG - Style Object" [level=3] [ref=e211]
+      - img [ref=e212]
+    - generic [ref=e214]:
+      - heading "SVG - Style String" [level=3] [ref=e215]
+      - img [ref=e216]
+    - generic [ref=e218]:
+      - heading "SVG - Class Object" [level=3] [ref=e219]
+      - img [ref=e220]
+    - generic [ref=e222]:
+      - heading "SVG - Class String" [level=3] [ref=e223]
+      - img [ref=e224]
+    - generic [ref=e226]:
+      - heading "SVG - Attribute Removal" [level=3] [ref=e227]
+      - img [ref=e228]
+    - generic [ref=e230]:
+      - heading "Template - External" [level=3] [ref=e231]
+      - generic [ref=e233]: outer inner
+      - generic [ref=e235]: outer inner
+    - generic [ref=e236]:
+      - heading "Template - SVG" [level=3] [ref=e237]
+      - img [ref=e238]
+    - heading "Portal - Static" [level=3] [ref=e241]
+    - heading "Portal - Observable" [level=3] [ref=e243]
+    - heading "Portal - Removal" [level=3] [ref=e245]
+    - generic [ref=e246]:
+      - heading "Portal - Mount Observable" [level=3] [ref=e247]
+      - paragraph [ref=e250]: content
+    - heading "Portal - When Observable" [level=3] [ref=e252]
+    - heading "Portal - Wrapper Static" [level=3] [ref=e254]
+    - generic [ref=e255]:
+      - heading "Resource - Fallback Value" [level=3] [ref=e256]
+      - paragraph [ref=e257]: Error!
+      - paragraph [ref=e258]: Error!
+    - generic [ref=e259]:
+      - heading "Resource - Fallback Latest" [level=3] [ref=e260]
+      - paragraph [ref=e261]: Error!
+      - paragraph [ref=e262]: Error!
+    - generic [ref=e263]:
+      - heading "Suspense - Always Value" [level=3] [ref=e264]
+      - paragraph [ref=e265]: Loading...
+    - generic [ref=e266]:
+      - heading "Suspense - Always Latest" [level=3] [ref=e267]
+      - paragraph [ref=e268]: Loading...
+    - generic [ref=e269]:
+      - heading "Suspense - Never" [level=3] [ref=e270]
+      - paragraph [ref=e271]: Content!
+    - generic [ref=e272]:
+      - heading "Suspense - Never Read" [level=3] [ref=e273]
+      - paragraph [ref=e274]: Content!
+    - generic [ref=e275]:
+      - heading "Suspense - Observable" [level=3] [ref=e276]
+      - paragraph [ref=e277]: Content! 123
+    - generic [ref=e278]:
+      - heading "Suspense - When" [level=3] [ref=e279]
+      - paragraph [ref=e280]: Content!
+    - generic [ref=e281]:
+      - heading "Suspense - Alive" [level=3] [ref=e282]
+      - paragraph [ref=e283]: Content (0.5173144336668248)!
+    - generic [ref=e284]:
+      - heading "Suspense - Children Observable Static" [level=3] [ref=e285]
+      - paragraph [ref=e286]: "Children: 0.37637421802537374"
+    - generic [ref=e287]:
+      - heading "Suspense - Children Function" [level=3] [ref=e288]
+      - paragraph [ref=e289]: "Children: 0.23753235907157766"
+    - generic [ref=e290]:
+      - heading "Suspense - Fallback Observable Static" [level=3] [ref=e291]
+      - paragraph [ref=e292]: "Fallback: 0.8594793679987835"
+    - generic [ref=e293]:
+      - heading "Suspense - Fallback Function" [level=3] [ref=e294]
+      - paragraph [ref=e295]: "Fallback: 0.7655383512358088"
+    - generic [ref=e296]:
+      - heading "Suspense - Alive" [level=3] [ref=e297]
+      - paragraph [ref=e298]: Content (0.9983394829376415)!
+    - generic [ref=e299]:
+      - heading "For - Unkeyed - Random" [level=3] [ref=e300]
+      - paragraph [ref=e301]: "Value: 0.4143691604085057"
+      - paragraph [ref=e302]: "Value: 0.012388183145008669"
+      - paragraph [ref=e303]: "Value: 0.36579265660001525"
+    - generic [ref=e304]:
+      - heading "Lazy" [level=3] [ref=e305]
+      - paragraph [ref=e306]: Loaded!
+    - generic [ref=e307]:
+      - heading "Nested Arrays" [level=3] [ref=e308]
+      - button "Increment" [ref=e309]
+      - list [ref=e310]:
+        - listitem [ref=e311]: "0"
+        - listitem [ref=e312]: "1"
+        - listitem [ref=e313]: "2"
+        - listitem [ref=e314]: test
+        - listitem [ref=e315]: "3"
+        - listitem [ref=e316]: "4"
+    - generic [ref=e317]:
+      - generic [ref=e318]: "1"
+      - generic [ref=e319]: "2"
+      - generic [ref=e320]: Footer
+    - generic [ref=e321]:
+      - generic [ref=e322]: before
+      - generic [ref=e323]: inner
+      - generic [ref=e324]: after
+    - generic [ref=e325]:
+      - heading "Dynamic - Context" [level=3] [ref=e326]
+      - generic [ref=e327]:
+        - paragraph [ref=e328]: context
+        - paragraph [ref=e329]:
+          - paragraph [ref=e330]: context
+          - paragraph
+          - paragraph
+          - paragraph
+        - paragraph [ref=e331]:
+          - paragraph [ref=e332]: context
+          - paragraph
+          - paragraph
+          - paragraph
+        - paragraph [ref=e333]:
+          - paragraph [ref=e334]: context
+          - paragraph
+          - paragraph
+          - paragraph
+    - generic [ref=e335]:
+      - heading "Ref - Context" [level=3] [ref=e336]
+      - paragraph [ref=e338]: "Got ref - Has parent: true - Is connected: true - Context: 321"
+    - separator [ref=e339]
+  - paragraph [ref=e341]: content
+  - generic [ref=e342]: c
+  - paragraph [ref=e344]: content
+  - paragraph [ref=e346]: content
+```

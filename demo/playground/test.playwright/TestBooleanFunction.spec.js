@@ -5,22 +5,18 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-test('TestBooleanFunction', async ({ page }) => {
+test('playground demo should render TestBooleanFunction component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
-    // Look for TestBooleanFunction component heading
-    const heading = page.getByText('Boolean - Function');
-    const headingCount = await heading.count();
-
-    if (headingCount > 0) {
-        // TestBooleanFunction is wrapped in TestSnapshots, so it won't be directly visible in the DOM
-        // We can only verify that the heading exists
-        console.log('Playground demo TestBooleanFunction component heading found (component wrapped in TestSnapshots)');
-    } else {
-        console.log('Playground demo TestBooleanFunction component heading not found (component wrapped in TestSnapshots)');
-    }
+    
+    // Look for TestBooleanFunction component
+    const componentHeading = page.locator('h3', { hasText: 'Boolean - Function' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    console.log('Playground demo TestBooleanFunction component renders correctly');
 });

@@ -5,27 +5,18 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-
-test('TestStringFunction', async ({ page }) => {
+test('playground demo should render TestStringFunction component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
+    
     // Look for TestStringFunction component
-    const stringFunctionHeading = page.locator('h3', { hasText: 'String - Function' });
-    const stringFunctionCount = await stringFunctionHeading.count();
-
-    if (stringFunctionCount > 0) {
-        // Get the parent container of the heading
-        const container = stringFunctionHeading.locator('..');
-        // Check that it has elements
-        const elements = container.locator('*');
-        const elementCount = await elements.count();
-        expect(elementCount).toBeGreaterThan(0);
-        console.log('Playground demo TestStringFunction component renders correctly');
-    } else {
-        console.log('Playground demo TestStringFunction component not found');
-    }
+    const componentHeading = page.locator('h3', { hasText: 'String - Function' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    console.log('Playground demo TestStringFunction component renders correctly');
 });

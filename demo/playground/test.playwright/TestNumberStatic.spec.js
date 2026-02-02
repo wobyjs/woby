@@ -5,29 +5,30 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-
 test('playground demo should render TestNumberStatic component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
+    
     // Look for TestNumberStatic component
-    const numberStaticHeading = page.locator('h3', { hasText: 'Number - Static' });
-    const numberStaticCount = await numberStaticHeading.count();
-
-    if (numberStaticCount > 0) {
-        // Get the parent container of the heading
-        const container = numberStaticHeading.locator('..');
+    const componentHeading = page.locator('h3', { hasText: 'Number - Static' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    if (componentCount > 0) {
+        // Get the first instance of the component
+        const container = componentHeading.first().locator('..');
         // Get the paragraph element
-        const paragraph = container.locator('p');
+        const paragraph = container.locator('p').first();
         // Get the text content
         const content = await paragraph.textContent();
-        // For number static, should be a numeric string
+        
+        // Perform assertions based on component type
         expect(!isNaN(parseFloat(content))).toBe(true);
+        
         console.log('Playground demo TestNumberStatic component renders correct snapshot');
-    } else {
-        console.log('Playground demo TestNumberStatic component not found');
     }
 });

@@ -5,27 +5,18 @@ test.use({
     baseURL: 'http://localhost:5176',
 });
 
-
-test('TestNullRemoval', async ({ page }) => {
+test('playground demo should render TestNullRemoval component with correct snapshot', async ({ page }) => {
     // Navigate to the playground demo via HTTP server
     await page.goto('/');
-
+    
     // Wait for content to load
     await page.waitForLoadState('networkidle');
-
+    
     // Look for TestNullRemoval component
-    const nullRemovalHeading = page.locator('h3', { hasText: 'Null - Removal' });
-    const nullRemovalCount = await nullRemovalHeading.count();
-
-    if (nullRemovalCount > 0) {
-        // Get the parent container of the heading
-        const container = nullRemovalHeading.locator('..');
-        // Check that it has elements
-        const elements = container.locator('*');
-        const elementCount = await elements.count();
-        expect(elementCount).toBeGreaterThan(0);
-        console.log('Playground demo TestNullRemoval component renders correctly');
-    } else {
-        console.log('Playground demo TestNullRemoval component not found');
-    }
+    const componentHeading = page.locator('h3', { hasText: 'Null - Removal' });
+    const componentCount = await componentHeading.count();
+    
+    expect(componentCount).toBeGreaterThan(0);
+    
+    console.log('Playground demo TestNullRemoval component renders correctly');
 });
