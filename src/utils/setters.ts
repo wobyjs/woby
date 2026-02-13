@@ -1039,7 +1039,7 @@ export const getSetters = (env?: Env) => {
 
     }
 
-    // if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
+    if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
 
     const setProp = (element: HTMLElement | Comment, key: string, value: any, stack: Stack): void => {
         if (element instanceof Comment || element instanceof Text) {

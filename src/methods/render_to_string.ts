@@ -2,6 +2,7 @@ import { FragmentUtils } from '../utils/fragment'
 import type { Child } from '../types'
 import { getSetters } from '../utils/setters'
 import { BaseNode } from '../ssr/base_node'
+import { document } from '../ssr/document'
 
 import { $$, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'

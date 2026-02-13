@@ -9,8 +9,10 @@ declare const via
 
 export type Env = 'ssr' | 'browser' | 'via'
 
-export function getEnv(type = 'browser' as Env) {
-    const isSSR = type === 'ssr'
+export function getEnv(type?: Env) {
+    // Auto-detect environment if not provided
+    const detectedType = type ?? (typeof window === 'undefined' ? 'ssr' : 'browser');
+    const isSSR = detectedType === 'ssr'
     // Return all necessary exports for SSR environment
     if (isSSR) {
         return {
@@ -18,7 +20,7 @@ export function getEnv(type = 'browser' as Env) {
             customElements,
             MutationObserver,
             isSSR: isSSR,
-            ...getCreators(type)
+            ...getCreators(detectedType)
         }
     } else {
         return {
@@ -26,7 +28,7 @@ export function getEnv(type = 'browser' as Env) {
             customElements: globalThis.customElements,
             MutationObserver: globalThis.MutationObserver,
             isSSR: false,
-            ...getCreators(type)
+            ...getCreators(detectedType)
         }
     }
 }
@@ -44,11 +46,22 @@ function getCreators(type = 'browser' as 'ssr' | 'browser' | 'via') {
         }
     } else {
         const document = type === 'ssr' ? doc : globalThis.document
-        // Fallback to SSR versions if document is not available or binding fails
+        // Ensure document exists before trying to bind methods
+        if (!document) {
+            // Fallback to SSR document for browser type when document is not available
+            const fallbackDoc = doc;
+            return {
+                createComment: fallbackDoc.createComment.bind(fallbackDoc) as FN<[any], Comment>,
+                createHTMLNode: fallbackDoc.createElement.bind(fallbackDoc) as FN<[ComponentIntrinsicElement], HTMLElement>,
+                createSVGNode: fallbackDoc.createElementNS.bind(fallbackDoc, 'http://www.w3.org/2000/svg') as FN<[ComponentIntrinsicElement], SVGElement>,
+                createText: fallbackDoc.createTextNode.bind(fallbackDoc) as FN<[any], Text>,
+                createDocumentFragment: fallbackDoc.createDocumentFragment.bind(fallbackDoc) as FN<[], DocumentFragment>
+            };
+        }
         return {
-            createComment: document.createComment.bind(document, '') as FN<[any], Comment>,
+            createComment: document.createComment.bind(document) as FN<[any], Comment>,
             createHTMLNode: document.createElement.bind(document) as FN<[ComponentIntrinsicElement], HTMLElement>,
-            createSVGNode: document.createElementNS.bind(document, 'http://www.w3.org/2000/svg') as FN<[ComponentIntrinsicElement], Element>,
+            createSVGNode: document.createElementNS.bind(document, 'http://www.w3.org/2000/svg') as FN<[ComponentIntrinsicElement], SVGElement>,
             createText: document.createTextNode.bind(document) as FN<[any], Text>,
             createDocumentFragment: document.createDocumentFragment.bind(document) as FN<[], DocumentFragment>
         }

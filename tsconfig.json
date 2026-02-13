@@ -69,5 +69,6 @@
     "via.d.tsx",
     "node_modules",
     "demo",
+    "playwright.config.*"
   ]
 }

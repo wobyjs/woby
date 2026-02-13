@@ -29,7 +29,18 @@ const ContextProvider = defaults(
   }
 )
 
-customElement('context-provider', ContextProvider)
+// Register the custom element lazily to avoid circular initialization issues
+// We defer the registration to avoid initialization during import time
+const registerContextProvider = () => {
+    customElement('context-provider', ContextProvider)
+}
+
+// Register the context provider only in browser environments
+// Skip registration during SSR to avoid circular dependency issues
+// We check if we're in a browser-like environment
+if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof customElements !== 'undefined') {
+    registerContextProvider()
+}
 
 declare module '../index' {
   namespace JSX {

@@ -57,8 +57,8 @@ import TestNumberStatic from './src/TestNumberStatic'
 import TestSimpleExpect from './src/TestSimpleExpect'
 import TestStringFunction from './src/TestStringFunction'
 import TestStringObservable from './src/TestStringObservable'
-import TestStringObservableDeepStatic from './src/TestStringObservableDeepStatic'
 import TestStringObservableStatic from './src/TestStringObservableStatic'
+import TestStringObservableDeepStatic from './src/TestStringObservableDeepStatic'
 import TestStringRemoval from './src/TestStringRemoval'
 import TestStringStatic from './src/TestStringStatic'
 import TestUndefinedFunction from './src/TestUndefinedFunction'
@@ -136,7 +136,7 @@ const tests = [
 const App = () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         {tests.map((TestComponent, index) => (
-            <div key={index} style={{ border: "1px solid #ccc", padding: "10px" }}>
+            <div key={`${index}`} style={{ border: "1px solid #ccc", padding: "10px" }}>
                 <TestComponent />
             </div>
         ))}

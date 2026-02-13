@@ -11,7 +11,7 @@
  * jsx(component, props, ...children)
  */
 
-import { renderToString, jsx } from 'woby'
+import { renderToString, jsx } from '../../src'
 
 // Test with JSX syntax
 const JSXTest = () => {

@@ -14,6 +14,7 @@ const config = defineConfig({
     },
     esbuild: {
         jsx: 'automatic',
+        jsxImportSource: 'woby',
     },
     resolve: {
         alias: {
