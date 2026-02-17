@@ -20,14 +20,16 @@ test('TestPromiseResolved component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const resolved = () => o  // Mock function
         const element = h('div', null,
-            h('h3', null, 'Promise - Resolved'),{() => {
-                if (resolved().pending) return             h('p', {}, "Pending...")
-                if (resolved().error) return             h('p', {}, "[observable-content]")
-                return             h('p', {}, "[observable-content]")
-            }}
+            h('h3', null, 'Promise - Resolved'),
+            (() => {
+                if (resolved().pending) return h('p', {}, "Pending...")
+                if (resolved().error) return h('p', {}, "[observable-content]")
+                return h('p', {}, "[observable-content]")
+            })()
         )
-        
+
         // Render to body
         render(element, document.body)
     })

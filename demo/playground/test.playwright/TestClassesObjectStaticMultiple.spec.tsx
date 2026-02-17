@@ -21,9 +21,10 @@ test('TestClassesObjectStaticMultiple component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Classes - Object Static Multiple'),            h('p', {'class': {{, ''red': true, 'bold':': true, 'true': true, '}}': true}, "content")
+            h('h3', null, 'Classes - Object Static Multiple'),
+            h('p', { 'class': { 'red': true, 'bold': true } }, "content")
         )
-        
+
         // Render to body
         render(element, document.body)
     })

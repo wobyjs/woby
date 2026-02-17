@@ -16,27 +16,29 @@ test('TestForRandomOnlyChild component', async ({ page }) => {
         const { $, h, render } = woby
 
         // Create the component logic based on source
-        const values = $("value")
-        const values = $("$(testObservables['TestForRandomOnlyChild']")
+        const values1 = $("value")
+        const values2 = $("$(testObservables['TestForRandomOnlyChild']")
 
         // Create the component element using h() function
+        const For = (props) => {
+            return props.values().map(props.children)
+        } // Mock For component
         const element = h('div', null,
-            h('h3', null, 'For - Random'),<For values={values}>
-                {(value: number) => {
-                    return             h('p', {}, "[observable-content]")
-                }}
-            </For>
+            h('h3', null, 'For - Random'),
+            h(For, { values: values2 },
+                (value) => h('p', {}, "[observable-content]")
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define update function
-        const update = () => values(prev => {
+        const update = () => values2(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['updateTestForRandomOnlyChild'] = update
+            ; (document.body as any)['updateTestForRandomOnlyChild'] = update
     })
 
     // Get initial state

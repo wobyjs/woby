@@ -20,14 +20,16 @@ test('TestPromiseRejected component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const rejected = () => o  // Mock function
         const element = h('div', null,
-            h('h3', null, 'Promise - Rejected'),{() => {
-                if (rejected().pending) return             h('p', {}, "Pending...")
-                if (rejected().error) return             h('p', {}, "[observable-content]")
-                return             h('p', {}, "[observable-content]")
-            }}
+            h('h3', null, 'Promise - Rejected'),
+            (() => {
+                if (rejected().pending) return h('p', {}, "Pending...")
+                if (rejected().error) return h('p', {}, "[observable-content]")
+                return h('p', {}, "[observable-content]")
+            })()
         )
-        
+
         // Render to body
         render(element, document.body)
     })

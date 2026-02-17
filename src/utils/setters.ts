@@ -636,15 +636,16 @@ export const getSetters = (env?: Env) => {
         // Added more events: mouse events, pointer events, and touch events for improved performance
         // TODO: Implement proper cleanup mechanism for event delegation
         const delegatedEvents = <const>{
-            onauxclick: ['_onauxclick', false],
-            onbeforeinput: ['_onbeforeinput', false],
-            onclick: ['_onclick', false],
-            ondblclick: ['_ondblclick', false],
-            onfocusin: ['_onfocusin', false],
-            onfocusout: ['_onfocusout', false],
-            oninput: ['_oninput', false],
-            onkeydown: ['_onkeydown', false],
-            onkeyup: ['_onkeyup', false],
+            // onauxclick: ['_onauxclick', false],
+            // onbeforeinput: ['_onbeforeinput', false],
+            // onclick: ['_onclick', false],
+            // ondblclick: ['_ondblclick', false],
+            // onfocusin: ['_onfocusin', false],
+            // onfocusout: ['_onfocusout', false],
+            // oninput: ['_oninput', false],
+            // onkeydown: ['_onkeydown', false],
+            // onkeyup: ['_onkeyup', false],
+
             // onmousedown: ['_onmousedown', false],
             // onmouseenter: ['_onmouseenter', false],
             // onmouseleave: ['_onmouseleave', false],

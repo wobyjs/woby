@@ -4,7 +4,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestStringObservableDeepStatic = (): JSX.Element => {
     return useMemo(() => {
-        const initialValue = String(random())
+        const initialValue = "0.123456"
         // For static test, we don't need to register an observable that changes
         const o = $(initialValue)
         // Don't use interval for static test
@@ -22,7 +22,7 @@ const TestStringObservableDeepStatic = (): JSX.Element => {
 
 TestStringObservableDeepStatic.test = {
     static: true,
-    // For static tests, don't use compareActualValues since we can't predict random values
+    expect: () => '<p>0.123456</p>'  // Use a fixed value for predictable testing
 }
 
 

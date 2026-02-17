@@ -21,23 +21,24 @@ test('TestFragmentStaticDeep component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Fragment - Static Deep'),<>
-                            h('p', {}, "first")
-            </>
-            <>
-                            h('p', {}, "second")
-            </>
-            <>
-                <>
-                    <>
-                        <>
-                                        h('p', {}, "deep")
-                        </>
-                    </>
-                </>
-            </>
+            h('h3', null, 'Fragment - Static Deep'),
+            h('div', null,  // Wrapper for Fragment-like behavior
+                h('p', {}, "first")
+            ),
+            h('div', null,  // Wrapper for Fragment-like behavior
+                h('p', {}, "second")
+            ),
+            h('div', null,  // Wrapper for Fragment-like behavior
+                h('div', null,  // Wrapper for Fragment-like behavior
+                    h('div', null,  // Wrapper for Fragment-like behavior
+                        h('div', null,  // Wrapper for Fragment-like behavior
+                            h('p', {}, "deep")
+                        )
+                    )
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

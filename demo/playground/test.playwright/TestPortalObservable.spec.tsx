@@ -16,40 +16,42 @@ test('TestPortalObservable component', async ({ page }) => {
         const { $, h, render } = woby
 
         // Create the component logic based on source
-        const component = $("a")
-        const component = $("c")
-        const component = $("ab")
+        const component1 = $("a")
+        const component2 = $("c")
+        const component3 = $("ab")
 
         // Create the component element using h() function
+        const Portal = (props) => h('div', null, props.children)  // Mock Portal component
         const element = h('div', null,
-            h('h3', null, 'Portal - Observable'),            h('p', null, "<Portal mount={document.body}>
-                {component}
-            </Portal>")
+            h('h3', null, 'Portal - Observable'),
+            h('p', null,
+                h(Portal, { mount: document.body },
+                    component3()
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
-        const toggle = () => component(prev => {
+        const toggle1 = () => component1(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        
+
         // Define toggle function
-        const toggle = () => component(prev => {
+        const toggle2 = () => component2(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        
+
         // Define toggle function
-        const toggle = () => component(prev => {
+        const toggle3 = () => component3(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestPortalObservable'] = toggle
-        ;(document.body as any)['toggleTestPortalObservable'] = toggle
-        ;(document.body as any)['toggleTestPortalObservable'] = toggle
+            ; (document.body as any)['toggleTestPortalObservable'] = toggle3
     })
 
     // For static test, verify initial state

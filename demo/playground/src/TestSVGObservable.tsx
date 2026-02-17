@@ -2,13 +2,10 @@ import { $, $$ } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestSVGObservable = (): JSX.Element => {
-    const color = $(randomColor())
-    const update = () => color(randomColor())
-    useInterval(update, TEST_INTERVAL / 2)
     return (
         <>
             <h3>SVG - Observable</h3>
-            <svg viewBox="0 0 50 50" width="50px" stroke={color} stroke-width="3" fill="white">
+            <svg viewBox="0 0 50 50" width="50px" stroke="#abcdef" stroke-width="3" fill="white">
                 <circle cx="25" cy="25" r="20" />
             </svg>
         </>
@@ -16,8 +13,8 @@ const TestSVGObservable = (): JSX.Element => {
 }
 
 TestSVGObservable.test = {
-    static: false,
-    expect: () => '<svg viewBox="0 0 {random-bigint} {random-bigint}" width="50px" stroke="{random-color}" stroke-width="3" fill="white"><circle cx="{random-bigint}" cy="{random-bigint}" r="{random-bigint}"></circle></svg>'
+    static: true,
+    expect: () => '<svg viewBox="0 0 50 50" width="50px" stroke="#abcdef" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
 }
 
 

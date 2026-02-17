@@ -20,12 +20,19 @@ test('TestDynamicStoreProps component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const Dynamic = (props: any) => {
+            const { component, children, ...restProps } = props
+            return h(component || 'div', restProps, children)
+        }
+        const propsObj = { class: 'dynamic-class' }
+
         const element = h('div', null,
-            h('h3', null, 'Dynamic - Store Props'),<Dynamic component="div" props={props}>
-                            h('p', {}, "[observable-content]")
-            </Dynamic>
+            h('h3', null, 'Dynamic - Store Props'),
+            h(Dynamic, { component: "div", props: propsObj },
+                h('p', {}, "[observable-content]")
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

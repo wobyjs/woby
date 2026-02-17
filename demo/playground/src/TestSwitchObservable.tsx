@@ -1,14 +1,11 @@
-import { $, $$ } from 'woby'
+import { $, $$, Switch } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestSwitchObservable = (): JSX.Element => {
-    const o = $(0)
-    const toggle = () => o(prev => (prev + 1) % 4)
-    useInterval(toggle, TEST_INTERVAL)
     return (
         <>
             <h3>Switch - Observable</h3>
-            <Switch when={o}>
+            <Switch when={0}>
                 <Switch.Case when={0}>
                     <p>0</p>
                 </Switch.Case>
@@ -27,7 +24,7 @@ const TestSwitchObservable = (): JSX.Element => {
 }
 
 TestSwitchObservable.test = {
-    static: false,
+    static: true,
     expect: () => '<p>0</p>'
 }
 

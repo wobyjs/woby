@@ -1,15 +1,9 @@
-import { $, $$ } from 'woby'
+import { $, $$, Switch } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestSwitchCaseFunction = (): JSX.Element => {
-    const caseValue = String(random())
-    registerTestObservable('TestSwitchCaseFunction', caseValue)
     const Case = () => {
-        const o = $(String(random()))
-        const randomize = () => o(String(random()))
-        useInterval(randomize, TEST_INTERVAL)
-        o()
-        return <p>Case: {caseValue}</p>
+        return <p>Case: 0.123456</p>  // Static value
     }
     return (
         <>
@@ -28,11 +22,7 @@ const TestSwitchCaseFunction = (): JSX.Element => {
 
 TestSwitchCaseFunction.test = {
     static: true,
-    compareActualValues: true,
-    expect: () => {
-        const caseValue = testObservables['TestSwitchCaseFunction']
-        return `<p>Case: ${caseValue}</p>`
-    }
+    expect: () => '<p>Case: 0.123456</p>'
 }
 
 

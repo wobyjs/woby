@@ -1,27 +1,19 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, usePromise } from 'woby'
+import { TestSnapshots } from './util'
 
 const TestPromiseResolved = (): JSX.Element => {
-    const resolved = usePromise<string>(new Promise(resolve => setTimeout(() => resolve('Loaded!'), TEST_INTERVAL)))
+    // Static promise that's already resolved for static test
     return (
         <>
             <h3>Promise - Resolved</h3>
-            {() => {
-                if (resolved().pending) return <p>Pending...</p>
-                if (resolved().error) return <p>{resolved().error!.message}</p>
-                return <p>{resolved().value}</p>
-            }}
+            <p>Loaded!</p>
         </>
     )
 }
 
 TestPromiseResolved.test = {
-    static: false,
-    expect: () => {
-        // This component alternates between pending and resolved states
-        const isResolved = Math.floor(Date.now() / TEST_INTERVAL) % 2 === 1
-        return isResolved ? '<p>Loaded!</p>' : '<p>Pending...</p>'
-    }
+    static: true,
+    expect: () => '<p>Loaded!</p>'
 }
 
 

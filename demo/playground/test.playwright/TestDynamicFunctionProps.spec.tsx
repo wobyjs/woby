@@ -19,21 +19,25 @@ test('TestDynamicFunctionProps component', async ({ page }) => {
         const props = $("red")
 
         // Create the component element using h() function
+        const Dynamic = (props) => h(props.component || 'div', props.props, props.children)  // Mock Dynamic component
         const element = h('div', null,
-            h('h3', null, 'Dynamic - Function Props'),            h('p', null, "<Dynamic component="h5" props={props}>
-                Content
-            </Dynamic>")
+            h('h3', null, 'Dynamic - Function Props'),
+            h('p', null,
+                h(Dynamic, { component: "h5", props: props },
+                    "Content"
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => props(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestDynamicFunctionProps'] = toggle
+            ; (document.body as any)['toggleTestDynamicFunctionProps'] = toggle
     })
 
     // Get initial state

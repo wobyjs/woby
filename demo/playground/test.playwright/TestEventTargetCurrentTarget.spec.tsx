@@ -20,10 +20,12 @@ test('TestEventTargetCurrentTarget component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const handleClick = (e) => { } // Mock event handler
         const element = h('div', null,
-            h('h3', null, 'Event - Target - Current Target'),            h('div', {'onClick': {e, '': true}, "[observable-content]")
+            h('h3', null, 'Event - Target - Current Target'),
+            h('div', { 'onClick': handleClick }, "[observable-content]")
         )
-        
+
         // Render to body
         render(element, document.body)
     })

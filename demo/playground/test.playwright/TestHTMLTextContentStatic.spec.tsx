@@ -21,9 +21,10 @@ test('TestHTMLTextContentStatic component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'HTML - textContent - Static'),            h('p', {'textContent': ', 'h('b',': true, '{},': true, '"danger")"': true})
+            h('h3', null, 'HTML - textContent - Static'),
+            h('p', { 'textContent': 'danger' })
         )
-        
+
         // Render to body
         render(element, document.body)
     })

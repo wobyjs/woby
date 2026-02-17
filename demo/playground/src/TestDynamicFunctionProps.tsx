@@ -1,11 +1,16 @@
-import { $, $$ } from 'woby'
+import { $, $$, Dynamic } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
+let testit = true
 const TestDynamicFunctionProps = (): JSX.Element => {
     const red = { class: 'red' }
     const blue = { class: 'blue' }
     const props = $(red)
-    const toggle = () => props(prev => prev === red ? blue : red)
+    registerTestObservable('TestDynamicFunctionProps', props)
+    const toggle = () => {
+        props(prev => prev === red ? blue : red)
+        testit = false
+    }
     useInterval(toggle, TEST_INTERVAL)
     return (
         <>
@@ -19,7 +24,11 @@ const TestDynamicFunctionProps = (): JSX.Element => {
 
 TestDynamicFunctionProps.test = {
     static: false,
-    expect: () => '<h5 class="red">Content</h5>'
+    compareActualValues: true,
+    expect: () => {
+        const props = $$(testObservables['TestDynamicFunctionProps'])
+        return `<h5 class="${props.class}">Content</h5>`
+    }
 }
 
 

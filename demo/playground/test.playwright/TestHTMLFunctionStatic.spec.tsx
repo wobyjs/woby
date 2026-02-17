@@ -20,14 +20,14 @@ test('TestHTMLFunctionStatic component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const If = (props) => props.when ? h('div', null, props.children) : null  // Mock If component
         const element = h('div', null,
-            h('h3', null, 'HTML - Function - Static'),{html`
-        <${If} when=${true}>
-                      h('p', {}, "[observable-content]")
-        </${If}>
-      `}
+            h('h3', null, 'HTML - Function - Static'),
+            h(If, { when: true },
+                h('p', {}, "[observable-content]")
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

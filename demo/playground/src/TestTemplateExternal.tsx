@@ -1,4 +1,4 @@
-import { $, $$ } from 'woby'
+import { $, $$, template } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestTemplateExternal = (): JSX.Element => {

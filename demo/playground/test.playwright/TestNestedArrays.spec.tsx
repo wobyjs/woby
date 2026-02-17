@@ -21,19 +21,29 @@ test('TestNestedArrays component', async ({ page }) => {
         const itemsState = $("$(testObservables['TestNestedArrays']")
 
         // Create the component element using h() function
+        const For = (props) => {
+            return props.values().map(props.children)
+        } // Mock For component
+        const If = (props) => props.when() ? h('div', null, props.children) : null // Mock If component
+        const incrementItems = () => { } // Mock function
+
         const element = h('div', null,
-            h('h3', null, 'Nested Arrays'),            h('button', {'onClick': {incrementItems}}, "Increment")
-            <ul>
-                <For values={items}>
-                    {item => {
-                        return (
-                            <>
-                                <If when={() => activeItem() === item}>
-                                                h('li', {}, "test")
-                                </If>
-                                            h('li', {}, "[observable-content]")
+            h('h3', null, 'Nested Arrays'),
+            h('button', { 'onClick': incrementItems }, "Increment"),
+            h('ul', null,
+                h(For, { values: items },
+                    (item) => {
+                        return h('div', null,  // Wrapper for Fragment-like behavior
+                            h(If, { when: () => activeItem() === item },
+                                h('li', {}, "test")
+                            ),
+                            h('li', {}, "[observable-content]")
+                        )
+                    }
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

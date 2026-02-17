@@ -21,9 +21,10 @@ test('TestRefs component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Refs'),            h('p', {'ref': {[ref1,, 'ref2,': true, 'null,': true, 'undefined]}': true}, "content")
+            h('h3', null, 'Refs'),
+            h('p', { 'ref': [ref1, ref2, null, undefined] }, "content")
         )
-        
+
         // Render to body
         render(element, document.body)
     })

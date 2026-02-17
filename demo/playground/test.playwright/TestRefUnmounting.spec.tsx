@@ -21,22 +21,24 @@ test('TestRefUnmounting component', async ({ page }) => {
         const ref = $("<HTMLElement>(")
 
         // Create the component element using h() function
+        const If = (props) => props.when ? h('div', null, props.children) : null  // Mock If component
         const element = h('div', null,
-            h('h3', null, 'Ref - Unmounting'),            h('p', {}, "[observable-content]")
-            <If when={mounted}>
-                            h('p', {'ref': {ref}}, "content")
-            </If>
+            h('h3', null, 'Ref - Unmounting'),
+            h('p', {}, "[observable-content]"),
+            h(If, { when: mounted },
+                h('p', { 'ref': ref }, "content")
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => mounted(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestRefUnmounting'] = toggle
+            ; (document.body as any)['toggleTestRefUnmounting'] = toggle
     })
 
     // Get initial state

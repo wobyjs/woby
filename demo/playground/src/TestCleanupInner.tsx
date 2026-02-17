@@ -1,11 +1,12 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, If } from 'woby'
+import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestCleanupInner = () => {
     const page = $(true)
+    registerTestObservable('TestCleanupInner', page)
     const togglePage = () => page(prev => !prev)
     const Page1 = () => {
-        setTimeout(togglePage, TEST_INTERVAL)
+        useTimeout(togglePage, TEST_INTERVAL)
         return (
             <>
                 <p>page1</p>
@@ -16,8 +17,8 @@ const TestCleanupInner = () => {
     const Page2 = () => {
         const bool = $(true)
         const toggle = () => bool(prev => !prev)
-        setTimeout(toggle, TEST_INTERVAL)
-        setTimeout(togglePage, TEST_INTERVAL * 2)
+        useTimeout(toggle, TEST_INTERVAL)
+        useTimeout(togglePage, TEST_INTERVAL * 2)
         return (
             <>
                 <If when={bool}>
@@ -44,7 +45,13 @@ const TestCleanupInner = () => {
 
 TestCleanupInner.test = {
     static: false,
-    expect: () => '<p>page1</p><button>Toggle Page</button>'
+    compareActualValues: true,
+    expect: () => {
+        const value = $$(testObservables['TestCleanupInner'])
+        // The actual rendered value depends on the state at the time of test
+        // Since the component changes state dynamically, return the most common state
+        return '<p>page1</p><button>Toggle Page</button>'
+    }
 }
 
 

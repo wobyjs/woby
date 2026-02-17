@@ -1,10 +1,7 @@
 import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots, random } from './util'
 
 const TestInputLabelFor = (): JSX.Element => {
-    const o = $<string | null>(String(random()))
-    const randomize = () => o(prev => prev ? null : String(random()))
-    useInterval(randomize, TEST_INTERVAL)
     return (
         <>
             <h3>Input - Label For</h3>
@@ -15,5 +12,9 @@ const TestInputLabelFor = (): JSX.Element => {
     )
 }
 
+TestInputLabelFor.test = {
+    static: true,
+    expect: () => '<p><label for="for-target">htmlFor</label></p><p><label for="for-target">for</label></p><p><input id="for-target"></p>'
+}
 
 export default () => <TestSnapshots Component={TestInputLabelFor} />

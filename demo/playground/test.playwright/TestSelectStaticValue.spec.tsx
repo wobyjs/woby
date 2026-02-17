@@ -20,12 +20,15 @@ test('TestSelectStaticValue component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Select - Static Value'),            h('select', {'ref': {ref}, 'name': 'select-static-value', 'value': 'bar'}, "<option value="foo">foo</option>
-                <option value="bar">bar</option>
-                <option value="baz">baz</option>
-                <option value="qux">qux</option>")
+            h('h3', null, 'Select - Static Value'),
+            h('select', { 'ref': ref, 'name': 'select-static-value', 'value': 'bar' },
+                h('option', { value: 'foo' }, 'foo'),
+                h('option', { value: 'bar' }, 'bar'),
+                h('option', { value: 'baz' }, 'baz'),
+                h('option', { value: 'qux' }, 'qux')
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

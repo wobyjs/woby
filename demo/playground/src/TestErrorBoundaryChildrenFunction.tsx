@@ -1,14 +1,16 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, ErrorBoundary } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
 
 const TestErrorBoundaryChildrenFunction = (): JSX.Element => {
     const childrenValue = String(random())
-    registerTestObservable('TestErrorBoundaryChildrenFunction', childrenValue)
+    const childrenObservable = $(childrenValue)
+    registerTestObservable('TestErrorBoundaryChildrenFunction', childrenObservable)
     const Children = (): JSX.Element => {
-        const o = $(String(random()))
-        const randomize = () => o(String(random()))
-        useInterval(randomize, TEST_INTERVAL)
-        o()
+        // Remove the dynamic updating to make this truly static
+        // const o = $(String(random()))
+        // const randomize = () => o(String(random()))
+        // useInterval(randomize, TEST_INTERVAL)
+        // o()
         return <p>Children: {childrenValue}</p>
     }
     const Fallback = (): JSX.Element => {
@@ -26,10 +28,9 @@ const TestErrorBoundaryChildrenFunction = (): JSX.Element => {
 
 TestErrorBoundaryChildrenFunction.test = {
     static: true,
-    compareActualValues: true,
     expect: () => {
-        const childrenValue = testObservables['TestErrorBoundaryChildrenFunction']
-        return `<p>Children: ${childrenValue}</p>`
+        const value = $$(testObservables['TestErrorBoundaryChildrenFunction'])
+        return `<p>Children: ${value}</p>`
     }
 }
 

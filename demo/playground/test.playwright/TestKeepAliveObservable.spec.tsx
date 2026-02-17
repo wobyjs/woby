@@ -19,28 +19,31 @@ test('TestKeepAliveObservable component', async ({ page }) => {
         const o = $("true")
 
         // Create the component element using h() function
+        const If = (props) => props.when ? h('div', null, props.children) : null  // Mock If component
+        const KeepAlive = (props) => h('div', { id: props.id, ttl: props.ttl }, props.children)  // Mock KeepAlive component
         const element = h('div', null,
-            h('h3', null, 'KeepAlive - Observable'),<If when={o}>
-                <KeepAlive id="observable-1">
-                                h('p', {}, "[observable-content]")
-                </KeepAlive>
-            </If>
-            <If when={o}>
-                <KeepAlive id="observable-2" ttl={100}>
-                                h('p', {}, "[observable-content]")
-                </KeepAlive>
-            </If>
+            h('h3', null, 'KeepAlive - Observable'),
+            h(If, { when: o },
+                h(KeepAlive, { id: "observable-1" },
+                    h('p', {}, "[observable-content]")
+                )
+            ),
+            h(If, { when: o },
+                h(KeepAlive, { id: "observable-2", ttl: 100 },
+                    h('p', {}, "[observable-content]")
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestKeepAliveObservable'] = toggle
+            ; (document.body as any)['toggleTestKeepAliveObservable'] = toggle
     })
 
     // Get initial state

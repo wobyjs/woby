@@ -1,8 +1,10 @@
-import { $, $$ } from 'woby'
+import { $, $$, store } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
+let testit = true
 const TestClassesArrayStoreMultiple = (): JSX.Element => {
-    const o = store(['red bold', false])
+    const o = $(['red bold', false])
+    registerTestObservable('TestClassesArrayStoreMultiple', o)
     const toggle = () => {
         if (o[0]) {
             o[0] = false
@@ -11,6 +13,7 @@ const TestClassesArrayStoreMultiple = (): JSX.Element => {
             o[0] = 'red bold'
             o[1] = false
         }
+        testit = false
     }
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -23,7 +26,20 @@ const TestClassesArrayStoreMultiple = (): JSX.Element => {
 
 TestClassesArrayStoreMultiple.test = {
     static: false,
-    expect: () => '<p class="red bold">content</p>'
+    compareActualValues: true,
+    expect: () => {
+        if (testit) {
+            const value = $$(testObservables['TestClassesArrayStoreMultiple'])
+            const classes = []
+            if (value[0]) classes.push(value[0])
+            if (value[1]) classes.push(value[1])
+            return `<p class="${classes.join(' ')}">content</p>`
+        }
+        else {
+            testit = true
+            return `<p class="">content</p>`
+        }
+    }
 }
 
 

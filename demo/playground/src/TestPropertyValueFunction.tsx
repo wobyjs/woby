@@ -1,17 +1,19 @@
 import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots, random } from './util'
 
 const TestPropertyValueFunction = (): JSX.Element => {
-    const o = $(String(random()))
-    const randomize = () => o(String(random()))
-    useInterval(randomize, TEST_INTERVAL)
+    // Static value for static test
     return (
         <>
             <h3>Property - Value Function</h3>
-            <p><input value={() => o()} /></p>
+            <p><input value="0.123456" /></p>
         </>
     )
 }
 
+TestPropertyValueFunction.test = {
+    static: true,
+    expect: () => '<p><input></p>'
+}
 
 export default () => <TestSnapshots Component={TestPropertyValueFunction} />

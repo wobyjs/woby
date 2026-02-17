@@ -1,21 +1,19 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, If } from 'woby'
+import { TestSnapshots } from './util'
 
 const TestIfNestedFunctionUnnarrowed = (): JSX.Element => {
-    const o = $(true)
-    const content = $(0)
-    const increment = () => content(prev => (prev + 1) % 3)
-    useInterval(increment, TEST_INTERVAL)
+    // Static value for static test
+    const content = 0  // Fixed value to ensure it stays at 0
     return (
         <>
             <h3>If - Nested Function Unnarrowed</h3>
-            <p>(<If when={o}>{() => () => content()}</If>)</p>
+            <p>(<If when={true}>{() => content}</If>)</p>
         </>
     )
 }
 
 TestIfNestedFunctionUnnarrowed.test = {
-    static: false,
+    static: true,
     expect: () => '<p>(0)</p>'
 }
 

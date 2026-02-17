@@ -19,21 +19,25 @@ test('TestDynamicObservableChildren component', async ({ page }) => {
         const o = $("value")
 
         // Create the component element using h() function
+        const Dynamic = (props) => h(props.component || 'div', null, props.children)  // Mock Dynamic component
         const element = h('div', null,
-            h('h3', null, 'Dynamic - Observable Children'),            h('p', null, "<Dynamic component="h5">
-                {o}
-            </Dynamic>")
+            h('h3', null, 'Dynamic - Observable Children'),
+            h('p', null,
+                h(Dynamic, { component: "h5" },
+                    o()
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define update function
         const update = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['updateTestDynamicObservableChildren'] = update
+            ; (document.body as any)['updateTestDynamicObservableChildren'] = update
     })
 
     // Get initial state

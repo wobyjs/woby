@@ -20,20 +20,21 @@ test('TestInputLabelFor component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Input - Label For'),            h('p', {}, "<label htmlFor="for-target">htmlFor</label>")
-                        h('p', {}, "<label for="for-target">for</label>")
-                        h('p', {}, "            h('input', {'id': 'for-target'})")
+            h('h3', null, 'Input - Label For'),
+            h('p', {}, h('label', { 'htmlFor': 'for-target' }, 'htmlFor')),
+            h('p', {}, h('label', { 'for': 'for-target' }, 'for')),
+            h('p', {}, h('input', { 'id': 'for-target' }))
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define randomize function
         const randomize = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['randomizeTestInputLabelFor'] = randomize
+            ; (document.body as any)['randomizeTestInputLabelFor'] = randomize
     })
 
     // Get initial state

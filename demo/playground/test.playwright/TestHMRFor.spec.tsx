@@ -20,25 +20,28 @@ test('TestHMRFor component', async ({ page }) => {
         const values = $("$(testObservables['TestHMRFor']")
 
         // Create the component element using h() function
+        const For = (props) => {
+            return props.values().map((item, index) => props.children(item, index))
+        } // Mock For component
+        const Button = (props) => h('button', null, `Button ${props.value} ${props.index}`) // Mock Button component
         const element = h('div', null,
-            h('h3', null, 'HMR - For'),            h('p', {}, "prev")
-            <For values={o}>
-                {(item, index) => (
-                    <Button value={item} index={index} />
-                )}
-            </For>
-                        h('p', {}, "next")
+            h('h3', null, 'HMR - For'),
+            h('p', {}, "prev"),
+            h(For, { values: o },
+                (item, index) => h(Button, { value: item, index: index })
+            ),
+            h('p', {}, "next")
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define update function
         const update = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['updateTestHMRFor'] = update
+            ; (document.body as any)['updateTestHMRFor'] = update
     })
 
     // Get initial state

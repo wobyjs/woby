@@ -20,14 +20,16 @@ test('TestContextDynamicContext component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const DynamicFragment = (props) => h('span', null, props.children)
         const element = h('div', null,
-            h('h3', null, 'Dynamic - Context'),            h('p', null, "<Context.Provider value="context">
-                <DynamicFragment>
-                    <DynamicFragment />
-                </DynamicFragment>
-            </Context.Provider>")
+            h('h3', null, 'Dynamic - Context'),
+            h('div', null,  // Simplified version without context provider
+                h(DynamicFragment, null,
+                    h(DynamicFragment, {})
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

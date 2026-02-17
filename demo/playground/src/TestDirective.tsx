@@ -1,4 +1,4 @@
-import { $, $$ } from 'woby'
+import { $, $$, createDirective, useEffect } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestDirective = (): JSX.Element => {

@@ -21,11 +21,12 @@ test('TestInputForm component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Input - Input Form'),            h('input', {'form': {undefined}})
-                        h('input', {'form': {null}})
-                        h('input', {'form': 'foo'})
+            h('h3', null, 'Input - Input Form'),
+            h('input', { 'form': undefined }),
+            h('input', { 'form': null }),
+            h('input', { 'form': 'foo' })
         )
-        
+
         // Render to body
         render(element, document.body)
     })

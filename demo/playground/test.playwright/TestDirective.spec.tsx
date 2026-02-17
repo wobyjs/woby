@@ -20,12 +20,14 @@ test('TestDirective component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const Model = { Provider: (props) => h('div', null, props.children) }  // Mock Provider
         const element = h('div', null,
-            h('h3', null, 'Directive'),<Model.Provider>
-                            h('input', {'value': 'foo', 'use:model': {['bar',, ''baz']}': true})
-            </Model.Provider>
+            h('h3', null, 'Directive'),
+            h(Model.Provider, null,
+                h('input', { 'value': 'foo', 'use:model': ['bar', 'baz'] })
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

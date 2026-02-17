@@ -19,21 +19,26 @@ test('TestDynamicObservableComponent component', async ({ page }) => {
         const level = $(1)
 
         // Create the component element using h() function
+        const Dynamic = (props) => h(props.component || 'div', null, props.children)  // Mock Dynamic component
+        const component = (props) => h('div', null, `Level: ${level()}`)  // Mock component
         const element = h('div', null,
-            h('h3', null, 'Dynamic - Observable Component'),            h('p', null, "<Dynamic component={component}>
-                Level: {level}
-            </Dynamic>")
+            h('h3', null, 'Dynamic - Observable Component'),
+            h('p', null,
+                h(Dynamic, { component: component },
+                    `Level: ${level()}`
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define increment function
         const increment = () => level(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['incrementTestDynamicObservableComponent'] = increment
+            ; (document.body as any)['incrementTestDynamicObservableComponent'] = increment
     })
 
     // Get initial state

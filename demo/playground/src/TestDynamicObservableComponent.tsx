@@ -1,10 +1,15 @@
-import { $, $$ } from 'woby'
+import { $, $$, Dynamic, useMemo } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
+let testit = true
 const TestDynamicObservableComponent = (): JSX.Element => {
     const level = $(1)
+    registerTestObservable('TestDynamicObservableComponent', level)
     const component = useMemo(() => `h${level()}`)
-    const increment = () => level((level() + 1) % 7 || 1)
+    const increment = () => {
+        level((level() + 1) % 7 || 1)
+        testit = false
+    }
     useInterval(increment, TEST_INTERVAL)
     return (
         <>
@@ -18,7 +23,11 @@ const TestDynamicObservableComponent = (): JSX.Element => {
 
 TestDynamicObservableComponent.test = {
     static: false,
-    expect: () => '<h1>Level: 1</h1>'
+    compareActualValues: true,
+    expect: () => {
+        const level = $$(testObservables['TestDynamicObservableComponent'])
+        return `<h${level}>Level: ${level}</h${level}>`
+    }
 }
 
 

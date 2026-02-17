@@ -21,9 +21,10 @@ test('TestRefsNested component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Refs - Nested'),            h('p', {'ref': {[ref1,, '[null,': true, '[undefined,': true, 'ref2]]]}': true}, "content")
+            h('h3', null, 'Refs - Nested'),
+            h('p', { 'ref': [ref1, [null, [undefined, ref2]]] }, "content")
         )
-        
+
         // Render to body
         render(element, document.body)
     })

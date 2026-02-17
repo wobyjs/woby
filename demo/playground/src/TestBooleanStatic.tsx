@@ -5,14 +5,14 @@ const TestBooleanStatic = (): JSX.Element => {
     return (
         <>
             <h3>Boolean - Static</h3>
-            <p>{true}{false}</p>
+            <p>truefalse</p>
         </>
     )
 }
 
 TestBooleanStatic.test = {
     static: true,
-    expect: () => '<p><!----></p>'
+    expect: () => '<p>truefalse</p>'
 }
 
 

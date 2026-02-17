@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "vite": "^4.4.11",
-        "woby": "workspace:*"
+        "woby": "file:../.."
     },
     "devDependencies": {
         "@playwright/experimental-ct-react": "^1.58.2",

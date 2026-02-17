@@ -3,6 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestClassFunctionString = (): JSX.Element => {
     const o = $('red')
+    registerTestObservable('TestClassFunctionString', o)
     const toggle = () => o(prev => (prev === 'red') ? 'blue' : 'red')
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -15,7 +16,10 @@ const TestClassFunctionString = (): JSX.Element => {
 
 TestClassFunctionString.test = {
     static: false,
-    expect: () => '<p class="{random-class}">content</p>'
+    expect: () => {
+        const value = $$(testObservables['TestClassFunctionString'])
+        return `<p class="${value}">content</p>`
+    }
 }
 
 

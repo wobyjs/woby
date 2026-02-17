@@ -1,5 +1,6 @@
-import { $, $$ } from 'woby'
+import { $, $$, Portal } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import TestCleanupInner from './TestCleanupInner'
 
 const TestCleanupInnerPortal = () => {
     return (
@@ -11,7 +12,8 @@ const TestCleanupInnerPortal = () => {
 
 TestCleanupInnerPortal.test = {
     static: true,
-    expect: () => ''
+    compareActualValues: true,
+    expect: () => '<!---->'
 }
 
 

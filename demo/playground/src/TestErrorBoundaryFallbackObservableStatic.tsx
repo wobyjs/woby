@@ -1,17 +1,18 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, ErrorBoundary } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
 
 const TestErrorBoundaryFallbackObservableStatic = (): JSX.Element => {
     const Children = (): JSX.Element => {
         throw new Error()
     }
     const fallbackValue = String(random())
-    registerTestObservable('TestErrorBoundaryFallbackObservableStatic', fallbackValue)
+    registerTestObservable('TestErrorBoundaryFallbackObservableStatic', $(fallbackValue))
     const Fallback = (): JSX.Element => {
-        const o = $(String(random()))
-        const randomize = () => o(String(random()))
-        useInterval(randomize, TEST_INTERVAL)
-        o()
+        // Remove dynamic updating for static test
+        // const o = $(String(random()))
+        // const randomize = () => o(String(random()))
+        // useInterval(randomize, TEST_INTERVAL)
+        // o()
         return <p>Fallback: {fallbackValue}</p>
     }
     return (
@@ -28,7 +29,7 @@ TestErrorBoundaryFallbackObservableStatic.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        const fallbackValue = testObservables['TestErrorBoundaryFallbackObservableStatic']
+        const fallbackValue = $$(testObservables['TestErrorBoundaryFallbackObservableStatic'])
         return `<p>Fallback: ${fallbackValue}</p>`
     }
 }

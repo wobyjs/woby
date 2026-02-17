@@ -20,12 +20,14 @@ test('TestDirectiveSingleArgument component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const Model = { Provider: (props) => h('div', null, props.children) }  // Mock Provider
         const element = h('div', null,
-            h('h3', null, 'Directive - Single Argument'),<Model.Provider>
-                            h('input', {'value': 'foo', 'use:model': 'bar'})
-            </Model.Provider>
+            h('h3', null, 'Directive - Single Argument'),
+            h(Model.Provider, null,
+                h('input', { 'value': 'foo', 'use:model': 'bar' })
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

@@ -6,7 +6,7 @@ const TestHMRFor = () => {
     // Store the observable globally so the test can access it
     registerTestObservable('TestHMRFor', o)
     const update = () => o([2, 3, 4])
-    setTimeout(update, TEST_INTERVAL)
+    useTimeout(update, TEST_INTERVAL)
 
     const Button = hmr(() => { }, ({ value, index }) => {
         return <button>{value}, {index}</button>
@@ -188,7 +188,7 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', renderApp)
 } else {
     // Small delay to ensure DOM is fully ready
-    setTimeout(renderApp, 0)
+    useTimeout(renderApp, 0)
 }
 
 

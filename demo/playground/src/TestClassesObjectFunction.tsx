@@ -3,6 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestClassesObjectFunction = (): JSX.Element => {
     const o = $({ red: true, blue: false })
+    registerTestObservable('TestClassesObjectFunction', o)
     const toggle = () => o(prev => prev.red ? { red: false, blue: true } : { red: true, blue: false })
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -15,7 +16,12 @@ const TestClassesObjectFunction = (): JSX.Element => {
 
 TestClassesObjectFunction.test = {
     static: false,
-    expect: () => '<p class="red">content</p>'
+    compareActualValues: true,
+    expect: () => {
+        const value = $$(testObservables['TestClassesObjectFunction'])
+        const classes = typeof value === 'object' ? Object.keys(value).filter(k => value[k]).join(' ') : (value || '')
+        return `<p class="${classes}">content</p>`
+    }
 }
 
 

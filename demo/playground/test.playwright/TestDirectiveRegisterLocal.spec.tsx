@@ -21,9 +21,10 @@ test('TestDirectiveRegisterLocal component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Directive'),            h('input', {'value': 'foo', 'use:modelLocal': {['bar',, ''baz']}': true})
+            h('h3', null, 'Directive'),
+            h('input', { 'value': 'foo', 'use:modelLocal': ['bar', 'baz'] })
         )
-        
+
         // Render to body
         render(element, document.body)
     })

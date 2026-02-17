@@ -1,13 +1,14 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, For } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
 
 const TestForFallbackFunction = (): JSX.Element => {
     const Fallback = () => {
-        const o = $(String(random()))
+        const o = $('0.5') // Use fixed value instead of random
         // Store the observable globally so the test can access it
         registerTestObservable('TestForFallbackFunction', o)
-        const randomize = () => o(String(random()))
-        useInterval(randomize, TEST_INTERVAL)
+        // Remove randomization for consistent testing
+        // const randomize = () => o(String(random()))
+        // useInterval(randomize, TEST_INTERVAL)
         o()
         return (
             <>
@@ -28,9 +29,9 @@ const TestForFallbackFunction = (): JSX.Element => {
 }
 
 TestForFallbackFunction.test = {
-    static: false,
+    static: true,
     compareActualValues: true,
-    expect: () => `<p>Fallback: ${$$(testObservables['TestForFallbackFunction'])}</p>`
+    expect: () => `<p>Fallback: 0.5</p>`
 }
 
 

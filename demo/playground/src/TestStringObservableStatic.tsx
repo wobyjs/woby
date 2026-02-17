@@ -2,7 +2,7 @@ import { $, $$ } from 'woby'
 import { TestSnapshots, random } from './util'
 
 const TestStringObservableStatic = (): JSX.Element => {
-    const initialValue = String(random())
+    const initialValue = "0.123456"
     return (
         <>
             <h3>String - Observable Static</h3>
@@ -13,8 +13,7 @@ const TestStringObservableStatic = (): JSX.Element => {
 
 TestStringObservableStatic.test = {
     static: true,
-    // For static tests, don't use compareActualValues since we can't predict random values
-    // Let the TestSnapshots component handle it with placeholder conversion
+    expect: () => '<p>0.123456</p>'  // Use a fixed value for predictable testing
 }
 
 

@@ -20,18 +20,19 @@ test('TestIdFunction component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'ID - Function'),            h('p', {'id': {(), '': true}, "o()}>content")
+            h('h3', null, 'ID - Function'),
+            h('p', { 'id': () => o() }, 'content')
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestIdFunction'] = toggle
+            ; (document.body as any)['toggleTestIdFunction'] = toggle
     })
 
     // Get initial state

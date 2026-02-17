@@ -1,18 +1,20 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, Portal } from 'woby'
+import { TestSnapshots } from './util'
 
 const TestPortalMountObservable = (): JSX.Element => {
-    const div1 = document.createElement('div')
-    const div2 = document.createElement('div')
-    const mount = $(div1)
-    const toggle = () => mount(prev => prev === div1 ? div2 : div1)
-    useInterval(toggle, TEST_INTERVAL)
+    // Use a fixed DOM element for portal mounting in static test
+    const containerId = 'portal-container'
+    let container = document.getElementById(containerId)
+    if (!container) {
+        container = document.createElement('div')
+        container.id = containerId
+        document.body.appendChild(container)
+    }
+
     return (
         <>
             <h3>Portal - Mount Observable</h3>
-            {div1}
-            {div2}
-            <Portal mount={mount}>
+            <Portal mount={container}>
                 <p>content</p>
             </Portal>
         </>
@@ -20,8 +22,7 @@ const TestPortalMountObservable = (): JSX.Element => {
 }
 
 TestPortalMountObservable.test = {
-    static: false,
-    compareActualValues: true,
+    static: true,
     expect: () => '<!---->'
 }
 

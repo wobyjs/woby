@@ -19,21 +19,26 @@ test('TestPortalRemoval component', async ({ page }) => {
         const o = $("<boolean | null>(true")
 
         // Create the component element using h() function
+        const If = (props) => props.when ? h('div', null, props.children) : null  // Mock If component
+        const Portalized = (props) => h('div', null, 'Portalized Content')  // Mock Portalized component
         const element = h('div', null,
-            h('h3', null, 'Portal - Removal'),            h('p', null, "<If when={o}>
-                <Portalized />
-            </If>")
+            h('h3', null, 'Portal - Removal'),
+            h('p', null,
+                h(If, { when: o },
+                    h(Portalized, {})
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestPortalRemoval'] = toggle
+            ; (document.body as any)['toggleTestPortalRemoval'] = toggle
     })
 
     // For static test, verify initial state

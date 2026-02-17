@@ -3,7 +3,7 @@
 import * as Woby from 'woby'
 import type { JSX, Observable } from 'woby'
 import { $$, Dynamic, ErrorBoundary, For, If, KeepAlive, Portal, Suspense, Switch, Ternary } from 'woby'
-import { useContext, useEffect, useInterval as ui, useMemo, usePromise, useResource, useTimeout } from 'woby'
+import { useContext, useEffect, useMemo, usePromise, useResource } from 'woby'
 import { $, batch, createContext, createDirective, html, hmr, lazy, render, renderToString, store, template } from 'woby'
 
 globalThis.Woby = Woby
@@ -76,6 +76,18 @@ export const useInterval = (callback, delay) => {
             }
         }
     })
+}
+
+// Custom useTimeout that runs once with limit support
+export const useTimeout = (callback, delay) => {
+    if (!delay) return
+
+    const timeoutId = setTimeout(() => {
+        callback()
+    }, delay)
+
+    // Return a cleanup function to clear the timeout if needed
+    return () => clearTimeout(timeoutId)
 }
 
 export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component | Constructor<Component>) & { test: { static?: boolean, wrap?: boolean, snapshots?: string[], compareActualValues?: boolean, expect?: () => string }, name?: string }, props?: Record<any, any> }): JSX.Element => {
@@ -179,7 +191,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                 // console.log('STATIC TEST - Equal:', actualForComparison === expectedValue)
                 if (actualForComparison === expectedValue) {
                     //temp hide for assertion only
-                    // console.log(`✅ Expect function test passed for ${Component.name}`)
+                    console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                 } else {
                     assert(false, `[${Component.name}]: Expected actual '${actualForComparison}' to be equal to function result '${expectedValue}'`)
                 }
@@ -189,7 +201,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                 if (Component.test.compareActualValues) {
                     if (actualSnapshot === expectedValue) {
                         //temp hide for assertion only
-                        // console.log(`✅ Expect function test passed for ${Component.name}`)
+                        console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                     } else {
                         assert(false, `[${Component.name}]: Expected '${actualSnapshot}' to match function result '${expectedValue}'`)
                     }
@@ -200,67 +212,14 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                     // console.log('DYNAMIC TEST - Actual (before conversion):', JSON.stringify(actualSnapshot))
                     // console.log('DYNAMIC TEST - Expected (before conversion):', JSON.stringify(expectedValue))
 
-                    // Convert actual snapshot to placeholder format (same logic as getSnapshot)
-                    let convertedActual = actualSnapshot
-
-                    // Convert decimal values (like 0.25, 0.5) to placeholders
-                    // BUT NOT for components with compareActualValues (like TestNumberObservable)
-                    if (!Component.test.compareActualValues) {
-                        convertedActual = convertedActual.replace(/\b0\.\d+\b/g, '0.{random-decimal}')
-                    }
-
-                    // Convert BigInt values to {random-bigint} format
-                    convertedActual = convertedActual.replace(/(?<!\d)([0-9]+)n\b/g, '{random-bigint}')
-
-                    // Convert numbers that look like BigInt values (11-100 range)
-                    convertedActual = convertedActual.replace(/(?<!\d)([0-9]+)\b(?!\.)/g, (match, number) => {
-                        const num = parseInt(number)
-                        if (num >= 11 && num <= 100) {
-                            return '{random-bigint}'
-                        }
-                        return match
-                    })
-
-                    // Convert numbers in parentheses
-                    convertedActual = convertedActual.replace(/\((\d+)\)/g, (match, number) => {
-                        const num = parseInt(number)
-                        if (num >= 11 && num <= 100) {
-                            return '({random-bigint})'
-                        }
-                        return match
-                    })
-
-                    // Convert hex colors to {random-color} placeholder
-                    convertedActual = convertedActual.replace(/#[a-fA-F0-9]+\{random-bigint\}/g, '{random-color}').replace(/#[a-fA-F0-9]{6,8}/g, '{random-color}')
-
-                    // Convert attribute values (id, class, style) that contain dynamic values
-                    // Convert id attributes that change between foo/bar
-                    convertedActual = convertedActual.replace(/id="(foo|bar)"/g, 'id="{random-id}"')
-
-                    // Convert class attributes that change between red/blue/green/orange
-                    convertedActual = convertedActual.replace(/class="(red|blue|green|orange)"/g, 'class="{random-class}"')
-                    convertedActual = convertedActual.replace(/class="(red|blue|green|orange) /g, 'class="{random-class} ')
-                    convertedActual = convertedActual.replace(/ (red|blue|green|orange)"/g, ' {random-class}"')
-
-                    // Convert style attributes that contain color values
-                    convertedActual = convertedActual.replace(/color: (red|blue|green|orange)(;|})/g, 'color: {random-color}$2')
-                    convertedActual = convertedActual.replace(/color: (red|blue|green|orange)$/g, 'color: {random-color}')
-
-                    // Convert flex-grow values (1, 2) and width values (50px, 100px) to placeholders
-                    convertedActual = convertedActual.replace(/flex-grow: (1|2)/g, 'flex-grow: {random-flex-grow}')
-                    convertedActual = convertedActual.replace(/width: (50|100)px/g, 'width: {random-width}px')
-
-                    // console.log('DYNAMIC TEST - Actual (after conversion):', JSON.stringify(convertedActual))
-                    // console.log('DYNAMIC TEST - Expected (unchanged):', JSON.stringify(expectedValue))
-
-                    // Basic validation - make sure the expected value is not completely empty
+                    // For dynamic components with registered observables, compare actual values directly
+                    // Components must use registerTestObservable and return concrete values in expect function
                     if (expectedValue && expectedValue.trim() !== '') {
-                        // For dynamic components, now we can do exact matching since both are in placeholder format
-                        if (convertedActual === expectedValue) {
-                            //temp hide for assertion only
-                            // console.log(`✅ Expect function test passed for ${Component.name}`)
+                        if (actualSnapshot === expectedValue) {
+                            // temp hide for assertion only
+                            console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                         } else {
-                            assert(false, `[${Component.name}]: Expected converted actual '${convertedActual}' to match expected '${expectedValue}'`)
+                            assert(false, `[${Component.name}]: Expected actual '${actualSnapshot}' to match expected '${expectedValue}'`)
                         }
                     } else {
                         assert(false, `[${Component.name}]: Expect function returned empty result: '${expectedValue}'`)

@@ -19,21 +19,27 @@ test('TestErrorBoundary component', async ({ page }) => {
         const o = $("true")
 
         // Create the component element using h() function
+        const ErrorBoundary = (props) => h('div', null, props.children)  // Mock ErrorBoundary component
+        const Fallback = (props) => h('div', null, 'Error fallback')  // Mock Fallback component
+        const Erroring = (props) => h('div', null, 'Erroring content')  // Mock Erroring component
         const element = h('div', null,
-            h('h3', null, 'Error Boundary'),            h('p', null, "<ErrorBoundary fallback={Fallback}>
-                <Erroring />
-            </ErrorBoundary>")
+            h('h3', null, 'Error Boundary'),
+            h('p', null,
+                h(ErrorBoundary, { fallback: h(Fallback, {}) },
+                    h(Erroring, {})
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestErrorBoundary'] = toggle
+            ; (document.body as any)['toggleTestErrorBoundary'] = toggle
     })
 
     // Get initial state

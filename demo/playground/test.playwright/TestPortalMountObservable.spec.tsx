@@ -19,23 +19,27 @@ test('TestPortalMountObservable component', async ({ page }) => {
         const mount = $("div1")
 
         // Create the component element using h() function
+        const Portal = (props) => h('div', null, props.children)  // Mock Portal component
+        const div1 = h('div', {}, '')  // Mock div1
+        const div2 = h('div', {}, '')  // Mock div2
         const element = h('div', null,
-            h('h3', null, 'Portal - Mount Observable'),{div1}
-            {div2}
-            <Portal mount={mount}>
-                            h('p', {}, "content")
-            </Portal>
+            h('h3', null, 'Portal - Mount Observable'),
+            div1,
+            div2,
+            h(Portal, { mount: mount },
+                h('p', {}, "content")
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => mount(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestPortalMountObservable'] = toggle
+            ; (document.body as any)['toggleTestPortalMountObservable'] = toggle
     })
 
     // Get initial state

@@ -21,9 +21,10 @@ test('TestStylesStatic component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Styles - Static'),            h('p', {'style': {{, 'color:': true, ''green'': true, '}}': true}, "content")
+            h('h3', null, 'Styles - Static'),
+            h('p', { 'style': { color: 'green' } }, "content")
         )
-        
+
         // Render to body
         render(element, document.body)
     })

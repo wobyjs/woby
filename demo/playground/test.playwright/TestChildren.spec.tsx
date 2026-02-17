@@ -21,15 +21,16 @@ test('TestChildren component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Children'),<A>
-                <B>
-                    <C>
-                                    h('p', {}, "content")
-                    </C>
-                </B>
-            </A>
+            h('h3', null, 'Children'),
+            h('A', {},
+                h('B', {},
+                    h('C', {},
+                        h('p', {}, "content")
+                    )
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

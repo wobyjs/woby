@@ -1,5 +1,5 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, html, If } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
 
 const TestHTMLFunctionStaticRegistry = (): JSX.Element => {
     const P = (): JSX.Element => {

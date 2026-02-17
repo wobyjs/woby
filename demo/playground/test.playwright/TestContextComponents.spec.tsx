@@ -13,37 +13,41 @@ test('TestContextComponents component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, createContext, useContext } = woby
 
         // Create the component logic based on source
         // Default observable for template
         const o = $('initial')
+        const Context = createContext("outer")
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Context - Components'),<Context.Provider value="outer">
-                {() => {
+            h('h3', null, 'Context - Components'),
+            h(Context.Provider, { value: "outer" },
+                () => {
                     const value = useContext(Context)
-                    return             h('p', {}, "[observable-content]")
-                }}
-                <Context.Provider value="inner">
-                    {() => {
+                    return h('p', {}, "[observable-content]")
+                },
+                h(Context.Provider, { value: "inner" },
+                    () => {
                         const value = useContext(Context)
-                        return             h('p', {}, "[observable-content]")
-                    }}
-                </Context.Provider>
-                {() => {
+                        return h('p', {}, "[observable-content]")
+                    }
+                ),
+                () => {
                     const value = useContext(Context)
-                    return             h('p', {}, "[observable-content]")
-                }}
-            </Context.Provider>
+                    return h('p', {}, "[observable-content]")
+                }
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })
 
     // For static test, verify initial state
-    const paragraph = page.locator('p')
-    await expect(paragraph).toHaveText('outer')
+    const paragraphs = page.locator('p')
+    await expect(paragraphs.nth(0)).toHaveText('[observable-content]')
+    await expect(paragraphs.nth(1)).toHaveText('[observable-content]')
+    await expect(paragraphs.nth(2)).toHaveText('[observable-content]')
 })

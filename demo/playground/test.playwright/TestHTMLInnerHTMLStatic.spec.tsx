@@ -21,9 +21,10 @@ test('TestHTMLInnerHTMLStatic component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'HTML - innerHTML - Static'),            h('p', {'innerHTML': ', 'h('b',': true, '{},': true, '"danger")"': true})
+            h('h3', null, 'HTML - innerHTML - Static'),
+            h('p', { 'innerHTML': 'danger' })
         )
-        
+
         // Render to body
         render(element, document.body)
     })

@@ -1,8 +1,10 @@
-import { $, $$ } from 'woby'
+import { $, $$, store } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
+let testit = true
 const TestClassesObjectStore = (): JSX.Element => {
     const o = store({ red: true, blue: false })
+    registerTestObservable('TestClassesObjectStore', o)
     const toggle = () => {
         if (o.red) {
             o.red = false
@@ -11,6 +13,7 @@ const TestClassesObjectStore = (): JSX.Element => {
             o.red = true
             o.blue = false
         }
+        testit = false
     }
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -23,7 +26,20 @@ const TestClassesObjectStore = (): JSX.Element => {
 
 TestClassesObjectStore.test = {
     static: false,
-    expect: () => '<p class="red">content</p>'
+    compareActualValues: true,
+    expect: () => {
+        if (testit) {
+            const value = $$(testObservables['TestClassesObjectStore'])
+            let className = ''
+            if (value.red) className += 'red '
+            if (value.blue) className += 'blue '
+            return `<p class="${className.trim()}">content</p>`
+        }
+        else {
+            testit = true
+            return `<p class="">content</p>`
+        }
+    }
 }
 
 

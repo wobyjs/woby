@@ -19,23 +19,35 @@ test('TestForFallbackFunction component', async ({ page }) => {
         const o = $("value")
 
         // Create the component element using h() function
+        const For = (props: any) => {
+            const items = Array.isArray(props.values) ? props.values : []
+            if (items.length === 0) {
+                return props.fallback ? props.fallback() : null
+            }
+            return items.map((item: any, index: number) =>
+                props.children(item, index)
+            )
+        }
+        const Fallback = () => h('div', {}, 'Fallback Content')
+
         const element = h('div', null,
-            h('h3', null, 'For - Fallback Function'),<For values={[]} fallback={Fallback}>
-                {(value: number) => {
-                    return             h('p', {}, "[observable-content]")
-                }}
-            </For>
+            h('h3', null, 'For - Fallback Function'),
+            h(For, { values: [], fallback: Fallback },
+                (value: number) => {
+                    return h('p', {}, "[observable-content]")
+                }
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define randomize function
         const randomize = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['randomizeTestForFallbackFunction'] = randomize
+            ; (document.body as any)['randomizeTestForFallbackFunction'] = randomize
     })
 
     // Get initial state

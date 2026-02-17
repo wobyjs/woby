@@ -1,5 +1,5 @@
 import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots, useInterval, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestSelectObservableValue = (): JSX.Element => {
     const ref = $<HTMLSelectElement>()
@@ -8,7 +8,7 @@ const TestSelectObservableValue = (): JSX.Element => {
     const toggle = () => value(prev => prev === 'bar' ? 'qux' : 'bar')
     useInterval(toggle, TEST_INTERVAL)
     useInterval(assert, TEST_INTERVAL)
-    setTimeout(assert, 1)
+    useTimeout(assert, 1)
     return (
         <>
             <h3>Select - Observable Value</h3>

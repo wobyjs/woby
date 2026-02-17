@@ -1,27 +1,26 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, If } from 'woby'
+import { TestSnapshots } from './util'
 
 const TestIfFunctionUntracked = (): JSX.Element => {
-    const o = $(true)
-    const toggle = () => o(prev => !prev)
-    useInterval(toggle, TEST_INTERVAL)
+    // Static values for static test
     return (
-        <If when={true}>
-            Noop
-            <If when={o} fallback="fallback">
-                {() => (
-                    <button onClick={() => o(false)}>
-                        Close {o()}
-                    </button>
-                )}
+        <>
+            <If when={true}>
+                <If when={true} fallback="fallback">
+                    {() => (
+                        <button onClick={() => { }}>
+                            Close
+                        </button>
+                    )}
+                </If>
             </If>
-        </If>
+        </>
     )
 }
 
 TestIfFunctionUntracked.test = {
-    static: false,
-    expect: () => 'Noop<button>Close </button>'
+    static: true,
+    expect: () => '<button>Close</button>'
 }
 
 

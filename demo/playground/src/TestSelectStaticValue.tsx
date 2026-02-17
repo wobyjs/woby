@@ -1,10 +1,10 @@
 import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestSelectStaticValue = (): JSX.Element => {
     const ref = $<HTMLSelectElement>()
     const assert = () => console.assert(ref()?.value === 'bar')
-    setTimeout(assert, 1)
+    useTimeout(assert, 1)
     return (
         <>
             <h3>Select - Static Value</h3>

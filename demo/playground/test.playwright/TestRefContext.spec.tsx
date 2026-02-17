@@ -19,12 +19,17 @@ test('TestRefContext component', async ({ page }) => {
         const message = $('')
 
         // Create the component element using h() function
+        const Context = { Provider: (props) => h('div', null, props.children) }  // Mock Context
+        const Reffed = (props) => h('div', null, 'Reffed Content')  // Mock Reffed component
         const element = h('div', null,
-            h('h3', null, 'Ref - Context'),            h('p', null, "<Context.Provider value={321}>
-                <Reffed />
-            </Context.Provider>")
+            h('h3', null, 'Ref - Context'),
+            h('p', null,
+                h(Context.Provider, { value: 321 },
+                    h(Reffed, {})
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

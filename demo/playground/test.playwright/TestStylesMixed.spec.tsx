@@ -21,9 +21,10 @@ test('TestStylesMixed component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Styles - Mixed'),            h('div', {'style': {[{, 'color:': true, ''red'': true, '},': true, '[{': true, 'fontStyle:': true, '()': true, '': true}, "'italic' }]]}>example")
+            h('h3', null, 'Styles - Mixed'),
+            h('div', { 'style': { color: 'red', fontStyle: () => o() } }, 'example')
         )
-        
+
         // Render to body
         render(element, document.body)
     })

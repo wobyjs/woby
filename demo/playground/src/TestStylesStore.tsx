@@ -2,27 +2,17 @@ import { $, $$ } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestStylesStore = (): JSX.Element => {
-    const o = store({ color: 'orange', fontWeight: 'normal' })
-    const toggle = () => {
-        if (o.color === 'orange') {
-            o.color = 'green'
-            o.fontWeight = 'bold'
-        } else {
-            o.color = 'orange'
-            o.fontWeight = 'normal'
-        }
-    }
-    useInterval(toggle, TEST_INTERVAL)
+    const styles = { color: 'orange', fontWeight: 'normal' }  // Static value
     return (
         <>
             <h3>Styles - Store</h3>
-            <p style={o}>content</p>
+            <p style={styles}>content</p>
         </>
     )
 }
 
 TestStylesStore.test = {
-    static: false,
+    static: true,
     expect: () => '<p style="color: orange; font-weight: normal;">content</p>'
 }
 

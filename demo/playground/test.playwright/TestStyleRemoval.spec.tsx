@@ -21,18 +21,19 @@ test('TestStyleRemoval component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Style - Removal'),            h('p', {'style': {{, 'color:': true, 'o': true, '}}': true}, "content")
+            h('h3', null, 'Style - Removal'),
+            h('p', { 'style': { color: o } }, 'content')
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestStyleRemoval'] = toggle
+            ; (document.body as any)['toggleTestStyleRemoval'] = toggle
     })
 
     // Get initial state

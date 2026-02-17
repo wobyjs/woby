@@ -3,6 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestStyleObservable = (): JSX.Element => {
     const o = $('green')
+    registerTestObservable('TestStyleObservable', o)
     const toggle = () => o(prev => (prev === 'green') ? 'orange' : 'green')
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -15,7 +16,10 @@ const TestStyleObservable = (): JSX.Element => {
 
 TestStyleObservable.test = {
     static: false,
-    expect: () => '<p style="color: {random-color};">content</p>'
+    expect: () => {
+        const value = $$(testObservables['TestStyleObservable'])
+        return `<p style="color: ${value};">content</p>`
+    }
 }
 
 

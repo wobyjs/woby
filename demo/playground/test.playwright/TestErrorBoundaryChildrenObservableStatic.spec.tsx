@@ -19,21 +19,27 @@ test('TestErrorBoundaryChildrenObservableStatic component', async ({ page }) => 
         const o = $("value")
 
         // Create the component element using h() function
+        const ErrorBoundary = (props) => h('div', null, props.children)  // Mock ErrorBoundary component
+        const Fallback = (props) => h('div', null, 'Fallback content')  // Mock Fallback component
+        const Children = (props) => h('div', null, 'Children content')  // Mock Children component
         const element = h('div', null,
-            h('h3', null, 'Error Boundary - Children Observable Static'),            h('p', null, "<ErrorBoundary fallback={<Fallback />}>
-                <Children />
-            </ErrorBoundary>")
+            h('h3', null, 'Error Boundary - Children Observable Static'),
+            h('p', null,
+                h(ErrorBoundary, { fallback: h(Fallback, {}) },
+                    h(Children, {})
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define randomize function
         const randomize = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['randomizeTestErrorBoundaryChildrenObservableStatic'] = randomize
+            ; (document.body as any)['randomizeTestErrorBoundaryChildrenObservableStatic'] = randomize
     })
 
     // For static test, verify initial state

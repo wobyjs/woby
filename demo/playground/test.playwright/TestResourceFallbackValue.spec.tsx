@@ -20,19 +20,27 @@ test('TestResourceFallbackValue component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const ErrorBoundary = (props) => h('div', null, props.children)  // Mock ErrorBoundary
+        const If = (props) => props.when ? h('div', null, props.children) : h('div', null, props.fallback)
+        const resource = { value: o }  // Mock resource object
         const element = h('div', null,
-            h('h3', null, 'Resource - Fallback Value'),<ErrorBoundary fallback={            h('p', {}, "Error!")}>
-                <If when={() => resource().value} fallback={            h('p', {}, "Loading!")}>
-                                h('p', {}, "Loaded!")
-                </If>
-            </ErrorBoundary>
-            <ErrorBoundary fallback={            h('p', {}, "Error!")}>
-                <If when={resource.value} fallback={            h('p', {}, "Loading!")}>
-                                h('p', {}, "Loaded!")
-                </If>
-            </ErrorBoundary>
+            h('h3', null, 'Resource - Fallback Value'),
+            h(ErrorBoundary, { fallback: h('p', {}, "Error!") },
+                h(If, {
+                    when: () => resource.value(),
+                    fallback: h('p', {}, "Loading!")
+                },
+                    h('p', {}, "Loaded!")
+                )),
+            h(ErrorBoundary, { fallback: h('p', {}, "Error!") },
+                h(If, {
+                    when: resource.value,
+                    fallback: h('p', {}, "Loading!")
+                },
+                    h('p', {}, "Loaded!")
+                ))
         )
-        
+
         // Render to body
         render(element, document.body)
     })

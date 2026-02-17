@@ -20,21 +20,26 @@ test('TestIfChildrenFunctionObservable component', async ({ page }) => {
         const val = $("$(testObservables['TestIfChildrenFunctionObservable']")
 
         // Create the component element using h() function
+        const If = (props) => props.when ? h('div', null, props.children) : null  // Mock If component
+        const Content = (props) => h('div', null, `Content: ${props.value}`)  // Mock Content component
         const element = h('div', null,
-            h('h3', null, 'If - Children Function Observable'),            h('p', null, "<If when={o}>
-                {value => <Content value={value} />}
-            </If>")
+            h('h3', null, 'If - Children Function Observable'),
+            h('p', null,
+                h(If, { when: o },
+                    (value) => h(Content, { value: value })
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define toggle function
         const toggle = () => o(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['toggleTestIfChildrenFunctionObservable'] = toggle
+            ; (document.body as any)['toggleTestIfChildrenFunctionObservable'] = toggle
     })
 
     // Get initial state

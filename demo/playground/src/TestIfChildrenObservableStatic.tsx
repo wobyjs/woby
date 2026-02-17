@@ -1,12 +1,17 @@
 import { $, $$ } from 'woby'
 import { If } from 'woby'
-import { TestSnapshots, random } from './util'
+import { TestSnapshots, random, registerTestObservable, testObservables, useInterval, TEST_INTERVAL } from './util'
+import { useEffect } from 'woby'
 
 const TestIfChildrenObservableStatic = (): JSX.Element => {
     const initialValue = String(random())
+    const valueObs = $(initialValue)
+    registerTestObservable('TestIfChildrenObservableStatic', valueObs)
     const Content = () => {
-        return <p>{initialValue}</p>
+        return <p>{valueObs()}</p>
     }
+
+
     return (
         <>
             <h3>If - Children Observable Static</h3>
@@ -17,8 +22,11 @@ const TestIfChildrenObservableStatic = (): JSX.Element => {
 
 TestIfChildrenObservableStatic.test = {
     static: true,
-    // For static tests, don't use compareActualValues since we can't predict random values
-    // Let the TestSnapshots component handle it with placeholder conversion
+    expect: () => {
+        // For static test, return the actual value from the observable
+        const value = testObservables['TestIfChildrenObservableStatic']?.() ?? 'default'
+        return `<p>${value}</p>`
+    }
 }
 
 

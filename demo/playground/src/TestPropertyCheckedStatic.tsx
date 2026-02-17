@@ -1,5 +1,5 @@
 import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots } from './util'
 
 const TestPropertyCheckedStatic = (): JSX.Element => {
     return (
@@ -10,5 +10,9 @@ const TestPropertyCheckedStatic = (): JSX.Element => {
     )
 }
 
+TestPropertyCheckedStatic.test = {
+    static: true,
+    expect: () => '<p><input type="checkbox"></p>'
+}
 
 export default () => <TestSnapshots Component={TestPropertyCheckedStatic} />

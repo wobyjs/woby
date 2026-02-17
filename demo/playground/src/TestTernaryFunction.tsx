@@ -1,8 +1,9 @@
-import { $, $$ } from 'woby'
+import { $, $$, Ternary } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestTernaryFunction = (): JSX.Element => {
     const o = $(true)
+    registerTestObservable('TestTernaryFunction', o)
     const toggle = () => o(prev => !prev)
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -18,7 +19,11 @@ const TestTernaryFunction = (): JSX.Element => {
 
 TestTernaryFunction.test = {
     static: false,
-    expect: () => '<p>false</p>'
+    compareActualValues: true,
+    expect: () => {
+        const value = !testObservables['TestTernaryFunction']?.() // since it uses !o()
+        return `<p>${value ? 'true' : 'false'}</p>`
+    }
 }
 
 

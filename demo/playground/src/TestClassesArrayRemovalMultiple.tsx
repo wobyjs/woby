@@ -20,7 +20,9 @@ TestClassesArrayRemovalMultiple.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestClassesArrayRemovalMultiple'])
-        return value ? `<p class="${Array.isArray(value) ? value.join(' ') : value}">content</p>` : '<p class="">content</p>'
+        if (!value) return '<p class="">content</p>'
+        const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : value
+        return `<p class="${classes}">content</p>`
     }
 }
 

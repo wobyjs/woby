@@ -20,7 +20,8 @@ TestClassesArrayFunction.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestClassesArrayFunction'])
-        return `<p class="${value[1] || ''}">content</p>`
+        const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : (value || '')
+        return `<p class="${classes}">content</p>`
     }
 }
 

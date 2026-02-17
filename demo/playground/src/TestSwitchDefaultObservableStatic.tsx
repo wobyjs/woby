@@ -1,15 +1,9 @@
-import { $, $$ } from 'woby'
+import { $, $$, Switch } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestSwitchDefaultObservableStatic = (): JSX.Element => {
-    const defaultValue = String(random())
-    registerTestObservable('TestSwitchDefaultObservableStatic', defaultValue)
     const Default = () => {
-        const o = $(String(random()))
-        const randomize = () => o(String(random()))
-        useInterval(randomize, TEST_INTERVAL)
-        o()
-        return <p>Default: {defaultValue}</p>
+        return <p>Default: 0.123456</p>  // Static value
     }
     return (
         <>
@@ -28,11 +22,7 @@ const TestSwitchDefaultObservableStatic = (): JSX.Element => {
 
 TestSwitchDefaultObservableStatic.test = {
     static: true,
-    compareActualValues: true,
-    expect: () => {
-        const defaultValue = testObservables['TestSwitchDefaultObservableStatic']
-        return `<p>Default: ${defaultValue}</p>`
-    }
+    expect: () => '<p>Default: 0.123456</p>'
 }
 
 

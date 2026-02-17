@@ -3,6 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestStyleFunctionNumeric = (): JSX.Element => {
     const o = $({ flexGrow: 1, width: 50 })
+    registerTestObservable('TestStyleFunctionNumeric', o)
     const toggle = () => o(prev => (prev.flexGrow === 1) ? { flexGrow: 2, width: 100 } : { flexGrow: 1, width: 50 })
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -15,7 +16,10 @@ const TestStyleFunctionNumeric = (): JSX.Element => {
 
 TestStyleFunctionNumeric.test = {
     static: false,
-    expect: () => '<p style="flex-grow: {random-flex-grow}; width: {random-width}px;">content</p>'
+    expect: () => {
+        const value = $$(testObservables['TestStyleFunctionNumeric'])
+        return `<p style="flex-grow: ${value.flexGrow}; width: ${value.width}px;">content</p>`
+    }
 }
 
 

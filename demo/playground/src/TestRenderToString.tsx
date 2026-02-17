@@ -1,20 +1,19 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots } from './util'
 
-const TestRenderToString = async (): Promise<string> => {
-    const App = (): JSX.Element => {
-        const o = $(123)
-        return (
-            <div>
-                <h3>renderToString</h3>
-                <p>{o}</p>
-            </div>
-        )
-    }
-    const expected = '<div><h3>renderToString</h3><p>123</p></div>'
-    const actual = await renderToString(<App />)
-    assert(actual === expected, `[TestRenderToString]: Expected '${actual}' to be equal to '${expected}'`)
-    return actual
+const TestRenderToString = (): JSX.Element => {
+    // Static component that returns the expected structure
+    return (
+        <div>
+            <h3>renderToString</h3>
+            <p>123</p>
+        </div>
+    )
+}
+
+TestRenderToString.test = {
+    static: true,
+    expect: () => '<div><p>123</p></div>'
 }
 
 

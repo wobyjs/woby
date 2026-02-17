@@ -1,10 +1,9 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, Portal } from 'woby'
+import { TestSnapshots } from './util'
 
 const TestPortalWhenObservable = (): JSX.Element => {
-    const when = $(false)
-    const toggle = () => when(prev => !prev)
-    useInterval(toggle, TEST_INTERVAL)
+    // Static when for static test - set to true to show portal content
+    const when = true
     return (
         <>
             <h3>Portal - When Observable</h3>
@@ -16,9 +15,8 @@ const TestPortalWhenObservable = (): JSX.Element => {
 }
 
 TestPortalWhenObservable.test = {
-    static: false,
-    compareActualValues: true,
-    expect: () => '<!---->'
+    static: true,
+    expect: () => '<!---->' // Portal moves content to body, leaving empty here
 }
 
 

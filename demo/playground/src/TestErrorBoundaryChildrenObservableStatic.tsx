@@ -1,14 +1,15 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, ErrorBoundary } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
 
 const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
     const childrenValue = String(random())
-    registerTestObservable('TestErrorBoundaryChildrenObservableStatic', childrenValue)
+    registerTestObservable('TestErrorBoundaryChildrenObservableStatic', $(childrenValue))
     const Children = (): JSX.Element => {
-        const o = $(String(random()))
-        const randomize = () => o(String(random()))
-        useInterval(randomize, TEST_INTERVAL)
-        o()
+        // Remove dynamic updating for static test
+        // const o = $(String(random()))
+        // const randomize = () => o(String(random()))
+        // useInterval(randomize, TEST_INTERVAL)
+        // o()
         return <p>Children: {childrenValue}</p>
     }
     const Fallback = (): JSX.Element => {

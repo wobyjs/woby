@@ -23,20 +23,19 @@ test('TestSuspenseAlive component', async ({ page }) => {
         const contentValue = $("value")
         const fallbackCount = $("$(testObservables['TestSuspenseAlive_fallback_count']")
         const contentCount = $("$(testObservables['TestSuspenseAlive_content_count']")
-        const contentValue = $("$(testObservables['TestSuspenseAlive_content']")
+        // Removed duplicate contentValue declaration
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'Suspense - Alive'), h('p', null, "<Suspense when={whenObservable} fallback={<Fallback />}>
-                < Content />
-            </Suspense > ")
+            h('h3', null, 'Suspense - Alive'),
+            h('div', null, "Suspense content")
         )
 
-    // Render to body
-    render(element, document.body)
-})
+        // Render to body
+        render(element, document.body)
+    })
 
-// Get initial state
-const paragraph = page.locator('p')
+    // Get initial state
+    const paragraph = page.locator('p')
     // Initial assertion would depend on actual content
 })

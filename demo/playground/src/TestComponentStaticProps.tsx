@@ -1,13 +1,12 @@
 import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
 
 const TestComponentStaticProps = ({ value }: { value: number }): JSX.Element => {
-    const propValue = random()
-    registerTestObservable('TestComponentStaticProps', propValue)
+    registerTestObservable('TestComponentStaticProps', $(value))
     return (
         <>
             <h3>Component - Static Props</h3>
-            <p>{propValue}</p>
+            <p>{value}</p>
         </>
     )
 }
@@ -16,10 +15,10 @@ TestComponentStaticProps.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        const propValue = testObservables['TestComponentStaticProps']
+        const propValue = $$(testObservables['TestComponentStaticProps'])
         return `<p>${propValue}</p>`
     }
 }
 
 
-export default () => <TestSnapshots Component={TestComponentStaticProps} />
+export default () => <TestSnapshots Component={TestComponentStaticProps} props={{ value: random() }} />

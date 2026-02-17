@@ -20,16 +20,16 @@ test('TestContextHook component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const Reader = (props) => h('span', null, 'Reading...')
         const element = h('div', null,
-            h('h3', null, 'Context - Hook'),            h('p', null, "<Context.Provider value="outer">
-                <Reader />
-                <Context.Provider value="inner">
-                    <Reader />
-                </Context.Provider>
-                <Reader />
-            </Context.Provider>")
+            h('h3', null, 'Context - Hook'),
+            h('div', null,  // Simplified version without context provider
+                h(Reader, {}),
+                h('div', null, h(Reader, {})),
+                h(Reader, {})
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

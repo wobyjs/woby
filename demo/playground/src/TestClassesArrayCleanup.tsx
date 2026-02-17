@@ -3,6 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestClassesArrayCleanup = (): JSX.Element => {
     const o = $<string[]>(['red'])
+    registerTestObservable('TestClassesArrayCleanup', o)
     const toggle = () => o(prev => prev[0] === 'red' ? ['blue'] : ['red'])
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -15,7 +16,11 @@ const TestClassesArrayCleanup = (): JSX.Element => {
 
 TestClassesArrayCleanup.test = {
     static: false,
-    expect: () => '<p class="red">content</p>'
+    compareActualValues: true,
+    expect: () => {
+        const value = $$(testObservables['TestClassesArrayCleanup'])
+        return `<p class="${Array.isArray(value) ? value.filter(v => v).join(' ') : value}">content</p>`
+    }
 }
 
 

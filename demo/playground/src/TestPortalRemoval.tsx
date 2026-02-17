@@ -1,15 +1,11 @@
-import { $, $$ } from 'woby'
+import { $, $$, Portal, If } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestPortalRemoval = (): JSX.Element => {
     const Inner = () => {
-        const log = () => console.count('portal.inner')
-        useInterval(log, TEST_INTERVAL / 4)
         return <p>content</p>
     }
     const Portalized = () => {
-        const log = () => console.count('portal')
-        useInterval(log, TEST_INTERVAL / 4)
         return (
             <Portal mount={document.body}>
                 <Inner />

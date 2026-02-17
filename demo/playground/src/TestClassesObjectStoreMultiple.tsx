@@ -1,8 +1,10 @@
-import { $, $$ } from 'woby'
+import { $, $$, store } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
+let testit = true
 const TestClassesObjectStoreMultiple = (): JSX.Element => {
     const o = store({ 'red bold': true, blue: false })
+    registerTestObservable('TestClassesObjectStoreMultiple', o)
     const toggle = () => {
         if (o['red bold']) {
             o['red bold'] = false
@@ -11,6 +13,7 @@ const TestClassesObjectStoreMultiple = (): JSX.Element => {
             o['red bold'] = true
             o.blue = false
         }
+        testit = false
     }
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -23,7 +26,20 @@ const TestClassesObjectStoreMultiple = (): JSX.Element => {
 
 TestClassesObjectStoreMultiple.test = {
     static: false,
-    expect: () => '<p class="red bold">content</p>'
+    compareActualValues: true,
+    expect: () => {
+        if (testit) {
+            const value = $$(testObservables['TestClassesObjectStoreMultiple'])
+            let className = ''
+            if (value['red bold']) className += 'red bold '
+            if (value.blue) className += 'blue '
+            return `<p class="${className.trim()}">content</p>`
+        }
+        else {
+            testit = true
+            return `<p class="">content</p>`
+        }
+    }
 }
 
 

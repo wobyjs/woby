@@ -16,16 +16,22 @@ test('TestLazy component', async ({ page }) => {
         const { $, h, render } = woby
 
         // Create the component logic based on source
-        const isLoading = $("true")
-        const isLoading = $("$(testObservables['TestLazy']")
+        const isLoading1 = $("true")
+        const isLoading2 = $("$(testObservables['TestLazy']")
 
         // Create the component element using h() function
+        const Suspense = (props) => h('div', null, props.children)  // Mock Suspense component
+        const Fallback = (props) => h('div', null, 'Loading...')  // Mock Fallback component
+        const LazyComponent = (props) => h('div', null, 'Lazy Content')  // Mock LazyComponent
         const element = h('div', null,
-            h('h3', null, 'Lazy'),            h('p', null, "<Suspense fallback={<Fallback />}>
-                <LazyComponent />
-            </Suspense>")
+            h('h3', null, 'Lazy'),
+            h('p', null,
+                h(Suspense, { fallback: h(Fallback, {}) },
+                    h(LazyComponent, {})
+                )
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
     })

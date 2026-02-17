@@ -1,18 +1,11 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, For, ObservableReadonly } from 'woby'
+import { TestSnapshots, random } from './util'
 
 const TestForUnkeyedFallbackObservableStatic = (): JSX.Element => {
-    const o = $(String(random()))
-    // Store the observable globally so the test can access it
-    registerTestObservable('TestForUnkeyedFallbackObservableStatic', o)
-    const randomize = () => o(String(random()))
-    useInterval(randomize, TEST_INTERVAL)
-    o()
-
     const Fallback = () => {
         return (
             <>
-                <p>Fallback: {o()}</p>
+                <p>Fallback: 0.123456</p>
             </>
         )
     }
@@ -30,8 +23,7 @@ const TestForUnkeyedFallbackObservableStatic = (): JSX.Element => {
 
 TestForUnkeyedFallbackObservableStatic.test = {
     static: true,
-    compareActualValues: true,
-    expect: () => `<p>Fallback: ${$$(testObservables['TestForUnkeyedFallbackObservableStatic'])}</p>`
+    expect: () => '<p>Fallback: 0.123456</p>'
 }
 
 

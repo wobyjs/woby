@@ -1,4 +1,4 @@
-import { $, $$ } from 'woby'
+import { $, $$, createContext, useContext } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestContextHook = (): JSX.Element => {
@@ -23,7 +23,7 @@ const TestContextHook = (): JSX.Element => {
 
 TestContextHook.test = {
     static: true,
-    expect: () => '<p>outer</p><p>inner</p><p>outer</p>'
+    expect: () => '<context-provider value="outer"><p>outer</p><context-provider value="inner"><p>inner</p></context-provider><p>outer</p></context-provider>'
 }
 
 

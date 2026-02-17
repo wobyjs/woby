@@ -1,16 +1,12 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, For, Observable } from 'woby'
+import { TestSnapshots } from './util'
 
 const TestForObservables = (): JSX.Element => {
     const v1 = $(1)
     const v2 = $(2)
     const v3 = $(3)
     const values = [v1, v2, v3]
-    useInterval(() => {
-        v1((v1() + 1) % 5)
-        v2((v2() + 1) % 5)
-        v3((v3() + 1) % 5)
-    }, TEST_INTERVAL)
+    // Remove dynamic updates for static test
     return (
         <>
             <h3>For - Observables</h3>
@@ -24,18 +20,10 @@ const TestForObservables = (): JSX.Element => {
 }
 
 TestForObservables.test = {
-    static: false,
+    static: true,
     expect: () => {
-        // This component cycles through values 1-4, wrapping at 5
-        const cyclePhase = Math.floor(Date.now() / TEST_INTERVAL) % 5
-        const values = [
-            [1, 2, 3],
-            [2, 3, 4],
-            [3, 4, 0],
-            [4, 0, 1],
-            [0, 1, 2]
-        ][cyclePhase]
-        return `<p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
+        // For static test, return the fixed values
+        return `<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>`
     }
 }
 

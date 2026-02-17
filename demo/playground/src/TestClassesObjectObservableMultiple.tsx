@@ -3,6 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestClassesObjectObservableMultiple = (): JSX.Element => {
     const o = $({ 'red bold': true, blue: false })
+    registerTestObservable('TestClassesObjectObservableMultiple', o)
     const toggle = () => o(prev => prev['red bold'] ? { 'red bold': false, blue: true } : { 'red bold': true, blue: false })
     useInterval(toggle, TEST_INTERVAL)
     return (
@@ -15,7 +16,12 @@ const TestClassesObjectObservableMultiple = (): JSX.Element => {
 
 TestClassesObjectObservableMultiple.test = {
     static: false,
-    expect: () => '<p class="red bold">content</p>'
+    compareActualValues: true,
+    expect: () => {
+        const value = $$(testObservables['TestClassesObjectObservableMultiple'])
+        const classes = typeof value === 'object' ? Object.keys(value).filter(k => value[k]).join(' ') : (value || '')
+        return `<p class="${classes}">content</p>`
+    }
 }
 
 

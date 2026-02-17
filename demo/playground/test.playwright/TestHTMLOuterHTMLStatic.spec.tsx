@@ -21,9 +21,10 @@ test('TestHTMLOuterHTMLStatic component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'HTML - outerHTML - Static'),            h('p', {'outerHTML': ', 'h('b',': true, '{},': true, '"danger")"': true})
+            h('h3', null, 'HTML - outerHTML - Static'),
+            h('p', { 'outerHTML': 'danger' })
         )
-        
+
         // Render to body
         render(element, document.body)
     })

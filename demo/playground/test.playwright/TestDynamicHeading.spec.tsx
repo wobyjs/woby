@@ -19,23 +19,27 @@ test('TestDynamicHeading component', async ({ page }) => {
         const level = $("<1 | 2 | 3 | 4 | 5 | 6>(1")
 
         // Create the component element using h() function
+        const Dynamic = (props) => h(props.component || 'div', null, props.children)  // Mock Dynamic component
         const element = h('div', null,
-            h('h3', null, 'Dynamic - Heading'),            h('p', null, "{() => (
-                <Dynamic component={`h${level()}`}>
-                    Level: {level}
-                </Dynamic>
-            )}")
+            h('h3', null, 'Dynamic - Heading'),
+            h('p', null,
+                (() => {
+                    return h(Dynamic, { component: `h${level()}` },
+                        `Level: ${level()}`
+                    )
+                })()
+            )
         )
-        
+
         // Render to body
         render(element, document.body)
-        
+
         // Define increment function
         const increment = () => level(prev => {
             // Toggle logic would be implemented based on source
             return typeof prev === 'boolean' ? !prev : typeof prev === 'number' ? prev + 1 : prev + '_updated'
         })
-        ;(document.body as any)['incrementTestDynamicHeading'] = increment
+            ; (document.body as any)['incrementTestDynamicHeading'] = increment
     })
 
     // Get initial state

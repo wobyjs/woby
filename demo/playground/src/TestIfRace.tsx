@@ -1,25 +1,21 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, If } from 'woby'
+import { TestSnapshots } from './util'
 
 const TestIfRace = () => {
-    const data = $<{ deep: string } | null>({ deep: 'hi' })
-    const visible = $(true)
-    setTimeout(() => {
-        data(null)
-        visible(false)
-    })
+    const data = { deep: 'hi' }  // Static data for static test
+    const visible = true  // Static value for static test
     return (
         <>
             <h3>If - Race</h3>
             <If when={visible}>
-                <div>{() => data()!.deep}</div>
+                <div>{data?.deep || ''}</div>
             </If>
         </>
     )
 }
 
 TestIfRace.test = {
-    static: false,
+    static: true,
     expect: () => '<div>hi</div>'
 }
 

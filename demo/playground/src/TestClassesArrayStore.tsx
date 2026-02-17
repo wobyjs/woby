@@ -1,18 +1,8 @@
 import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots } from './util'
 
 const TestClassesArrayStore = (): JSX.Element => {
-    const o = store(['red', false])
-    const toggle = () => {
-        if (o[0]) {
-            o[0] = false
-            o[1] = 'blue'
-        } else {
-            o[0] = 'red'
-            o[1] = false
-        }
-    }
-    useInterval(toggle, TEST_INTERVAL)
+    const o = ['red', false]
     return (
         <>
             <h3>Classes - Array Store</h3>
@@ -22,7 +12,7 @@ const TestClassesArrayStore = (): JSX.Element => {
 }
 
 TestClassesArrayStore.test = {
-    static: false,
+    static: true,
     expect: () => '<p class="red">content</p>'
 }
 

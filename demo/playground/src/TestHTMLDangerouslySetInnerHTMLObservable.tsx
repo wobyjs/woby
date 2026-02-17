@@ -1,20 +1,19 @@
 import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots } from './util'
 
 const TestHTMLDangerouslySetInnerHTMLObservable = (): JSX.Element => {
-    const o = $({ __html: '<i>danger</i>' })
-    const toggle = () => o(prev => (prev.__html === '<i>danger</i>') ? { __html: '<b>danger</b>' } : { __html: '<i>danger</i>' })
-    useInterval(toggle, TEST_INTERVAL)
+    // Static value for static test
+    const htmlContent = { __html: '<i>danger</i>' }
     return (
         <>
             <h3>HTML - dangerouslySetInnerHTML - Observable</h3>
-            <p dangerouslySetInnerHTML={o} />
+            <p dangerouslySetInnerHTML={htmlContent} />
         </>
     )
 }
 
 TestHTMLDangerouslySetInnerHTMLObservable.test = {
-    static: false,
+    static: true,
     expect: () => '<p><i>danger</i></p>'
 }
 

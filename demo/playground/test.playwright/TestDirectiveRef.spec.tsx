@@ -20,10 +20,12 @@ test('TestDirectiveRef component', async ({ page }) => {
         const o = $('initial')
 
         // Create the component element using h() function
+        const Model = { ref: (val) => val }  // Mock ref function
         const element = h('div', null,
-            h('h3', null, 'Directive - Ref'),            h('input', {'ref': {Model.ref('bar')}, 'value': 'foo'})
+            h('h3', null, 'Directive - Ref'),
+            h('input', { 'ref': Model.ref('bar'), 'value': 'foo' })
         )
-        
+
         // Render to body
         render(element, document.body)
     })

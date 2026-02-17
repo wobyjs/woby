@@ -1,4 +1,4 @@
-import { $, $$ } from 'woby'
+import { $, $$, For, Observable } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
 const TestForObservablesStatic = (): JSX.Element => {
