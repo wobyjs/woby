@@ -1,0 +1,65 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - heading "Custom Element Context Test" [level=1] [ref=e6]
+  - generic [ref=e7]:
+    - paragraph [ref=e8]: "App-level context values:"
+    - paragraph [ref=e9]: "Theme: dark"
+    - paragraph [ref=e10]: "Counter: 100"
+    - paragraph [ref=e11]: "Nested: app-level"
+    - generic [ref=e12]:
+      - strong [ref=e13]: App-level Context Consumer
+      - paragraph [ref=e14]: "Theme: dark"
+      - paragraph [ref=e15]: "Counter: 100"
+      - paragraph [ref=e16]: "Nested: app-level"
+  - generic [ref=e17]:
+    - strong [ref=e18]: Direct TSX Consumer
+    - paragraph [ref=e19]: "Theme: dark"
+    - paragraph [ref=e20]: "Counter: 100"
+    - paragraph [ref=e21]: "Nested: app-level"
+  - generic [ref=e25]:
+    - 'heading "Context Provider (Theme: dark, Counter: 50)" [level=3] [ref=e26]'
+    - generic [ref=e27]:
+      - strong [ref=e28]: Nested Consumer 1
+      - paragraph [ref=e29]: "Theme: () => theme()"
+      - paragraph [ref=e30]: "Counter: () => counter()"
+      - paragraph [ref=e31]: "Nested: custom-provider"
+    - generic [ref=e32]:
+      - strong [ref=e33]: Nested Consumer 2
+      - paragraph [ref=e34]: "Theme: dark"
+      - paragraph [ref=e35]: "Counter: 50"
+      - paragraph [ref=e36]: "Nested: custom-provider"
+  - generic [ref=e38]:
+    - heading "TSX Counter Element" [level=3] [ref=e39]
+    - paragraph [ref=e40]: "Internal Count: 10"
+    - button "Increment" [ref=e41]
+    - generic [ref=e42]:
+      - strong [ref=e43]: Counter Context Consumer
+      - paragraph [ref=e44]: "Theme: dark"
+      - paragraph [ref=e45]: "Counter: () => count()"
+      - paragraph [ref=e46]: "Nested: app-level"
+  - generic [ref=e50]:
+    - 'heading "Context Provider (Theme: light, Counter: 200)" [level=4] [ref=e51]'
+    - generic [ref=e52]:
+      - strong [ref=e53]: Level 1 Consumer
+      - paragraph [ref=e54]: "Theme: light"
+      - paragraph [ref=e55]: "Counter: 200"
+      - paragraph [ref=e56]: "Nested: tsx-provider"
+    - generic [ref=e58]:
+      - heading "Nested Counter" [level=3] [ref=e59]
+      - paragraph [ref=e60]: "Internal Count: 5"
+      - button "Increment" [ref=e61]
+      - generic [ref=e62]:
+        - strong [ref=e63]: Level 2 Consumer
+        - paragraph [ref=e64]: "Theme: light"
+        - paragraph [ref=e65]: "Counter: () => count()"
+        - paragraph [ref=e66]: "Nested: tsx-provider"
+      - generic [ref=e70]:
+        - 'heading "Context Provider (Theme: dark, Counter: 999)" [level=3] [ref=e71]'
+        - generic [ref=e72]:
+          - strong [ref=e73]: Level 3 Consumer
+          - paragraph [ref=e74]: "Theme: () => theme()"
+          - paragraph [ref=e75]: "Counter: () => counter()"
+          - paragraph [ref=e76]: "Nested: custom-provider"
+```

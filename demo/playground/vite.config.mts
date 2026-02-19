@@ -9,7 +9,7 @@ import { defineConfig } from 'vite'
 
 const config = defineConfig({
     server: {
-        port: 5176,
+        port: 5276,
         strictPort: true
     },
     esbuild: {

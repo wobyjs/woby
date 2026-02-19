@@ -24,31 +24,29 @@ test('For Random component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { h, render } = woby
 
-        // Component logic extracted from source file
-        // Dynamic content - with intervals or observables
-        // [Implementation based on source file: TestForRandom.tsx]
-        
-        // Create the component element using h() function
+        const randomValues = [
+            Math.floor(Math.random() * 1000),
+            Math.floor(Math.random() * 1000),
+            Math.floor(Math.random() * 1000)
+        ]
+
         const element = h('div', null,
-            h('h3', null, 'For Random'),
-            h('p', null, 'content')  // This should be updated based on actual source
+            h('h3', null, 'For - Random Only Child'),
+            h('p', null, 'Value: ', randomValues[0]),
+            h('p', null, 'Value: ', randomValues[1]),
+            h('p', null, 'Value: ', randomValues[2])
         )
-        
-        // Render to body
+
         render(element, document.body)
     })
 
-    // Step-by-step verification for dynamic content
-    const paragraph = page.locator('p')
-    
-    // Initial state verification
+    const container = page.locator('div').first()
+
     await page.waitForTimeout(50)
-    let outerHTML = await paragraph.evaluate(el => el.outerHTML)
-    // This assertion should be updated based on actual expected output
-    await expect(outerHTML).toBe('<p>content</p>')
-    
-    // Additional steps for dynamic components would go here
-    // Based on the specific logic in the source file
+    const innerHTML = await container.evaluate(el => el.innerHTML)
+
+    expect(innerHTML).toContain('For - Random Only Child')
+    expect(innerHTML).toMatch(/Value: \d+</g)
 })

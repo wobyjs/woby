@@ -325,12 +325,22 @@ import TestUndefinedFunction from './src/TestUndefinedFunction'
 import TestUndefinedObservable from './src/TestUndefinedObservable'
 import TestUndefinedRemoval from './src/TestUndefinedRemoval'
 import TestUndefinedStatic from './src/TestUndefinedStatic'
+import TestCustomElementBasic from './src/TestCustomElementBasic'
+import TestCustomElementSlots from './src/TestCustomElementSlots'
+import TestCustomElementContext from './src/TestCustomElementContext'
+import TestCustomElementNested from './src/TestCustomElementNested'
+import TestCustomElementComprehensive from './src/TestCustomElementComprehensive'
 
 globalThis.Woby = Woby
 
 /* MAIN */
 
 const tests = [
+    TestCustomElementBasic,
+    TestCustomElementSlots,
+    TestCustomElementContext,
+    TestCustomElementNested,
+    TestCustomElementComprehensive,
     // TestABCD,
     // TestAttributeBooleanStatic,
     // TestAttributeFunction,
