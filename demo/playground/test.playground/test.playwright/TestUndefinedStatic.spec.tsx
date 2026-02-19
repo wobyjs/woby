@@ -1,0 +1,43 @@
+/** @jsxImportSource woby */
+import { test, expect } from '@playwright/test'
+// @ts-ignore
+import fs from 'fs'
+// @ts-ignore
+import path from 'path'
+// @ts-ignore
+import { fileURLToPath } from 'url'
+import type * as Woby from 'woby'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+test('Undefined Static component', async ({ page }) => {
+    const wobyScript = fs.readFileSync(path.join(__dirname, '../../../../dist/index.umd.js'), 'utf8')
+    await page.addScriptTag({ content: wobyScript })
+
+    await page.evaluate(() => {
+        const woby: typeof Woby = (window as any).woby
+        const { h, render } = woby
+
+        // Component logic extracted from source file
+        // Static content - direct rendering without intervals
+        // Source has <p>{undefined}</p> which renders as <p><!----></p> (placeholder)
+
+        // Create the component element using h() function - static content
+        const element = h('div', null,
+            h('h3', null, 'Undefined - Static'),
+            h('p', null, undefined)  // Source has {undefined} which renders as placeholder
+        )
+
+        // Render to body
+        render(element, document.body)
+    })
+
+    // Static test verification
+    const paragraph = page.locator('p')
+
+    // Verify the complete element structure
+    await page.waitForTimeout(50)
+    const outerHTML = await paragraph.evaluate(el => el.outerHTML)
+    await expect(outerHTML).toBe('<p><!----></p>')  // Expected output - undefined renders as placeholder
+})

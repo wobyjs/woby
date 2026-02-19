@@ -6,7 +6,7 @@
         "dev": "vite --force --mode dev --host",
         "prod": "vite --force",
         "build": "vite build",
-        "test": "playwright test",
+        "test": "playwright test --config=playwright.direct.config.ts",
         "test:ui": "playwright test --ui",
         "test:woby": "npx playwright test test.playwright/woby-simple-umd-test.spec.ts --config=playwright.direct.config.ts"
     },

@@ -337,7 +337,7 @@ const tests = [
     // TestAttributeFunctionBoolean,
     // TestAttributeObservable,
     // TestAttributeObservableBoolean,
-    // TestAttributeRemoval,
+    TestAttributeRemoval,
     // TestAttributeStatic,
     // TestBigIntFunction,
     // TestBigIntObservable,
