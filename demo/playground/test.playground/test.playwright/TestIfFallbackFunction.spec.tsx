@@ -17,28 +17,28 @@ test('If Fallback Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { h, render } = woby
+        const { $, h, render, If } = woby
 
-        // Component logic extracted from source file
-        // Static content - direct rendering without intervals
-        // [Implementation based on source file: TestIfFallbackFunction.tsx]
-        
-        // Create the component element using h() function - static content
+        // Component logic extracted from source file: TestIfFallbackFunction.tsx
+        const initialValue = "0.123456"
+        const Fallback = () => {
+            return h('p', null, 'Fallback: ' + initialValue)
+        }
+
         const element = h('div', null,
-            h('h3', null, 'If Fallback Function'),
-            h('p', null, 'content')  // This should be updated based on actual source
+            h('h3', null, 'If - Fallback Function'),
+            h(If, { when: false, fallback: Fallback }, 'Children')
         )
         
-        // Render to body
         render(element, document.body)
     })
 
     // Static test verification
-    const paragraph = page.locator('p')
+    const container = page.locator('div')
     
-    // Verify the complete element structure
     await page.waitForTimeout(50)
-    const outerHTML = await paragraph.evaluate(el => el.outerHTML)
-    // This assertion should be updated based on actual expected output from source
-    await expect(outerHTML).toBe('<p>content</p>')
+    const innerHTML = await container.innerHTML()
+    await expect(innerHTML).toContain('<h3>If - Fallback Function</h3>')
+    await expect(innerHTML).toContain('<p>Fallback: 0.123456</p>')
+    await expect(innerHTML).not.toContain('Children')
 })

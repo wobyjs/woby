@@ -17,28 +17,28 @@ test('If Children Observable Static component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { h, render } = woby
+        const { $, h, render, If } = woby
 
-        // Component logic extracted from source file
-        // Static content - direct rendering without intervals
-        // [Implementation based on source file: TestIfChildrenObservableStatic.tsx]
+        // Component logic extracted from source file: TestIfChildrenObservableStatic.tsx
+        const valueObs = $('static_value')
         
-        // Create the component element using h() function - static content
+        const Content = () => {
+            return h('p', null, valueObs())
+        }
+
         const element = h('div', null,
-            h('h3', null, 'If Children Observable Static'),
-            h('p', null, 'content')  // This should be updated based on actual source
+            h('h3', null, 'If - Children Observable Static'),
+            h(If, { when: true }, h(Content))
         )
         
-        // Render to body
         render(element, document.body)
     })
 
     // Static test verification
-    const paragraph = page.locator('p')
+    const container = page.locator('div')
     
-    // Verify the complete element structure
     await page.waitForTimeout(50)
-    const outerHTML = await paragraph.evaluate(el => el.outerHTML)
-    // This assertion should be updated based on actual expected output from source
-    await expect(outerHTML).toBe('<p>content</p>')
+    const innerHTML = await container.innerHTML()
+    await expect(innerHTML).toContain('<h3>If - Children Observable Static</h3>')
+    await expect(innerHTML).toContain('<p>static_value</p>')
 })

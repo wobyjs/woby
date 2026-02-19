@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  testMatch: ['**/test.playwright/**/*.spec.ts'],
+  testMatch: ['**/test.playwright/**/*.spec.ts', '**/test.playwright/**/*.spec.tsx'],
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
   expect: {
@@ -37,30 +37,32 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { 
-        channel: 'chrome',
+        // channel: 'chrome', // Use bundled chromium
       },
     },
 
     {
       name: 'firefox',
       use: { 
-        channel: 'firefox',
+        // channel: 'firefox', // Use bundled firefox
       },
     },
 
     {
       name: 'webkit',
       use: { 
-        channel: 'webkit',
+        // channel: 'webkit', // Use bundled webkit
       },
     },
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'cd demo/playground && npx vite --port 5176',
-    url: 'http://localhost:5176',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  // webServer is disabled because the dev server build fails in this environment due to missing workspace dependencies.
+  // The tests use injected scripts and do not require the dev server.
+  // webServer: {
+  //   command: 'cd demo/playground && npx vite --port 5176',
+  //   url: 'http://localhost:5176',
+  //   reuseExistingServer: !process.env.CI,
+  //   timeout: 120 * 1000,
+  // },
 });

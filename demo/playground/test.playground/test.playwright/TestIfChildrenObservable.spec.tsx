@@ -11,44 +11,47 @@ import type * as Woby from 'woby'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Augment window type for test observables
-declare global {
-    interface Window {
-        testObservableIfChildrenObservable: import('woby').Observable<any>;
-    }
-}
-
 test('If Children Observable component', async ({ page }) => {
     const wobyScript = fs.readFileSync(path.join(__dirname, '../../../../dist/index.umd.js'), 'utf8')
     await page.addScriptTag({ content: wobyScript })
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, If } = woby
 
-        // Component logic extracted from source file
-        // Dynamic content - with intervals or observables
-        // [Implementation based on source file: TestIfChildrenObservable.tsx]
-        
+        // Component logic extracted from source file: TestIfChildrenObservable.tsx
+        const o = $('initial_value')
+        // Expose observable for testing
+        // Use (window as any) to avoid TypeScript errors
+        (window as any).testObservableIfChildrenObservable = o
+
         // Create the component element using h() function
+        // Source returns a fragment with h3 and If
         const element = h('div', null,
-            h('h3', null, 'If Children Observable'),
-            h('p', null, 'content')  // This should be updated based on actual source
+            h('h3', null, 'If - Children Observable'),
+            h(If, { when: true }, o)
         )
         
         // Render to body
         render(element, document.body)
     })
 
-    // Step-by-step verification for dynamic content
-    const paragraph = page.locator('p')
+    // Step-by-step verification
+    const container = page.locator('div')
     
     // Initial state verification
     await page.waitForTimeout(50)
-    let outerHTML = await paragraph.evaluate(el => el.outerHTML)
-    // This assertion should be updated based on actual expected output
-    await expect(outerHTML).toBe('<p>content</p>')
+    let innerHTML = await container.innerHTML()
+    await expect(innerHTML).toContain('initial_value')
+    await expect(innerHTML).toContain('<h3>If - Children Observable</h3>')
     
-    // Additional steps for dynamic components would go here
-    // Based on the specific logic in the source file
+    // Update observable
+    await page.evaluate(() => {
+        (window as any).testObservableIfChildrenObservable('updated_value')
+    })
+
+    await page.waitForTimeout(50)
+    innerHTML = await container.innerHTML()
+    await expect(innerHTML).toContain('updated_value')
+    await expect(innerHTML).not.toContain('initial_value')
 })
