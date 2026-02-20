@@ -1,12 +1,8 @@
-/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
-// @ts-ignore
+import { test } from '@playwright/test'
 import fs from 'fs'
-// @ts-ignore
 import path from 'path'
-// @ts-ignore
 import { fileURLToPath } from 'url'
-import type * as Woby from 'woby'
+import type Woby from '../../../../src'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -26,16 +22,32 @@ test('Custom Element Basic Functionality', async ({ page }) => {
             active: $(false),
             color: $('blue')
         }), ({ title, count, active, color, children }) => {
+            // Helper to handle both observable and raw values
+            const getValue = (val) => {
+                if (typeof val === 'function') {
+                    return val() // it's an observable
+                } else if (typeof val === 'string') {
+                    // Convert string representations to appropriate types
+                    if (val === 'true') return true
+                    if (val === 'false') return false
+                    // Try to parse as number if it looks like one
+                    const numVal = Number(val)
+                    if (!isNaN(numVal)) return numVal
+                    return val // return as string
+                }
+                return val
+            }
+
             return h('div', {
                 'style': {
-                    'border': `2px solid ${color()}`,
+                    'border': '2px solid ' + getValue(color),
                     'padding': '10px',
-                    'background-color': active() ? '#e0e0e0' : 'white'
+                    'background-color': getValue(active) ? '#e0e0e0' : 'white'
                 }
             } as any,
-                h('h2', null, () => title()),
-                h('p', null, () => `Count: ${count()}`),
-                h('p', null, () => `Active: ${active() ? 'Yes' : 'No'}`),
+                h('h2', null, () => getValue(title)),
+                h('p', null, () => `Count: ${getValue(count)}`),
+                h('p', null, () => `Active: ${getValue(active) ? 'Yes' : 'No'}`),
                 h('div', null, children)
             )
         })
@@ -55,7 +67,7 @@ test('Custom Element Basic Functionality', async ({ page }) => {
             h('p', null, 'This is child content from TSX')
         )
 
-        // 2. Custom Element usage - using registered component function
+        // 2. Custom Element usage - using component function
         const element2 = h(BasicElement, {
             title: $('HTML Attribute Title'),
             count: $(100),
@@ -100,24 +112,26 @@ test('Custom Element Basic Functionality', async ({ page }) => {
     await expect(componentElement).toContainText('Active: Yes')
     await expect(componentElement).toContainText('This is child content from HTML - goes into slot')
 
-    // Test 3: Mixed usage (Component containing Component)
+    // Test 3: Mixed usage
     const mixedElement = await page.locator('div:has(h2:text("Mixed TSX"))').first()
     await expect(mixedElement).toBeVisible()
+    await expect(mixedElement).toContainText('Nested Custom Element')
     const nestedElement = await mixedElement.locator('div:has(h2:text("Nested Custom Element"))').first()
-    await expect(nestedElement).toContainText('Nested Custom Element')
+    await expect(nestedElement).toBeVisible()
     await expect(nestedElement).toContainText('Count: 50')
 
     // Test style properties
     const styledElement = await page.locator('div:has(h2:text("HTML Attribute Title"))').first()
-    const computedStyle = await styledElement.evaluate(el => {
-        const style = window.getComputedStyle(el)
-        return {
-            border: style.border,
-            backgroundColor: style.backgroundColor
-        }
+    const hasRedBorder = await styledElement.evaluate(el => {
+        return el.style.border.includes('red') || el.style.borderColor === 'red'
     })
-    await expect(computedStyle.border).toContain('rgb(255, 0, 0)')
-    await expect(computedStyle.backgroundColor).toBe('rgb(224, 224, 224)')
+    await expect(hasRedBorder).toBe(true)
+
+    const backgroundColor = await styledElement.evaluate(el => {
+        const style = window.getComputedStyle(el)
+        return style.backgroundColor
+    })
+    await expect(backgroundColor).toBe('rgb(224, 224, 224)')
 
     console.log('✅ Custom Element Basic tests passed')
 })

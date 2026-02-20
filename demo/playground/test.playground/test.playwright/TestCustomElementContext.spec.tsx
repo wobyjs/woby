@@ -63,8 +63,8 @@ test('Custom Element Context Functionality', async ({ page }) => {
             theme: $('light'),
             counter: $(0)
         }), ({ theme, counter, children }) => {
-            return h(ThemeContext.Provider, { value: () => theme() } as any,
-                h(CounterContext.Provider, { value: () => counter() } as any,
+            return h(ThemeContext.Provider, { value: theme() } as any,
+                h(CounterContext.Provider, { value: counter() } as any,
                     h(NestedContext.Provider, { value: 'custom-provider' } as any,
                         h('div', {
                             'style': { 'padding': '15px', 'border': '2px solid blue', 'margin': '10px' }
@@ -85,7 +85,7 @@ test('Custom Element Context Functionality', async ({ page }) => {
             const count = $(initialCount() as number)
             const increment = () => count((prev: any) => prev + 1)
 
-            return h(CounterContext.Provider, { value: () => count() } as any,
+            return h(CounterContext.Provider, { value: count } as any,
                 h('div', {
                     'style': { 'padding': '15px', 'border': '2px solid green', 'margin': '10px' }
                 } as any,

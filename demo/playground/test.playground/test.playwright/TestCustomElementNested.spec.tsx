@@ -34,6 +34,19 @@ test('Custom Element Nested Components', async ({ page }) => {
             text: $('Leaf Element'),
             number: $(0)
         }), ({ text, number }) => {
+            // Helper to handle both observable and raw values
+            const getValue = (val) => {
+                if (typeof val === 'function') {
+                    return val() // it's an observable
+                } else if (typeof val === 'string') {
+                    // Try to parse as number if it looks like one
+                    const numVal = Number(val)
+                    if (!isNaN(numVal)) return numVal
+                    return val // return as string
+                }
+                return val
+            }
+
             return h('div', {
                 'style': {
                     'border': '1px solid #ccc',
@@ -42,7 +55,7 @@ test('Custom Element Nested Components', async ({ page }) => {
                     'backgroundColor': '#f9f9f9'
                 }
             } as any,
-                h('small', null, () => `Leaf: ${text()} (${number()})`)
+                h('small', null, () => `Leaf: ${getValue(text)} (${getValue(number)})`)
             )
         })
 
@@ -52,6 +65,21 @@ test('Custom Element Nested Components', async ({ page }) => {
             count: $(0),
             active: $(false)
         }), ({ title, count, active, children }) => {
+            // Helper to handle both observable and raw values
+            const getValue = (val) => {
+                if (typeof val === 'function') {
+                    return val() // it's an observable
+                } else if (typeof val === 'string') {
+                    if (val === 'true') return true
+                    if (val === 'false') return false
+                    // Try to parse as number if it looks like one
+                    const numVal = Number(val)
+                    if (!isNaN(numVal)) return numVal
+                    return val // return as string
+                }
+                return val
+            }
+
             return h('div', {
                 'style': {
                     'border': '2px solid #666',
@@ -60,9 +88,9 @@ test('Custom Element Nested Components', async ({ page }) => {
                     'backgroundColor': '#e6f3ff'
                 }
             } as any,
-                h('h4', null, () => title()),
-                h('p', null, () => `Count: ${count()}`),
-                h('p', null, () => `Active: ${active() ? 'Yes' : 'No'}`),
+                h('h4', null, () => getValue(title)),
+                h('p', null, () => `Count: ${getValue(count)}`),
+                h('p', null, () => `Active: ${getValue(active) ? 'Yes' : 'No'}`),
                 h('div', { 'style': { 'marginLeft': '15px' } } as any, children)
             )
         })
@@ -72,6 +100,19 @@ test('Custom Element Nested Components', async ({ page }) => {
             title: $('Root Element'),
             count: $(0)
         }), ({ title, count, children }) => {
+            // Helper to handle both observable and raw values
+            const getValue = (val) => {
+                if (typeof val === 'function') {
+                    return val() // it's an observable
+                } else if (typeof val === 'string') {
+                    // Try to parse as number if it looks like one
+                    const numVal = Number(val)
+                    if (!isNaN(numVal)) return numVal
+                    return val // return as string
+                }
+                return val
+            }
+
             return h('div', {
                 'style': {
                     'border': '3px solid #333',
@@ -80,8 +121,8 @@ test('Custom Element Nested Components', async ({ page }) => {
                     'backgroundColor': '#ffffe6'
                 }
             } as any,
-                h('h3', null, () => title()),
-                h('p', null, () => `Count: ${count()}`),
+                h('h3', null, () => getValue(title)),
+                h('p', null, () => `Count: ${getValue(count)}`),
                 h('div', { 'style': { 'marginLeft': '20px', 'borderLeft': '2px dashed #999', 'paddingLeft': '10px' } } as any, children)
             )
         })
@@ -94,28 +135,28 @@ test('Custom Element Nested Components', async ({ page }) => {
         // Create test elements - MIXED APPROACHES
 
         // 1. Pure custom elements
-        const element1 = h(RootElement, {
-            title: $('Level 1: Main Root'),
-            count: $(42)
-        },
-            h(IntermediateElement, {
-                title: $('Main Intermediate'),
-                count: $(42),
-                active: $(true)
-            },
-                h(LeafElement, {
-                    text: $('Nested Leaf'),
-                    number: $(100)
-                }),
-                h(LeafElement, {
-                    text: $('Another Leaf'),
-                    number: $(200)
-                })
+        const element1 = h('root-element' as any, {
+            title: 'Level 1: Main Root',
+            count: '42'
+        } as any,
+            h('intermediate-element' as any, {
+                title: 'Main Intermediate',
+                count: '42',
+                active: 'true'
+            } as any,
+                h('leaf-element' as any, {
+                    text: 'Nested Leaf',
+                    number: '100'
+                } as any),
+                h('leaf-element' as any, {
+                    text: 'Another Leaf',
+                    number: '200'
+                } as any)
             ),
-            h(LeafElement, {
-                text: $('Direct Root Child'),
-                number: $(300)
-            })
+            h('leaf-element' as any, {
+                text: 'Direct Root Child',
+                number: '300'
+            } as any)
         )
 
         // Render all elements
