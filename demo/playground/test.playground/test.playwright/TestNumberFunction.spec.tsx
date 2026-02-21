@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -26,14 +27,16 @@ test('Number - Function component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestNumberFunction.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestNumberFunction.tsx
+        const element = h(TestNumberFunction, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Number - Function'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestNumberFunction() {
+            const o = $(Math.random())
+            return [
+                h('h3', null, 'Number - Function'),
+                h('p', null, () => o())
+            ]
+        }
 
         // Render to body
         render(element, document.body)

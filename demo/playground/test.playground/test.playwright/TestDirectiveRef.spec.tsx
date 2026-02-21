@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -14,7 +15,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestDirectiveRef: import('woby').Observable<undefined>
     }
 }
 
@@ -26,14 +26,24 @@ test('Directive - Ref component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestDirectiveRef.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestDirectiveRef.tsx
+        const model = (element, arg1) => {
+            useEffect(() => {
+                const value = `${arg1}`
+                element.value = value
+                element.setAttribute('value', value)
+            }, { sync: true })
+        }
+        const Model = createDirective('model', model)
+        
+        const element = h(TestDirectiveRef, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Directive - Ref'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestDirectiveRef() {
+            return [
+                h('h3', null, 'Directive - Ref'),
+                h('input', { ref: Model.ref('bar'), value: 'foo' })
+            ]
+        }
 
         // Render to body
         render(element, document.body)

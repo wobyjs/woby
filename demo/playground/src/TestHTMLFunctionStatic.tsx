@@ -7,7 +7,7 @@ const TestHTMLFunctionStatic = (): JSX.Element => {
       <h3>HTML - Function - Static</h3>
       {html`
         <${If} when=${true}>
-          <p>${random()}</p>
+          <p>content</p>
         </${If}>
       `}
     </>
@@ -16,7 +16,7 @@ const TestHTMLFunctionStatic = (): JSX.Element => {
 
 TestHTMLFunctionStatic.test = {
   static: true,
-  expect: () => ''
+  expect: () => '<p>content</p>'
 }
 
 

@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -26,14 +27,21 @@ test('Error Boundary - Fallback Observable Static component', async ({ page }) =
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestErrorBoundaryFallbackObservableStatic.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestErrorBoundaryFallbackObservableStatic.tsx
+        const fallbackValue = String(Math.random())
+        
+        const element = h(TestErrorBoundaryFallbackObservableStatic, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Error Boundary - Fallback Observable Static'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestErrorBoundaryFallbackObservableStatic() {
+            const Children = () => { throw new Error() }
+            const Fallback = () => h('p', null, 'Fallback: ', fallbackValue)
+            return [
+                h('h3', null, 'Error Boundary - Fallback Observable Static'),
+                h(ErrorBoundary, { fallback: h(Fallback, null) },
+                    h(Children, null)
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

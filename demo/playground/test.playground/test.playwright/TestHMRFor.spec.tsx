@@ -14,7 +14,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestHMRFor: import('woby').Observable<undefined>
     }
 }
 
@@ -24,28 +23,46 @@ test('HMR - For component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, For, hmr, useTimeout } = woby
 
-        // TODO: Implement component logic based on TestHMRFor.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestHMRFor.tsx
+        const element = h(TestHMRFor, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'HMR - For'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestHMRFor() {
+            const o = $([1, 2, 3])
+            const Button = hmr(() => { }, ({ value, index }) => {
+                return h('button', null, value, ', ', index)
+            })
+            return [
+                h('h3', null, 'HMR - For'),
+                h('p', null, 'prev'),
+                h(For, { values: o },
+                    (item, index) => h(Button, { value: item, index: index })
+                ),
+                h('p', null, 'next')
+            ]
+        }
 
         // Render to body
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-
-    // Initial state verification
-    await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestHMRFor.tsx
-    await expect(innerHTML).not.toBe('')
+    // Wait for rendering
+    await page.waitForTimeout(100)
+    
+    // Get all button elements
+    const buttons = await page.locator('button').all()
+    
+    // Verify the initial state - there should be 3 buttons
+    expect(buttons.length).toBe(3)
+    
+    // Verify the content of each button
+    const button1Text = await buttons[0].textContent()
+    const button2Text = await buttons[1].textContent()
+    const button3Text = await buttons[2].textContent()
+    
+    expect(button1Text?.trim()).toBe('1, 0')
+    expect(button2Text?.trim()).toBe('2, 1')
+    expect(button3Text?.trim()).toBe('3, 2')
 })
 

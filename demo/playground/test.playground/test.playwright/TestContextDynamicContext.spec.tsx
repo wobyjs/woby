@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -14,7 +15,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestContextDynamicContext: import('woby').Observable<undefined>
     }
 }
 
@@ -26,14 +26,29 @@ test('Dynamic - Context component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestContextDynamicContext.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestContextDynamicContext.tsx
+        const element = h(TestContextDynamicContext, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Dynamic - Context'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestContextDynamicContext() {
+            const Context = createContext('default')
+            const DynamicFragment = (props) => {
+                const ctx = useContext(Context)
+                return [
+                    h('p', null, ctx),
+                    h('p', null, props.children),
+                    h(Dynamic, { component: 'p' }, props.children),
+                    h(Dynamic, { component: 'p', children: props.children })
+                ]
+            }
+            return [
+                h('h3', null, 'Dynamic - Context'),
+                h(Context.Provider, { value: 'context' },
+                    h(DynamicFragment, null,
+                        h(DynamicFragment, null)
+                    )
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

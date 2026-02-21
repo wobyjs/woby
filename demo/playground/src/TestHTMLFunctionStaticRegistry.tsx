@@ -3,7 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestHTMLFunctionStaticRegistry = (): JSX.Element => {
     const P = (): JSX.Element => {
-        return <p>{random()}</p>
+        return <p>content</p>
     }
     html.register({ If, P })
     return (
@@ -20,7 +20,7 @@ const TestHTMLFunctionStaticRegistry = (): JSX.Element => {
 
 TestHTMLFunctionStaticRegistry.test = {
     static: true,
-    expect: () => ''
+    expect: () => '<p>content</p>'
 }
 
 

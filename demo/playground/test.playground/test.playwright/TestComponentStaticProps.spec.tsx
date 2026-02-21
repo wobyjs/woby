@@ -45,8 +45,8 @@ test('Component - Static Props component', async ({ page }) => {
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestComponentStaticProps.tsx
-    await expect(innerHTML).not.toBe('')
+    const textContent = await paragraph.evaluate(el => el.textContent)
+    // Add proper expectations based on TestComponentStaticProps.tsx
+    await expect(textContent).toBe('42')
 })
 

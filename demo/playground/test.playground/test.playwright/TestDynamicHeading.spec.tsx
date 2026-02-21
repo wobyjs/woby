@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -54,7 +55,7 @@ test('Dynamic - Heading component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const dynamicElement = page.locator('h1, h2, h3, h4, h5, h6')
+    const dynamicElement = page.locator('h1, h2, h3, h4, h5, h6').filter({ hasNotText: 'Dynamic - Heading' }).first()
 
     // Initial state: should be h1 (level 1)
     await page.waitForTimeout(50)

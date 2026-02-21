@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -14,7 +15,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestContextComponents: import('woby').Observable<undefined>
     }
 }
 
@@ -26,14 +26,32 @@ test('Context - Components component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestContextComponents.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestContextComponents.tsx
+        const Context = createContext('')
+        
+        const element = h(TestContextComponents, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Context - Components'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestContextComponents() {
+            return [
+                h('h3', null, 'Context - Components'),
+                h(Context.Provider, { value: 'outer' },
+                    () => {
+                        const value = useContext(Context)
+                        return h('p', null, value)
+                    },
+                    h(Context.Provider, { value: 'inner' },
+                        () => {
+                            const value = useContext(Context)
+                            return h('p', null, value)
+                        }
+                    ),
+                    () => {
+                        const value = useContext(Context)
+                        return h('p', null, value)
+                    }
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

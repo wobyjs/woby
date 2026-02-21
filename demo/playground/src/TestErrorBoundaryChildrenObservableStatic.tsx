@@ -1,7 +1,7 @@
 import { $, $$, ErrorBoundary } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
 
-const  = (): JSX.Element => {
+const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
     const childrenValue = String(random())
     registerTestObservable('TestErrorBoundaryChildrenObservableStatic', $(childrenValue))
     const Children = (): JSX.Element => {

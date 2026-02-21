@@ -7,7 +7,7 @@ const TestRefContext = (): JSX.Element => {
         <>
             <h3>Ref - Context</h3>
             <Context.Provider value={321}>
-                <p></p> {/* Static content without ref */}
+                <p>content</p>
             </Context.Provider>
         </>
     )
@@ -15,7 +15,7 @@ const TestRefContext = (): JSX.Element => {
 
 TestRefContext.test = {
     static: true,
-    expect: () => '<context-provider value="321"><p></p> </context-provider>'
+    expect: () => '<p>content</p>'
 }
 
 

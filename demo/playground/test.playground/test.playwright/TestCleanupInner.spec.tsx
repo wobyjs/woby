@@ -26,14 +26,22 @@ test('Cleanup - Inner component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestCleanupInner.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestCleanupInner.tsx
+        const element = h(TestCleanupInner, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Cleanup - Inner'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestCleanupInner() {
+            const page = $(true)
+            const togglePage = () => page(prev => !prev)
+            const Page1 = () => [
+                h('p', null, 'page1'),
+                h('button', { onClick: togglePage }, 'Toggle Page')
+            ]
+            const Page = page() ? Page1 : null
+            return [
+                h('h3', null, 'Cleanup - Inner'),
+                h(Page, null)
+            ]
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,10 +49,14 @@ test('Cleanup - Inner component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
+    const button = page.locator('button')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestCleanupInner.tsx
-    await expect(innerHTML).not.toBe('')
+    const paragraphText = await paragraph.evaluate(el => el.textContent)
+    const buttonText = await button.evaluate(el => el.textContent)
+    
+    // Add proper expectations based on TestCleanupInner.tsx
+    await expect(paragraphText).toBe('page1')
+    await expect(buttonText).toBe('Toggle Page')
 })

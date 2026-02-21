@@ -14,7 +14,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestRenderToString: import('woby').Observable<undefined>
     }
 }
 
@@ -42,12 +41,12 @@ test('renderToString component', async ({ page }) => {
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-
-    // Initial state verification
+    // Wait for rendering
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestRenderToString.tsx
-    await expect(innerHTML).not.toBe('')
+    
+    // Get the paragraph element
+    const paragraph = page.locator('p')
+    
+    // Verify the paragraph content
+    await expect(paragraph).toHaveText('123')
 })

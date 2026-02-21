@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,7 +25,7 @@ test('Dynamic - Observable Component component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, Dynamic, useMemo, $$ } = woby
 
         // Implement component logic based on TestDynamicObservableComponent.tsx
         const level = $(1)
@@ -34,10 +35,10 @@ test('Dynamic - Observable Component component', async ({ page }) => {
             level((level() + 1) % 7 || 1)
         }
 
-        // Create the component element using h() function
+        // Create the component element using h() function with Dynamic component
         const element = h('div', null,
             h('h3', null, 'Dynamic - Observable Component'),
-            h('woby-dynamic', { component: component }, 'Level: ', () => $$(level))
+            h(Dynamic, { component: component }, 'Level: ', () => $$(level))
         )
 
         // Render to body
@@ -45,12 +46,12 @@ test('Dynamic - Observable Component component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const dynamicElement = page.locator('h1, h2, h3, h4, h5, h6').filter({ hasNotText: 'Dynamic - Observable Component' }).first()
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    const textContent = await dynamicElement.evaluate(el => el.textContent)
     // Add proper expectations based on TestDynamicObservableComponent.tsx
-    await expect(innerHTML).toContain('Level: ')
+    await expect(textContent).toContain('Level: ')
 })
 

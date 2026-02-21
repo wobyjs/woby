@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,16 +25,22 @@ test('Dynamic - Store Props component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, Dynamic } = woby
 
-        // TODO: Implement component logic based on TestDynamicStoreProps.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestDynamicStoreProps.tsx
+        const props = $( { class: 'red' } )
+        
+        const element = h(TestDynamicStoreProps, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Dynamic - Store Props'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestDynamicStoreProps() {
+            let count = 1
+            return [
+                h('h3', null, 'Dynamic - Store Props'),
+                h(Dynamic, { component: 'div', props: props },
+                    h('p', null, () => count++)
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

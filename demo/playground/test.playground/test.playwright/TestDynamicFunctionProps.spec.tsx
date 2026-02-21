@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,7 +25,7 @@ test('Dynamic - Function Props component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render, Dynamic } = woby
+        const { $, h, render, Dynamic, $$ } = woby
 
         // Component logic extracted from source file
         // Dynamic content - uses manual toggle to switch between red and blue props
@@ -32,6 +33,8 @@ test('Dynamic - Function Props component', async ({ page }) => {
 
         const red = { class: 'red' }
         const blue = { class: 'blue' }
+        window.testTestDynamicFunctionProps_red = red  // Make red accessible globally
+        window.testTestDynamicFunctionProps_blue = blue  // Make blue accessible globally
         const props = $(red)
         window.testTestDynamicFunctionProps = props  // Make observable accessible globally
         const toggle = () => props(prev => prev === red ? blue : red)
@@ -59,8 +62,8 @@ test('Dynamic - Function Props component', async ({ page }) => {
     // Step 1: toggle to blue
     await page.evaluate(() => {
         const props = window.testTestDynamicFunctionProps
-        const red = { class: 'red' }
-        const blue = { class: 'blue' }
+        const red = window.testTestDynamicFunctionProps_red
+        const blue = window.testTestDynamicFunctionProps_blue
         const toggle = () => props(prev => prev === red ? blue : red)
         toggle()
     })
@@ -71,8 +74,8 @@ test('Dynamic - Function Props component', async ({ page }) => {
     // Step 2: toggle back to red
     await page.evaluate(() => {
         const props = window.testTestDynamicFunctionProps
-        const red = { class: 'red' }
-        const blue = { class: 'blue' }
+        const red = window.testTestDynamicFunctionProps_red
+        const blue = window.testTestDynamicFunctionProps_blue
         const toggle = () => props(prev => prev === red ? blue : red)
         toggle()
     })

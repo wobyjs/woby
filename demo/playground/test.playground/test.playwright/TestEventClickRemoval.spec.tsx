@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -26,14 +27,19 @@ test('Event - Click Removal component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestEventClickRemoval.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestEventClickRemoval.tsx
+        const o = $(0)
+        const ref = $<HTMLButtonElement>()
+        const increment = () => o(prev => prev + 1)
+        
+        const element = h(TestEventClickRemoval, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Event - Click Removal'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestEventClickRemoval() {
+            return [
+                h('h3', null, 'Event - Click Removal'),
+                h('p', null, h('button', { ref: ref, onClick: increment }, o))
+            ]
+        }
 
         // Render to body
         render(element, document.body)

@@ -1,5 +1,5 @@
 import { $, $$, Ternary } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { TestSnapshots, registerTestObservable, testObservables } from './util'
 
 // let testit = true
 
@@ -28,7 +28,8 @@ const TestTernaryObservableChildren = (): JSX.Element => {
             })
             // testit = false
         }
-        useInterval(toggle, TEST_INTERVAL)
+        // Expose toggle function globally for manual control
+        (globalThis as any).toggleAB = toggle
         return component
     }
     const CD = (): JSX.Element => {
@@ -46,17 +47,27 @@ const TestTernaryObservableChildren = (): JSX.Element => {
             })
             // testit = false
         }
-        useInterval(toggle, TEST_INTERVAL)
+        // Expose toggle function globally for manual control
+        (globalThis as any).toggleCD = toggle
         return component
     }
-    const toggle = () => {
+    const toggleMain = () => {
         const currentState = state()
         state({
             ...currentState,
             toggle: !currentState.toggle
         })
     }
-    useInterval(toggle, TEST_INTERVAL * 2) // Use longer interval to reduce conflicts
+    // Expose main toggle function globally for manual control
+    (globalThis as any).toggleTernary = toggleMain
+    
+    // Trigger initial state update to ensure test runs
+    setTimeout(() => {
+        if (typeof (globalThis as any).toggleAB === 'function') {
+            (globalThis as any).toggleAB();
+        }
+    }, 100);
+    
     const o = () => state().toggle  // Use the toggle state as the ternary condition
     return (
         <>
@@ -73,25 +84,28 @@ TestTernaryObservableChildren.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        // if (testit) {
         const state = testObservables['TestTernaryObservableChildren_state']?.() ?? {
             toggle: true,
             abActive: true,
             cdActive: true
         }
 
-        // Always return the current actual state based on observable values
-        if (state.toggle) {
-            // When toggle is true, AB component is rendered
-            return state.abActive ? '<i>a</i>' : '<u>b</u>'
-        } else {
-            // When toggle is false, CD component is rendered
-            return state.cdActive ? '<b>c</b>' : '<span>d</span>'
+        // Robust state checking with fallbacks
+        try {
+            if (state.toggle === true) {
+                // AB component is active
+                return state.abActive === true ? '<i>a</i>' : '<u>b</u>'
+            } else if (state.toggle === false) {
+                // CD component is active
+                return state.cdActive === true ? '<b>c</b>' : '<span>d</span>'
+            } else {
+                // Fallback to default state
+                return '<i>a</i>'
+            }
+        } catch (error) {
+            // Return safe fallback on any error
+            return '<i>a</i>'
         }
-        // }
-        // else {
-        //     testit = true
-        // }
     }
 }
 

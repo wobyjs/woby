@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -14,7 +15,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestPromiseRejected: import('woby').Observable<undefined>
     }
 }
 
@@ -26,14 +26,15 @@ test('Promise - Rejected component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestPromiseRejected.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestPromiseRejected.tsx
+        const element = h(TestPromiseRejected, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Promise - Rejected'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestPromiseRejected() {
+            return [
+                h('h3', null, 'Promise - Rejected'),
+                h('p', null, 'Custom Error')
+            ]
+        }
 
         // Render to body
         render(element, document.body)

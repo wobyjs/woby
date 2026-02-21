@@ -1,8 +1,28 @@
 
 Running 1 test using 1 worker
 
-[1A[2K[1/1] test.playwright\TestStringStatic.spec.js:8:1 ΓÇ║ playground demo should render TestStringStatic component with correct snapshot
-[1A[2Ktest.playwright\TestStringStatic.spec.js:8:1 ΓÇ║ playground demo should render TestStringStatic component with correct snapshot
-Playground demo TestStringStatic component renders correct snapshot
+  Γ£ÿ  1 [chromium-direct] ΓÇ║ test.playground\test.playwright\TestDynamicObservableChildren.spec.tsx:20:1 ΓÇ║ Dynamic - Observable Children component (30.2s)
 
-[1A[2K  1 passed (19.4s)
+
+  1) [chromium-direct] ΓÇ║ test.playground\test.playwright\TestDynamicObservableChildren.spec.tsx:20:1 ΓÇ║ Dynamic - Observable Children component 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.textContent: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('h5').first()[22m
+
+
+      48 |     
+      49 |     // Verify that the h5 element has content (the random number)
+    > 50 |     const textContent = await h5.textContent()
+         |                                  ^
+      51 |     await expect(textContent).not.toBe('')
+      52 |     
+      53 |     // Verify the content is numeric (since it's a random number)
+        at D:\temp\woby\demo\playground\test.playground\test.playwright\TestDynamicObservableChildren.spec.tsx:50:34
+
+    Error Context: test-results\TestDynamicObservableChild-6062b-servable-Children-component-chromium-direct\error-context.md
+
+  1 failed
+    [chromium-direct] ΓÇ║ test.playground\test.playwright\TestDynamicObservableChildren.spec.tsx:20:1 ΓÇ║ Dynamic - Observable Children component 

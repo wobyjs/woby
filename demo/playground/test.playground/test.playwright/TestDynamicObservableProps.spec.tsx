@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,7 +25,7 @@ test('Dynamic - Observable Props component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, Dynamic, $$ } = woby
 
         // Implement component logic based on TestDynamicObservableProps.tsx
         const red = { class: 'red' }
@@ -35,10 +36,10 @@ test('Dynamic - Observable Props component', async ({ page }) => {
             props(prev => prev === red ? blue : red)
         }
 
-        // Create the component element using h() function
+        // Create the component element using h() function with Dynamic component
         const element = h('div', null,
             h('h3', null, 'Dynamic - Observable Props'),
-            h('woby-dynamic', { component: 'h5', props: $$(props) }, 'Content')
+            h(Dynamic, { component: 'h5', props: $$(props) }, 'Content')
         )
 
         // Render to body
@@ -46,13 +47,10 @@ test('Dynamic - Observable Props component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const h5 = page.locator('h5')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // Add proper expectations based on TestDynamicObservableProps.tsx
-    const h5 = await paragraph.locator('h5').first()
     const className = await h5.evaluate(el => el.className)
     await expect(className).toBe('red')
     const textContent = await h5.evaluate(el => el.textContent)

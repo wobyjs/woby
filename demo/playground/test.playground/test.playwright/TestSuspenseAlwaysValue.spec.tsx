@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -22,20 +23,26 @@ test('Suspense - Always Value component', async ({ page }) => {
         const { $, h, render } = woby
 
         // Implement component logic based on TestSuspenseAlwaysValue.tsx
-        const Fallback = () => {
-            return h('p', null, 'Loading...')
-        }
         
-        const Content = () => {
-            // Simulate resource that never resolves
-            return h('p', null, 'Content! undefined')
-        }
+        const element = h(TestSuspenseAlwaysValue, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Suspense - Always Value'),
-            h('woby-suspense', { fallback: Fallback }, Content)
-        )
+        function TestSuspenseAlwaysValue() {
+            const Fallback = () => {
+                return h('p', null, 'Loading...')
+            }
+            const Content = () => {
+                const resource = useResource(() => {
+                    return new Promise<undefined>(() => { })
+                })
+                return h('p', null, 'Content! ', resource.value)
+            }
+            return [
+                h('h3', null, 'Suspense - Always Value'),
+                h(Suspense, { fallback: h(Fallback, null) },
+                    h(Content, null)
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

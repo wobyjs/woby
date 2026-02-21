@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -14,7 +15,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestContextHook: import('woby').Observable<undefined>
     }
 }
 
@@ -26,26 +26,48 @@ test('Context - Hook component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestContextHook.tsx
-        // Extract the actual component logic from the source file
+        const { createContext, useContext } = woby
+        
+        const Context = createContext('')
+        
+        const element = h(TestContextHook, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Context - Hook'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestContextHook() {
+            const Reader = () => {
+                const value = useContext(Context)
+                return h('p', null, value)
+            }
+            return [
+                h('h3', null, 'Context - Hook'),
+                h(Context.Provider, { value: 'outer' },
+                    h(Reader, null),
+                    h(Context.Provider, { value: 'inner' },
+                        h(Reader, null)
+                    ),
+                    h(Reader, null)
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-
-    // Initial state verification
+    // Wait for rendering
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestContextHook.tsx
-    await expect(innerHTML).not.toBe('')
+    
+    // Get all p elements
+    const paragraphs = await page.locator('p').all()
+    
+    // Verify each paragraph's content
+    expect(paragraphs.length).toBe(3)
+    
+    const firstParaText = await paragraphs[0].textContent()
+    const secondParaText = await paragraphs[1].textContent()
+    const thirdParaText = await paragraphs[2].textContent()
+    
+    expect(firstParaText?.trim()).toBe('outer')
+    expect(secondParaText?.trim()).toBe('inner')
+    expect(thirdParaText?.trim()).toBe('outer')
 })
 

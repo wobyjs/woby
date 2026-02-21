@@ -1,4 +1,5 @@
-﻿import { test, expect } from '@playwright/test'
+﻿import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -23,17 +24,17 @@ test('Dynamic - Observable Children component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, Dynamic } = woby
 
         // Implement component logic based on TestDynamicObservableChildren.tsx
         const o = $(Math.random())
         window.testTestDynamicObservableChildren = o
         const update = () => o(Math.random())
 
-        // Create the component element using h() function
+        // Create the component element using h() function with Dynamic component
         const element = h('div', null,
             h('h3', null, 'Dynamic - Observable Children'),
-            h('woby-dynamic', { component: 'h5' }, o)
+            h(Dynamic, { component: 'h5' }, o)
         )
 
         // Render to body
@@ -41,16 +42,40 @@ test('Dynamic - Observable Children component', async ({ page }) => {
     })
 
     // Wait for initial render
-    await page.waitForTimeout(50)
+    await page.waitForTimeout(100)
+    
+    // Debug: Check what elements are on the page
+    const bodyContent = await page.evaluate(() => document.body.innerHTML)
+    console.log('Body content:', bodyContent)
     
     // Check for the h5 element that should be created by the Dynamic component
-    const h5 = page.locator('h5').first()
+    const h5Count = await page.locator('h5').count()
+    console.log('Number of h5 elements:', h5Count)
     
-    // Verify that the h5 element has content (the random number)
-    const textContent = await h5.textContent()
-    await expect(textContent).not.toBe('')
-    
-    // Verify the content is numeric (since it's a random number)
-    await expect(parseFloat(textContent)).toBeGreaterThan(0)
+    if (h5Count > 0) {
+        const h5 = page.locator('h5').first()
+        
+        // Verify that the h5 element has content (the random number)
+        const textContent = await h5.textContent()
+        console.log('h5 text content:', textContent)
+        await expect(textContent).not.toBe('')
+        
+        // Verify the content is numeric (since it's a random number)
+        await expect(parseFloat(textContent)).toBeGreaterThan(0)
+    } else {
+        // If no h5 element, check for other elements
+        const allElements = await page.evaluate(() => {
+            const elements = Array.from(document.querySelectorAll('*'))
+            return elements.map(el => ({
+                tag: el.tagName,
+                text: el.textContent,
+                html: el.outerHTML
+            }))
+        })
+        console.log('All elements:', JSON.stringify(allElements, null, 2))
+        
+        // Fail the test with a clear message
+        throw new Error('No h5 elements found on the page')
+    }
 })
 

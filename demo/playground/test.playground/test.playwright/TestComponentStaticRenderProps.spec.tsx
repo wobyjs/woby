@@ -1,5 +1,6 @@
 ﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+import test from '@playwright/test'
+import expect from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -26,14 +27,17 @@ test('Component - Static Render Props component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestComponentStaticRenderProps.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestComponentStaticRenderProps.tsx
+        const propValue = Math.random()
+        
+        const element = h(TestComponentStaticRenderProps, { value: 42 })
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Component - Static Render Props'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestComponentStaticRenderProps(props) {
+            return [
+                h('h3', null, 'Component - Static Render Props'),
+                h('p', null, propValue)
+            ]
+        }
 
         // Render to body
         render(element, document.body)

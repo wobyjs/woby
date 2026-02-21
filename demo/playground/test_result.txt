@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium-direct] › test.playground\test.playwright\TestCleanupInner.spec.tsx:21:1 › Cleanup - Inner component (587ms)
+
+  1 passed (12.4s)
