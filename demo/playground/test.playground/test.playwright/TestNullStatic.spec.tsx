@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestNullStatic: import('woby').Observable<any>
+        // No observable exposed to window in this test
     }
 }
 
@@ -26,13 +26,12 @@ test('Null - Static component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestNullStatic.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestNullStatic.tsx
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Null - Static'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', null, null)
         )
 
         // Render to body
@@ -41,11 +40,11 @@ test('Null - Static component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestNullStatic.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestNullStatic.tsx
+    await expect(innerHTML).toBe('')
 })
 

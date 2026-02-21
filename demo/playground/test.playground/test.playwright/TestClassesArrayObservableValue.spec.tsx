@@ -24,7 +24,7 @@ test('Classes - Array Observable Value component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Component logic from TestClassesArrayObservableValue.tsx
         const o = $('red')
@@ -33,7 +33,7 @@ test('Classes - Array Observable Value component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'Classes - Array Observable Value'),
-            h('p', { class: [o] } as any, () => o())
+            h('p', { class: [o] } as any, o)
         )
 
         // Render to body

@@ -26,13 +26,15 @@ test('Style - Observable component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestStyleObservable.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestStyleObservable.tsx
+        const o = $('green')
+        window.testTestStyleObservable = o
+        const toggle = () => o(prev => (prev === 'green') ? 'orange' : 'green')
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Style - Observable'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', { style: { color: $$(o) } }, 'content')
         )
 
         // Render to body
@@ -41,11 +43,13 @@ test('Style - Observable component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestStyleObservable.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestStyleObservable.tsx
+    const style = await paragraph.evaluate(el => el.style.cssText)
+    await expect(style).toContain('color: green')
+    await expect(innerHTML).toBe('content')
 })
 

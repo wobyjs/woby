@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestErrorBoundaryChildrenFunction: import('woby').Observable<any>
+        testTestErrorBoundaryChildrenFunction: import('woby').Observable<string>
     }
 }
 
@@ -26,14 +26,21 @@ test('Error Boundary - Children Function component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestErrorBoundaryChildrenFunction.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestErrorBoundaryChildrenFunction.tsx
+        const element = h(TestErrorBoundaryChildrenFunction, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Error Boundary - Children Function'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestErrorBoundaryChildrenFunction() {
+            const childrenValue = 'test-value'
+            const childrenObservable = $(childrenValue)
+            const Children = () => h('p', null, 'Children: ', childrenValue)
+            const Fallback = () => h('p', null, 'Fallback!')
+            return [
+                h('h3', null, 'Error Boundary - Children Function'),
+                h(ErrorBoundary, { fallback: h(Fallback, null) },
+                    h(Children, null)
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,7 +48,7 @@ test('Error Boundary - Children Function component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

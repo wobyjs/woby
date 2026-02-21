@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestRefUntrack: import('woby').Observable<any>
+        testTestRefUntrack: import('woby').Observable<number>
     }
 }
 
@@ -26,13 +26,21 @@ test('Ref - Untrack component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestRefUntrack.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestRefUntrack.tsx
+        const o = $(0)
+        const increment = () => o(prev => prev + 1)
+        
+        const Reffed = () => {
+            const ref = element => {
+                if (element) element.textContent = o()
+            }
+            return h('p', { ref: ref }, 'content')
+        }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Ref - Untrack'),
-            h('p', null, 'TODO: Implement based on source')
+            Reffed
         )
 
         // Render to body
@@ -41,11 +49,11 @@ test('Ref - Untrack component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestRefUntrack.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestRefUntrack.tsx
+    await expect(innerHTML).toBe('0')
 })
 

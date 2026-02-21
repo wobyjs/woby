@@ -24,7 +24,7 @@ test('Class - Function String component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Create component logic based on TestClassFunctionString.tsx
         // Dynamic component with function string class
@@ -36,7 +36,7 @@ test('Class - Function String component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Class - Function String'),
-            h('p', { class: () => o() }, 'content')
+            h('p', { class: () => $$(o) } as any, 'content')
         )
 
         // Render to body

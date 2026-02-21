@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestForUnkeyedObservables: import('woby').Observable<any>
+        testTestForUnkeyedObservables: import('woby').Observable<import('woby').Observable<number>[]>
     }
 }
 

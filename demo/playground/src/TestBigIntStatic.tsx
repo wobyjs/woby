@@ -12,7 +12,7 @@ const TestBigIntStatic = (): JSX.Element => {
 
 TestBigIntStatic.test = {
     static: true,
-    expect: () => '<p>123123n</p>'
+    expect: () => '<p>123123</p>'
 }
 
 

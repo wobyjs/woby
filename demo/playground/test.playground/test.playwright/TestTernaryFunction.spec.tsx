@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestTernaryFunction: import('woby').Observable<any>
+        testTestTernaryFunction: import('woby').Observable<boolean>
     }
 }
 
@@ -24,7 +24,7 @@ test('Ternary - Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render, Ternary } = woby
+        const { $, $$, h, render, Ternary } = woby
 
         // Create the component logic based on source
         const o = $(true)
@@ -34,7 +34,7 @@ test('Ternary - Function component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Ternary - Function'),
-            h(Ternary, { when: () => !o() } as any, h('p', null, 'true'), h('p', null, 'false'))
+            h(Ternary, { when: () => !$$(o) } as any, h('p', null, 'true'), h('p', null, 'false'))
         )
 
         // Render to body

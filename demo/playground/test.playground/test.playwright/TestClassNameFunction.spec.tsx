@@ -24,7 +24,7 @@ test('ClassName - Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Create component logic based on TestClassNameFunction.tsx
         // Dynamic component with function class name
@@ -36,7 +36,7 @@ test('ClassName - Function component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'ClassName - Function'),
-            h('p', { class: () => o() }, 'content')
+            h('p', { class: () => $$(o) } as any, 'content')
         )
 
         // Render to body

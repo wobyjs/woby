@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestDynamicStoreProps: import('woby').Observable<any>
+        testTestDynamicStoreProps: import('woby').Observable<{ class: string }>
     }
 }
 
@@ -41,7 +41,7 @@ test('Dynamic - Store Props component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

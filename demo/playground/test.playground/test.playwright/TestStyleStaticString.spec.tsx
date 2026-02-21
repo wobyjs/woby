@@ -26,13 +26,13 @@ test('Style - Static String component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestStyleStaticString.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestStyleStaticString.tsx
+        const styles = 'flex-grow: 1; height: 50px;'
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Style - Static String'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', { style: styles }, 'content')
         )
 
         // Render to body
@@ -41,11 +41,14 @@ test('Style - Static String component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestStyleStaticString.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestStyleStaticString.tsx
+    const style = await paragraph.evaluate(el => el.style.cssText)
+    await expect(style).toContain('flex-grow: 1')
+    await expect(style).toContain('height: 50px')
+    await expect(innerHTML).toBe('content')
 })
 

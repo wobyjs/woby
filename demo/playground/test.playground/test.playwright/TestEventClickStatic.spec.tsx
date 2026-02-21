@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestEventClickStatic: import('woby').Observable<any>
+        testTestEventClickStatic: import('woby').Observable<number>
     }
 }
 
@@ -36,13 +36,7 @@ test('Event - Click Static component', async ({ page }) => {
 
         const increment = () => o(prev => prev + 1)
 
-        // Set up interval to programmatically click the button
-        setInterval(() => {
-            const button = ref()
-            if (button) {
-                button.click()
-            }
-        }, 100)  // Using 100ms interval instead of TEST_INTERVAL
+
 
         // Create the component element using h() function
         const element = h('div', null,
@@ -67,10 +61,15 @@ test('Event - Click Static component', async ({ page }) => {
     let innerHTML = await paragraph.evaluate(el => el.innerHTML)
     await expect(innerHTML).toBe('<button>0</button>')
 
-    // Wait for increment to occur
-    await page.waitForTimeout(150)
+    // Actually click the button
+    await page.click('button')
+    await page.waitForTimeout(50)
     innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // The button should have been clicked, so value should be incremented
-    // Since the interval keeps running, the value might be 1 or higher
-    expect(innerHTML).toMatch(/<button>[1-9]\d*<\/button>/)
+    await expect(innerHTML).toBe('<button>1</button>')
+
+    // Trigger another click
+    await page.click('button')
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    await expect(innerHTML).toBe('<button>2</button>')
 })

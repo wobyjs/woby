@@ -24,7 +24,7 @@ test('Attribute - Observable Boolean component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Component logic from TestAttributeObservableBoolean.tsx
         const o = $(false)
@@ -32,7 +32,7 @@ test('Attribute - Observable Boolean component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'Attribute - Observable Boolean'),
-            h('p', { 'data-red': () => String(o()) }, 'content')
+            h('p', { 'data-red': $$(o) } as any, 'content')
         )
 
         // Render to body

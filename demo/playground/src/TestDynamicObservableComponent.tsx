@@ -26,7 +26,7 @@ TestDynamicObservableComponent.test = {
     compareActualValues: true,
     expect: () => {
         const level = $$(testObservables['TestDynamicObservableComponent'])
-        return `<h${level}>Level: ${level}</h${level}>`
+        return `<h${level}>Level: ${$$(level)}</h${level}>`
     }
 }
 

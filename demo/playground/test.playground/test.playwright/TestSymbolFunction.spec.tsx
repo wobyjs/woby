@@ -24,7 +24,7 @@ test('Symbol - Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Component logic extracted from source file
         // Dynamic content - uses useInterval to cycle through Symbol values
@@ -37,7 +37,7 @@ test('Symbol - Function component', async ({ page }) => {
         // Create the component element using h() function - dynamic content
         const element = h('div', null,
             h('h3', null, 'Symbol - Function'),
-            h('p', null, () => o())
+            h('p', null, o)
         )
 
         // Render to body

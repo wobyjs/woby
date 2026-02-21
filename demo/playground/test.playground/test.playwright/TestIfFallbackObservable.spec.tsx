@@ -36,7 +36,7 @@ test('If - Fallback Observable component', async ({ page }) => {
         const randomize = () => o(String(random()))
 
         const Fallback = () => {
-            return h('p', null, `Fallback: ${o()}`)
+            return h('p', null, 'Fallback: ', o)
         }
 
         // Create the component element using h() function - dynamic content

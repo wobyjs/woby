@@ -1,5 +1,4 @@
-﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+﻿import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -14,7 +13,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestForFallbackStatic: import('woby').Observable<any>
+        testTestForFallbackStatic: import('woby').Observable<undefined>
     }
 }
 
@@ -51,7 +50,7 @@ test('For - Fallback Static component', async ({ page }) => {
     // For static test, verify initial state
     // Check that fallback content is rendered
     await page.waitForTimeout(50)
-    const container = page.locator('body')
+    const container = page.locator('div').first()
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
     await expect(innerHTML).toBe('<h3>For - Fallback Static</h3><div>Fallback!</div>')

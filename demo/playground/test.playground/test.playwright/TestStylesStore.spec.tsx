@@ -11,12 +11,7 @@ import type * as Woby from 'woby'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Augment window type for test observables
-declare global {
-    interface Window {
-        testTestStylesStore: import('woby').Observable<any>
-    }
-}
+
 
 test('Styles - Store component', async ({ page }) => {
     const wobyScript = fs.readFileSync(path.join(__dirname, '../../../../dist/index.umd.js'), 'utf8')
@@ -26,13 +21,13 @@ test('Styles - Store component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestStylesStore.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestStylesStore.tsx
+        const styles = { color: 'orange', fontWeight: 'normal' }  // Static value
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Styles - Store'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', { style: styles }, 'content')
         )
 
         // Render to body
@@ -41,11 +36,14 @@ test('Styles - Store component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestStylesStore.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestStylesStore.tsx
+    const style = await paragraph.evaluate(el => el.style.cssText)
+    await expect(style).toContain('color: orange')
+    await expect(style).toContain('font-weight: normal')
+    await expect(innerHTML).toBe('content')
 })
 

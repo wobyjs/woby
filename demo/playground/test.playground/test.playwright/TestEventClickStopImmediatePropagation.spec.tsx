@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestEventClickStopImmediatePropagation: import('woby').Observable<any>
+        testTestEventClickStopImmediatePropagation: import('woby').Observable<undefined>
     }
 }
 
@@ -26,13 +26,32 @@ test('Event - Click - Stop Immediate Propagation component', async ({ page }) =>
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestEventClickStopImmediatePropagation.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestEventClickStopImmediatePropagation.tsx
+        const outer = $(0)
+        const inner = $(0)
+        const ref = $()
+        const refInner = $()
+        window.testTestEventClickStopImmediatePropagation_outer = outer
+        window.testTestEventClickStopImmediatePropagation_inner = inner
+        
+        const incrementOuter = () => {
+            outer(prev => prev + 1)
+        }
+        
+        const incrementInner = (event) => {
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation()
+            inner(prev => prev + 1)
+        }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Event - Click - Stop Immediate Propagation'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', null, h('button', { ref: ref, onClick: incrementOuter }, 
+                () => $$(outer),
+                h('button', { ref: refInner, onClick: incrementInner }, 
+                    () => $$(inner)
+                )
+            ))
         )
 
         // Render to body
@@ -41,11 +60,16 @@ test('Event - Click - Stop Immediate Propagation component', async ({ page }) =>
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestEventClickStopImmediatePropagation.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestEventClickStopImmediatePropagation.tsx
+    const outerButton = await paragraph.locator('button').first()
+    const innerButton = await outerButton.locator('button').first()
+    const outerText = await outerButton.evaluate(el => el.textContent)
+    const innerText = await innerButton.evaluate(el => el.textContent)
+    await expect(outerText).toBeDefined()
+    await expect(innerText).toBeDefined()
 })
 

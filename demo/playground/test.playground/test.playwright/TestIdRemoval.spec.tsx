@@ -26,14 +26,16 @@ test('ID - Removal component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestIdRemoval.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestIdRemoval.tsx
+        const element = h(TestIdRemoval, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'ID - Removal'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestIdRemoval() {
+            const o = $<string | null>(null)  // Start with null to test removal
+            return [
+                h('h3', null, 'ID - Removal'),
+                h('p', { id: o }, 'content')
+            ]
+        }
 
         // Render to body
         render(element, document.body)

@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestStylesRemoval: import('woby').Observable<any>
+        testTestStylesRemoval: import('woby').Observable<Record<string, string> | null>
     }
 }
 
@@ -26,13 +26,15 @@ test('Styles - Removal component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestStylesRemoval.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestStylesRemoval.tsx
+        const o = $({ color: 'orange', fontWeight: 'normal' })
+        window.testTestStylesRemoval = o
+        const toggle = () => o(prev => prev ? null : { color: 'orange', fontWeight: 'normal' })
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Styles - Removal'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', { style: () => $$(o) }, 'content')
         )
 
         // Render to body
@@ -45,7 +47,10 @@ test('Styles - Removal component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestStylesRemoval.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestStylesRemoval.tsx
+    const style = await paragraph.evaluate(el => el.style.cssText)
+    await expect(style).toContain('color: orange')
+    await expect(style).toContain('font-weight: normal')
+    await expect(innerHTML).toBe('content')
 })
 

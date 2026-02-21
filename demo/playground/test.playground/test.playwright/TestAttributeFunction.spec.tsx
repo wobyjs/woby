@@ -6,7 +6,7 @@ import fs from 'fs'
 import path from 'path'
 // @ts-ignore
 import { fileURLToPath } from 'url'
-import type * as Woby from 'woby'
+import { useEffect } from 'woby'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testAttributeFunction: import("woby").Observable<string>
+        testTestAttributeFunction: import("woby").Observable<string>
     }
 }
 
@@ -23,18 +23,21 @@ test('Attribute - Function component', async ({ page }) => {
     await page.addScriptTag({ content: wobyScript })
 
     await page.evaluate(() => {
-        const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, useEffect, h, render } = (window as any).woby
 
-        // Create the component logic based on source
+        // Component logic from TestAttributeFunction.tsx
         const o = $('red')
-        window.testAttributeFunction = o  // Make observable accessible globally
+        window.testTestAttributeFunction = o
         const toggle = () => o(prev => (prev === 'red') ? 'blue' : 'red')
 
-        // Create the component element using h() function with function attribute
+        useEffect(() => {
+            const interval = setInterval(toggle, 1000)
+            return () => clearInterval(interval)
+        }, [])
+
         const element = h('div', null,
             h('h3', null, 'Attribute - Function'),
-            h('p', { 'data-color': () => `dark${o()}` } as any, 'content')
+            h('p', { 'data-color': () => `dark${$$(o)}` } as any, 'content')
         )
 
         // Render to body
@@ -45,27 +48,17 @@ test('Attribute - Function component', async ({ page }) => {
     const paragraph = page.locator('p')
 
     // Initial state: should have data-color="darkred"
-    await page.waitForTimeout(50)
+    await page.waitForTimeout(1100)
     let attribute = await paragraph.getAttribute('data-color')
     await expect(attribute).toBe('darkred')
 
-    // Step 1: red -> blue
-    await page.evaluate(() => {
-        const o = window.testAttributeFunction
-        const toggle = () => o(prev => (prev === 'red') ? 'blue' : 'red')
-        toggle()
-    })
-    await page.waitForTimeout(50)
+    // Step 1: red -> blue (after 1 second)
+    await page.waitForTimeout(1100)
     attribute = await paragraph.getAttribute('data-color')
     await expect(attribute).toBe('darkblue')
 
-    // Step 2: blue -> red
-    await page.evaluate(() => {
-        const o = window.testAttributeFunction
-        const toggle = () => o(prev => (prev === 'red') ? 'blue' : 'red')
-        toggle()
-    })
-    await page.waitForTimeout(50)
+    // Step 2: blue -> red (after another second)
+    await page.waitForTimeout(1100)
     attribute = await paragraph.getAttribute('data-color')
     await expect(attribute).toBe('darkred')
 })

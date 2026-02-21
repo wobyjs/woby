@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestNestedIfs: import('woby').Observable<any>
+        // No observable exposed to window in this test
     }
 }
 
@@ -26,13 +26,17 @@ test('TestNestedIfs component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestNestedIfs.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestNestedIfs.tsx
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('h3', null, 'TestNestedIfs'),
-            h('p', null, 'TODO: Implement based on source')
+            h('woby-if', { when: true }, 
+                h('woby-if', { when: true },
+                    h('div', null, '1'),
+                    h('div', null, '2')
+                ),
+                h('div', null, 'Footer')
+            )
         )
 
         // Render to body
@@ -41,11 +45,13 @@ test('TestNestedIfs component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestNestedIfs.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestNestedIfs.tsx
+    await expect(innerHTML).toContain('1')
+    await expect(innerHTML).toContain('2')
+    await expect(innerHTML).toContain('Footer')
 })
 

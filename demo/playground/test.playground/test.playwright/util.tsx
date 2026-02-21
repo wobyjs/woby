@@ -37,9 +37,9 @@ export const randomColor = (): string => {
 }
 
 // Global test observables registry
-export const testObservables: Record<string, Observable<any>> = {}
+export const testObservables: Record<string, Observable<unknown>> = {}
 
-export const registerTestObservable = (name: string, observable: Observable<any>) => {
+export const registerTestObservable = (name: string, observable: Observable<unknown>) => {
     testObservables[name] = observable
 }
 

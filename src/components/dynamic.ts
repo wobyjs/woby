@@ -9,15 +9,12 @@ import { isFunction } from '../utils/lang'
 import type { Child, Component, FunctionMaybe } from '../types'
 
 /* MAIN */
-
 const Dynamic = <P = {}>({ component, props, children }: { component: Component<P>, props?: FunctionMaybe<P | null>, children?: Child }): Child => {
-
     if (isFunction(component) || isFunction(props)) {
 
         return useMemo(() => {
 
-            return resolve(createElement<P>($$(component, false), $$(props), children))
-
+            return resolve(createElement<P>($$(component), $$(props), children))
         })
 
     } else {

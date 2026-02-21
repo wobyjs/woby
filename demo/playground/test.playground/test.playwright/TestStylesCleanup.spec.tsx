@@ -11,12 +11,7 @@ import type * as Woby from 'woby'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Augment window type for test observables
-declare global {
-    interface Window {
-        testTestStylesCleanup: import('woby').Observable<any>
-    }
-}
+
 
 test('Styles - Observable Cleanup component', async ({ page }) => {
     const wobyScript = fs.readFileSync(path.join(__dirname, '../../../../dist/index.umd.js'), 'utf8')
@@ -26,13 +21,13 @@ test('Styles - Observable Cleanup component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestStylesCleanup.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestStylesCleanup.tsx
+        const styles = { color: 'orange', fontWeight: 'bold' }  // Static value
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Styles - Observable Cleanup'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', { style: styles }, 'content')
         )
 
         // Render to body
@@ -41,11 +36,14 @@ test('Styles - Observable Cleanup component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestStylesCleanup.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestStylesCleanup.tsx
+    const style = await paragraph.evaluate(el => el.style.cssText)
+    await expect(style).toContain('color: orange')
+    await expect(style).toContain('font-weight: bold')
+    await expect(innerHTML).toBe('content')
 })
 

@@ -24,7 +24,7 @@ test('Class - Function Boolean component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Create the component logic based on source
         const o = $(true)
@@ -34,7 +34,7 @@ test('Class - Function Boolean component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Class - Function Boolean'),
-            h('p', { class: { red: () => o() } }, 'content')
+            h('p', { class: { red: () => $$(o) } } as any, 'content')
         )
 
         // Render to body

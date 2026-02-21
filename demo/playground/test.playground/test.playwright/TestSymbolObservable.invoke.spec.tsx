@@ -11,7 +11,7 @@ import type * as Woby from 'woby'
 // Augment window type for test observables
 declare global {
     interface Window {
-        testSymbolObservableInvoke: import('woby').Observable<any>
+        testSymbolObservableInvoke: import('woby').Observable<symbol>
     }
 }
 

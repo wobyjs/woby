@@ -24,7 +24,7 @@ test('Classes - Array Function Value component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Component logic from TestClassesArrayFunctionValue.tsx
         const o = $('red')
@@ -33,7 +33,7 @@ test('Classes - Array Function Value component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'Classes - Array Function Value'),
-            h('p', { class: [() => o()] } as any, 'content')
+            h('p', { class: [() => $$(o)] } as any, 'content')
         )
 
         // Render to body

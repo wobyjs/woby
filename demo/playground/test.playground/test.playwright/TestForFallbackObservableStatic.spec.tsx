@@ -54,7 +54,7 @@ test('For - Fallback Observable Static component', async ({ page }) => {
     // For static test, verify initial state
     // Check that fallback content is rendered
     await page.waitForTimeout(50)
-    const container = page.locator('body')
+    const container = page.locator('div')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
     await expect(innerHTML).toBe('<h3>For - Fallback Observable Static</h3><p>Fallback: 0.5</p>')

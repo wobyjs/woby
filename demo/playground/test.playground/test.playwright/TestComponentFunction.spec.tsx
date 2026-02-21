@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        // No observable exposed to window in this test (TODO implementation)
+        testTestComponentFunction: import('woby').Observable<undefined>
     }
 }
 
@@ -26,13 +26,16 @@ test('Component - Function component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestComponentFunction.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestComponentFunction.tsx
+        const getRandom = (): number => Math.random()
+        const o = $(getRandom())
+        window.testTestComponentFunction = o
+        const randomize = () => o(getRandom())
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Component - Function'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', null, () => $$(o))
         )
 
         // Render to body
@@ -45,7 +48,7 @@ test('Component - Function component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestComponentFunction.tsx
+    // Add proper expectations based on TestComponentFunction.tsx
     await expect(innerHTML).not.toBe('')
 })
 

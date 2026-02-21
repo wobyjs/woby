@@ -26,14 +26,15 @@ test('HTML - dangerouslySetInnerHTML - Static component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestHTMLDangerouslySetInnerHTMLStatic.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestHTMLDangerouslySetInnerHTMLStatic.tsx
+        const element = h(TestHTMLDangerouslySetInnerHTMLStatic, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'HTML - dangerouslySetInnerHTML - Static'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestHTMLDangerouslySetInnerHTMLStatic() {
+            return [
+                h('h3', null, 'HTML - dangerouslySetInnerHTML - Static'),
+                h('p', { dangerouslySetInnerHTML: { __html: '<i>danger</i>' } }, null)
+            ]
+        }
 
         // Render to body
         render(element, document.body)

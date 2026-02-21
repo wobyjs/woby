@@ -46,7 +46,7 @@ test('Ternary - Children Function component', async ({ page }) => {
                 true1 = true
             }
             o()
-            return h('p', null, `True: ${trueValue()}`)
+            return h('p', null, 'True: ', trueValue)
         }
 
         let false1 = false
@@ -58,7 +58,7 @@ test('Ternary - Children Function component', async ({ page }) => {
                 false1 = true
             }
             o()
-            return h('p', null, `False: ${falseValue()}`)
+            return h('p', null, 'False: ', falseValue)
         }
 
         // Create the component element using h() function - dynamic content

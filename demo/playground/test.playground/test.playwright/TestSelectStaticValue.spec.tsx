@@ -26,14 +26,20 @@ test('Select - Static Value component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestSelectStaticValue.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestSelectStaticValue.tsx
+        const element = h(TestSelectStaticValue, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Select - Static Value'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestSelectStaticValue() {
+            return [
+                h('h3', null, 'Select - Static Value'),
+                h('select', { name: 'select-static-value', value: 'bar' },
+                    h('option', { value: 'foo' }, 'foo'),
+                    h('option', { value: 'bar' }, 'bar'),
+                    h('option', { value: 'baz' }, 'baz'),
+                    h('option', { value: 'qux' }, 'qux')
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,7 +47,7 @@ test('Select - Static Value component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

@@ -26,7 +26,7 @@ test('Custom Element Slots Functionality', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, defaults, customElement, h, render } = woby
+        const { $, $$, defaults, customElement, h, render } = woby
 
         // Create slot element component
         const SlotElement = defaults(() => ({
@@ -36,7 +36,7 @@ test('Custom Element Slots Functionality', async ({ page }) => {
             return h('div', {
                 'style': { 'border': '2px solid purple', 'padding': '15px', 'margin': '10px' }
             } as any,
-                h('h3', null, () => title()),
+                h('h3', null, () => $$(title)),
                 h('div', {
                     'style': { 'backgroundColor': '#f0f0f0', 'padding': '10px', 'margin': '5px 0' }
                 } as any,

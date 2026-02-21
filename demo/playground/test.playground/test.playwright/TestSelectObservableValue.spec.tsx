@@ -26,14 +26,22 @@ test('Select - Observable Value component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestSelectObservableValue.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestSelectObservableValue.tsx
+        const element = h(TestSelectObservableValue, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Select - Observable Value'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestSelectObservableValue() {
+            const value = $('bar')
+            // Note: For static test, we don't use interval
+            return [
+                h('h3', null, 'Select - Observable Value'),
+                h('select', { name: 'select-observable-value', value: value },
+                    h('option', { value: 'foo' }, 'foo'),
+                    h('option', { value: 'bar' }, 'bar'),
+                    h('option', { value: 'baz' }, 'baz'),
+                    h('option', { value: 'qux' }, 'qux')
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,7 +49,7 @@ test('Select - Observable Value component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

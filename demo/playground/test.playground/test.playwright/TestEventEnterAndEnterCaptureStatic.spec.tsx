@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestEventEnterAndEnterCaptureStatic: import('woby').Observable<any>
+        testTestEventEnterAndEnterCaptureStatic: import('woby').Observable<number>
     }
 }
 
@@ -26,26 +26,41 @@ test('Event - Enter & Enter Capture Static component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestEventEnterAndEnterCaptureStatic.tsx
-        // Extract the actual component logic from the source file
+        // Component logic extracted from source file
+        const o = $(0)
+        const ref = $(null)
+        window.testTestEventEnterAndEnterCaptureStatic = o  // Expose observable for testing
+        const increment = () => o(prev => prev + 1)
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Event - Enter & Enter Capture Static'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', null,
+                h('button', {
+                    ref,
+                    onPointerEnter: increment,
+                    onPointerEnterCapture: increment
+                } as any, o)
+            )
         )
 
         // Render to body
         render(element, document.body)
     })
 
-    // Step-by-step verification
+    // Step-by-step verification for dynamic content
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestEventEnterAndEnterCaptureStatic.tsx
-    await expect(innerHTML).not.toBe('')
+    let innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    await expect(innerHTML).toBe('<button>0</button>')
+
+    // Trigger pointerenter event
+    await page.hover('button')
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    // Both onPointerEnter and onPointerEnterCapture should increment, so value should be 2
+    await expect(innerHTML).toBe('<button>2</button>')
 })
 

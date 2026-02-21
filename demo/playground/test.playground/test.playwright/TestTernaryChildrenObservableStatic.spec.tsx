@@ -25,7 +25,7 @@ test('Ternary - Children Observable Static component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, $$, h, render, Ternary } = woby
+        const { $, h, render, Ternary, useInterval } = woby
 
         // Component logic extracted from source file
         // Dynamic content - uses useInterval to cycle through random values
@@ -42,7 +42,7 @@ test('Ternary - Children Observable Static component', async ({ page }) => {
             const randomize = () => o(String(random()))
             useInterval(randomize, 100)  // TEST_INTERVAL
             o()
-            return h('p', null, 'True: ', () => $$(trueValue))
+            return h('p', null, 'True: ', trueValue)
         }
 
         const False = () => {
@@ -50,7 +50,7 @@ test('Ternary - Children Observable Static component', async ({ page }) => {
             const randomize = () => o(String(random()))
             useInterval(randomize, 100)  // TEST_INTERVAL
             o()
-            return h('p', null, 'False: ', () => $$(falseValue))
+            return h('p', null, 'False: ', falseValue)
         }
 
         // Create the component element using h() function - dynamic content

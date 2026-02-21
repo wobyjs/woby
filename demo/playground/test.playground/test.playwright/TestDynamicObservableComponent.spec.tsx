@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestDynamicObservableComponent: import('woby').Observable<any>
+        testTestDynamicObservableComponent: import('woby').Observable<number>
     }
 }
 
@@ -26,13 +26,18 @@ test('Dynamic - Observable Component component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestDynamicObservableComponent.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestDynamicObservableComponent.tsx
+        const level = $(1)
+        window.testTestDynamicObservableComponent = level
+        const component = useMemo(() => `h${level()}`)
+        const increment = () => {
+            level((level() + 1) % 7 || 1)
+        }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Dynamic - Observable Component'),
-            h('p', null, 'TODO: Implement based on source')
+            h('woby-dynamic', { component: component }, 'Level: ', () => $$(level))
         )
 
         // Render to body
@@ -41,11 +46,11 @@ test('Dynamic - Observable Component component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestDynamicObservableComponent.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestDynamicObservableComponent.tsx
+    await expect(innerHTML).toContain('Level: ')
 })
 

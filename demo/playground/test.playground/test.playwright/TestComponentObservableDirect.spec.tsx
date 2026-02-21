@@ -26,13 +26,16 @@ test('Component - Observable Direct component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestComponentObservableDirect.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestComponentObservableDirect.tsx
+        const getRandom = (): number => Math.random()
+        const o = $(getRandom())
+        window.testTestComponentObservableDirect = o
+        const randomize = () => o(getRandom())
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Component - Observable Direct'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', null, $$(o))
         )
 
         // Render to body
@@ -41,11 +44,11 @@ test('Component - Observable Direct component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestComponentObservableDirect.tsx
+    // Add proper expectations based on TestComponentObservableDirect.tsx
     await expect(innerHTML).not.toBe('')
 })
 

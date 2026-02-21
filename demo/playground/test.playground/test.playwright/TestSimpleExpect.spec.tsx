@@ -26,14 +26,16 @@ test('Simple Expect Test component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestSimpleExpect.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestSimpleExpect.tsx
+        const element = h(TestSimpleExpect, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Simple Expect Test'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestSimpleExpect() {
+            const value = $("Hello World")
+            return [
+                h('h3', null, 'Simple Expect Test'),
+                h('p', null, value)
+            ]
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,7 +43,7 @@ test('Simple Expect Test component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

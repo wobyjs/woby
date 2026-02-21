@@ -24,7 +24,7 @@ test('BigInt - Removal component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Component logic from TestBigIntRemoval.tsx
         const o = $<bigint | null>(null)
@@ -32,7 +32,7 @@ test('BigInt - Removal component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'BigInt - Removal'),
-            h('p', null, () => o() !== null ? `(${o()}n)` : '(<!---->)')
+            h('p', null, o)
         )
 
         // Render to body
@@ -42,10 +42,10 @@ test('BigInt - Removal component', async ({ page }) => {
     // Step-by-step verification
     const paragraph = page.locator('p')
 
-    // Initial state: should have empty content (null value shows as <!---->)
+    // Initial state: should have <!----> placeholder for null value
     await page.waitForTimeout(50)
     let innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('(&lt;!----&gt;)')
+    await expect(innerHTML).toBe('(<!---->)')
 
     // Step 1: change o to a BigInt value
     await page.evaluate(() => {
@@ -63,5 +63,5 @@ test('BigInt - Removal component', async ({ page }) => {
     })
     await page.waitForTimeout(50)
     innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('(&lt;!----&gt;)')
+    await expect(innerHTML).toBe('(<!---->)')
 })

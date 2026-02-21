@@ -26,14 +26,18 @@ test('String - Observable Deep Static component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestStringObservableDeepStatic.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestStringObservableDeepStatic.tsx
+        const element = h(TestStringObservableDeepStatic, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'String - Observable Deep Static'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestStringObservableDeepStatic() {
+            const initialValue = "0.123456"
+            const o = $(initialValue)
+            const Deep = () => [
+                h('h3', null, 'String - Observable Deep Static'),
+                h('p', null, initialValue)
+            ]
+            return h(Deep, null)
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,7 +45,7 @@ test('String - Observable Deep Static component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

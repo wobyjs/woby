@@ -11,12 +11,7 @@ import type * as Woby from 'woby'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Augment window type for test observables
-declare global {
-    interface Window {
-        testTestSuspenseCleanup: import('woby').Observable<any>
-    }
-}
+
 
 test('Suspense - Cleanup component', async ({ page }) => {
     const wobyScript = fs.readFileSync(path.join(__dirname, '../../../../dist/index.umd.js'), 'utf8')
@@ -26,13 +21,15 @@ test('Suspense - Cleanup component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestSuspenseCleanup.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestSuspenseCleanup.tsx
+        const ChildrenPlain = () => {
+            return h('p', null, 'Loaded!')
+        }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Suspense - Cleanup'),
-            h('p', null, 'TODO: Implement based on source')
+            h('woby-suspense', { fallback: h('p', null, 'Loading...') }, ChildrenPlain)
         )
 
         // Render to body
@@ -41,11 +38,11 @@ test('Suspense - Cleanup component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestSuspenseCleanup.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestSuspenseCleanup.tsx
+    await expect(innerHTML).toBe('Loaded!')
 })
 

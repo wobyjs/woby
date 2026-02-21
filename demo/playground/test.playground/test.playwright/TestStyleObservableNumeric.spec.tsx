@@ -26,13 +26,15 @@ test('Style - Observable Numeric component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestStyleObservableNumeric.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestStyleObservableNumeric.tsx
+        const o = $({ flexGrow: 1, width: 50 })
+        window.testTestStyleObservableNumeric = o
+        const toggle = () => o(prev => (prev.flexGrow === 1) ? { flexGrow: 2, width: 100 } : { flexGrow: 1, width: 50 })
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Style - Observable Numeric'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', { style: $$(o) }, 'content')
         )
 
         // Render to body
@@ -41,11 +43,14 @@ test('Style - Observable Numeric component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestStyleObservableNumeric.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestStyleObservableNumeric.tsx
+    const style = await paragraph.evaluate(el => el.style.cssText)
+    await expect(style).toContain('flex-grow: 1')
+    await expect(style).toContain('width: 50px')
+    await expect(innerHTML).toBe('content')
 })
 

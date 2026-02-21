@@ -26,14 +26,17 @@ test('KeepAlive - Static component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestKeepAliveStatic.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestKeepAliveStatic.tsx
+        const element = h(TestKeepAliveStatic, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'KeepAlive - Static'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestKeepAliveStatic() {
+            return [
+                h('h3', null, 'KeepAlive - Static'),
+                h(KeepAlive, { id: 'static' },
+                    h('p', null, '123')
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

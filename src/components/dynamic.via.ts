@@ -16,7 +16,7 @@ const Dynamic = <P = {}>({ component, props/* , children */ }: { component: Comp
 
         return useMemo(() => {
 
-            return resolve(createElement<P>($$(component, false), $$(props), /* children */))
+            return resolve(createElement<P>($$(component), $$(props), /* children */))
 
         })
 

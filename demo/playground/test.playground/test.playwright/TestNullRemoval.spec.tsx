@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestNullRemoval: import('woby').Observable<any>
+        testTestNullRemoval: import('woby').Observable<null>
     }
 }
 
@@ -24,7 +24,7 @@ test('Null - Removal component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, $$, h, render } = woby
+        const { $, h, render } = woby
 
         // Create the component logic based on source
         const o = $(null)  // Start with null to show <!----> placeholder
@@ -32,7 +32,7 @@ test('Null - Removal component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Null - Removal'),
-            h('p', null, '(', () => $$(o), ')')
+            h('p', null, '(', o, ')')
         )
 
         // Render to body

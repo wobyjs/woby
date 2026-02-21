@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestEventTargetCurrentTarget: import('woby').Observable<any>
+        testTestEventTargetCurrentTarget: import('woby').Observable<undefined>
     }
 }
 
@@ -26,14 +26,29 @@ test('Event - Target - Current Target component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestEventTargetCurrentTarget.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestEventTargetCurrentTarget.tsx
+        const element = h(TestEventTargetCurrentTarget, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Event - Target - Current Target'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestEventTargetCurrentTarget() {
+            const divClicks = $(3) // Static value for static test
+            const ulClicks = $(2) // Static value for static test
+            const liClicks = $(1) // Static value for static test
+            
+            return [
+                h('h3', null, 'Event - Target - Current Target'),
+                h('div', null,
+                    h('p', null, 'paragraph'),
+                    h('ul', null,
+                        h('li', null, 'one'),
+                        h('li', null, 'two'),
+                        h('li', null, 'three')
+                    )
+                ),
+                h('p', null, 'Div clicks: ', divClicks),
+                h('p', null, 'UL clicks: ', ulClicks),
+                h('p', null, 'LI clicks: ', liClicks)
+            ]
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,7 +56,7 @@ test('Event - Target - Current Target component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestSuspenseFallbackFunction: import('woby').Observable<any>
+        testTestSuspenseFallbackFunction: import('woby').Observable<string>
     }
 }
 
@@ -41,7 +41,7 @@ test('Suspense - Fallback Function component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

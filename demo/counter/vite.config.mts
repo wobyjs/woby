@@ -11,13 +11,13 @@ const config = defineConfig({
     resolve: {
         alias: isDev ? {
             '~': path.resolve('../../src'),
-            'woby/jsx-runtime': path.resolve('../../../woby/src/jsx/runtime'),
-            'woby': path.resolve('../../../woby/src')
+            'woby/jsx-runtime': path.resolve('../../src/jsx/runtime'),
+            'woby': path.resolve('../../src')
         } : {
             '~': path.resolve('../../src'),
             // In build mode, resolve to the actual package
-            'woby/jsx-runtime': path.resolve('../../../woby/src/jsx/runtime'),
-            'woby': path.resolve('../../../woby/src')
+            'woby/jsx-runtime': path.resolve('../../src/jsx/runtime'),
+            'woby': path.resolve('../../src')
         }
     }
 })

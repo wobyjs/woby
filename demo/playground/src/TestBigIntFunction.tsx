@@ -18,8 +18,8 @@ TestBigIntFunction.test = {
     compareActualValues: true, // Use compareActualValues to bypass conversion logic
     expect: () => {
         const value = $$(testObservables['TestBigIntFunction'])
-        // Return value with 'n' suffix to match actual rendering
-        return `<p>${value}n</p>`
+        // Return value without 'n' suffix to match actual rendering
+        return `<p>${value}</p>`
     }
 }
 

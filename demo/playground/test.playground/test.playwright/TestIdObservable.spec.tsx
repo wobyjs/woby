@@ -26,14 +26,17 @@ test('ID - Observable component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestIdObservable.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestIdObservable.tsx
+        const element = h(TestIdObservable, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'ID - Observable'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestIdObservable() {
+            const o = $('foo')
+            // Note: For static test, we don't use interval
+            return [
+                h('h3', null, 'ID - Observable'),
+                h('p', { id: o }, 'content')
+            ]
+        }
 
         // Render to body
         render(element, document.body)

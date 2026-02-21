@@ -26,14 +26,15 @@ test('HTML - textContent - Static component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestHTMLTextContentStatic.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestHTMLTextContentStatic.tsx
+        const element = h(TestHTMLTextContentStatic, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'HTML - textContent - Static'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestHTMLTextContentStatic() {
+            return [
+                h('h3', null, 'HTML - textContent - Static'),
+                h('p', { textContent: '<b>danger</b>' }, null)
+            ]
+        }
 
         // Render to body
         render(element, document.body)

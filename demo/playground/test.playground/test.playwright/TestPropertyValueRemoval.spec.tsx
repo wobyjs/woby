@@ -11,12 +11,7 @@ import type * as Woby from 'woby'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Augment window type for test observables
-declare global {
-    interface Window {
-        testTestPropertyValueRemoval: import('woby').Observable<any>
-    }
-}
+
 
 test('Property - Value Removal component', async ({ page }) => {
     const wobyScript = fs.readFileSync(path.join(__dirname, '../../../../dist/index.umd.js'), 'utf8')
@@ -26,14 +21,16 @@ test('Property - Value Removal component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestPropertyValueRemoval.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestPropertyValueRemoval.tsx
+        // Static value for static test - set to a defined value
+        const element = h(TestPropertyValueRemoval, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Property - Value Removal'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestPropertyValueRemoval() {
+            return [
+                h('h3', null, 'Property - Value Removal'),
+                h('p', null, h('input', { value: 'test-value' }))
+            ]
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,10 +38,12 @@ test('Property - Value Removal component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestPropertyValueRemoval.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestPropertyValueRemoval.tsx
+    const input = await paragraph.locator('input').first()
+    const value = await input.evaluate(el => el.value)
+    await expect(value).toBe('test-value')
 })

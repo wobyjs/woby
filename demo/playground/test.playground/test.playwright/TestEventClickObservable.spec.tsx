@@ -24,7 +24,7 @@ test('Event - Click Observable component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Component logic extracted from source file
         // Dynamic content - with intervals or observables
@@ -43,7 +43,7 @@ test('Event - Click Observable component', async ({ page }) => {
                 h('button', {
                     ref,
                     onClick: increment
-                } as any, () => o())
+                } as any, () => $$(o))
             )
         )
 

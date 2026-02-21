@@ -18,7 +18,7 @@ test('Custom Element Context Functionality', async ({ page }) => {
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
         // Fix: destructure defaults and customElement which were missing
-        const { $, createContext, useMountedContext, defaults, customElement, h, render } = woby
+        const { $, $$, createContext, useMountedContext, defaults, customElement, h, render } = woby
 
         // Create contexts
         const ThemeContext = createContext('light')
@@ -43,14 +43,14 @@ test('Custom Element Context Functionality', async ({ page }) => {
                     'padding': '10px',
                     'margin': '5px',
                     'border': '1px solid #ccc',
-                    'background-color': () => theme() === 'dark' ? '#333' : '#fff',
-                    'color': () => theme() === 'dark' ? '#fff' : '#000'
+                    'background-color': () => $$(theme) === 'dark' ? '#333' : '#fff',
+                    'color': () => $$(theme) === 'dark' ? '#fff' : '#000'
                 }
             } as any,
-                h('strong', null, () => label()),
-                h('p', null, () => `Theme: ${theme()}`),
-                h('p', null, () => `Counter: ${counter()}`),
-                h('p', null, () => `Nested: ${nested()}`),
+                h('strong', null, () => $$(label)),
+                h('p', null, () => `Theme: ${$$(theme)}`),
+                h('p', null, () => `Counter: ${$$(counter)}`),
+                h('p', null, () => `Nested: ${$$(nested)}`),
                 // mounts must be in rendered output for traversal to work
                 themeMount,
                 counterMount,
@@ -63,13 +63,13 @@ test('Custom Element Context Functionality', async ({ page }) => {
             theme: $('light'),
             counter: $(0)
         }), ({ theme, counter, children }) => {
-            return h(ThemeContext.Provider, { value: theme() } as any,
-                h(CounterContext.Provider, { value: counter() } as any,
+            return h(ThemeContext.Provider, { value: $$(theme) } as any,
+                h(CounterContext.Provider, { value: $$(counter) } as any,
                     h(NestedContext.Provider, { value: 'custom-provider' } as any,
                         h('div', {
                             'style': { 'padding': '15px', 'border': '2px solid blue', 'margin': '10px' }
                         } as any,
-                            h('h3', null, () => `Context Provider (Theme: ${theme()}, Counter: ${counter()})`),
+                            h('h3', null, () => `Context Provider (Theme: ${$$(theme)}, Counter: ${$$(counter)})`),
                             children
                         )
                     )
@@ -89,8 +89,8 @@ test('Custom Element Context Functionality', async ({ page }) => {
                 h('div', {
                     'style': { 'padding': '15px', 'border': '2px solid green', 'margin': '10px' }
                 } as any,
-                    h('h3', null, () => title()),
-                    h('p', null, () => `Internal Count: ${count()}`),
+                    h('h3', null, () => $$(title)),
+                    h('p', null, () => `Internal Count: ${$$(count)}`),
                     h('button', { onclick: increment }, 'Increment'),
                     children
                 )

@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestDynamicObservableProps: import('woby').Observable<any>
+        testTestDynamicObservableProps: import('woby').Observable<{ class: string }>
     }
 }
 
@@ -26,13 +26,19 @@ test('Dynamic - Observable Props component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestDynamicObservableProps.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestDynamicObservableProps.tsx
+        const red = { class: 'red' }
+        const blue = { class: 'blue' }
+        const props = $(red)
+        window.testTestDynamicObservableProps = props
+        const toggle = () => {
+            props(prev => prev === red ? blue : red)
+        }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Dynamic - Observable Props'),
-            h('p', null, 'TODO: Implement based on source')
+            h('woby-dynamic', { component: 'h5', props: $$(props) }, 'Content')
         )
 
         // Render to body
@@ -41,11 +47,15 @@ test('Dynamic - Observable Props component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestDynamicObservableProps.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestDynamicObservableProps.tsx
+    const h5 = await paragraph.locator('h5').first()
+    const className = await h5.evaluate(el => el.className)
+    await expect(className).toBe('red')
+    const textContent = await h5.evaluate(el => el.textContent)
+    await expect(textContent).toBe('Content')
 })
 

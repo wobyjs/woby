@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestComponentStaticProps: import('woby').Observable<any>
+        testTestComponentStaticProps: import('woby').Observable<number>
     }
 }
 
@@ -26,14 +26,15 @@ test('Component - Static Props component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestComponentStaticProps.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestComponentStaticProps.tsx
+        const element = h(TestComponentStaticProps, { value: 42 })
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Component - Static Props'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestComponentStaticProps(props) {
+            return [
+                h('h3', null, 'Component - Static Props'),
+                h('p', null, props.value)
+            ]
+        }
 
         // Render to body
         render(element, document.body)
@@ -41,7 +42,7 @@ test('Component - Static Props component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

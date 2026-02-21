@@ -24,7 +24,7 @@ test('If - Function Untracked Narrowed component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render, If } = woby
+        const { $, $$, h, render, If } = woby
 
         // Component logic extracted from source file
         // Dynamic content - uses useInterval to cycle through values 0,1,2
@@ -39,7 +39,7 @@ test('If - Function Untracked Narrowed component', async ({ page }) => {
         const element = h('div', null,
             h('h3', null, 'If - Function Untracked Narrowed'),
             h('p', null, '(',
-                h(If, { when: o, children: (value: any) => content().toString() } as any),
+                h(If, { when: o, children: (value: any) => $$(content).toString() } as any),
                 ')'
             )
         )

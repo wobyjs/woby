@@ -24,7 +24,7 @@ test('Classes - Object Function Multiple component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Create the component logic based on source
         const o = $({ 'red bold': true, blue: false })
@@ -34,7 +34,7 @@ test('Classes - Object Function Multiple component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Classes - Object Function Multiple'),
-            h('p', { class: () => o() }, 'content')
+            h('p', { class: () => $$(o) } as any, 'content')
         )
 
         // Render to body

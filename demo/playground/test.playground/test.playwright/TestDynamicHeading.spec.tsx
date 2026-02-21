@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestDynamicHeading: import('woby').Observable<any>
+        testTestDynamicHeading: import('woby').Observable<1 | 2 | 3 | 4 | 5 | 6>
     }
 }
 
@@ -30,11 +30,11 @@ test('Dynamic - Heading component', async ({ page }) => {
         // Dynamic content - uses manual increment to cycle through heading levels
         // [Implementation based on source file: TestDynamicHeading.tsx]
 
-        const level = $(1)
-        window.testTestDynamicHeading = level  // Make observable accessible globally
+        const level = $(1 as 1 | 2 | 3 | 4 | 5 | 6)
+        window.testTestDynamicHeading = level as import("woby").Observable<1 | 2 | 3 | 4 | 5 | 6>  // Make observable accessible globally
         const increment = () => {
             const nextLevel = (level() + 1) % 7 || 1
-            level(nextLevel)
+            level(nextLevel as 1 | 2 | 3 | 4 | 5 | 6)
         }
 
         // Create the component element using h() function - dynamic content

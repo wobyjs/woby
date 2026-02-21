@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestErrorBoundary: import('woby').Observable<any>
+        // No observable exposed to window in this test
     }
 }
 
@@ -26,13 +26,20 @@ test('Error Boundary component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestErrorBoundary.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestErrorBoundary.tsx
+        const Erroring = () => {
+            // Immediately throw error for predictable test
+            throw new Error('Custom error')
+        }
+        
+        const Fallback = ({ error }) => {
+            return h('p', null, 'Error caught: ', error.message)
+        }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Error Boundary'),
-            h('p', null, 'TODO: Implement based on source')
+            h('woby-error-boundary', { fallback: Fallback }, Erroring)
         )
 
         // Render to body
@@ -41,11 +48,11 @@ test('Error Boundary component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestErrorBoundary.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestErrorBoundary.tsx
+    await expect(innerHTML).toBe('Error caught: Custom error')
 })
 

@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestErrorBoundaryChildrenObservableStatic: import('woby').Observable<any>
+        testTestErrorBoundaryChildrenObservableStatic: import('woby').Observable<string>
     }
 }
 
@@ -26,13 +26,23 @@ test('Error Boundary - Children Observable Static component', async ({ page }) =
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestErrorBoundaryChildrenObservableStatic.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestErrorBoundaryChildrenObservableStatic.tsx
+        const childrenValue = String(Math.random())
+        const childrenObservable = $(childrenValue)
+        window.testTestErrorBoundaryChildrenObservableStatic = childrenObservable
+        
+        const Children = () => {
+            return h('p', null, 'Children: ', childrenValue)
+        }
+        
+        const Fallback = () => {
+            return h('p', null, 'Fallback!')
+        }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Error Boundary - Children Observable Static'),
-            h('p', null, 'TODO: Implement based on source')
+            h('woby-error-boundary', { fallback: Fallback }, Children)
         )
 
         // Render to body
@@ -41,11 +51,11 @@ test('Error Boundary - Children Observable Static component', async ({ page }) =
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestErrorBoundaryChildrenObservableStatic.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestErrorBoundaryChildrenObservableStatic.tsx
+    await expect(innerHTML).toContain('Children: ')
 })
 

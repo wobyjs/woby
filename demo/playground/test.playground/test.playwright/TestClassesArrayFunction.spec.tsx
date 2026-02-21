@@ -24,7 +24,7 @@ test('Classes - Array Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Create the component logic based on source
         const o = $(['red', false])
@@ -34,7 +34,7 @@ test('Classes - Array Function component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Classes - Array Function'),
-            h('p', { class: () => o().filter(v => v && v !== false).join(' ') }, 'content')
+            h('p', { class: () => $$(o).filter(Boolean).join(' ') } as any, 'content')
         )
 
         // Render to body

@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestRefsNested: import('woby').Observable<any>
+        testTestRefsNested: import('woby').Observable<string>
     }
 }
 
@@ -26,13 +26,27 @@ test('Refs - Nested component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestRefsNested.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestRefsNested.tsx
+        const ref1 = $()
+        const ref2 = $()
+        
+        const updateRefs = () => {
+            const element1 = ref1()
+            const element2 = ref2()
+            if (!element1 || !element2) return
+            const content1 = `Got ref1 - Has parent: ${!!element1.parentElement} - Is connected: ${!!element1.isConnected}`
+            const content2 = `Got ref2 - Has parent: ${!!element2.parentElement} - Is connected: ${!!element2.isConnected}`
+            element1.textContent = `${content1} / ${content2}`
+        }
+        
+        // Simulate the ref assignment
+        window.testTestRefsNested_ref1 = ref1
+        window.testTestRefsNested_ref2 = ref2
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Refs - Nested'),
-            h('p', null, 'TODO: Implement based on source')
+            h('p', { ref: [ref1, [null, [undefined, ref2]]] }, 'content')
         )
 
         // Render to body
@@ -41,11 +55,12 @@ test('Refs - Nested component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestRefsNested.tsx
-    await expect(innerHTML).not.toBe('')
+    // Add proper expectations based on TestRefsNested.tsx
+    await expect(innerHTML).toContain('Got ref1 - Has parent: true - Is connected: true')
+    await expect(innerHTML).toContain('Got ref2 - Has parent: true - Is connected: true')
 })
 

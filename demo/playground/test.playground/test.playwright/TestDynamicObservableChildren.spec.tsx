@@ -1,5 +1,4 @@
-﻿/** @jsxImportSource woby */
-import { test, expect } from '@playwright/test'
+﻿import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -14,7 +13,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestDynamicObservableChildren: import('woby').Observable<any>
+        testTestDynamicObservableChildren: import('woby').Observable<number>
     }
 }
 
@@ -26,26 +25,32 @@ test('Dynamic - Observable Children component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestDynamicObservableChildren.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestDynamicObservableChildren.tsx
+        const o = $(Math.random())
+        window.testTestDynamicObservableChildren = o
+        const update = () => o(Math.random())
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Dynamic - Observable Children'),
-            h('p', null, 'TODO: Implement based on source')
+            h('woby-dynamic', { component: 'h5' }, o)
         )
 
         // Render to body
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-    
-    // Initial state verification
+    // Wait for initial render
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestDynamicObservableChildren.tsx
-    await expect(innerHTML).not.toBe('')
+    
+    // Check for the h5 element that should be created by the Dynamic component
+    const h5 = page.locator('h5').first()
+    
+    // Verify that the h5 element has content (the random number)
+    const textContent = await h5.textContent()
+    await expect(textContent).not.toBe('')
+    
+    // Verify the content is numeric (since it's a random number)
+    await expect(parseFloat(textContent)).toBeGreaterThan(0)
 })
 
