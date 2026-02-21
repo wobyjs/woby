@@ -32,7 +32,7 @@ const TestContextDynamicContext = () => {
 
 TestContextDynamicContext.test = {
     static: true,
-    expect: () => '<context-provider value="context"><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p></context-provider>'
+    expect: () => '<p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p>'
 }
 
 

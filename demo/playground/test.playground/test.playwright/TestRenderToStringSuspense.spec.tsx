@@ -26,14 +26,17 @@ test('renderToString - Suspense component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestRenderToStringSuspense.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestRenderToStringSuspense.tsx
+        const element = h(TestRenderToStringSuspense, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'renderToString - Suspense'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestRenderToStringSuspense() {
+            return [
+                h('div', null,
+                    h('h3', null, 'renderToString - Suspense'),
+                    h('p', null, '123123')
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

@@ -11,12 +11,12 @@
         "test:woby": "npx playwright test test.playwright/woby-simple-umd-test.spec.ts --config=playwright.direct.config.ts"
     },
     "dependencies": {
-        "vite": "^4.4.11",
-        "woby": "file:../.."
+        "vite": "^4.5.14",
+        "woby": "workspace:../.."
     },
     "devDependencies": {
         "@playwright/experimental-ct-react": "^1.58.2",
         "@playwright/test": "^1.56.1",
-        "@types/node": "^24.10.0"
+        "@types/node": "^24.10.13"
     }
 }

@@ -8,12 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@types/node':
+        specifier: ^24.10.13
+        version: 24.10.13
       vite:
-        specifier: ^4.4.11
-        version: 4.5.14
+        specifier: ^4.5.14
+        version: 4.5.14(@types/node@24.10.13)
       woby:
-        specifier: workspace:../../../woby
-        version: link:../../../woby
+        specifier: workspace:*
+        version: link:../..
 
 packages:
 
@@ -149,6 +152,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@types/node@24.10.13':
+    resolution: {integrity: sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==}
+
   esbuild@0.18.20:
     resolution: {integrity: sha512-ceqxoedUrcayh7Y7ZX6NdbbDzGROiyVBgC4PriJThBKSVPWnnFHZAkfI1lJT8QFkOwH4qOS2SJkS4wvpGl8BpA==}
     engines: {node: '>=12'}
@@ -179,6 +185,9 @@ packages:
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
+
+  undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
   vite@4.5.14:
     resolution: {integrity: sha512-+v57oAaoYNnO3hIu5Z/tJRZjq5aHM2zDve9YZ8HngVHbhk66RStobhb1sqPMIPEleV6cNKYK4eGrAbE9Ulbl2g==}
@@ -276,6 +285,10 @@ snapshots:
   '@esbuild/win32-x64@0.18.20':
     optional: true
 
+  '@types/node@24.10.13':
+    dependencies:
+      undici-types: 7.16.0
+
   esbuild@0.18.20:
     optionalDependencies:
       '@esbuild/android-arm': 0.18.20
@@ -320,10 +333,13 @@ snapshots:
 
   source-map-js@1.2.1: {}
 
-  vite@4.5.14:
+  undici-types@7.16.0: {}
+
+  vite@4.5.14(@types/node@24.10.13):
     dependencies:
       esbuild: 0.18.20
       postcss: 8.5.6
       rollup: 3.29.5
     optionalDependencies:
+      '@types/node': 24.10.13
       fsevents: 2.3.3

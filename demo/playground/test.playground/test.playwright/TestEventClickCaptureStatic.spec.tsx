@@ -26,14 +26,19 @@ test('Event - Click Capture Static component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestEventClickCaptureStatic.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestEventClickCaptureStatic.tsx
+        const element = h(TestEventClickCaptureStatic, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Event - Click Capture Static'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestEventClickCaptureStatic() {
+            const o = $(0)
+            const increment = () => o(prev => prev + 1)
+            return [
+                h('h3', null, 'Event - Click Capture Static'),
+                h('p', null,
+                    h('button', { onClickCapture: increment }, o)
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

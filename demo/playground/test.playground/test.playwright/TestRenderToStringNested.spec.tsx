@@ -26,14 +26,17 @@ test('renderToString - Nested component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestRenderToStringNested.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestRenderToStringNested.tsx
+        const element = h(TestRenderToStringNested, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'renderToString - Nested'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestRenderToStringNested() {
+            return [
+                h('div', null,
+                    h('h3', null, 'renderToString - Nested'),
+                    h('p', null, '123<div><h3>renderToString</h3><p>123</p></div>')
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

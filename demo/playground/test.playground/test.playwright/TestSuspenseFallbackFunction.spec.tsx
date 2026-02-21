@@ -26,14 +26,25 @@ test('Suspense - Fallback Function component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestSuspenseFallbackFunction.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestSuspenseFallbackFunction.tsx
+        const element = h(TestSuspenseFallbackFunction, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Suspense - Fallback Function'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestSuspenseFallbackFunction() {
+            const initialValue = 'test-initial-value'
+            const Children = () => {
+                const resource = useResource(() => {
+                    return new Promise<undefined>(() => { })
+                })
+                return h('p', null, 'children ', resource.value)
+            }
+            const Fallback = () => h('p', null, 'Fallback: ', initialValue)
+            return [
+                h('h3', null, 'Suspense - Fallback Function'),
+                h(Suspense, { fallback: h(Fallback, null) },
+                    h(Children, null)
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

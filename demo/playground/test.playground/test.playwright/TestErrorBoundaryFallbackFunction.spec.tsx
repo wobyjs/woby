@@ -26,14 +26,20 @@ test('Error Boundary - Fallback Function component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestErrorBoundaryFallbackFunction.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestErrorBoundaryFallbackFunction.tsx
+        const element = h(TestErrorBoundaryFallbackFunction, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Error Boundary - Fallback Function'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestErrorBoundaryFallbackFunction() {
+            const fallbackValue = 'test-fallback'
+            const Children = () => { throw new Error() }
+            const Fallback = () => h('p', null, 'Fallback: ', fallbackValue)
+            return [
+                h('h3', null, 'Error Boundary - Fallback Function'),
+                h(ErrorBoundary, { fallback: h(Fallback, null) },
+                    h(Children, null)
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

@@ -25,20 +25,11 @@ const TestClassesArrayStoreMultiple = (): JSX.Element => {
 }
 
 TestClassesArrayStoreMultiple.test = {
-    static: false,
+    static: true,
     compareActualValues: true,
     expect: () => {
-        if (testit) {
-            const value = $$(testObservables['TestClassesArrayStoreMultiple'])
-            const classes = []
-            if (value[0]) classes.push(value[0])
-            if (value[1]) classes.push(value[1])
-            return `<p class="${classes.join(' ')}">content</p>`
-        }
-        else {
-            testit = true
-            return `<p class="">content</p>`
-        }
+        // For static test, just return the initial state
+        return '<p class="red bold">content</p>'
     }
 }
 

@@ -12,11 +12,11 @@ importers:
         specifier: ^0.173.0
         version: 0.173.0
       vite:
-        specifier: ^4.4.11
+        specifier: ^4.5.14
         version: 4.5.14
       woby:
-        specifier: workspace:../../../woby
-        version: link:../../../woby
+        specifier: workspace:*
+        version: link:../..
 
 packages:
 

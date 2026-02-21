@@ -26,14 +26,25 @@ test('Directive component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestDirective.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestDirective.tsx
+        const element = h(TestDirective, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'Directive'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestDirective() {
+            const model = (element, arg1, arg2) => {
+                useEffect(() => {
+                    const value = `${arg1} - ${arg2}`
+                    element.value = value
+                    element.setAttribute('value', value)
+                }, { sync: true })
+            }
+            const Model = createDirective('model', model)
+            return [
+                h('h3', null, 'Directive'),
+                h(Model.Provider, null,
+                    h('input', { value: 'foo', use: { model: ['bar', 'baz'] } })
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)

@@ -15,15 +15,22 @@ const Dynamic = <P = {}>({ component, props/* , children */ }: { component: Comp
     if (isFunction(component) || isFunction(props)) {
 
         return useMemo(() => {
-
-            return resolve(createElement<P>($$(component), $$(props), /* children */))
-
+            const resolvedComponent = $$(component);
+            // If the resolved component is a string (tag name), create an element with it
+            if (typeof resolvedComponent === 'string') {
+                return resolve(createElement(resolvedComponent, $$(props), /* children */));
+            } else {
+                return resolve(createElement<P>(resolvedComponent, $$(props), /* children */));
+            }
         })
 
     } else {
-
-        return createElement<P>(component, props, /* children */)
-
+        // If component is a string tag name, create element directly
+        if (typeof component === 'string') {
+            return createElement(component, props, /* children */);
+        } else {
+            return createElement<P>(component, props, /* children */)
+        }
     }
 }
 

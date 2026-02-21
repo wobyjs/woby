@@ -26,14 +26,24 @@ test('KeepAlive - Observable component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // TODO: Implement component logic based on TestKeepAliveObservable.tsx
-        // Extract the actual component logic from the source file
+        // Implement component logic based on TestKeepAliveObservable.tsx
+        const element = h(TestKeepAliveObservable, null)
 
-        // Create the component element using h() function
-        const element = h('div', null,
-            h('h3', null, 'KeepAlive - Observable'),
-            h('p', null, 'TODO: Implement based on source')
-        )
+        function TestKeepAliveObservable() {
+            return [
+                h('h3', null, 'KeepAlive - Observable'),
+                h(If, { when: true },
+                    h(KeepAlive, { id: 'observable-1' },
+                        h('p', null, '0.123456')
+                    )
+                ),
+                h(If, { when: true },
+                    h(KeepAlive, { id: 'observable-2', ttl: 100 },
+                        h('p', null, '0.789012')
+                    )
+                )
+            ]
+        }
 
         // Render to body
         render(element, document.body)
