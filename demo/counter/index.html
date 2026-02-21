@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Counter</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module" src="./index.tsx"></script>
+
+    <h1>HTML-created Custom Elements with Context</h1>
+
+    <!-- Parent counter element with a value -->
+    <counter-element title="Parent Counter" value="5" style.color="blue" style.font-size="1.5em"
+        class="border-2 border-blue-500 border-solid bg-amber-400 p-4 m-2">
+        <p>Parent Context Value: <context-value /></p>
+        <p>Parent my-上下文-值: <my-上下文-值 /></p>
+        <p>Parent processed context value: <processed-context-value /></p>
+        <p>Parent processed context nested value:
+            <span><span></span><processed-context-value></processed-context-value></span>
+        </p>
+        Child counter element that should inherit context
+        <div>
+            <counter-element title="Child Counter" value="10" style$color="green" style$font-size="1em"
+                obj='{"name": "John", "age": 30}' class="border-2 border-green-500 border-solid bg-yellow-200 p-2 m-2">
+                <p>Child Context Value: <context-value /></p>
+                <p>Child my-上下文-值: <my-上下文-值 /></p>
+                <p>Child processed context value: <processed-context-value /></p>
+                <P>Child processed context nested value:
+                    <span><span></span><processed-context-value></processed-context-value></span>
+                </P>
+            </counter-element>
+        </div>
+    </counter-element>
+
+</body>
+
+</html>

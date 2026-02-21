@@ -83,10 +83,12 @@
     "declaration": "tsc --declaration --emitDeclarationOnly --declarationMap",
     "declaration:watch": "tsc --declaration --emitDeclarationOnly  --declarationMap--watch",
     "build:only": "vite build",
+    "build:umd:only": "vite build --config vite.umd.config.mts",
     "watch:only": "vite build --watch",
     "watch": "run-s watch:only declaration:watch",
-    "build": "run-s clean build:only declaration",
+    "build": "run-s clean build:only declaration build:umd:only",
     "clean": "tsex clean",
+    "build:umd": "vite build --config vite.umd.config.mts",
     "compile": "tsex compile && tsc --declaration --emitDeclarationOnly --declarationMap",
     "compile:watch": "tsex compile --watch",
     "dev:benchmark": "cd demo/benchmark && npm i && npm update && npm run dev",
@@ -175,12 +177,5 @@
     "ssr.js",
     "via.js",
     "testing.js"
-  ],
-  "pnpm": {
-    "overrides": {
-      "woby": "workspace:../woby",
-      "@woby/styled": "workspace:../styled",
-      "@woby/use": "workspace:../use"
-    }
-  }
+  ]
 }

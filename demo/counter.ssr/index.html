@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>SSR Counter</title>
+    <script>
+        // Early polyfill setup - define process.platform before any modules load
+        (function() {
+            if (typeof globalThis.process === 'undefined') {
+                globalThis.process = { platform: 'win32' };
+            } else if (typeof globalThis.process.platform === 'undefined') {
+                globalThis.process.platform = 'win32';
+            }
+        })();
+    </script>
+    <script type="module" src="./index.tsx"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- This content will be replaced by server-side rendering -->
+        <h1>Loading...</h1>
+    </div>
+    <script>
+        console.log('globalThis', globalThis)
+        globalThis.clearImmediate = globalThis.clearTimeout.bind(globalThis)
+        globalThis.setImmediate = globalThis.setTimeout.bind(globalThis)
+        console.log('Client-side script loaded')
+    </script>
+</body>
+
+</html>

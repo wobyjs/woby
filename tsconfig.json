@@ -49,12 +49,17 @@
       "types",
     ],
     "paths": {
-      "~/*":["./src/*"],
+      "~/*": [
+        "./src/*"
+      ],
     }
     // "incremental": true,
     // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     // "composite": true,
   },
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
     "vite.*.*ts",
     "dist",
