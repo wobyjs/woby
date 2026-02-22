@@ -24,8 +24,7 @@ test('Style - Removal component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, 
-
+        const { $, $$, h, render } = woby
         // Implement component logic based on TestStyleRemoval.tsx
         const o = $('green')
         window.testTestStyleRemoval = o

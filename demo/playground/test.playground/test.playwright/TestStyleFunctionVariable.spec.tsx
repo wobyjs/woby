@@ -24,8 +24,7 @@ test('Style - Function Variable component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, 
-
+        const { $, $$, h, render } = woby
         // Implement component logic based on TestStyleFunctionVariable.tsx
         const o = $('green')
         window.testTestStyleFunctionVariable = o

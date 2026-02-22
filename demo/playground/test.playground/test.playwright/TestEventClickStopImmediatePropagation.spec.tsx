@@ -23,7 +23,7 @@ test('Event - Click - Stop Immediate Propagation component', async ({ page }) =>
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Implement component logic based on TestEventClickStopImmediatePropagation.tsx
         const outer = $(0)
@@ -32,11 +32,11 @@ test('Event - Click - Stop Immediate Propagation component', async ({ page }) =>
         const refInner = $()
         window.testTestEventClickStopImmediatePropagation_outer = outer
         window.testTestEventClickStopImmediatePropagation_inner = inner
-        
+
         const incrementOuter = () => {
             outer(prev => prev + 1)
         }
-        
+
         const incrementInner = (event) => {
             if (event.stopImmediatePropagation) event.stopImmediatePropagation()
             inner(prev => prev + 1)
@@ -45,9 +45,9 @@ test('Event - Click - Stop Immediate Propagation component', async ({ page }) =>
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Event - Click - Stop Immediate Propagation'),
-            h('p', null, h('button', { ref: ref, onClick: incrementOuter }, 
+            h('p', null, h('button', { ref: ref, onClick: incrementOuter },
                 () => $$(outer),
-                h('button', { ref: refInner, onClick: incrementInner }, 
+                h('button', { ref: refInner, onClick: incrementInner },
                     () => $$(inner)
                 )
             ))

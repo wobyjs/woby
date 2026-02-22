@@ -13,12 +13,12 @@ const Dynamic = <P = {}>({ component, props, children }: { component: Component<
     if (isFunction(component) || isFunction(props)) {
 
         return useMemo(() => {
-            const resolvedComponent = $$(component);
+            const resolvedComponent = $$(component as FunctionMaybe<Child>);
             // If the resolved component is a string (tag name), create an element with it
             if (isString(resolvedComponent)) {
-                return resolve(createElement(resolvedComponent, $$(props), children));
+                return resolve(createElement(resolvedComponent as Component<P>, $$(props), children));
             } else {
-                return resolve(createElement<P>(resolvedComponent, $$(props), children));
+                return resolve(createElement<P>(resolvedComponent as Component<P>, $$(props), children));
             }
         })
 

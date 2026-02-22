@@ -24,8 +24,7 @@ test('Styles - Removal component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, 
-
+        const { $, $$, h, render } = woby
         // Implement component logic based on TestStylesRemoval.tsx
         const o = $({ color: 'orange', fontWeight: 'normal' })
         window.testTestStylesRemoval = o
@@ -43,7 +42,7 @@ test('Styles - Removal component', async ({ page }) => {
 
     // Step-by-step verification
     const paragraph = page.locator('p')
-    
+
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)

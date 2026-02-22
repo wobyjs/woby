@@ -30,8 +30,15 @@ test('For - Random Only Child component', async ({ page }) => {
         // For content with random values - uses observable array with random numbers
         // [Implementation based on source file: TestForRandom.tsx]
 
+        // Define random function inline (mocks util.random())
+        const random = (): number => {
+            const value = Math.random()
+            if (value === 0 || value === 1) return random()
+            return value
+        }
+
         // Create the component element using h() function - For with random values
-        const values = $([0.1, 0.2, 0.3]) // Fixed values for static test
+        const values = $([random(), random(), random()])
         window.testTestForRandom = values  // Make values accessible globally
 
         const element = h('div', null,

@@ -5,7 +5,7 @@ import useMemo from '../hooks/use_memo'
 import createElement from '../methods/create_element.ssr'
 import resolve from '../methods/resolve'
 import $$ from '../methods/SS'
-import { isFunction } from '../utils/lang'
+import { isFunction, isString } from '../utils/lang'
 import type { Child, Component, FunctionMaybe } from '../types'
 
 /* MAIN */
@@ -15,18 +15,18 @@ const Dynamic = <P = {}>({ component, props/* , children */ }: { component: Comp
     if (isFunction(component) || isFunction(props)) {
 
         return useMemo(() => {
-            const resolvedComponent = $$(component);
+            const resolvedComponent = $$(component as FunctionMaybe<Child>);
             // If the resolved component is a string (tag name), create an element with it
-            if (typeof resolvedComponent === 'string') {
-                return resolve(createElement(resolvedComponent, $$(props), /* children */));
+            if (isString(resolvedComponent)) {
+                return resolve(createElement(resolvedComponent as Component<P>, $$(props), /* children */));
             } else {
-                return resolve(createElement<P>(resolvedComponent, $$(props), /* children */));
+                return resolve(createElement<P>(resolvedComponent as Component<P>, $$(props), /* children */));
             }
         })
 
     } else {
         // If component is a string tag name, create element directly
-        if (typeof component === 'string') {
+        if (isString(component)) {
             return createElement(component, props, /* children */);
         } else {
             return createElement<P>(component, props, /* children */)

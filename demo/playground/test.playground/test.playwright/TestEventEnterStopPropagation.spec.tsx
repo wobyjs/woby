@@ -23,7 +23,7 @@ test('Event - Enter - Stop Propagation component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, $, h, render } = woby
+        const { $, $$, h, render } = woby
 
         // Implement component logic based on TestEventEnterStopPropagation.tsx
         const outer = $(0) // Static test
@@ -32,9 +32,9 @@ test('Event - Enter - Stop Propagation component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Event - Enter - Stop Propagation'),
-            h('p', null, h('button', null, 
+            h('p', null, h('button', null,
                 () => $$(outer),
-                h('button', null, 
+                h('button', null,
                     () => $$(inner)
                 )
             ))
