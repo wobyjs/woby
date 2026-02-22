@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -33,12 +32,11 @@ test('For - Static component', async ({ page }) => {
         // Create the component element using h() function - For component
         const values = [1, 2, 3]
 
+        const fn = (value: number) => h('p', null, 'Value: ', value)
+
         const element = h('div', null,
             h('h3', null, 'For - Static'),
-            h(For, {
-                values: values,
-                children: (value: number) => h('p', null, 'Value: ', value)
-            } as any)
+            h(For, { values, children: fn })
         )
 
         // Render to body

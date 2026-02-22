@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -15,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestEventClickCaptureObservable: import('woby').Observable<number>
+        testEventClickCaptureObservable: any
     }
 }
 
@@ -25,33 +24,69 @@ test('Event - Click Capture Observable component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, $$ } = woby
 
-        // Implement component logic based on TestEventClickCaptureObservable.tsx
+        // Component logic extracted from source file
+        // Event click capture with observable - button increments on click capture
+        // [Implementation based on source file: TestEventClickCaptureObservable.tsx]
+        
         const o = $(0)
         const ref = $<HTMLButtonElement>()
+        window.testEventClickCaptureObservable = o  // Make observable accessible globally
         const increment = () => o(prev => prev + 1)
         
-        const element = h(TestEventClickCaptureObservable, null)
-
-        function TestEventClickCaptureObservable() {
+        const TestEventClickCaptureObservable = () => {
             return [
                 h('h3', null, 'Event - Click Capture Observable'),
-                h('p', null, h('button', { ref: ref, onClickCapture: increment }, o))
+                h('p', null, 
+                    h('button', { ref: ref, onClickCapture: increment }, o)
+                )
             ]
         }
+
+        const element = h(TestEventClickCaptureObservable, null)
 
         // Render to body
         render(element, document.body)
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const paragraph = page.locator('p')
+    const button = page.locator('button')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestEventClickCaptureObservable.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(heading).toHaveText('Event - Click Capture Observable')
+    const buttonText = await button.evaluate(el => el.textContent)
+    await expect(buttonText).toBe('0')
+    
+    // Fire click event externally
+    await page.evaluate(() => {
+        const button = document.querySelector('button')
+        if (button) {
+            button.click()
+        }
+    })
+    
+    // Wait for update and verify
+    await page.waitForTimeout(50)
+    const observableValue = await page.evaluate(() => window.testEventClickCaptureObservable())
+    const buttonText1 = await button.evaluate(el => el.textContent)
+    await expect(buttonText1).toBe(`${observableValue}`)
+    
+    // Second click to verify incrementing
+    await page.evaluate(() => {
+        const button = document.querySelector('button')
+        if (button) {
+            button.click()
+        }
+    })
+    
+    await page.waitForTimeout(50)
+    const observableValue2 = await page.evaluate(() => window.testEventClickCaptureObservable())
+    const buttonText2 = await button.evaluate(el => el.textContent)
+    await expect(buttonText2).toBe(`${observableValue2}`)
+    await expect(observableValue2).toBe(2)
 })
 

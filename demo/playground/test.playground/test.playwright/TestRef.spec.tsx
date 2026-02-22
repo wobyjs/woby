@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,7 +24,7 @@ test('Ref component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, useEffect } = woby
 
         // Implement component logic based on TestRef.tsx
         const ref = $()

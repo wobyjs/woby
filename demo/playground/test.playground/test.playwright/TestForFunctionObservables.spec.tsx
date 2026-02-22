@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -32,17 +31,13 @@ test('For - Function Observables component', async ({ page }) => {
         // [Implementation based on source file: TestForFunctionObservables.tsx]
 
         // Create the component element using h() function - For with function observables
-        const v1 = $(1) // Force refresh
-        const v2 = $(2) // Force refresh
-        const v3 = $(3) // Force refresh
-        const values = [v1, v2, v3]
-        window.testTestForFunctionObservables = values  // Make values accessible globally
+        const values = $([1, 2, 3])
 
         const element = h('div', null,
             h('h3', null, 'For - Function Observables'),
             h(For, {
-                values: () => values,
-                children: (value: import('woby').Observable<number>) => h('p', null, 'Value: ', value)
+                values: () => values(),
+                children: (value: number) => h('p', null, 'Value: ', value)
             } as any)
         )
 

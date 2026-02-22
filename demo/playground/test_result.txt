@@ -1,6 +1,6 @@
 
 Running 1 test using 1 worker
 
-  ✓  1 [chromium-direct] › test.playground\test.playwright\TestCleanupInner.spec.tsx:21:1 › Cleanup - Inner component (587ms)
+  ✓  1 [chromium-direct] › test.playground\test.playwright\TestIfFunction.spec.tsx:21:1 › If - Function component (414ms)
 
-  1 passed (12.4s)
+  1 passed (4.3s)

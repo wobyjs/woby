@@ -3,22 +3,17 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestEventClickRemoval = (): JSX.Element => {
     const o = $(0)
-    const ref = $<HTMLButtonElement>()
-    registerTestObservable('TestEventClickRemoval_o', o)
-    const increment = () => o(prev => prev + 1)
-
-    // Fire click event programmatically
-    useInterval(() => {
-        const button = ref()
-        if (button) {
-            button.click()
-        }
-    }, TEST_INTERVAL)
+    const onClick = $(() => { })
+    const increment = () => o(prev => {
+        onClick(() => null)
+        return prev + 1
+    })
+    onClick(() => increment)
 
     return (
         <>
             <h3>Event - Click Removal</h3>
-            <p><button ref={ref} onClick={increment}>{o}</button></p>
+            <p><button onClick={onClick}>{o}</button></p>
         </>
     )
 }

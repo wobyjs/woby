@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -12,25 +11,21 @@ import type * as Woby from 'woby'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Augment window type for test observables
-declare global {
-    interface Window {
-    }
-}
-
 test('Dynamic - Context component', async ({ page }) => {
     const wobyScript = fs.readFileSync(path.join(__dirname, '../../../../dist/index.umd.js'), 'utf8')
     await page.addScriptTag({ content: wobyScript })
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, createContext, useContext, Dynamic } = woby
 
-        // Implement component logic based on TestContextDynamicContext.tsx
-        const element = h(TestContextDynamicContext, null)
-
+        // Component logic extracted from source file
+        // Dynamic context with nested components - uses createContext and useContext
+        // [Implementation based on source file: TestContextDynamicContext.tsx]
+        
         function TestContextDynamicContext() {
             const Context = createContext('default')
+            
             const DynamicFragment = (props) => {
                 const ctx = useContext(Context)
                 return [
@@ -40,27 +35,33 @@ test('Dynamic - Context component', async ({ page }) => {
                     h(Dynamic, { component: 'p', children: props.children })
                 ]
             }
+            
             return [
                 h('h3', null, 'Dynamic - Context'),
                 h(Context.Provider, { value: 'context' },
                     h(DynamicFragment, null,
-                        h(DynamicFragment, null)
+                        h(DynamicFragment)
                     )
                 )
             ]
         }
 
         // Render to body
+        const element = h(TestContextDynamicContext)
         render(element, document.body)
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const heading = page.locator('h3')
+    const paragraphs = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestContextDynamicContext.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(heading).toHaveText('Dynamic - Context')
+    
+    // Check expected HTML structure matches source exactly
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    const expectedHTML = '<h3>Dynamic - Context</h3><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p>'
+    await expect(bodyHTML).toBe(expectedHTML)
 })
 

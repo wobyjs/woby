@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -49,12 +48,11 @@ test('Select - Observable Option component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const select = page.locator('select')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestSelectObservableOption.tsx
-    await expect(innerHTML).not.toBe('')
+    const selectValue = await select.evaluate(el => (el as HTMLSelectElement).value)
+    await expect(selectValue).toBe('bar')
 })
 

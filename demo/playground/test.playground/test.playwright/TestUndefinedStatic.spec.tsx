@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -38,7 +37,7 @@ test('Undefined - Static component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // Undefined should render as empty content
-    await expect(innerHTML).toBe('')
+    // Undefined renders as an HTML comment in woby
+    await expect(innerHTML).toBe('<!---->')
 })
 

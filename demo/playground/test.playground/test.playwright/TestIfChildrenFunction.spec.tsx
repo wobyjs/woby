@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -28,8 +27,8 @@ test('If - Children Function component', async ({ page }) => {
         const { $, h, render } = woby
 
         // Implement component logic based on TestIfChildrenFunction.tsx
-        const element = h(TestIfChildrenFunction, null)
-
+        const { If } = woby
+        
         function TestIfChildrenFunction() {
             const initialValue = 'test-value'
             const valueObs = $(initialValue)
@@ -39,6 +38,8 @@ test('If - Children Function component', async ({ page }) => {
                 h(If, { when: true }, h(Content, null))
             ]
         }
+        
+        const element = h(TestIfChildrenFunction, null)
 
         // Render to body
         render(element, document.body)
@@ -50,7 +51,6 @@ test('If - Children Function component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestIfChildrenFunction.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(innerHTML).toBe('test-value')
 })
 

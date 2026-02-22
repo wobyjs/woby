@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -43,11 +42,11 @@ test('Template - External component', async ({ page }) => {
     // Step-by-step verification
     const divElements = page.locator('div')
 
-    // Initial state verification
-    await expect(divElements).toHaveCount(2)
+    // Initial state verification - there are 3 divs total (wrapper + 2 templated)
+    await expect(divElements).toHaveCount(3)
 
-    const firstDiv = page.locator('div.red')
-    const secondDiv = page.locator('div.blue')
+    const firstDiv = page.locator('div > div.red')
+    const secondDiv = page.locator('div > div.blue')
 
     await expect(firstDiv).toHaveAttribute('class', 'red')
     await expect(secondDiv).toHaveAttribute('class', 'blue')

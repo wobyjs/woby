@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -15,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        // No observable exposed to window in this test (TODO implementation)
+        // Observable exposed to window for testing
     }
 }
 
@@ -25,7 +24,14 @@ test('Number - Removal component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, $$ } = woby
+        
+        // Implement random function from util.tsx
+        const random = (): number => {
+            const value = Math.random()
+            if (value === 0 || value === 1) return random()
+            return value
+        }
 
         // Create the component logic based on source
         const o = $(null)  // Start with null to show <!----> placeholder

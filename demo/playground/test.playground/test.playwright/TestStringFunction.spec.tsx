@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -15,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        // No observable exposed to window in this test (TODO implementation)
+        testTestStringFunction: import('woby').Observable<string>
     }
 }
 
@@ -27,28 +26,55 @@ test('String - Function component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // Implement component logic based on TestStringFunction.tsx
-        const element = h(TestStringFunction, null)
-
-        function TestStringFunction() {
-            const o = $(String(Math.random()))
+        // Component logic extracted from source file
+        // String function with random values - uses useInterval to update
+        // [Implementation based on source file: TestStringFunction.tsx]
+        
+        const { random } = woby
+        
+        const TestStringFunction = () => {
+            const o = $(String(random()))
+            const testTestStringFunction = o
+            window.testTestStringFunction = testTestStringFunction
+            const randomize = () => o(String(random()))
+            
             return [
                 h('h3', null, 'String - Function'),
                 h('p', null, () => o())
             ]
         }
 
+        const element = h(TestStringFunction, null)
+
         // Render to body
         render(element, document.body)
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const paragraph = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestStringFunction.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(heading).toHaveText('String - Function')
+    
+    // Check initial value is a random string
+    const initialValue = await paragraph.evaluate(el => el.innerHTML)
+    await expect(initialValue).toMatch(/^\d+\.\d+$/)
+    
+    // Get the observable value from window
+    const observableValue = await page.evaluate(() => window.testTestStringFunction.valueOf())
+    await expect(initialValue).toBe(observableValue)
+    
+    // Step 1: Randomize the value
+    await page.evaluate(() => {
+        const o = window.testTestStringFunction
+        const randomize = () => o(String(Math.random()))
+        randomize()
+    })
+    await page.waitForTimeout(50)
+    const newValue = await paragraph.evaluate(el => el.innerHTML)
+    await expect(newValue).toMatch(/^\d+\.\d+$/)
+    await expect(newValue).not.toBe(initialValue)
 })
 

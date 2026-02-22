@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,22 +24,23 @@ test('Error Boundary component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, ErrorBoundary } = woby
 
         // Implement component logic based on TestErrorBoundary.tsx
         const Erroring = () => {
             // Immediately throw error for predictable test
             throw new Error('Custom error')
         }
-        
+
         const Fallback = ({ error }) => {
-            return h('p', null, 'Error caught: ', error.message)
+            if (!error) return h('p', null, 'No error')
+            return h('p', null, 'Error caught: ', String(error.message || error))
         }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Error Boundary'),
-            h('woby-error-boundary', { fallback: Fallback }, Erroring)
+            h(ErrorBoundary, { fallback: Fallback }, h(Erroring))
         )
 
         // Render to body

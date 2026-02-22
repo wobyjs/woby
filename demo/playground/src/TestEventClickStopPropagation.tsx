@@ -5,36 +5,27 @@ let testit = true
 const TestEventClickStopPropagation = (): JSX.Element => {
     const outer = $(0)
     const inner = $(0)
-    const ref = $<HTMLButtonElement>()
-    const refInner = $<HTMLButtonElement>()
-    registerTestObservable('TestEventClickStopPropagation_outer', outer)
-    registerTestObservable('TestEventClickStopPropagation_inner', inner)
+    const onClickOuter = $(() => { })
+    const onClickInner = $(() => { })
+    
     const incrementOuter = () => {
         outer(prev => prev + 1)
         testit = false
     }
+    
     const incrementInner = event => {
         event.stopPropagation()
         inner(prev => prev + 1)
         testit = false
     }
-
-    // Programmatic event firing
-    useInterval(() => {
-        const button = ref()
-        const innerButton = refInner()
-        if (button) {
-            button.click()
-        }
-        if (innerButton) {
-            innerButton.click()
-        }
-    }, TEST_INTERVAL)
+    
+    onClickOuter(() => incrementOuter)
+    onClickInner(() => incrementInner)
 
     return (
         <>
             <h3>Event - Click - Stop Propagation</h3>
-            <p><button ref={ref} onClick={incrementOuter}>{outer}<button ref={refInner} onClick={incrementInner}>{inner}</button></button></p>
+            <p><button onClick={onClickOuter}>{outer}<button onClick={onClickInner}>{inner}</button></button></p>
         </>
     )
 }

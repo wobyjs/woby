@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,7 +24,7 @@ test('Suspense - Fallback Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, Suspense, useResource } = woby
 
         // Implement component logic based on TestSuspenseFallbackFunction.tsx
         const element = h(TestSuspenseFallbackFunction, null)
@@ -57,7 +56,6 @@ test('Suspense - Fallback Function component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestSuspenseFallbackFunction.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(innerHTML).toBe('Fallback: test-initial-value')
 })
 

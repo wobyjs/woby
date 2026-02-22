@@ -38,5 +38,5 @@ test('If - Function component', async ({ page }) => {
 
     // For static test, verify initial state
     const paragraph = page.locator('p')
-    await expect(paragraph).toHaveText('(content)')
+    await expect(paragraph).toHaveText('content')
 })

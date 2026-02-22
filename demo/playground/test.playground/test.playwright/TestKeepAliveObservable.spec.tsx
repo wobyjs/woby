@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,7 +23,7 @@ test('KeepAlive - Observable component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, If, KeepAlive } = woby
 
         // Implement component logic based on TestKeepAliveObservable.tsx
         const element = h(TestKeepAliveObservable, null)
@@ -50,11 +49,16 @@ test('KeepAlive - Observable component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const paragraphs = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestKeepAliveObservable.tsx
-    await expect(innerHTML).not.toBe('')
+    const count = await paragraphs.count()
+    await expect(count).toBe(2)
+    
+    const firstParagraph = await paragraphs.nth(0).evaluate(el => el.textContent)
+    const secondParagraph = await paragraphs.nth(1).evaluate(el => el.textContent)
+    
+    await expect(firstParagraph).toBe('0.123456')
+    await expect(secondParagraph).toBe('0.789012')
 })

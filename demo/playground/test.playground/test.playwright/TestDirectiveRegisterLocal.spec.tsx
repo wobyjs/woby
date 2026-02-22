@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,7 +23,7 @@ test('Directive component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, useEffect, createDirective } = woby
 
         // Implement component logic based on TestDirectiveRegisterLocal.tsx
         const model = (element, arg1, arg2) => {
@@ -50,13 +49,13 @@ test('Directive component', async ({ page }) => {
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-
-    // Initial state verification
+    // Wait for rendering
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestDirectiveRegisterLocal.tsx
-    await expect(innerHTML).not.toBe('')
+    
+    // Get the input element
+    const input = page.locator('input')
+    
+    // Verify the input has the expected value
+    await expect(input).toHaveValue('bar - baz')
 })
 

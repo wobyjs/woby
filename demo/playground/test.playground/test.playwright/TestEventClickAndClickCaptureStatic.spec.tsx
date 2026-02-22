@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -29,6 +28,7 @@ test('Event - Click & Click Capture Static component', async ({ page }) => {
 
         // Implement component logic based on TestEventClickAndClickCaptureStatic.tsx
         const o = $(0)
+        window.testTestEventClickAndClickCaptureStatic = o  // Make observable accessible globally
         const ref = $<HTMLButtonElement>()
         const increment = () => o(prev => prev + 1)
         const captureIncrement = () => o(prev => prev + 1)
@@ -47,12 +47,12 @@ test('Event - Click & Click Capture Static component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const button = page.locator('button')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestEventClickAndClickCaptureStatic.tsx
-    await expect(innerHTML).not.toBe('')
+    const textContent = await button.evaluate(el => el.textContent)
+    // Add proper expectations based on TestEventClickAndClickCaptureStatic.tsx
+    await expect(textContent).toBe('0')
 })
 

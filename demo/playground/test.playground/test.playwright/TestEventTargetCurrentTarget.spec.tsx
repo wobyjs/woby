@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -55,12 +54,22 @@ test('Event - Target - Current Target component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const divElement = page.locator('div')
+    const ulElement = page.locator('ul')
+    const liElements = page.locator('li')
+    const paragraphs = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestEventTargetCurrentTarget.tsx
-    await expect(innerHTML).not.toBe('')
+    const divInnerHTML = await divElement.evaluate(el => el.innerHTML)
+    const ulCount = await ulElement.count()
+    const liCount = await liElements.count()
+    const paragraphCount = await paragraphs.count()
+    
+    // Verify the structure and content
+    await expect(divInnerHTML).toContain('paragraph')
+    await expect(ulCount).toBe(1)
+    await expect(liCount).toBe(3)
+    await expect(paragraphCount).toBe(4) // 1 from div content + 3 for click counts
 })
 

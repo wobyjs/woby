@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -42,7 +41,7 @@ test('For - Observables component', async ({ page }) => {
             h('h3', null, 'For - Observables'),
             h(For, {
                 values: values,
-                children: (value: import('woby').Observable<number>) => h('p', null, 'Value: ', value)
+                children: (value: import('woby').Observable<number>) => h('p', null, 'Value: ', value())
             } as any)
         )
 

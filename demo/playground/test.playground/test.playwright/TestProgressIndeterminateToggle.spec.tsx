@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,7 +24,7 @@ test('Progress - Indeterminate Toggle component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, $$ } = woby
 
         // Implement component logic based on TestProgressIndeterminateToggle.tsx
         const element = h(TestProgressIndeterminateToggle, null)
@@ -46,12 +45,12 @@ test('Progress - Indeterminate Toggle component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const progress = page.locator('progress')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestProgressIndeterminateToggle.tsx
-    await expect(innerHTML).not.toBe('')
+    const value = await progress.evaluate(el => el.value)
+    // Add proper expectations based on TestProgressIndeterminateToggle.tsx
+    await expect(value).toBe(0.25)
 })
 

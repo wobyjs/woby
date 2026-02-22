@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -15,7 +14,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestKeepAliveStatic: import('woby').Observable<undefined>
     }
 }
 
@@ -25,12 +23,13 @@ test('KeepAlive - Static component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, KeepAlive } = woby
 
-        // Implement component logic based on TestKeepAliveStatic.tsx
-        const element = h(TestKeepAliveStatic, null)
-
-        function TestKeepAliveStatic() {
+        // Component logic extracted from source file
+        // Static KeepAlive component with fixed content
+        // [Implementation based on source file: TestKeepAliveStatic.tsx]
+        
+        const TestKeepAliveStatic = () => {
             return [
                 h('h3', null, 'KeepAlive - Static'),
                 h(KeepAlive, { id: 'static' },
@@ -39,17 +38,24 @@ test('KeepAlive - Static component', async ({ page }) => {
             ]
         }
 
+        const element = h(TestKeepAliveStatic, null)
+
         // Render to body
         render(element, document.body)
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const paragraph = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestKeepAliveStatic.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(heading).toHaveText('KeepAlive - Static')
+    await expect(paragraph).toHaveText('123')
+    
+    // Verify the exact HTML structure
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    const expectedHTML = '<h3>KeepAlive - Static</h3><p>123</p>'
+    await expect(bodyHTML).toBe(expectedHTML)
 })
 

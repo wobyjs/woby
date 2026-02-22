@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,7 +23,7 @@ test('Directive component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, createDirective, useEffect } = woby
 
         // Implement component logic based on TestDirective.tsx
         const element = h(TestDirective, null)
@@ -40,9 +39,7 @@ test('Directive component', async ({ page }) => {
             const Model = createDirective('model', model)
             return [
                 h('h3', null, 'Directive'),
-                h(Model.Provider, null,
-                    h('input', { value: 'foo', use: { model: ['bar', 'baz'] } })
-                )
+                h('input', { ref: Model.ref('bar', 'baz'), value: 'foo' })
             ]
         }
 
@@ -51,12 +48,12 @@ test('Directive component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const input = page.locator('input')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestDirective.tsx
-    await expect(innerHTML).not.toBe('')
+    const value = await input.evaluate(el => el.value)
+    // Add proper expectations based on TestDirective.tsx
+    await expect(value).toBe('bar - baz')
 })
 

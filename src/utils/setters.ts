@@ -5,6 +5,7 @@ import { DIRECTIVES, SYMBOLS_DIRECTIVES, SYMBOL_UNCACHED } from '../constants'
 import useMicrotask from '../hooks/use_microtask'
 import useRenderEffect from '../hooks/use_render_effect'
 import isStore from '../methods/is_store'
+import isObservable from '../methods/is_observable'
 import $$ from '../methods/SS'
 import store from '../methods/store'
 import untrack from '../methods/untrack'
@@ -700,7 +701,9 @@ const setEventStatic = (() => {
 
 const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>): void => {
 
-    setEventStatic(element, event, value)
+    // Resolve observables before passing to setEventStatic
+    const resolvedValue = isObservable(value) ? (value as Function)() : value
+    setEventStatic(element, event, resolvedValue)
 
 }
 

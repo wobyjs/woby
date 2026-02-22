@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -41,12 +40,12 @@ test('HTML - dangerouslySetInnerHTML - Function String component', async ({ page
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-
-    // Initial state verification
+    // Wait for rendering
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestHTMLDangerouslySetInnerHTMLFunctionString.tsx
-    await expect(innerHTML).not.toBe('')
+    
+    // Get the paragraph element
+    const paragraph = page.locator('p')
+    
+    // Verify the paragraph content contains the expected inner HTML
+    await expect(paragraph).toContainHTML('<i>danger</i>')
 })

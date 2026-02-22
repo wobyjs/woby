@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,14 +24,14 @@ test('Error Boundary - Children Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, ErrorBoundary } = woby
 
         // Implement component logic based on TestErrorBoundaryChildrenFunction.tsx
         const element = h(TestErrorBoundaryChildrenFunction, null)
 
         function TestErrorBoundaryChildrenFunction() {
             const childrenValue = 'test-value'
-            const childrenObservable = $(childrenValue)
+            window.testTestErrorBoundaryChildrenFunction = $(childrenValue)  // Make observable accessible globally
             const Children = () => h('p', null, 'Children: ', childrenValue)
             const Fallback = () => h('p', null, 'Fallback!')
             return [
@@ -52,8 +51,8 @@ test('Error Boundary - Children Function component', async ({ page }) => {
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestErrorBoundaryChildrenFunction.tsx
-    await expect(innerHTML).not.toBe('')
+    const textContent = await paragraph.evaluate(el => el.textContent)
+    // Add proper expectations based on TestErrorBoundaryChildrenFunction.tsx
+    await expect(textContent).toContain('Children: ')
 })
 

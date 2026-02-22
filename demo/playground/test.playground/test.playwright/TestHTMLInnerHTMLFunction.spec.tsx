@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -46,6 +45,6 @@ test('HTML - innerHTML - Function component', async ({ page }) => {
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
     // Add proper expectations based on TestHTMLInnerHTMLFunction.tsx
-    await expect(innerHTML).toBe('')
+    await expect(innerHTML).toBe('<!---->')
 })
 

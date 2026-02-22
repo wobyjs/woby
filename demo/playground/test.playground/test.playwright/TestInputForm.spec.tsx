@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -43,13 +42,24 @@ test('Input - Input Form component', async ({ page }) => {
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-
-    // Initial state verification
+    // Wait for rendering
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestInputForm.tsx
-    await expect(innerHTML).not.toBe('')
+    
+    // Get all input elements
+    const inputs = await page.locator('input').all()
+    
+    // Verify there are three inputs
+    expect(inputs.length).toBe(3)
+    
+    // Check the 'form' attribute of each input
+    const firstInputForm = await inputs[0].getAttribute('form')
+    const secondInputForm = await inputs[1].getAttribute('form')
+    const thirdInputForm = await inputs[2].getAttribute('form')
+    
+    // First two inputs should not have form attribute (undefined/null in JSX becomes no attribute)
+    expect(firstInputForm).toBe(null)
+    expect(secondInputForm).toBe(null)
+    // Third input should have form="foo"
+    expect(thirdInputForm).toBe('foo')
 })
 

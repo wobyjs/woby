@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -46,11 +45,10 @@ test('Select - Static Value component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const selectElement = page.locator('select[name="select-static-value"]')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestSelectStaticValue.tsx
-    await expect(innerHTML).not.toBe('')
+    const selectValue = await selectElement.evaluate(el => el.value)
+    await expect(selectValue).toBe('bar')
 })

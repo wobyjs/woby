@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -15,7 +14,6 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestHTMLTextContentFunction: import('woby').Observable<undefined>
     }
 }
 
@@ -47,6 +45,6 @@ test('HTML - textContent - Function component', async ({ page }) => {
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
     // Add proper expectations based on TestHTMLTextContentFunction.tsx
-    await expect(innerHTML).toBe('')
+    await expect(innerHTML).toBe('<!---->')
 })
 

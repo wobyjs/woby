@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -20,15 +19,17 @@ test('Ref - Context component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, createContext } = woby
 
         // Implement component logic based on TestRefContext.tsx
+        
         const Context = createContext(123)
-
-        // Create the component element using h() function
+        
         const element = h('div', null,
             h('h3', null, 'Ref - Context'),
-            h('context-provider', { value: 321 }, h('p', null))
+            h(Context.Provider, { value: 321 }, 
+                h('p', null, 'content')
+            )
         )
 
         // Render to body
@@ -42,6 +43,6 @@ test('Ref - Context component', async ({ page }) => {
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
     // Add proper expectations based on TestRefContext.tsx
-    await expect(innerHTML).toBe('')
+    await expect(innerHTML).toBe('content')
 })
 

@@ -1,5 +1,4 @@
-﻿import test from '@playwright/test'
-import expect from '@playwright/test'
+﻿import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore

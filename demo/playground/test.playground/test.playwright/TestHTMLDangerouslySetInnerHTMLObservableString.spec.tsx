@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -46,6 +45,5 @@ test('HTML - dangerouslySetInnerHTML - Observable String component', async ({ pa
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestHTMLDangerouslySetInnerHTMLObservableString.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(innerHTML).toBe('<i>danger</i>')
 })

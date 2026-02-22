@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -42,12 +41,12 @@ test('renderToString - Nested component', async ({ page }) => {
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-
-    // Initial state verification
+    // Wait for rendering
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestRenderToStringNested.tsx
-    await expect(innerHTML).not.toBe('')
+    
+    // Get the paragraph element
+    const paragraph = page.locator('p')
+    
+    // Verify the paragraph content
+    await expect(paragraph).toHaveText('123<div><h3>renderToString</h3><p>123</p></div>')
 })

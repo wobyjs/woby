@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,7 +23,7 @@ test('Resource - Fallback Value component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, useResource, ErrorBoundary, If } = woby
 
         // Implement component logic based on TestResourceFallbackValue.tsx
         const element = h(TestResourceFallbackValue, null)
@@ -51,12 +50,17 @@ test('Resource - Fallback Value component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const paragraphs = page.locator('p')
 
-    // Initial state verification
-    await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestResourceFallbackValue.tsx
-    await expect(innerHTML).not.toBe('')
+    // Wait for the resource to fail and show error messages
+    await page.waitForTimeout(100)
+    const count = await paragraphs.count()
+    const firstError = await paragraphs.nth(0).textContent()
+    const secondError = await paragraphs.nth(1).textContent()
+    
+    // Both ErrorBoundary components should show 'Error!' because the resource throws
+    await expect(count).toBe(2)
+    await expect(firstError).toBe('Error!')
+    await expect(secondError).toBe('Error!')
 })
 

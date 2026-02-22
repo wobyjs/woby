@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -44,11 +43,15 @@ test('renderToString - Suspense Nested component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const divElement = page.locator('div')
+    const paragraphs = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestRenderToStringSuspenseNested.tsx
-    await expect(innerHTML).not.toBe('')
+    const divInnerHTML = await divElement.evaluate(el => el.innerHTML)
+    const paragraphCount = await paragraphs.count()
+    
+    // Verify the expected structure
+    await expect(paragraphCount).toBe(2)
+    await expect(divInnerHTML).toContain('<p>123123</p><p>123123</p>')
 })

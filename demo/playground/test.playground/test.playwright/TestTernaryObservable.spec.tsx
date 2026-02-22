@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -35,7 +34,7 @@ test('Ternary - Observable component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Ternary - Observable'),
-            Ternary({ when: o }, h('p', null, 'true'), h('p', null, 'false'))
+            h(Ternary, { when: o }, h('p', null, 'true'), h('p', null, 'false'))
         )
 
         // Render to body

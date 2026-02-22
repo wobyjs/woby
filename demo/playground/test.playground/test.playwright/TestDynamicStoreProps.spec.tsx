@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,7 +24,7 @@ test('Dynamic - Store Props component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render, Dynamic } = woby
+        const { $, h, render, Dynamic, store } = woby
 
         // Implement component logic based on TestDynamicStoreProps.tsx
         const props = $( { class: 'red' } )
@@ -47,12 +46,15 @@ test('Dynamic - Store Props component', async ({ page }) => {
     })
 
     // Step-by-step verification
+    const divElement = page.locator('div.red')
     const paragraph = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestDynamicStoreProps.tsx
-    await expect(innerHTML).not.toBe('')
+    const divClass = await divElement.evaluate(el => el.className)
+    const paragraphText = await paragraph.evaluate(el => el.textContent)
+    
+    await expect(divClass).toBe('red')
+    await expect(paragraphText).toBe('1')
 })
 

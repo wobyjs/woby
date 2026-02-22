@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,7 +24,7 @@ test('ID - Removal component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, $$ } = woby
 
         // Implement component logic based on TestIdRemoval.tsx
         const element = h(TestIdRemoval, null)
@@ -47,7 +46,9 @@ test('ID - Removal component', async ({ page }) => {
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestIdRemoval.tsx
-    await expect(innerHTML).not.toBe('')
+    const id = await paragraph.evaluate(el => el.id)
+    // Add proper expectations based on TestIdRemoval.tsx
+    await expect(id).toBe('')  // Should be empty string when o is null
+    const textContent = await paragraph.evaluate(el => el.textContent)
+    await expect(textContent).toBe('content')
 })

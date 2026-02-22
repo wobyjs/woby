@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,7 +23,7 @@ test('Context - Components component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, createContext, useContext } = woby
 
         // Implement component logic based on TestContextComponents.tsx
         const Context = createContext('')
@@ -58,12 +57,20 @@ test('Context - Components component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const paragraphs = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestContextComponents.tsx
-    await expect(innerHTML).not.toBe('')
+    const count = await paragraphs.count()
+    await expect(count).toBe(3)
+    
+    const firstText = await paragraphs.nth(0).evaluate(el => el.textContent)
+    const secondText = await paragraphs.nth(1).evaluate(el => el.textContent)
+    const thirdText = await paragraphs.nth(2).evaluate(el => el.textContent)
+    
+    // Add proper expectations based on TestContextComponents.tsx
+    await expect(firstText).toBe('outer')
+    await expect(secondText).toBe('inner')
+    await expect(thirdText).toBe('outer')
 })
 

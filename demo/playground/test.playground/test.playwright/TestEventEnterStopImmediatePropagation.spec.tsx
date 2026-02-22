@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -24,26 +23,46 @@ test('Event - Enter - Stop Immediate Propagation component', async ({ page }) =>
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, useInterval } = woby
 
         // Implement component logic based on TestEventEnterStopImmediatePropagation.tsx
         const element = h(TestEventEnterStopImmediatePropagation, null)
 
         function TestEventEnterStopImmediatePropagation() {
+            let testit = true
             const outer = $(0)
             const inner = $(0)
+            const ref = $(null)
+            const refInner = $(null)
             const incrementOuter = () => {
                 outer(prev => prev + 1)
+                testit = false
             }
             const incrementInner = event => {
                 event.stopImmediatePropagation()
                 inner(prev => prev + 1)
+                testit = false
             }
+
+            // Programmatic event firing
+            useInterval(() => {
+                const button = ref()
+                const innerButton = refInner()
+                if (button) {
+                    const event = new PointerEvent('pointerenter')
+                    button.dispatchEvent(event)
+                }
+                if (innerButton) {
+                    const event = new PointerEvent('pointerenter')
+                    innerButton.dispatchEvent(event)
+                }
+            }, 100)
+
             return [
                 h('h3', null, 'Event - Enter - Stop Immediate Propagation'),
                 h('p', null,
-                    h('button', { onPointerEnter: incrementOuter }, outer,
-                        h('button', { onPointerEnter: incrementInner }, inner)
+                    h('button', { ref, onPointerEnter: incrementOuter }, outer,
+                        h('button', { ref: refInner, onPointerEnter: incrementInner }, inner)
                     )
                 )
             ]
@@ -54,12 +73,42 @@ test('Event - Enter - Stop Immediate Propagation component', async ({ page }) =>
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const outerButton = page.locator('p > button').first()
+    const innerButton = page.locator('p > button > button').first()
 
-    // Initial state verification
+    // Initial state: Both counters should be 0
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestEventEnterStopImmediatePropagation.tsx
-    await expect(innerHTML).not.toBe('')
+    let outerCount = await outerButton.textContent()
+    let innerCount = await innerButton.textContent()
+    await expect(outerCount).toBe('0')
+    await expect(innerCount).toBe('0')
+
+    // Step 1: Trigger outer button event - should increment outer counter
+    await page.evaluate(() => {
+        const button = document.querySelector('p > button')
+        if (button) {
+            const event = new PointerEvent('pointerenter')
+            button.dispatchEvent(event)
+        }
+    })
+    await page.waitForTimeout(50)
+    outerCount = await outerButton.textContent()
+    innerCount = await innerButton.textContent()
+    await expect(outerCount).toBe('1')
+    await expect(innerCount).toBe('0')
+
+    // Step 2: Trigger inner button event - should increment inner counter but not outer due to stopImmediatePropagation
+    await page.evaluate(() => {
+        const innerButton = document.querySelector('p > button > button')
+        if (innerButton) {
+            const event = new PointerEvent('pointerenter')
+            innerButton.dispatchEvent(event)
+        }
+    })
+    await page.waitForTimeout(50)
+    outerCount = await outerButton.textContent()
+    innerCount = await innerButton.textContent()
+    await expect(outerCount).toBe('1')  // Should remain 1 due to stopImmediatePropagation
+    await expect(innerCount).toBe('1')  // Should increment to 1
 })
 

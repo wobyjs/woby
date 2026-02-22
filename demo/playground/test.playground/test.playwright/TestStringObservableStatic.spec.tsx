@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -48,6 +47,5 @@ test('String - Observable Static component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestStringObservableStatic.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(innerHTML).toBe('0.123456')
 })

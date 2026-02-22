@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -15,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        // No observable exposed to window in this test (TODO implementation)
+        testNumberFunction: any
     }
 }
 
@@ -25,18 +24,31 @@ test('Number - Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, $$ } = woby
+        
+        // Implement random function from util.tsx
+        const random = (): number => {
+            const value = Math.random()
+            if (value === 0 || value === 1) return random()
+            return value
+        }
 
-        // Implement component logic based on TestNumberFunction.tsx
-        const element = h(TestNumberFunction, null)
-
+        // Component logic extracted from source file
+        // Number function - uses random() to generate values
+        // [Implementation based on source file: TestNumberFunction.tsx]
+        
         function TestNumberFunction() {
-            const o = $(Math.random())
+            const o = $(random())
+            window.testNumberFunction = o  // Make observable accessible globally
+            const randomize = () => o(random())
+            
             return [
                 h('h3', null, 'Number - Function'),
                 h('p', null, () => o())
             ]
         }
+        
+        const element = h(TestNumberFunction, null)
 
         // Render to body
         render(element, document.body)
@@ -45,10 +57,29 @@ test('Number - Function component', async ({ page }) => {
     // Step-by-step verification
     const paragraph = page.locator('p')
 
-    // Initial state verification
+    // Initial state: should be a number string
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestNumberFunction.tsx
-    await expect(innerHTML).not.toBe('')
+    let innerHTML = await paragraph.innerHTML()
+    await expect(innerHTML).toMatch(/^\d+\.\d+$/)
+    
+    // Step 1: randomize the value
+    await page.evaluate(() => {
+        const o = window.testNumberFunction
+        const randomize = () => o(Math.random())
+        randomize()
+    })
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.innerHTML()
+    await expect(innerHTML).toMatch(/^\d+\.\d+$/)
+    
+    // Step 2: randomize again
+    await page.evaluate(() => {
+        const o = window.testNumberFunction
+        const randomize = () => o(Math.random())
+        randomize()
+    })
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.innerHTML()
+    await expect(innerHTML).toMatch(/^\d+\.\d+$/)
 })
 

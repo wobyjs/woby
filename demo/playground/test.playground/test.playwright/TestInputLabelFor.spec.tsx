@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -43,12 +42,19 @@ test('Input - Label For component', async ({ page }) => {
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const paragraph = page.locator('p')
-
-    // Initial state verification
+    // Wait for rendering
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestInputLabelFor.tsx
-    await expect(innerHTML).not.toBe('')
+    
+    // Get all label elements
+    const labels = await page.locator('label').all()
+    
+    // Verify there are two labels
+    expect(labels.length).toBe(2)
+    
+    // Check the 'for' attribute of each label
+    const firstLabelFor = await labels[0].getAttribute('for')
+    const secondLabelFor = await labels[1].getAttribute('for')
+    
+    expect(firstLabelFor).toBe('for-target')
+    expect(secondLabelFor).toBe('for-target')
 })

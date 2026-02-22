@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,35 +24,45 @@ test('Error Boundary - Fallback Observable Static component', async ({ page }) =
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, ErrorBoundary } = woby
 
-        // Implement component logic based on TestErrorBoundaryFallbackObservableStatic.tsx
-        const fallbackValue = String(Math.random())
+        // Component logic extracted from source file
+        // Error boundary with static observable fallback - throws error in child component
+        // [Implementation based on source file: TestErrorBoundaryFallbackObservableStatic.tsx]
         
-        const element = h(TestErrorBoundaryFallbackObservableStatic, null)
-
-        function TestErrorBoundaryFallbackObservableStatic() {
+        const { random, ErrorBoundary } = woby
+        
+        const TestErrorBoundaryFallbackObservableStatic = () => {
             const Children = () => { throw new Error() }
+            const fallbackValue = String(random())
+            window.testTestErrorBoundaryFallbackObservableStatic = fallbackValue  // Store the actual value
+            
             const Fallback = () => h('p', null, 'Fallback: ', fallbackValue)
+            
             return [
                 h('h3', null, 'Error Boundary - Fallback Observable Static'),
-                h(ErrorBoundary, { fallback: h(Fallback, null) },
-                    h(Children, null)
+                h(ErrorBoundary, { fallback: h(Fallback) },
+                    h(Children)
                 )
             ]
         }
+
+        const element = h(TestErrorBoundaryFallbackObservableStatic, null)
 
         // Render to body
         render(element, document.body)
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const paragraph = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestErrorBoundaryFallbackObservableStatic.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(heading).toHaveText('Error Boundary - Fallback Observable Static')
+    
+    // Get the value from window and verify
+    const fallbackValue = await page.evaluate(() => window.testTestErrorBoundaryFallbackObservableStatic)
+    await expect(paragraph).toHaveText(`Fallback: ${fallbackValue}`)
 })
 

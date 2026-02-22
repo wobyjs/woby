@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,33 +24,54 @@ test('Event - Click Capture Static component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, $$ } = woby
 
-        // Implement component logic based on TestEventClickCaptureStatic.tsx
-        const element = h(TestEventClickCaptureStatic, null)
-
-        function TestEventClickCaptureStatic() {
-            const o = $(0)
-            const increment = () => o(prev => prev + 1)
+        // Component logic extracted from source file
+        // Event click capture static - button increments on click capture
+        // [Implementation based on source file: TestEventClickCaptureStatic.tsx]
+        
+        const o = $(0)
+        const ref = $<HTMLButtonElement>()
+        const testTestEventClickCaptureStatic = o
+        window.testTestEventClickCaptureStatic = testTestEventClickCaptureStatic
+        const increment = () => o(prev => prev + 1)
+        
+        const TestEventClickCaptureStatic = () => {
             return [
                 h('h3', null, 'Event - Click Capture Static'),
-                h('p', null,
-                    h('button', { onClickCapture: increment }, o)
-                )
+                h('p', null, h('button', { ref: ref, onClickCapture: increment }, o))
             ]
         }
+
+        const element = h(TestEventClickCaptureStatic, null)
 
         // Render to body
         render(element, document.body)
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const paragraph = page.locator('p')
+    const button = page.locator('button')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // TODO: Add proper expectations based on TestEventClickCaptureStatic.tsx
-    await expect(innerHTML).not.toBe('')
+    await expect(heading).toHaveText('Event - Click Capture Static')
+    const buttonText = await button.evaluate(el => el.textContent)
+    await expect(buttonText).toBe('0')
+    
+    // Fire click event externally
+    await page.evaluate(() => {
+        const button = document.querySelector('button')
+        if (button) {
+            button.click()
+        }
+    })
+    
+    // Wait for update and verify
+    await page.waitForTimeout(10)
+    const observableValue = await page.evaluate(() => window.testTestEventClickCaptureStatic())
+    const buttonText2 = await button.evaluate(el => el.textContent)
+    await expect(buttonText2).toBe(`${observableValue}`)
 })
 

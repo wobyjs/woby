@@ -1,6 +1,5 @@
 ﻿/** @jsxImportSource woby */
-import test from '@playwright/test'
-import expect from '@playwright/test'
+import { test, expect } from '@playwright/test'
 // @ts-ignore
 import fs from 'fs'
 // @ts-ignore
@@ -25,7 +24,7 @@ test('Refs component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, useEffect } = woby
 
         // Implement component logic based on TestRefs.tsx
         const ref1 = $()
@@ -40,9 +39,10 @@ test('Refs component', async ({ page }) => {
             element1.textContent = `${content1} / ${content2}`
         }
         
-        // Simulate the ref assignment
-        window.testTestRefs_ref1 = ref1
-        window.testTestRefs_ref2 = ref2
+        // Add useEffect to trigger update when refs are assigned
+        useEffect(() => {
+            updateRefs()
+        }, { sync: true })
 
         // Create the component element using h() function
         const element = h('div', null,
