@@ -28,11 +28,12 @@ test('Dynamic - Context component', async ({ page }) => {
             
             const DynamicFragment = (props) => {
                 const ctx = useContext(Context)
+                const children = props.children || []
                 return [
                     h('p', null, ctx),
-                    h('p', null, props.children),
-                    h(Dynamic, { component: 'p' }, props.children),
-                    h(Dynamic, { component: 'p', children: props.children })
+                    h('p', null, children),
+                    h(Dynamic, { component: 'p' }, children),
+                    h(Dynamic, { component: 'p', children: children })
                 ]
             }
             
@@ -40,7 +41,7 @@ test('Dynamic - Context component', async ({ page }) => {
                 h('h3', null, 'Dynamic - Context'),
                 h(Context.Provider, { value: 'context' },
                     h(DynamicFragment, null,
-                        h(DynamicFragment)
+                        h(DynamicFragment, null)
                     )
                 )
             ]

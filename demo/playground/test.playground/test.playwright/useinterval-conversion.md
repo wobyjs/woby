@@ -6,8 +6,8 @@ This document tracks the conversion of incomplete `.spec.tsx` files that have co
 ## Statistics
 - **Total files using useInterval/useTimeout**: 249
 - **Files with TODO comments needing conversion**: 230
-- **Files updated so far**: 274
-- **Files remaining to update**: 220
+- **Files updated so far**: 277
+- **Files remaining to update**: 217
 
 ## Updated Files
 1. `TestUndefinedObservable.spec.tsx` - ✅ Updated
@@ -57,6 +57,11 @@ This document tracks the conversion of incomplete `.spec.tsx` files that have co
 40. `TestTernaryChildrenFunction.spec.tsx` - ✅ Updated (Step 1-2 pattern with proper Observable<string> types)
 41. `TestTernaryChildrenObservableStatic.spec.tsx` - ✅ Updated (Step 1-2 pattern with proper Observable<string> types)
 42. `TestTernaryObservableChildren.spec.tsx` - ✅ Updated (Step 1-4 pattern with complex state management)
+
+### TestEvent Files Updated (Step 1-4 pattern with multiple fire & expect)
+43. `TestEventClickCaptureObservable.spec.tsx` - ✅ Updated (Step 1-4 pattern with plus2/minus1 pattern)
+44. `TestEventClickCaptureRemoval.spec.tsx` - ✅ Updated (Step 1-4 pattern with increment/null pattern)
+45. `TestEventClickObservable.spec.tsx` - ✅ Updated (Step 1-4 pattern with plus2/minus1 pattern)
 
 ## Conversion Pattern
 
@@ -210,12 +215,19 @@ npx playwright test TestUndefinedObservable.spec.tsx --headed
 - Uses `Ternary` component with when condition
 - Expected values: `'true'` and `'false'` (as text content)
 
+### TestEvent Components
+- Use complex observable patterns (plus2/minus1, increment/null)
+- Event handlers (onClick, onClickCapture, onPointerEnter, etc.)
+- Manual event simulation using `dispatchEvent()` or `click()`
+- Step-by-step verification with multiple fire & expect cycles
+- Expected values follow the specific pattern logic (0 → 2 → 1 → 3 → 2, etc.)
+
 ## Progress Tracking
 
-- **Files Updated**: 193
+- **Files Updated**: 196
 - **Files Remaining**: 0
-- **Last Updated**: All files fixed
-- **Date**: 2026-02-21
+- **Last Updated**: TestEvent files updated with step-by-step pattern
+- **Date**: 2026-02-22
 
 ## Resume Instructions
 1. Open this document to see current progress

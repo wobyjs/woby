@@ -24,7 +24,7 @@ test('Style - Observable Numeric component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $, h, render } = woby
 
         // Implement component logic based on TestStyleObservableNumeric.tsx
         const o = $({ flexGrow: 1, width: 50 })

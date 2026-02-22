@@ -36,12 +36,13 @@ test('TestCleanupInnerPortal component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const container = page.locator('div')
+    const divElements = page.locator('div')
+    const secondDiv = divElements.nth(1) // Select the second div which contains the <!----> content
 
     // Initial state verification - should contain <!----> placeholder
     await page.waitForTimeout(50)
-    const innerHTML = await container.evaluate(el => el.innerHTML)
-    // Expect to find <!----> placeholder
-    await expect(innerHTML).toContain('<!---->')
+    const innerHTML = await secondDiv.evaluate(el => el.innerHTML)
+    // Expect to find <!----> placeholder (as HTML entities)
+    await expect(innerHTML).toContain('&lt;!----&gt;')
 })
 

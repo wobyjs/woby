@@ -14,6 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
+        testPromiseRejected: any
     }
 }
 
@@ -29,9 +30,11 @@ test('Promise - Rejected component', async ({ page }) => {
         const element = h(TestPromiseRejected, null)
 
         function TestPromiseRejected() {
+            const errorObservable = $('Custom Error')
+            window.testPromiseRejected = errorObservable  // Store observable for testing
             return [
                 h('h3', null, 'Promise - Rejected'),
-                h('p', null, 'Custom Error')
+                h('p', null, errorObservable)
             ]
         }
 
@@ -40,10 +43,20 @@ test('Promise - Rejected component', async ({ page }) => {
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const paragraph = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('Custom Error')
+    await expect(heading).toHaveText('Promise - Rejected')
+    await expect(paragraph).toHaveText('Custom Error')
+    
+    // Verify the exact HTML structure
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    const expectedHTML = '<h3>Promise - Rejected</h3><p>Custom Error</p>'
+    await expect(bodyHTML).toBe(expectedHTML)
+    
+    // Verify the observable value
+    const observableValue = await page.evaluate(() => window.testPromiseRejected())
+    await expect(observableValue).toBe('Custom Error')
 })

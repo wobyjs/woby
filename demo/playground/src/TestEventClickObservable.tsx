@@ -3,6 +3,8 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestEventClickObservable = (): JSX.Element => {
     const o = $(0)
+    const ref = $<HTMLButtonElement>()
+    registerTestObservable('TestEventClickObservable_o', o)
     const onClick = $(() => { })
     const plus2 = () => o(prev => {
         onClick(() => minus1)
@@ -14,10 +16,18 @@ const TestEventClickObservable = (): JSX.Element => {
     })
     onClick(() => plus2)
 
+    // Fire click event programmatically for testing
+    useInterval(() => {
+        const button = ref()
+        if (button) {
+            button.click()
+        }
+    }, TEST_INTERVAL)
+
     return (
         <>
             <h3>Event - Click Observable</h3>
-            <p><button onClick={onClick}>{o}</button></p>
+            <p><button ref={ref} onClick={onClick}>{o}</button></p>
         </>
     )
 }

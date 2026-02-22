@@ -23,7 +23,7 @@ test('HTML - innerHTML - Observable component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, $, h, render } = woby
 
         // Implement component logic based on TestHTMLInnerHTMLObservable.tsx
         const o = $('<b>danger1</b>')

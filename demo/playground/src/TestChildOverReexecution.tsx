@@ -1,47 +1,36 @@
 import { $, $$, useEffect } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
-// Custom useTimeout that runs once after delay
-const useTimeout = (callback, delay) => {
-    const hasRun = $(false)
-
-    useEffect(() => {
-        if (hasRun()) return
-
-        let timeoutId
-
-        const tick = () => {
-            if ($$(hasRun)) return
-            callback()
-            hasRun(true)
-        }
-
-        if (delay && !hasRun()) {
-            timeoutId = useTimeout(tick, delay)
-        }
-
-        // Cleanup function
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId)
-            }
-        }
-    })
-}
-
 const TestChildOverReexecution = (): JSX.Element => {
     const count = $(0)
-    const increment = () => count(prev => Math.min(3, prev + 1))
-    // Store the observable globally so the test can access it
+    let executions = 0
     registerTestObservable('TestChildOverReexecution', count)
-    const executions = 0
 
-    useTimeout(increment, TEST_INTERVAL)
+    const increment = () => count(prev => Math.min(3, prev + 1))
+
+    // Expose increment function for testing
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            (window as any).testChildOverReexecutionIncrement = increment
+        }
+    })
+
+    // For playground testing, add automatic increment
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if ($$(count) < 6) {
+                increment()
+            }
+        }, 1000)
+
+        return () => clearInterval(interval)
+    })
+
     return (
         <>
             <h3>Child - OverReexecution</h3>
             <div>
-                {() => executions + 1}
+                {() => executions += 1}
             </div>
             {count}
         </>
@@ -51,8 +40,12 @@ const TestChildOverReexecution = (): JSX.Element => {
 TestChildOverReexecution.test = {
     static: false,
     expect: () => {
-        const countValue = $$(testObservables['TestChildOverReexecution'])
-        return `<div>1</div>${countValue}`
+        const observable = testObservables['TestChildOverReexecution']
+        if (observable) {
+            const currentValue = $$(observable)
+            return `<div>1</div>${currentValue}`
+        }
+        return `<div>1</div>0`
     }
 }
 

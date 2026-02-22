@@ -5,6 +5,10 @@ let testit = true
 const TestEventClickStopImmediatePropagation = (): JSX.Element => {
     const outer = $(0)
     const inner = $(0)
+    const refOuter = $<HTMLButtonElement>()
+    const refInner = $<HTMLButtonElement>()
+    registerTestObservable('TestEventClickStopImmediatePropagation_outer', outer)
+    registerTestObservable('TestEventClickStopImmediatePropagation_inner', inner)
     const onClickOuter = $(() => { })
     const onClickInner = $(() => { })
     
@@ -22,10 +26,22 @@ const TestEventClickStopImmediatePropagation = (): JSX.Element => {
     onClickOuter(() => incrementOuter)
     onClickInner(() => incrementInner)
 
+    // Fire click events programmatically for testing
+    useInterval(() => {
+        const buttonOuter = refOuter()
+        const buttonInner = refInner()
+        if (buttonOuter) {
+            buttonOuter.click()
+        }
+        if (buttonInner) {
+            buttonInner.click()
+        }
+    }, TEST_INTERVAL)
+
     return (
         <>
             <h3>Event - Click - Stop Immediate Propagation</h3>
-            <p><button onClick={onClickOuter}>{outer}<button onClick={onClickInner}>{inner}</button></button></p>
+            <p><button ref={refOuter} onClick={onClickOuter}>{outer}<button ref={refInner} onClick={onClickInner}>{inner}</button></button></p>
         </>
     )
 }

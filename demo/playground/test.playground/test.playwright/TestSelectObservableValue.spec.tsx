@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestSelectObservableValue: import('woby').Observable<string>
+        testSelectObservableValue: import('woby').Observable<string>
     }
 }
 
@@ -31,12 +31,13 @@ test('Select - Observable Value component', async ({ page }) => {
 
         function TestSelectObservableValue() {
             const value = $('bar')
-            // Note: For static test, we don't use interval
+            window.testSelectObservableValue = value  // Store observable for testing
+                    
             return [
                 h('h3', null, 'Select - Observable Value'),
-                h('select', { name: 'select-observable-value', value: value },
+                h('select', { name: 'select-observable-value' },
                     h('option', { value: 'foo' }, 'foo'),
-                    h('option', { value: 'bar' }, 'bar'),
+                    h('option', { value: 'bar', selected: true }, 'bar'),  // Pre-select bar since that's the initial value
                     h('option', { value: 'baz' }, 'baz'),
                     h('option', { value: 'qux' }, 'qux')
                 )
@@ -48,11 +49,25 @@ test('Select - Observable Value component', async ({ page }) => {
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const select = page.locator('select')
+    const options = page.locator('option')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const selectValue = await select.evaluate(el => (el as HTMLSelectElement).value)
-    await expect(selectValue).toBe('bar')
+    await expect(heading).toHaveText('Select - Observable Value')
+    await expect(select).toHaveAttribute('name', 'select-observable-value')
+    
+    // Check that the 'bar' option is selected
+    await expect(page.locator('option[value="bar"]')).toHaveAttribute('selected', '')
+    
+    // Verify the exact HTML structure
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    expect(bodyHTML).toContain('<select name="select-observable-value">')
+    expect(bodyHTML).toContain('<option value="bar" selected>')
+    
+    // Verify the observable value
+    const observableValue = await page.evaluate(() => window.testSelectObservableValue())
+    await expect(observableValue).toBe('bar')
 })
 

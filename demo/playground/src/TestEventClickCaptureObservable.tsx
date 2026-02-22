@@ -1,6 +1,18 @@
 import { $, $$ } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
 
+// Declare global property for TypeScript
+declare global {
+    interface Window {
+        testObservables: Record<string, any>
+    }
+}
+
+// Expose test observables globally for testing
+if (typeof window !== 'undefined') {
+    (window as any).testObservables = testObservables
+}
+
 const TestEventClickCaptureObservable = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
@@ -38,14 +50,14 @@ TestEventClickCaptureObservable.test = {
     expect: () => {
         // For the plus2/minus1 pattern: 0 -> 2 -> 1 -> 3 -> 2 -> 4 -> 3...
         // The observable should be updating correctly with the pattern
-        const observable = testObservables['TestEventClickCaptureObservable_o'];
+        const observable = testObservables['TestEventClickCaptureObservable_o']
         if (observable) {
-            const currentValue = observable();
+            const currentValue = $$(observable)
             // Check that the value is following the expected pattern
             // Should be increasing by 2, then decreasing by 1, etc.
-            return `<p><button>${currentValue}</button></p>`;
+            return `<p><button>${currentValue}</button></p>`
         }
-        return `<p><button>0</button></p>`;
+        return `<p><button>0</button></p>`
     }
 }
 

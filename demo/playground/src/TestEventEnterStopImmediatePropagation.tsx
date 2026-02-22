@@ -5,6 +5,10 @@ let testit = true
 const TestEventEnterStopImmediatePropagation = (): JSX.Element => {
     const outer = $(0)
     const inner = $(0)
+    const refOuter = $<HTMLButtonElement>()
+    const refInner = $<HTMLButtonElement>()
+    registerTestObservable('TestEventEnterStopImmediatePropagation_outer', outer)
+    registerTestObservable('TestEventEnterStopImmediatePropagation_inner', inner)
     const onEnterOuter = $(() => { })
     const onEnterInner = $(() => { })
     
@@ -22,10 +26,24 @@ const TestEventEnterStopImmediatePropagation = (): JSX.Element => {
     onEnterOuter(() => incrementOuter)
     onEnterInner(() => incrementInner)
 
+    // Fire enter events programmatically for testing
+    useInterval(() => {
+        const buttonOuter = refOuter()
+        const buttonInner = refInner()
+        if (buttonOuter) {
+            const event = new PointerEvent('pointerenter')
+            buttonOuter.dispatchEvent(event)
+        }
+        if (buttonInner) {
+            const event = new PointerEvent('pointerenter')
+            buttonInner.dispatchEvent(event)
+        }
+    }, TEST_INTERVAL)
+
     return (
         <>
             <h3>Event - Enter - Stop Immediate Propagation</h3>
-            <p><button onPointerEnter={onEnterOuter}>{outer}<button onPointerEnter={onEnterInner}>{inner}</button></button></p>
+            <p><button ref={refOuter} onPointerEnter={onEnterOuter}>{outer}<button ref={refInner} onPointerEnter={onEnterInner}>{inner}</button></button></p>
         </>
     )
 }

@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestSelectObservableOption: import('woby').Observable<boolean>
+        testSelectObservableOption: import('woby').Observable<boolean>
     }
 }
 
@@ -31,7 +31,7 @@ test('Select - Observable Option component', async ({ page }) => {
 
         function TestSelectObservableOption() {
             const branch = $(true)
-            // Note: For static test, we don't use interval
+            window.testSelectObservableOption = branch  // Store observable for testing
             return [
                 h('h3', null, 'Select - Observable Option'),
                 h('select', { name: 'select-observable-option' },
@@ -48,11 +48,25 @@ test('Select - Observable Option component', async ({ page }) => {
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const select = page.locator('select')
+    const options = page.locator('option')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const selectValue = await select.evaluate(el => (el as HTMLSelectElement).value)
-    await expect(selectValue).toBe('bar')
+    await expect(heading).toHaveText('Select - Observable Option')
+    await expect(select).toHaveAttribute('name', 'select-observable-option')
+    
+    // Check that the 'bar' option is selected (since branch starts as true)
+    await expect(page.locator('option[value="bar"]')).toHaveAttribute('selected', '')
+    
+    // Verify the exact HTML structure
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    expect(bodyHTML).toContain('<select name="select-observable-option">')
+    expect(bodyHTML).toContain('<option value="bar" selected>')
+    
+    // Verify the observable value
+    const observableValue = await page.evaluate(() => window.testSelectObservableOption())
+    await expect(observableValue).toBe(true)
 })
 

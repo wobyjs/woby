@@ -28,14 +28,14 @@ test('Child - OverReexecution component', async ({ page }) => {
 
         // Create component logic based on TestChildOverReexecution.tsx
         const count = $(0)
-        const increment = () => count(prev => Math.min(3, prev + 1))
+        let executions = 0
+        const increment = () => count(prev => Math.min(6, prev + 1))
         window.testTestChildOverReexecution = count
-        const executions = 0
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Child - OverReexecution'),
-            h('div', null, executions + 1),
+            h('div', null, () => executions += 1),
             h('p', null, count)
         )
 
@@ -55,7 +55,7 @@ test('Child - OverReexecution component', async ({ page }) => {
     // Step 1: increment count -> 1
     await page.evaluate(() => {
         const count = window.testTestChildOverReexecution
-        const increment = () => count(prev => Math.min(3, prev + 1))
+        const increment = () => count(prev => Math.min(6, prev + 1))
         increment()
     })
     await page.waitForTimeout(50)
@@ -65,30 +65,60 @@ test('Child - OverReexecution component', async ({ page }) => {
     // Step 2: increment count -> 2
     await page.evaluate(() => {
         const count = window.testTestChildOverReexecution
-        const increment = () => count(prev => Math.min(3, prev + 1))
+        const increment = () => count(prev => Math.min(6, prev + 1))
         increment()
     })
     await page.waitForTimeout(50)
     innerHTML = await paragraph.innerHTML()
     await expect(innerHTML).toBe('2')
 
-    // Step 3: increment count -> 3 (max)
+    // Step 3: increment count -> 3
     await page.evaluate(() => {
         const count = window.testTestChildOverReexecution
-        const increment = () => count(prev => Math.min(3, prev + 1))
+        const increment = () => count(prev => Math.min(6, prev + 1))
         increment()
     })
     await page.waitForTimeout(50)
     innerHTML = await paragraph.innerHTML()
     await expect(innerHTML).toBe('3')
 
-    // Step 4: Should not increment beyond 3
+    // Step 4: increment count -> 4
     await page.evaluate(() => {
         const count = window.testTestChildOverReexecution
-        const increment = () => count(prev => Math.min(3, prev + 1))
+        const increment = () => count(prev => Math.min(6, prev + 1))
         increment()
     })
     await page.waitForTimeout(50)
     innerHTML = await paragraph.innerHTML()
-    await expect(innerHTML).toBe('3')
+    await expect(innerHTML).toBe('4')
+
+    // Step 5: increment count -> 5
+    await page.evaluate(() => {
+        const count = window.testTestChildOverReexecution
+        const increment = () => count(prev => Math.min(6, prev + 1))
+        increment()
+    })
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.innerHTML()
+    await expect(innerHTML).toBe('5')
+
+    // Step 6: increment count -> 6 (max)
+    await page.evaluate(() => {
+        const count = window.testTestChildOverReexecution
+        const increment = () => count(prev => Math.min(6, prev + 1))
+        increment()
+    })
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.innerHTML()
+    await expect(innerHTML).toBe('6')
+
+    // Step 7: Should not increment beyond 6
+    await page.evaluate(() => {
+        const count = window.testTestChildOverReexecution
+        const increment = () => count(prev => Math.min(6, prev + 1))
+        increment()
+    })
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.innerHTML()
+    await expect(innerHTML).toBe('6')
 })

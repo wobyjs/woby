@@ -35,7 +35,7 @@ test('Component - Observable component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Component - Observable'),
-            h('p', null, $$(o))
+            h('p', null, $(o))
         )
 
         // Render to body

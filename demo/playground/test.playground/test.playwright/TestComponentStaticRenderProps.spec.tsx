@@ -30,7 +30,11 @@ test('Component - Static Render Props component', async ({ page }) => {
         // Static component with render props - uses random() to generate value
         // [Implementation based on source file: TestComponentStaticRenderProps.tsx]
         
-        const { random } = woby
+        // Define the random function as in the source file
+        const random = () => {
+            const value = Math.random()
+            return value
+        }
         
         const TestComponentStaticRenderProps = ({ value }) => {
             const propValue = random()

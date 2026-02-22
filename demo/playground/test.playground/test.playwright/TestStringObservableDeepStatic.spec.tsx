@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestStringObservableDeepStatic: import('woby').Observable<string>
+        testStringObservableDeepStatic: import('woby').Observable<string>
     }
 }
 
@@ -32,10 +32,13 @@ test('String - Observable Deep Static component', async ({ page }) => {
         function TestStringObservableDeepStatic() {
             const initialValue = "0.123456"
             const o = $(initialValue)
-            const Deep = () => [
-                h('h3', null, 'String - Observable Deep Static'),
-                h('p', null, initialValue)
-            ]
+            window.testStringObservableDeepStatic = o  // Store observable for testing
+            const Deep = () => {
+                return [
+                    h('h3', null, 'String - Observable Deep Static'),
+                    h('p', null, o)  // Use the observable instead of static value
+                ]
+            }
             return h(Deep, null)
         }
 
@@ -44,11 +47,21 @@ test('String - Observable Deep Static component', async ({ page }) => {
     })
 
     // Step-by-step verification
+    const heading = page.locator('h3')
     const paragraph = page.locator('p')
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('0.123456')
+    await expect(heading).toHaveText('String - Observable Deep Static')
+    await expect(paragraph).toHaveText('0.123456')
+
+    // Verify the exact HTML structure
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    const expectedHTML = '<h3>String - Observable Deep Static</h3><p>0.123456</p>'
+    await expect(bodyHTML).toBe(expectedHTML)
+
+    // Verify the observable value
+    const observableValue = await page.evaluate(() => window.testStringObservableDeepStatic())
+    await expect(observableValue).toBe('0.123456')
 })
 

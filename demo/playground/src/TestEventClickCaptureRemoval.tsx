@@ -3,6 +3,8 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestEventClickCaptureRemoval = (): JSX.Element => {
     const o = $(0)
+    const ref = $<HTMLButtonElement>()
+    registerTestObservable('TestEventClickCaptureRemoval_o', o)
     const onClick = $(() => { })
     const increment = () => o(prev => {
         onClick(() => null)
@@ -10,10 +12,18 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
     })
     onClick(() => increment)
 
+    // Fire click event programmatically for testing
+    useInterval(() => {
+        const button = ref()
+        if (button) {
+            button.click()
+        }
+    }, TEST_INTERVAL)
+
     return (
         <>
             <h3>Event - Click Capture Removal</h3>
-            <p><button onClickCapture={onClick}>{o}</button></p>
+            <p><button ref={ref} onClickCapture={onClick}>{o}</button></p>
         </>
     )
 }

@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testEventClickCaptureObservable: any
+        testEventClickCaptureObservable: import('woby').Observable<number>
     }
 }
 
@@ -24,69 +24,96 @@ test('Event - Click Capture Observable component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render, $$ } = woby
+        const { $, h, render } = woby
 
         // Component logic extracted from source file
-        // Event click capture with observable - button increments on click capture
+        // Event click capture with observable - uses plus2/minus1 pattern
         // [Implementation based on source file: TestEventClickCaptureObservable.tsx]
         
         const o = $(0)
-        const ref = $<HTMLButtonElement>()
+        const onClick = $(() => { })
         window.testEventClickCaptureObservable = o  // Make observable accessible globally
-        const increment = () => o(prev => prev + 1)
         
-        const TestEventClickCaptureObservable = () => {
-            return [
-                h('h3', null, 'Event - Click Capture Observable'),
-                h('p', null, 
-                    h('button', { ref: ref, onClickCapture: increment }, o)
-                )
-            ]
-        }
+        const plus2 = () => o(prev => {
+            onClick(() => minus1)
+            return prev + 2
+        })
+        
+        const minus1 = () => o(prev => {
+            onClick(() => plus2)
+            return prev - 1
+        })
+        
+        onClick(() => plus2)
 
-        const element = h(TestEventClickCaptureObservable, null)
+        // Create the component element using h() function - dynamic content
+        const element = h('div', null,
+            h('h3', null, 'Event - Click Capture Observable'),
+            h('p', null, 
+                h('button', { onClickCapture: onClick }, o)
+            )
+        )
 
         // Render to body
         render(element, document.body)
     })
 
     // Step-by-step verification
-    const heading = page.locator('h3')
     const paragraph = page.locator('p')
     const button = page.locator('button')
 
-    // Initial state verification
+    // Initial state: should be 0
     await page.waitForTimeout(50)
-    await expect(heading).toHaveText('Event - Click Capture Observable')
-    const buttonText = await button.evaluate(el => el.textContent)
-    await expect(buttonText).toBe('0')
+    let innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    await expect(innerHTML).toBe('<button>0</button>')
     
-    // Fire click event externally
+    // Step 1: First click -> plus2 (0 -> 2)
+    await page.evaluate(() => {
+        // Simulate click capture event
+        const button = document.querySelector('button')
+        if (button) {
+            const event = new MouseEvent('click', { bubbles: true })
+            button.dispatchEvent(event)
+        }
+    })
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    await expect(innerHTML).toBe('<button>2</button>')
+    
+    // Step 2: Second click -> minus1 (2 -> 1)
     await page.evaluate(() => {
         const button = document.querySelector('button')
         if (button) {
-            button.click()
+            const event = new MouseEvent('click', { bubbles: true })
+            button.dispatchEvent(event)
         }
     })
-    
-    // Wait for update and verify
     await page.waitForTimeout(50)
-    const observableValue = await page.evaluate(() => window.testEventClickCaptureObservable())
-    const buttonText1 = await button.evaluate(el => el.textContent)
-    await expect(buttonText1).toBe(`${observableValue}`)
+    innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    await expect(innerHTML).toBe('<button>1</button>')
     
-    // Second click to verify incrementing
+    // Step 3: Third click -> plus2 (1 -> 3)
     await page.evaluate(() => {
         const button = document.querySelector('button')
         if (button) {
-            button.click()
+            const event = new MouseEvent('click', { bubbles: true })
+            button.dispatchEvent(event)
         }
     })
-    
     await page.waitForTimeout(50)
-    const observableValue2 = await page.evaluate(() => window.testEventClickCaptureObservable())
-    const buttonText2 = await button.evaluate(el => el.textContent)
-    await expect(buttonText2).toBe(`${observableValue2}`)
-    await expect(observableValue2).toBe(2)
+    innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    await expect(innerHTML).toBe('<button>3</button>')
+    
+    // Step 4: Fourth click -> minus1 (3 -> 2)
+    await page.evaluate(() => {
+        const button = document.querySelector('button')
+        if (button) {
+            const event = new MouseEvent('click', { bubbles: true })
+            button.dispatchEvent(event)
+        }
+    })
+    await page.waitForTimeout(50)
+    innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    await expect(innerHTML).toBe('<button>2</button>')
 })
 
