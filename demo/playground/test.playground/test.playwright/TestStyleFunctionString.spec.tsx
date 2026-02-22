@@ -24,7 +24,7 @@ test('Style - Function String component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, $, h, render } = woby
+        const { $, 
 
         // Implement component logic based on TestStyleFunctionString.tsx
         const o = $('color: green')

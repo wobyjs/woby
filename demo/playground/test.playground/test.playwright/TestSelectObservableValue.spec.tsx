@@ -32,7 +32,7 @@ test('Select - Observable Value component', async ({ page }) => {
         function TestSelectObservableValue() {
             const value = $('bar')
             window.testSelectObservableValue = value  // Store observable for testing
-                    
+
             return [
                 h('h3', null, 'Select - Observable Value'),
                 h('select', { name: 'select-observable-value' },
@@ -57,15 +57,15 @@ test('Select - Observable Value component', async ({ page }) => {
     await page.waitForTimeout(50)
     await expect(heading).toHaveText('Select - Observable Value')
     await expect(select).toHaveAttribute('name', 'select-observable-value')
-    
+
     // Check that the 'bar' option is selected
     await expect(page.locator('option[value="bar"]')).toHaveAttribute('selected', '')
-    
+
     // Verify the exact HTML structure
     const bodyHTML = await page.evaluate(() => document.body.innerHTML)
     expect(bodyHTML).toContain('<select name="select-observable-value">')
     expect(bodyHTML).toContain('<option value="bar" selected>')
-    
+
     // Verify the observable value
     const observableValue = await page.evaluate(() => window.testSelectObservableValue())
     await expect(observableValue).toBe('bar')

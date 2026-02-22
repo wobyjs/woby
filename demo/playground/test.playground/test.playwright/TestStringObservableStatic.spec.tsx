@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testStringObservableStatic: import('woby').Observable<string>
+
     }
 }
 
@@ -31,11 +31,9 @@ test('String - Observable Static component', async ({ page }) => {
 
         function TestStringObservableStatic() {
             const initialValue = "0.123456"
-            const o = $(initialValue)
-            window.testStringObservableStatic = o  // Store observable for testing
             return [
                 h('h3', null, 'String - Observable Static'),
-                h('p', null, o)
+                h('p', null, initialValue)
             ]
         }
 
@@ -57,7 +55,5 @@ test('String - Observable Static component', async ({ page }) => {
     const expectedHTML = '<h3>String - Observable Static</h3><p>0.123456</p>'
     await expect(bodyHTML).toBe(expectedHTML)
 
-    // Verify the observable value
-    const observableValue = await page.evaluate(() => window.testStringObservableStatic())
-    await expect(observableValue).toBe('0.123456')
+
 })

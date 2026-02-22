@@ -50,12 +50,12 @@ test('Promise - Rejected component', async ({ page }) => {
     await page.waitForTimeout(50)
     await expect(heading).toHaveText('Promise - Rejected')
     await expect(paragraph).toHaveText('Custom Error')
-    
+
     // Verify the exact HTML structure
     const bodyHTML = await page.evaluate(() => document.body.innerHTML)
     const expectedHTML = '<h3>Promise - Rejected</h3><p>Custom Error</p>'
     await expect(bodyHTML).toBe(expectedHTML)
-    
+
     // Verify the observable value
     const observableValue = await page.evaluate(() => window.testPromiseRejected())
     await expect(observableValue).toBe('Custom Error')

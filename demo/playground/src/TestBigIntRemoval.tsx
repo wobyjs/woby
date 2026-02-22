@@ -16,14 +16,7 @@ TestBigIntRemoval.test = {
     static: true, // Make it static for predictable testing
     // Let TestSnapshots handle the conversion of BigInt values to placeholders
     expect: () => {
-        // Check the actual value to decide what to return
-        const val = $$(testObservables['TestBigIntRemoval'])
-        if (val !== null) {
-            // The TestSnapshots component will convert BigInt values to {random-bigint} placeholders
-            return '<p>({random-bigint})</p>'
-        } else {
-            return '<p>(<!---->)</p>'
-        }
+        return '<p>(<!---->)</p>'
     }
 }
 

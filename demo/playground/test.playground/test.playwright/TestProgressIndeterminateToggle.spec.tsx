@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testTestProgressIndeterminateToggle: import('woby').Observable<number | null | undefined>
+        testProgressIndeterminateToggle: import('woby').Observable<number | null | undefined>
     }
 }
 
@@ -31,6 +31,7 @@ test('Progress - Indeterminate Toggle component', async ({ page }) => {
 
         function TestProgressIndeterminateToggle() {
             const o = $<number | null | undefined>(.25)
+            window.testProgressIndeterminateToggle = o  // Store observable for testing
             const values = [.25, null, .5, undefined]
             const cycle = () => o(prev => values[(values.indexOf(prev) + 1) % values.length])
             // Note: We're not using interval for the static test
@@ -49,8 +50,18 @@ test('Progress - Indeterminate Toggle component', async ({ page }) => {
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const value = await progress.evaluate(el => el.value)
-    // Add proper expectations based on TestProgressIndeterminateToggle.tsx
-    await expect(value).toBe(0.25)
+
+    // Check the initial value
+    const value = await progress.evaluate(el => el.hasAttribute('value') ? el.getAttribute('value') : null)
+    await expect(value).toBe('0.25')
+
+    // Verify the exact HTML structure
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    const expectedHTML = '<h3>Progress - Indeterminate Toggle</h3><progress value="0.25"></progress>'
+    await expect(bodyHTML).toBe(expectedHTML)
+
+    // Verify the observable value
+    const observableValue = await page.evaluate(() => window.testProgressIndeterminateToggle())
+    await expect(observableValue).toBe(0.25)
 })
 

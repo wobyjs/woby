@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 // Augment window type for test observables
 declare global {
     interface Window {
-        testComponentStaticRenderProps: any
+        testComponentStaticRenderProps: number
     }
 }
 
@@ -29,24 +29,24 @@ test('Component - Static Render Props component', async ({ page }) => {
         // Component logic extracted from source file
         // Static component with render props - uses random() to generate value
         // [Implementation based on source file: TestComponentStaticRenderProps.tsx]
-        
-        // Define the random function as in the source file
-        const random = () => {
+
+        // Implement random function from util.tsx
+        const random = (): number => {
             const value = Math.random()
+            if (value === 0 || value === 1) return random()
             return value
         }
-        
-        const TestComponentStaticRenderProps = ({ value }) => {
+
+        function TestComponentStaticRenderProps() {
             const propValue = random()
-            window.testComponentStaticRenderProps = propValue  // Store the actual value
-            
+            window.testComponentStaticRenderProps = propValue  // Store observable for testing
             return [
                 h('h3', null, 'Component - Static Render Props'),
                 h('p', null, propValue)
             ]
         }
 
-        const element = h(TestComponentStaticRenderProps, { value: 42 })
+        const element = h(TestComponentStaticRenderProps, null)
 
         // Render to body
         render(element, document.body)
@@ -59,9 +59,14 @@ test('Component - Static Render Props component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     await expect(heading).toHaveText('Component - Static Render Props')
-    
-    // Get the value from window and verify
+
+    // Verify the paragraph contains the expected random value
     const propValue = await page.evaluate(() => window.testComponentStaticRenderProps)
     await expect(paragraph).toHaveText(`${propValue}`)
+
+    // Verify the exact HTML structure
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    const expectedHTML = `<h3>Component - Static Render Props</h3><p>${propValue}</p>`
+    await expect(bodyHTML).toBe(expectedHTML)
 })
 

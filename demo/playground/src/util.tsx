@@ -90,9 +90,11 @@ export const useTimeout = (callback, delay) => {
     return () => clearTimeout(timeoutId)
 }
 
-export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component | Constructor<Component>) & { test: { static?: boolean, wrap?: boolean, snapshots?: string[], compareActualValues?: boolean, expect?: () => string }, name?: string }, props?: Record<any, any> }): JSX.Element => {
+let staticIndex = 0
+
+export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component | Constructor<any>) & { test: { static?: boolean, wrap?: boolean, snapshots?: string[], compareActualValues?: boolean, expect?: () => string }, name?: string }, props?: Record<any, any> }): JSX.Element => {
     const ref = $<HTMLDivElement>()
-    let index = -1
+    const index = staticIndex++
     let htmlPrev = ''
     let ticks = 0
     let done = false
@@ -253,8 +255,11 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
         return () => observer.disconnect()
     })
     return (
-        <div ref={ref}>
-            <Component {...props} />
+        <div>
+            <span><b>Test #{index}</b></span>
+            <div ref={ref}>
+                <Component {...props} />
+            </div>
         </div>
     )
 }
