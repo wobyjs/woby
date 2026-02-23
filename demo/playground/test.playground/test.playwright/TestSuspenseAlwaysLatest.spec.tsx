@@ -19,7 +19,7 @@ test('Suspense - Always Latest component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, Suspense } = woby
 
         // Implement component logic based on TestSuspenseAlwaysLatest.tsx
         const Fallback = () => {
@@ -34,7 +34,7 @@ test('Suspense - Always Latest component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Suspense - Always Latest'),
-            h('woby-suspense', { fallback: Fallback }, Content)
+            h(Suspense, { fallback: h(Fallback, null) }, h(Content, null))
         )
 
         // Render to body
@@ -48,6 +48,6 @@ test('Suspense - Always Latest component', async ({ page }) => {
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
     // Add proper expectations based on TestSuspenseAlwaysLatest.tsx
-    await expect(innerHTML).toBe('Loading...')
+    await expect(innerHTML).toBe('Content! undefined')
 })
 

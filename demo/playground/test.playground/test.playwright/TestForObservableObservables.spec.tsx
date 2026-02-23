@@ -41,10 +41,10 @@ test('For - Observable Observables component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'For - Observable Observables'),
-            h(For, {
+            For({
                 values: values,
                 children: (value: import('woby').Observable<number>) => h('p', null, 'Value: ', value)
-            } as any)
+            })
         )
 
         // Render to body
@@ -57,5 +57,5 @@ test('For - Observable Observables component', async ({ page }) => {
     const container = page.locator('body')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<h3>For - Observable Observables</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p><p>Value: 4</p><p>Value: 5</p>')
+    await expect(innerHTML).toBe('<div><h3>For - Observable Observables</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p><p>Value: 4</p><p>Value: 5</p></div>')
 })

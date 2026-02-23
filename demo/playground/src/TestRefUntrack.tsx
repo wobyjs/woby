@@ -1,5 +1,5 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestRefUntrack = (): JSX.Element => {
     const o = $(0)
@@ -11,17 +11,44 @@ const TestRefUntrack = (): JSX.Element => {
         return <p ref={ref}>content</p>
     })
 
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Ref - Untrack</h3>
             <Reffed />
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestRefUntrack_ssr', ret)
+    
+    return ret
 }
 
 TestRefUntrack.test = {
     static: true,
-    expect: () => '<p>0</p>'
+    expect: () => {
+        const expected = '<p>0</p>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestRefUntrack_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h3>Ref - Untrack</h3><p>0</p>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

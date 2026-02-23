@@ -104,7 +104,7 @@ test('SVG - Static Complex component', async ({ page }) => {
     await expect(pathElements).toHaveCount(5)  // There should be 5 path elements
 
     const useElements = page.locator('use')
-    await expect(useElements).toHaveCount(4)  // There should be 4 use elements
+    await expect(useElements).toHaveCount(6)  // There should be 6 use elements (with placeholders)
 
     const gElements = page.locator('g')
     await expect(gElements).toHaveCount(12)  // There should be 12 g elements

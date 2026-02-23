@@ -1,5 +1,5 @@
-import { $, $$, Dynamic } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, Dynamic, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let testit = true
 const TestDynamicObservableProps = (): JSX.Element => {
@@ -12,7 +12,7 @@ const TestDynamicObservableProps = (): JSX.Element => {
         testit = false
     }
     useInterval(toggle, TEST_INTERVAL)
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Dynamic - Observable Props</h3>
             <Dynamic component="h5" props={props}>
@@ -20,6 +20,11 @@ const TestDynamicObservableProps = (): JSX.Element => {
             </Dynamic>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestDynamicObservableProps_ssr', ret)
+    
+    return ret
 }
 
 TestDynamicObservableProps.test = {
@@ -27,7 +32,31 @@ TestDynamicObservableProps.test = {
     compareActualValues: true,
     expect: () => {
         const props = $$(testObservables['TestDynamicObservableProps'])
-        return `<h5 class="${props.class}">Content</h5>`
+        
+        // Define expected values for both main test and SSR test
+        const expectedFull = `<h3>Dynamic - Observable Props</h3><h5 class="${props.class}">Content</h5>`  // For SSR comparison
+        const expected = `<h5 class="${props.class}">Content</h5>`   // For main test comparison
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestDynamicObservableProps_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                // If it's a JSX element or function, we can render it to string
+                // If it's a function, we need to call it first to get the element
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

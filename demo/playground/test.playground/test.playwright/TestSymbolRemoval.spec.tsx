@@ -38,6 +38,6 @@ test('Symbol - Removal component', async ({ page }) => {
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
     // Symbol should render as empty content
-    await expect(innerHTML).toBe('')
+    await expect(innerHTML).toBe('<!---->')
 })
 

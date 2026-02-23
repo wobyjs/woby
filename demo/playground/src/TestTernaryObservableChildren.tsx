@@ -1,5 +1,5 @@
-import { $, $$, Ternary } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables } from './util'
+import { $, $$, Ternary, renderToString } from 'woby'
+import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
 // let testit = true
 
@@ -69,7 +69,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
     }, 100);
     
     const o = () => state().toggle  // Use the toggle state as the ternary condition
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Ternary - Observable Children</h3>
             <Ternary when={o}>
@@ -78,6 +78,11 @@ const TestTernaryObservableChildren = (): JSX.Element => {
             </Ternary>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestTernaryObservableChildren_ssr', ret)
+    
+    return ret
 }
 
 TestTernaryObservableChildren.test = {
@@ -91,21 +96,44 @@ TestTernaryObservableChildren.test = {
         }
 
         // Robust state checking with fallbacks
+        let result;
         try {
             if (state.toggle === true) {
                 // AB component is active
-                return state.abActive === true ? '<i>a</i>' : '<u>b</u>'
+                result = state.abActive === true ? '<i>a</i>' : '<u>b</u>'
             } else if (state.toggle === false) {
                 // CD component is active
-                return state.cdActive === true ? '<b>c</b>' : '<span>d</span>'
+                result = state.cdActive === true ? '<b>c</b>' : '<span>d</span>'
             } else {
                 // Fallback to default state
-                return '<i>a</i>'
+                result = '<i>a</i>'
             }
         } catch (error) {
             // Return safe fallback on any error
-            return '<i>a</i>'
+            result = '<i>a</i>'
         }
+        
+        const expected = result;
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestTernaryObservableChildren_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = `<h3>Ternary - Observable Children</h3>${result}`
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

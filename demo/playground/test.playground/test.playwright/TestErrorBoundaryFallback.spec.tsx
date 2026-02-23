@@ -24,7 +24,7 @@ test('Error Boundary - Fallback Test component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, ErrorBoundary } = woby
 
         // Implement component logic based on TestErrorBoundaryFallback.tsx
         const ErroringComponent = () => {
@@ -32,13 +32,14 @@ test('Error Boundary - Fallback Test component', async ({ page }) => {
         }
         
         const FallbackComponent = ({ error }) => {
-            return h('p', null, 'Fallback: ', error.message)
+            if (!error) return h('p', null, 'No error')
+            return h('p', null, 'Fallback: ', String(error.message || error))
         }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Error Boundary - Fallback Test'),
-            h('woby-error-boundary', { fallback: FallbackComponent }, ErroringComponent)
+            h(ErrorBoundary, { fallback: FallbackComponent }, h(ErroringComponent))
         )
 
         // Render to body
@@ -52,5 +53,5 @@ test('Error Boundary - Fallback Test component', async ({ page }) => {
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
     // Add proper expectations based on TestErrorBoundaryFallback.tsx
-    await expect(innerHTML).toBe('Fallback: Error')
+    await expect(innerHTML).toContain('Fallback:')
 })

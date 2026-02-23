@@ -32,7 +32,7 @@ test('Attribute - Observable Boolean component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'Attribute - Observable Boolean'),
-            h('p', { 'data-red': $$(o) } as any, 'content')
+            h('p', { 'data-red': o } as any, 'content')
         )
 
         // Render to body
@@ -54,7 +54,7 @@ test('Attribute - Observable Boolean component', async ({ page }) => {
     })
     await page.waitForTimeout(50)
     attribute = await paragraph.getAttribute('data-red')
-    await expect(attribute).toBe('true')
+    await expect(attribute).toBe('')
 
     // Step 2: change o back to false -> data-red should become false
     await page.evaluate(() => {

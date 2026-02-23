@@ -39,6 +39,11 @@ export const randomColor = (): string => {
 // Global test observables registry
 export const testObservables: Record<string, Observable<any>> = {}
 
+// Expose testObservables globally for testing
+if (typeof window !== 'undefined') {
+    (window as any).testObservables = testObservables
+}
+
 export const registerTestObservable = (name: string, observable: Observable<any>) => {
     testObservables[name] = observable
 }

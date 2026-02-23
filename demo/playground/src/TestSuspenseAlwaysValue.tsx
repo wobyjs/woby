@@ -1,5 +1,5 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, Suspense, useResource, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSuspenseAlwaysValue = (): JSX.Element => {
     const Fallback = () => {
@@ -11,7 +11,7 @@ const TestSuspenseAlwaysValue = (): JSX.Element => {
         })
         return <p>Content! {resource.value}</p>
     }
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Suspense - Always Value</h3>
             <Suspense fallback={<Fallback />}>
@@ -19,11 +19,38 @@ const TestSuspenseAlwaysValue = (): JSX.Element => {
             </Suspense>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestSuspenseAlwaysValue_ssr', ret)
+    
+    return ret
 }
 
 TestSuspenseAlwaysValue.test = {
     static: true,
-    expect: () => '<p>Loading...</p>'
+    expect: () => {
+        const expected = '<p>Loading...</p>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestSuspenseAlwaysValue_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h3>Suspense - Always Value</h3><p>Loading...</p>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

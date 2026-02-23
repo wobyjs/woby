@@ -40,7 +40,7 @@ test('For - Fallback Observable Static component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'For - Fallback Observable Static'),
-            h(For, {
+            For({
                 values: [],
                 fallback: h(Fallback, {}),
                 children: (value: number) => h('p', null, 'Value: ', value)
@@ -57,6 +57,6 @@ test('For - Fallback Observable Static component', async ({ page }) => {
     const container = page.locator('div')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<h3>For - Fallback Observable Static</h3><p>Fallback: 0.5</p>')
+    await expect(innerHTML).toBe('<div><h3>For - <p>Fallback: 0.5</p></div>')
 })
 

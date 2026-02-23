@@ -1,18 +1,45 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestUndefinedStatic = (): JSX.Element => {
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Undefined - Static</h3>
             <p>{undefined}</p>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestUndefinedStatic_ssr', ret)
+    
+    return ret
 }
 
 TestUndefinedStatic.test = {
     static: true,
-    expect: () => '<p></p>'
+    expect: () => {
+        const expected = '<p></p>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestUndefinedStatic_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h3>Undefined - Static</h3><p></p>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

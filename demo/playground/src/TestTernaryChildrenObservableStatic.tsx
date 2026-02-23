@@ -1,5 +1,5 @@
-import { $, $$, Ternary } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
+import { $, $$, Ternary, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestTernaryChildrenObservableStatic = (): JSX.Element => {
     const trueValue = $(String(random()))
@@ -20,7 +20,7 @@ const TestTernaryChildrenObservableStatic = (): JSX.Element => {
         o()
         return <p>False: {falseValue}</p>
     }
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Ternary - Children Observable Static</h3>
             <Ternary when={true}>
@@ -33,6 +33,11 @@ const TestTernaryChildrenObservableStatic = (): JSX.Element => {
             </Ternary>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestTernaryChildrenObservableStatic_ssr', ret)
+    
+    return ret
 }
 
 TestTernaryChildrenObservableStatic.test = {
@@ -41,7 +46,27 @@ TestTernaryChildrenObservableStatic.test = {
     expect: () => {
         const trueValue = $$(testObservables['TestTernaryChildrenObservableStatic_true'])
         const falseValue = $$(testObservables['TestTernaryChildrenObservableStatic_false'])
-        return `<p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
+        const expected = `<p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestTernaryChildrenObservableStatic_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = `<h3>Ternary - Children Observable Static</h3><p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

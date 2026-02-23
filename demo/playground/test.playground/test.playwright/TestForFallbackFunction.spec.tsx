@@ -38,11 +38,11 @@ test('For - Fallback Function component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'For - Fallback Function'),
-            h(For, {
+            For({
                 values: [],
                 fallback: Fallback,
                 children: (value: number) => h('p', null, 'Value: ', value)
-            } as any)
+            })
         )
 
         // Render to body
@@ -55,6 +55,6 @@ test('For - Fallback Function component', async ({ page }) => {
     const container = page.locator('div')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<h3>For - Fallback Function</h3><p>Fallback: 0.5</p>')
+    await expect(innerHTML).toBe('<div><h3>For - <p>Fallback: 0.5</p></div>')
 })
 

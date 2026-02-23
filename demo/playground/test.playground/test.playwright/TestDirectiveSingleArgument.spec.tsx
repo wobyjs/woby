@@ -40,9 +40,7 @@ test('Directive - Single Argument component', async ({ page }) => {
         function TestDirectiveSingleArgument() {
             return [
                 h('h3', null, 'Directive - Single Argument'),
-                h(Model.Provider, null,
-                    h('input', { value: 'foo', use: { model: 'bar' } })
-                )
+                h('input', { value: 'foo', ref: Model.ref('bar') })
             ]
         }
 

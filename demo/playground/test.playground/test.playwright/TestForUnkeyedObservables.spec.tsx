@@ -38,11 +38,11 @@ test('For - Unkeyed - Observables component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'For - Unkeyed - Observables'),
-            h(For, {
+            For({
                 values: values,
                 unkeyed: true,
                 children: (value: import('woby').ObservableReadonly<number>) => h('p', null, 'Value: ', value)
-            } as any)
+            })
         )
 
         // Render to body
@@ -55,5 +55,5 @@ test('For - Unkeyed - Observables component', async ({ page }) => {
     const container = page.locator('body')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<h3>For - Unkeyed - Observables</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>')
+    await expect(innerHTML).toBe('<div><h3>For - Unkeyed - Observables</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p></div>')
 })

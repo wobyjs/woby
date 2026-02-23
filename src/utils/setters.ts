@@ -660,7 +660,21 @@ const setEventStatic = (() => {
 
             }
 
-            element[delegated[0]] = value
+            // For delegated events, handle observables and null/undefined properly
+            if (isNil(value)) {
+                // Remove the delegated handler by setting it to undefined
+                element[delegated[0]] = undefined
+            } else if (isObservable(value)) {
+                // Create a wrapper that resolves the observable when the event fires
+                element[delegated[0]] = (event: Event) => {
+                    const resolvedValue = (value as Function)();
+                    if (resolvedValue && typeof resolvedValue === 'function') {
+                        return resolvedValue(event);
+                    }
+                };
+            } else {
+                element[delegated[0]] = value
+            }
 
         } else if (event.endsWith('passive')) {
 
@@ -691,7 +705,20 @@ const setEventStatic = (() => {
 
         } else {
 
-            element[event] = value
+            // Handle null/undefined values and observables for direct event assignment
+            if (isNil(value)) {
+                element[event] = null
+            } else if (isObservable(value)) {
+                // Create a wrapper that resolves the observable when the event fires
+                element[event] = (event: Event) => {
+                    const resolvedValue = (value as Function)();
+                    if (resolvedValue && typeof resolvedValue === 'function') {
+                        return resolvedValue(event);
+                    }
+                };
+            } else {
+                element[event] = value
+            }
 
         }
 
@@ -701,9 +728,8 @@ const setEventStatic = (() => {
 
 const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>): void => {
 
-    // Resolve observables before passing to setEventStatic
-    const resolvedValue = isObservable(value) ? (value as Function)() : value
-    setEventStatic(element, event, resolvedValue)
+    // Pass observables directly to setEventStatic for resolution on event firing
+    setEventStatic(element, event, value)
 
 }
 

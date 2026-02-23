@@ -29,7 +29,7 @@ test('If - Observable component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'If - Observable'),
-            h('p', null, h(If, { when: true } as any, 'content'))
+            h('p', null, '(', h(If, { when: true } as any, 'content'), ')')
         )
 
         // Render to body

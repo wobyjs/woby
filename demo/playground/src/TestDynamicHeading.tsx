@@ -1,5 +1,5 @@
-import { $, $$, Dynamic } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, Dynamic, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestDynamicHeading = (): JSX.Element => {
     const level = $(1 as 1 | 2 | 3 | 4 | 5 | 6)
@@ -9,7 +9,7 @@ const TestDynamicHeading = (): JSX.Element => {
         level(nextLevel as 1 | 2 | 3 | 4 | 5 | 6)
     }
     useInterval(increment, TEST_INTERVAL)
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Dynamic - Heading</h3>
             {() => {
@@ -21,6 +21,11 @@ const TestDynamicHeading = (): JSX.Element => {
             }}
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestDynamicHeading_ssr', ret)
+    
+    return ret
 }
 
 TestDynamicHeading.test = {
@@ -28,7 +33,31 @@ TestDynamicHeading.test = {
     compareActualValues: true,
     expect: () => {
         const level = $$(testObservables['TestDynamicHeading'])
-        return `<h${level}>Level: ${level}</h${level}>`
+        
+        // Define expected values for both main test and SSR test
+        const expectedFull = `<h3>Dynamic - Heading</h3><h${level}>Level: ${level}</h${level}>`  // For SSR comparison
+        const expected = `<h${level}>Level: ${level}</h${level}>`   // For main test comparison
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestDynamicHeading_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                // If it's a JSX element or function, we can render it to string
+                // If it's a function, we need to call it first to get the element
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

@@ -1,9 +1,9 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestResourceFallbackValue = (): JSX.Element => {
     const resource = useResource(() => { throw new Error('Some error') })
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Resource - Fallback Value</h3>
             <ErrorBoundary fallback={<p>Error!</p>}>
@@ -18,11 +18,38 @@ const TestResourceFallbackValue = (): JSX.Element => {
             </ErrorBoundary>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestResourceFallbackValue_ssr', ret)
+    
+    return ret
 }
 
 TestResourceFallbackValue.test = {
     static: true,
-    expect: () => '<p>Error!</p><p>Error!</p>'
+    expect: () => {
+        const expected = '<p>Error!</p><p>Error!</p>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestResourceFallbackValue_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h3>Resource - Fallback Value</h3><p>Error!</p><p>Error!</p>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

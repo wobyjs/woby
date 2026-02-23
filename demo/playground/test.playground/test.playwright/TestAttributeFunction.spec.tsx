@@ -47,18 +47,18 @@ test('Attribute - Function component', async ({ page }) => {
     // Step-by-step verification
     const paragraph = page.locator('p')
 
-    // Initial state: should have data-color="darkred"
+    // Initial state: should have data-color="darkblue" (first toggle happens after 1000ms)
     await page.waitForTimeout(1100)
     let attribute = await paragraph.getAttribute('data-color')
+    await expect(attribute).toBe('darkblue')
+
+    // Step 1: blue -> red (after another ~1000ms)
+    await page.waitForTimeout(1100)
+    attribute = await paragraph.getAttribute('data-color')
     await expect(attribute).toBe('darkred')
 
-    // Step 1: red -> blue (after 1 second)
+    // Step 2: red -> blue (after another ~1000ms)
     await page.waitForTimeout(1100)
     attribute = await paragraph.getAttribute('data-color')
     await expect(attribute).toBe('darkblue')
-
-    // Step 2: blue -> red (after another second)
-    await page.waitForTimeout(1100)
-    attribute = await paragraph.getAttribute('data-color')
-    await expect(attribute).toBe('darkred')
 })

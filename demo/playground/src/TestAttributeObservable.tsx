@@ -1,5 +1,5 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestAttributeObservable = (): JSX.Element => {
     const o = $('red')
@@ -7,12 +7,17 @@ const TestAttributeObservable = (): JSX.Element => {
     registerTestObservable('TestAttributeObservable', o)
     const toggle = () => o(prev => (prev === 'red') ? 'blue' : 'red')
     useInterval(toggle, TEST_INTERVAL)
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Attribute - Observable</h3>
             <p data-color={o}>content</p>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestAttributeObservable_ssr', ret)
+    
+    return ret
 }
 
 TestAttributeObservable.test = {
@@ -20,7 +25,27 @@ TestAttributeObservable.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestAttributeObservable'])
-        return `<p data-color="${value}">content</p>`
+        const expected = `<p data-color="${value}">content</p>`
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestAttributeObservable_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = `<h3>Attribute - Observable</h3>${expected}`
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

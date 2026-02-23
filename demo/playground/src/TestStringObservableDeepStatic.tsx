@@ -1,9 +1,9 @@
-import { $, $$ } from 'woby'
+import { $, $$, renderToString } from 'woby'
 import { useMemo } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestStringObservableDeepStatic = (): JSX.Element => {
-    return useMemo(() => {
+    const ret: JSX.Element = useMemo(() => {
         const initialValue = "0.123456"
         // For static test, we don't need to register an observable that changes
         const o = $(initialValue)
@@ -18,11 +18,38 @@ const TestStringObservableDeepStatic = (): JSX.Element => {
         }
         return <Deep />
     })
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestStringObservableDeepStatic_ssr', ret)
+    
+    return ret
 }
 
 TestStringObservableDeepStatic.test = {
     static: true,
-    expect: () => '<p>0.123456</p>'  // Use a fixed value for predictable testing
+    expect: () => {
+        const expected = '<p>0.123456</p>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestStringObservableDeepStatic_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h3>String - Observable Deep Static</h3><p>0.123456</p>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

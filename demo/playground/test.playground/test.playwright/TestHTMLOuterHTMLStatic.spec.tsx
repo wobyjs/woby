@@ -44,6 +44,6 @@ test('HTML - outerHTML - Static component', async ({ page }) => {
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
     // Add proper expectations based on TestHTMLOuterHTMLStatic.tsx
-    await expect(innerHTML).toBe('')
+    await expect(innerHTML).toBe('<!---->')
 })
 

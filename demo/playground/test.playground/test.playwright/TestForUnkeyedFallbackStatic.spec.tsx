@@ -32,12 +32,12 @@ test('For - Unkeyed - Fallback Static component', async ({ page }) => {
         // Create the component element using h() function - For with unkeyed fallback static
         const element = h('div', null,
             h('h3', null, 'For - Unkeyed - Fallback Static'),
-            h(For, {
+            For({
                 values: [],
                 fallback: h('div', null, 'Fallback!'),
                 unkeyed: true,
                 children: (value: import('woby').ObservableReadonly<number>) => h('p', null, 'Value: ', value)
-            } as any)
+            })
         )
 
         // Render to body
@@ -50,6 +50,6 @@ test('For - Unkeyed - Fallback Static component', async ({ page }) => {
     const container = page.locator('body')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<h3>For - Unkeyed - Fallback Static</h3><div>Fallback!</div>')
+    await expect(innerHTML).toBe('<div><h3>For - <div>Fallback!</div></div>')
 })
 

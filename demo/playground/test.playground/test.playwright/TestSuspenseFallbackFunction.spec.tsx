@@ -75,9 +75,9 @@ test('Suspense - Fallback Function component', async ({ page }) => {
     expect(bodyHTML).toContain('<h3>Suspense - Fallback Function</h3>')
     expect(bodyHTML).toContain('Fallback: ')
     
-    // Verify the observable value
+    // Verify the observable value matches what's shown in the fallback
     const observableValue = await page.evaluate(() => window.testSuspenseFallbackFunction())
     const paragraphText = await paragraph.textContent()
-    expect(String(observableValue)).toContain(String(paragraphText))
+    expect(paragraphText).toContain(String(observableValue))
 })
 

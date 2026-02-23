@@ -1,11 +1,11 @@
-import { $, $$, Suspense, useResource, Ternary } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, Suspense, useResource, Ternary, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSuspenseCleanup = (): JSX.Element => {
     const ChildrenPlain = () => {
         return <p>Loaded!</p>
     }
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Suspense - Cleanup</h3>
             <Suspense fallback={<p>Loading...</p>}>
@@ -13,11 +13,38 @@ const TestSuspenseCleanup = (): JSX.Element => {
             </Suspense>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestSuspenseCleanup_ssr', ret)
+    
+    return ret
 }
 
 TestSuspenseCleanup.test = {
     static: true,
-    expect: () => '<p>Loaded!</p>'
+    expect: () => {
+        const expected = '<p>Loaded!</p>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestSuspenseCleanup_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h3>Suspense - Cleanup</h3><p>Loaded!</p>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

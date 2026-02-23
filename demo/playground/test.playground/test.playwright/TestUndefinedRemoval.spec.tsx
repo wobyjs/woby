@@ -45,6 +45,6 @@ test('Undefined - Removal component', async ({ page }) => {
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
     // Expect to find <!----> placeholder for undefined value
-    await expect(innerHTML).toBe('(<!---->)')
+    await expect(innerHTML).toBe('<!---->')
 })
 

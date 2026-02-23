@@ -36,7 +36,7 @@ test('For - Static component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'For - Static'),
-            h(For, { values, children: fn })
+            For({ values, children: fn })
         )
 
         // Render to body

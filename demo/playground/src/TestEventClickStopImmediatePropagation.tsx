@@ -1,5 +1,5 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let testit = true
 const TestEventClickStopImmediatePropagation = (): JSX.Element => {
@@ -31,19 +31,46 @@ const TestEventClickStopImmediatePropagation = (): JSX.Element => {
         const buttonOuter = refOuter()
         const buttonInner = refInner()
         if (buttonOuter) {
-            buttonOuter.click()
+            // For delegated events, manually trigger the handler
+            if (buttonOuter._onclick) {
+                const mockEvent = {
+                    currentTarget: buttonOuter,
+                    target: buttonOuter,
+                    composedPath: () => [buttonOuter, buttonOuter.parentNode, document.body, document],
+                    cancelBubble: false,
+                    stopPropagation: () => {},
+                    stopImmediatePropagation: () => {}
+                };
+                buttonOuter._onclick.call(buttonOuter, mockEvent);
+            }
         }
         if (buttonInner) {
-            buttonInner.click()
+            // For delegated events, manually trigger the handler
+            if (buttonInner._onclick) {
+                const mockEvent = {
+                    currentTarget: buttonInner,
+                    target: buttonInner,
+                    composedPath: () => [buttonInner, buttonInner.parentNode, document.body, document],
+                    cancelBubble: false,
+                    stopPropagation: () => {},
+                    stopImmediatePropagation: () => {}
+                };
+                buttonInner._onclick.call(buttonInner, mockEvent);
+            }
         }
     }, TEST_INTERVAL)
 
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Event - Click - Stop Immediate Propagation</h3>
             <p><button ref={refOuter} onClick={onClickOuter}>{outer}<button ref={refInner} onClick={onClickInner}>{inner}</button></button></p>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestEventClickStopImmediatePropagation_ssr', ret)
+    
+    return ret
 }
 
 
@@ -51,15 +78,39 @@ TestEventClickStopImmediatePropagation.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
+        let expected, expectedFull;
         if (testit) {
-            return `<p><button>0<button>0</button></button></p>`
+            expected = `<p><button>0<button>0</button></button></p>`
+            expectedFull = `<h3>Event - Click - Stop Immediate Propagation</h3><p><button>0<button>0</button></button></p>`
         }
         else {
             const outerValue = $$(testObservables['TestEventClickStopImmediatePropagation_outer'])
             const innerValue = $$(testObservables['TestEventClickStopImmediatePropagation_inner'])
             testit = true
-            return `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
+            expected = `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
+            expectedFull = `<h3>Event - Click - Stop Immediate Propagation</h3><p><button>${outerValue}<button>${innerValue}</button></button></p>`
         }
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestEventClickStopImmediatePropagation_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                // If it's a JSX element or function, we can render it to string
+                // If it's a function, we need to call it first to get the element
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

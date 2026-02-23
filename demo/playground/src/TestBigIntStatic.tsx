@@ -1,18 +1,45 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestBigIntStatic = (): JSX.Element => {
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>BigInt - Static</h3>
             <p>{123123n}</p>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestBigIntStatic_ssr', ret)
+    
+    return ret
 }
 
 TestBigIntStatic.test = {
     static: true,
-    expect: () => '<p>123123</p>'
+    expect: () => {
+        const expected = '<p>123123</p>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestBigIntStatic_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = `<h3>BigInt - Static</h3>${expected}`
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

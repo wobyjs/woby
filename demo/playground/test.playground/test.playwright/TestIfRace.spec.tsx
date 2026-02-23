@@ -42,6 +42,6 @@ test('If - Race component', async ({ page }) => {
 
     // For static test, verify initial state
     // The content should be 'hi' inside a div
-    const div = page.locator('div')
+    const div = page.locator('div').nth(1)
     await expect(div).toHaveText('hi')
 })

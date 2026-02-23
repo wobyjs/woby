@@ -43,9 +43,8 @@ test('HTML - dangerouslySetInnerHTML - Function String component', async ({ page
     // Wait for rendering
     await page.waitForTimeout(50)
     
-    // Get the paragraph element
+    // Get the paragraph element and check its innerHTML
     const paragraph = page.locator('p')
-    
-    // Verify the paragraph content contains the expected inner HTML
-    await expect(paragraph).toContainHTML('<i>danger</i>')
+    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    await expect(innerHTML).toContain('<i>danger</i>')
 })

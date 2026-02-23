@@ -1,8 +1,8 @@
-import { $, $$, Switch } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, Switch, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSwitchFunction = (): JSX.Element => {
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Switch - Function</h3>
             <Switch when={0}>
@@ -21,11 +21,38 @@ const TestSwitchFunction = (): JSX.Element => {
             </Switch>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestSwitchFunction_ssr', ret)
+    
+    return ret
 }
 
 TestSwitchFunction.test = {
     static: true,
-    expect: () => '<p>0</p>'
+    expect: () => {
+        const expected = '<p>0</p>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestSwitchFunction_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h3>Switch - Function</h3><p>0</p>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

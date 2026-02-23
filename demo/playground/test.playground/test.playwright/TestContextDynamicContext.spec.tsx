@@ -28,7 +28,7 @@ test('Dynamic - Context component', async ({ page }) => {
             
             const DynamicFragment = (props) => {
                 const ctx = useContext(Context)
-                const children = props.children || []
+                const children = props?.children || []
                 return [
                     h('p', null, ctx),
                     h('p', null, children),
@@ -62,7 +62,7 @@ test('Dynamic - Context component', async ({ page }) => {
     
     // Check expected HTML structure matches source exactly
     const bodyHTML = await page.evaluate(() => document.body.innerHTML)
-    const expectedHTML = '<h3>Dynamic - Context</h3><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p>'
+    const expectedHTML = '<h3>Dynamic - Context</h3><p>context</p><p><p>context</p><p><!----></p><p><!----></p><p><!----></p></p><p><p>context</p><p><!----></p><p><!----></p><p><!----></p></p><p><!----></p>'
     await expect(bodyHTML).toBe(expectedHTML)
 })
 

@@ -41,7 +41,7 @@ test('Directive component', async ({ page }) => {
         function TestDirectiveRegisterLocal() {
             return [
                 h('h3', null, 'Directive'),
-                h('input', { value: 'foo', use: { modelLocal: ['bar', 'baz'] } })
+                h('input', { value: 'foo', ref: Model.ref('bar', 'baz') })
             ]
         }
 

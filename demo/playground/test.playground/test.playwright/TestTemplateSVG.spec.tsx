@@ -25,7 +25,16 @@ test('Template - SVG component', async ({ page }) => {
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render, template } = woby
-        const randomColor = (window as any).woby.util.randomColor
+        
+        // Define randomColor function locally since it's not available in the util
+        const randomColor = () => {
+            const letters = '0123456789ABCDEF'
+            let color = '#'
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)]
+            }
+            return color
+        }
 
         // Create the component element using h() function
         const color = $(randomColor())

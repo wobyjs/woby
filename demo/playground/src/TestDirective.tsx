@@ -1,5 +1,5 @@
-import { $, $$, createDirective, useEffect } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, createDirective, useEffect, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestDirective = (): JSX.Element => {
     const model = (element, arg1, arg2) => {
@@ -10,7 +10,7 @@ const TestDirective = (): JSX.Element => {
         }, { sync: true })
     }
     const Model = createDirective('model', model)
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Directive</h3>
             <Model.Provider>
@@ -18,11 +18,41 @@ const TestDirective = (): JSX.Element => {
             </Model.Provider>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestDirective_ssr', ret)
+    
+    return ret
 }
 
 TestDirective.test = {
     static: true,
-    expect: () => '<input value="bar - baz">'
+    expect: () => {
+        // Define expected values for both main test and SSR test
+        const expectedFull = '<h3>Directive</h3><input value="bar - baz">'  // For SSR comparison
+        const expected = '<input value="bar - baz">'   // For main test comparison
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestDirective_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                // If it's a JSX element or function, we can render it to string
+                // If it's a function, we need to call it first to get the element
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
 }
 
 

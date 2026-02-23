@@ -19,7 +19,7 @@ test('Suspense - Alive component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, Suspense } = woby
 
         // Implement component logic based on TestSuspenseAlive.tsx
         const Content = () => {
@@ -29,7 +29,7 @@ test('Suspense - Alive component', async ({ page }) => {
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Suspense - Alive'),
-            h('woby-suspense', { when: true, fallback: h('p', null, 'Loading (0.789012)...') }, Content)
+            h(Suspense, { when: true, fallback: h('p', null, 'Loading (0.789012)...') }, h(Content, null))
         )
 
         // Render to body

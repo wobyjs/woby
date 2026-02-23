@@ -1,5 +1,5 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSVGAttributeRemoval = (): JSX.Element => {
     const o = $<string | null>('red')
@@ -7,7 +7,7 @@ const TestSVGAttributeRemoval = (): JSX.Element => {
     registerTestObservable('TestSVGAttributeRemoval', o)
     const toggle = () => o(prev => (prev === 'red') ? null : 'red')
     useInterval(toggle, TEST_INTERVAL)
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>SVG - Attribute Removal</h3>
             <svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white">
@@ -15,6 +15,11 @@ const TestSVGAttributeRemoval = (): JSX.Element => {
             </svg>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestSVGAttributeRemoval_ssr', ret)
+    
+    return ret
 }
 
 TestSVGAttributeRemoval.test = {
@@ -22,11 +27,31 @@ TestSVGAttributeRemoval.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestSVGAttributeRemoval'])
-        if (value) {
-            return `<svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20" version="${value}"></circle></svg>`
-        } else {
-            return '<svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
-        }
+        const expected = value ? 
+            `<svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20" version="${value}"></circle></svg>` :
+            '<svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestSVGAttributeRemoval_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = value ?
+                        `<h3>SVG - Attribute Removal</h3><svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20" version="${value}"></circle></svg>` :
+                        '<h3>SVG - Attribute Removal</h3><svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

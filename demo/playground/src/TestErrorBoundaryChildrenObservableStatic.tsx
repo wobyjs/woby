@@ -1,5 +1,5 @@
-import { $, $$, ErrorBoundary } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
+import { $, $$, ErrorBoundary, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
     const childrenValue = String(random())
@@ -15,14 +15,19 @@ const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
     const Fallback = (): JSX.Element => {
         return <p>Fallback!</p>
     }
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Error Boundary - Children Observable Static</h3>
-            <ErrorBoundary fallback={<Fallback />}>
+            <ErrorBoundary fallback={<Fallback />}> 
                 <Children />
             </ErrorBoundary>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestErrorBoundaryChildrenObservableStatic_ssr', ret)
+    
+    return ret
 }
 
 TestErrorBoundaryChildrenObservableStatic.test = {
@@ -30,7 +35,31 @@ TestErrorBoundaryChildrenObservableStatic.test = {
     compareActualValues: true,
     expect: () => {
         const childrenValue = $$(testObservables['TestErrorBoundaryChildrenObservableStatic'])
-        return `<p>Children: ${childrenValue}</p>`
+        
+        // Define expected values for both main test and SSR test
+        const expectedFull = `<h3>Error Boundary - Children Observable Static</h3><p>Children: ${childrenValue}</p>`  // For SSR comparison
+        const expected = `<p>Children: ${childrenValue}</p>`   // For main test comparison
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestErrorBoundaryChildrenObservableStatic_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                // If it's a JSX element or function, we can render it to string
+                // If it's a function, we need to call it first to get the element
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

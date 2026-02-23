@@ -36,10 +36,10 @@ test('For - Random component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'For - Random'),
-            h(For, {
+            For({
                 values: values,
                 children: (value: number) => h('p', null, value)
-            } as any)
+            })
         )
 
         // Render to body
@@ -52,6 +52,6 @@ test('For - Random component', async ({ page }) => {
     const container = page.locator('body')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<h3>For - Random</h3><p>0.4</p><p>0.5</p><p>0.6</p>')
+    await expect(innerHTML).toBe('<div><h3>For - <p>0.4</p><p>0.5</p><p>0.6</p></div>')
 })
 

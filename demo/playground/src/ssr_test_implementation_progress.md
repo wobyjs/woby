@@ -1,0 +1,393 @@
+# SSR Test Implementation Progress
+
+## Overview
+This document tracks the implementation of Server-Side Rendering (SSR) tests for all component files in the `woby/demo/playground/src` directory.
+
+## Total Files: 296 .tsx files
+
+## Files Already Implemented with SSR Tests
+1. [TestABCD.tsx](file:///d:/temp/woby/demo/playground/src/TestABCD.tsx) - ✅ Complete
+
+## Files Remaining: 236
+
+## Implementation Status
+- Completed: 145/296 files (49.0%)
+- Remaining: 151/296 files (51.0%)
+
+## Process for Adding SSR Tests
+
+### 1. Update Imports
+```typescript
+// Add renderToString to woby imports
+import { $, $$, renderToString } from 'woby'
+
+// Add assert to util imports
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+```
+
+### 2. Register Component for SSR
+```typescript
+const ComponentName = (): JSX.Element => {
+    const ret: JSX.Element = (
+        // existing JSX content
+    )
+    
+    // Store the component for SSR testing
+    registerTestObservable('ComponentName_ssr', ret)
+    
+    return ret
+}
+```
+
+### 3. Update Expect Function
+```typescript
+ComponentName.test = {
+    static: true/false,
+    expect: () => {
+        // Original expected value for client-side test
+        const expected = 'original_expected_value'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['ComponentName_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = 'full_html_with_heading'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
+}
+```
+
+## Files to Process (Remaining 292)
+
+### Basic Static Tests
+- [x] TestHMRFor.tsx
+- [x] TestAttributeFunction.tsx
+- [x] TestAttributeFunctionBoolean.tsx
+- [x] TestAttributeObservable.tsx
+- [x] TestAttributeObservableBoolean.tsx
+- [x] TestAttributeRemoval.tsx
+- [x] TestAttributeStatic.tsx
+- [x] TestBigIntFunction.tsx
+- [x] TestBigIntObservable.tsx
+- [x] TestBigIntRemoval.tsx
+- [x] TestBigIntStatic.tsx
+- [x] TestBooleanFunction.tsx
+- [x] TestBooleanObservable.tsx
+- [x] TestBooleanRemoval.tsx
+- [x] TestBooleanStatic.tsx
+- [x] TestCheckboxIndeterminateToggle.tsx
+- [x] TestChildOverReexecution.tsx
+- [x] TestChildren.tsx
+- [x] TestChildrenBoolean.tsx
+- [x] TestChildrenSymbol.tsx
+- [x] TestClassFunction.tsx
+- [x] TestClassFunctionString.tsx
+- [x] TestClassNameFunction.tsx
+- [x] TestClassNameObservable.tsx
+- [x] TestClassNameStatic.tsx
+- [x] TestClassObservable.tsx
+- [x] TestClassObservableString.tsx
+- [x] TestClassRemoval.tsx
+- [x] TestClassRemovalString.tsx
+- [x] TestClassStatic.tsx
+- [x] TestClassStaticString.tsx
+- [x] TestClassesArrayCleanup.tsx
+- [x] TestClassesArrayFunction.tsx
+- [x] TestClassesArrayFunctionMultiple.tsx
+- [x] TestClassesArrayFunctionValue.tsx
+- [x] TestClassesArrayNestedStatic.tsx
+- [x] TestClassesArrayObservable.tsx
+- [x] TestClassesArrayObservableMultiple.tsx
+- [x] TestClassesArrayObservableValue.tsx
+- [x] TestClassesArrayRemoval.tsx
+- [x] TestClassesArrayRemovalMultiple.tsx
+- [x] TestClassesArrayStatic.tsx
+- [x] TestClassesArrayStaticMultiple.tsx
+- [x] TestClassesArrayStore.tsx
+- [x] TestClassesArrayStoreMultiple.tsx
+- [ ] TestClassesObjectCleanup.tsx
+- [ ] TestClassesObjectFunction.tsx
+- [ ] TestClassesObjectFunctionMultiple.tsx
+- [ ] TestClassesObjectObservable.tsx
+- [ ] TestClassesObjectObservableMultiple.tsx
+- [ ] TestClassesObjectRemoval.tsx
+- [ ] TestClassesObjectRemovalMultiple.tsx
+- [ ] TestClassesObjectStatic.tsx
+- [ ] TestClassesObjectStaticMultiple.tsx
+- [ ] TestClassesObjectStore.tsx
+- [ ] TestClassesObjectStoreMultiple.tsx
+- [ ] TestCleanupInner.tsx
+- [ ] TestCleanupInnerPortal.tsx
+- [x] TestComponentFunction.tsx
+- [x] TestComponentObservable.tsx
+- [x] TestComponentObservableDirect.tsx
+- [x] TestComponentStatic.tsx
+- [x] TestComponentStaticProps.tsx
+- [x] TestComponentStaticRenderProps.tsx
+- [x] TestComponentStaticRenderState.tsx
+- [x] TestContextComponents.tsx
+- [x] TestContextDynamicContext.tsx
+- [x] TestContextHook.tsx
+- [x] TestDirective.tsx
+- [x] TestDirectiveRef.tsx
+- [x] TestDirectiveRegisterLocal.tsx
+- [x] TestDirectiveSingleArgument.tsx
+- [x] TestDynamicFunctionComponent.tsx
+- [x] TestDynamicFunctionProps.tsx
+- [x] TestDynamicHeading.tsx
+- [x] TestDynamicObservableChildren.tsx
+- [x] TestDynamicObservableComponent.tsx
+- [x] TestDynamicObservableProps.tsx
+- [x] TestDynamicStoreProps.tsx
+- [x] TestErrorBoundary.tsx
+- [x] TestErrorBoundaryChildrenFunction.tsx
+- [x] TestErrorBoundaryChildrenObservableStatic.tsx
+- [x] TestErrorBoundaryFallback.tsx
+- [x] TestErrorBoundaryFallbackFunction.tsx
+- [x] TestErrorBoundaryFallbackObservableStatic.tsx
+- [x] TestErrorBoundaryNoError.tsx
+- [x] TestEventClickAndClickCaptureStatic.tsx
+- [x] TestEventClickCaptureObservable.tsx
+- [x] TestEventClickCaptureRemoval.tsx
+- [x] TestEventClickCaptureStatic.tsx
+- [x] TestEventClickObservable.tsx
+- [x] TestEventClickRemoval.tsx
+- [x] TestEventClickStatic.tsx
+- [x] TestEventClickStopImmediatePropagation.tsx
+- [x] TestEventClickStopPropagation.tsx
+- [x] TestEventEnterAndEnterCaptureStatic.tsx
+- [x] TestEventEnterStopImmediatePropagation.tsx
+- [x] TestEventEnterStopPropagation.tsx
+- [x] TestEventMiddleClickCaptureStatic.tsx
+- [x] TestEventMiddleClickStatic.tsx
+- [x] TestEventTargetCurrentTarget.tsx
+- [ ] TestForFallbackFunction.tsx
+- [ ] TestForFallbackObservable.tsx
+- [ ] TestForFallbackObservableStatic.tsx
+- [ ] TestForFallbackStatic.tsx
+- [ ] TestForFunctionObservables.tsx
+- [ ] TestForObservableObservables.tsx
+- [ ] TestForObservablesStatic.tsx
+- [ ] TestForRandom.tsx
+- [ ] TestForRandomOnlyChild.tsx
+- [ ] TestForStatic.tsx
+- [ ] TestForUnkeyedFallbackFunction.tsx
+- [ ] TestForUnkeyedFallbackObservable.tsx
+- [ ] TestForUnkeyedFallbackObservableStatic.tsx
+- [ ] TestForUnkeyedFallbackStatic.tsx
+- [ ] TestForUnkeyedFunctionObservables.tsx
+- [ ] TestForUnkeyedObservableObservables.tsx
+- [ ] TestForUnkeyedObservables.tsx
+- [ ] TestForUnkeyedObservablesStatic.tsx
+- [ ] TestForUnkeyedRandom.tsx
+- [ ] TestForUnkeyedRandomOnlyChild.tsx
+- [ ] TestForUnkeyedStatic.tsx
+- [ ] TestFragmentStatic.tsx
+- [ ] TestFragmentStaticComponent.tsx
+- [ ] TestFragmentStaticDeep.tsx
+- [ ] TestHMRFor.tsx
+- [x] TestHTMLDangerouslySetInnerHTMLFunction.tsx
+- [x] TestHTMLDangerouslySetInnerHTMLFunctionString.tsx
+- [x] TestHTMLDangerouslySetInnerHTMLObservable.tsx
+- [x] TestHTMLDangerouslySetInnerHTMLObservableString.tsx
+- [x] TestHTMLDangerouslySetInnerHTMLStatic.tsx
+- [x] TestHTMLFunctionStatic.tsx
+- [x] TestHTMLFunctionStaticRegistry.tsx
+- [x] TestHTMLInnerHTMLFunction.tsx
+- [x] TestHTMLInnerHTMLObservable.tsx
+- [x] TestHTMLInnerHTMLStatic.tsx
+- [x] TestHTMLOuterHTMLFunction.tsx
+- [x] TestHTMLOuterHTMLObservable.tsx
+- [x] TestHTMLOuterHTMLStatic.tsx
+- [x] TestHTMLTextContentFunction.tsx
+- [x] TestHTMLTextContentObservable.tsx
+- [x] TestHTMLTextContentStatic.tsx
+- [x] TestIdFunction.tsx
+- [x] TestIdObservable.tsx
+- [x] TestIdRemoval.tsx
+- [x] TestIdStatic.tsx
+- [ ] TestIfChildrenFunction.tsx
+- [ ] TestIfChildrenFunctionObservable.tsx
+- [ ] TestIfChildrenObservable.tsx
+- [ ] TestIfChildrenObservableStatic.tsx
+- [ ] TestIfFallbackFunction.tsx
+- [ ] TestIfFallbackObservable.tsx
+- [ ] TestIfFallbackObservableStatic.tsx
+- [ ] TestIfFallbackStatic.tsx
+- [ ] TestIfFunction.tsx
+- [ ] TestIfFunctionUntracked.tsx
+- [ ] TestIfFunctionUntrackedNarrowed.tsx
+- [ ] TestIfFunctionUntrackedUnnarrowed.tsx
+- [ ] TestIfNestedFunctionNarrowed.tsx
+- [ ] TestIfNestedFunctionUnnarrowed.tsx
+- [ ] TestIfObservable.tsx
+- [ ] TestIfRace.tsx
+- [ ] TestIfStatic.tsx
+- [ ] TestInputForm.tsx
+- [ ] TestInputLabelFor.tsx
+- [ ] TestKeepAliveObservable.tsx
+- [ ] TestKeepAliveStatic.tsx
+- [ ] TestLazy.tsx
+- [ ] TestNestedArrays.tsx
+- [ ] TestNestedIfs.tsx
+- [ ] TestNestedIfsLazy.tsx
+- [ ] TestNullFunction.tsx
+- [ ] TestNullObservable.tsx
+- [ ] TestNullRemoval.tsx
+- [ ] TestNullStatic.tsx
+- [ ] TestNumberFunction.tsx
+- [ ] TestNumberObservable.tsx
+- [ ] TestNumberRemoval.tsx
+- [ ] TestNumberStatic.tsx
+- [ ] TestPortalMountObservable.tsx
+- [ ] TestPortalObservable.tsx
+- [ ] TestPortalRemoval.tsx
+- [ ] TestPortalStatic.tsx
+- [ ] TestPortalWhenObservable.tsx
+- [ ] TestPortalWrapperStatic.tsx
+- [ ] TestProgressIndeterminateToggle.tsx
+- [ ] TestPromiseRejected.tsx
+- [ ] TestPromiseResolved.tsx
+- [ ] TestPropertyCheckedFunction.tsx
+- [ ] TestPropertyCheckedObservable.tsx
+- [ ] TestPropertyCheckedRemoval.tsx
+- [ ] TestPropertyCheckedStatic.tsx
+- [ ] TestPropertyValueFunction.tsx
+- [ ] TestPropertyValueObservable.tsx
+- [ ] TestPropertyValueRemoval.tsx
+- [ ] TestPropertyValueStatic.tsx
+- [ ] TestRef.tsx
+- [ ] TestRefContext.tsx
+- [x] TestRefUnmounting.tsx
+- [x] TestRefUntrack.tsx
+- [x] TestRefs.tsx
+- [x] TestRefsNested.tsx
+- [x] TestRenderToString.tsx
+- [x] TestRenderToStringNested.tsx
+- [x] TestRenderToStringSuspense.tsx
+- [x] TestRenderToStringSuspenseNested.tsx
+- [x] TestResourceFallbackLatest.tsx
+- [x] TestResourceFallbackValue.tsx
+- [x] TestSVGAttributeRemoval.tsx
+- [x] TestSVGClassObject.tsx
+- [x] TestSVGClassString.tsx
+- [x] TestSVGFunction.tsx
+- [x] TestSVGObservable.tsx
+- [x] TestSVGStatic.tsx
+- [x] TestSVGStaticCamelCase.tsx
+- [x] TestSVGStaticComplex.tsx
+- [x] TestSVGStyleObject.tsx
+- [x] TestSVGStyleString.tsx
+- [x] TestSelectObservableOption.tsx
+- [x] TestSelectObservableValue.tsx
+- [x] TestSelectStaticOption.tsx
+- [x] TestSelectStaticValue.tsx
+- [x] TestSimpleExpect.tsx
+- [x] TestStringFunction.tsx
+- [x] TestStringObservable.tsx
+- [x] TestStringObservableDeepStatic.tsx
+- [x] TestStringObservableStatic.tsx
+- [x] TestStringRemoval.tsx
+- [x] TestStringStatic.tsx
+- [x] TestStyleFunction.tsx
+- [x] TestStyleFunctionNumeric.tsx
+- [x] TestStyleFunctionString.tsx
+- [x] TestStyleFunctionVariable.tsx
+- [x] TestStyleObservable.tsx
+- [x] TestStyleObservableNumeric.tsx
+- [x] TestStyleObservableString.tsx
+- [x] TestStyleObservableVariable.tsx
+- [x] TestStyleRemoval.tsx
+- [x] TestStyleStatic.tsx
+- [x] TestStyleStaticNumeric.tsx
+- [x] TestStyleStaticString.tsx
+- [x] TestStyleStaticVariable.tsx
+- [x] TestStylesCleanup.tsx
+- [x] TestStylesFunction.tsx
+- [x] TestStylesMixed.tsx
+- [x] TestStylesObservable.tsx
+- [x] TestStylesRemoval.tsx
+- [x] TestStylesStatic.tsx
+- [x] TestStylesStore.tsx
+- [x] TestSuspenseAlive.tsx
+- [x] TestSuspenseAlwaysLatest.tsx
+- [x] TestSuspenseAlwaysValue.tsx
+- [x] TestSuspenseChildrenFunction.tsx
+- [x] TestSuspenseChildrenObservableStatic.tsx
+- [x] TestSuspenseCleanup.tsx
+- [x] TestSuspenseFallbackFunction.tsx
+- [x] TestSuspenseFallbackObservableStatic.tsx
+- [x] TestSuspenseMiddleman.tsx
+- [x] TestSuspenseNever.tsx
+- [x] TestSuspenseNeverRead.tsx
+- [x] TestSuspenseObservable.tsx
+- [x] TestSuspenseWhen.tsx
+- [x] TestSwitchCaseFunction.tsx
+- [x] TestSwitchCaseObservableStatic.tsx
+- [x] TestSwitchDefaultFunction.tsx
+- [x] TestSwitchDefaultObservableStatic.tsx
+- [x] TestSwitchFallbackFunction.tsx
+- [x] TestSwitchFallbackObservableStatic.tsx
+- [x] TestSwitchFunction.tsx
+- [x] TestSwitchObservable.tsx
+- [x] TestSwitchObservableComplex.tsx
+- [x] TestSwitchStatic.tsx
+- [x] TestSymbolFunction.tsx
+- [x] TestSymbolObservable.tsx
+- [x] TestSymbolRemoval.tsx
+- [x] TestSymbolStatic.tsx
+- [x] TestTabIndexBooleanFunction.tsx
+- [x] TestTabIndexBooleanObservable.tsx
+- [x] TestTabIndexBooleanStatic.tsx
+- [x] TestTemplateExternal.tsx
+- [x] TestTemplateSVG.tsx
+- [x] TestTernaryChildrenFunction.tsx
+- [x] TestTernaryChildrenObservableStatic.tsx
+- [x] TestTernaryFunction.tsx
+- [x] TestTernaryObservable.tsx
+- [x] TestTernaryObservableChildren.tsx
+- [x] TestTernaryStatic.tsx
+- [x] TestTernaryStaticInline.tsx
+- [x] TestUndefinedFunction.tsx
+- [x] TestUndefinedObservable.tsx
+- [x] TestUndefinedRemoval.tsx
+- [x] TestUndefinedStatic.tsx
+
+### Custom Implementation Notes
+- Files with existing `registerTestObservable` calls need special attention to not duplicate registrations
+- Files with dynamic content may require different SSR expectations
+- Some files may need special handling for complex components
+- The `index.ori.tsx` file should likely be excluded from SSR testing
+
+## Methodology
+
+For each file, the following changes are applied:
+
+1. **Import Updates**: Add `renderToString` to woby imports and `assert` to util imports
+2. **Component Registration**: Wrap JSX in a variable and register with `registerTestObservable('ComponentName_ssr', ret)`
+3. **Expect Function Enhancement**: Add asynchronous SSR testing within a setTimeout
+
+## Success Criteria
+- Each component file includes SSR testing capability
+- Both client-side and server-side rendering produce consistent output
+- All tests pass in both environments
+- No breaking changes to existing functionality
+
+## Next Steps
+1. Continue implementation for remaining files
+2. Test all updated components to ensure functionality
+3. Verify SSR tests work correctly
+4. Document any special cases or exceptions

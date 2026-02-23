@@ -34,11 +34,11 @@ test('For - Unkeyed - Random Only Child component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'For - Unkeyed - Random Only Child'),
-            h(For, {
+            For({
                 values: values,
                 unkeyed: true,
                 children: (value: import('woby').ObservableReadonly<number>) => h('p', null, value)
-            } as any)
+            })
         )
 
         // Render to body
@@ -51,5 +51,5 @@ test('For - Unkeyed - Random Only Child component', async ({ page }) => {
     const container = page.locator('body')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<h3>For - Unkeyed - Random Only Child</h3><p>0.123456</p><p>0.789012</p><p>0.345678</p>')
+    await expect(innerHTML).toBe('<div><h3>For - <p>0.123456</p><p>0.789012</p><p>0.345678</p></div>')
 })

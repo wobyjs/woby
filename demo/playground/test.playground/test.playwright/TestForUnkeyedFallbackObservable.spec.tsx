@@ -40,7 +40,7 @@ test('For - Unkeyed - Fallback Observable component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'For - Unkeyed - Fallback Observable'),
-            h(For, {
+            For({
                 values: [],
                 fallback: h(Fallback, {}),
                 unkeyed: true,
@@ -58,6 +58,6 @@ test('For - Unkeyed - Fallback Observable component', async ({ page }) => {
     const container = page.locator('body')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<h3>For - Unkeyed - Fallback Observable</h3><p>Fallback: 0.8</p>')
+    await expect(innerHTML).toBe('<div><h3>For - <p>Fallback: 0.8</p></div>')
 })
 

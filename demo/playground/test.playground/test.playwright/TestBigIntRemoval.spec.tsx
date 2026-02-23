@@ -45,7 +45,7 @@ test('BigInt - Removal component', async ({ page }) => {
     // Initial state: should have <!----> placeholder for null value
     await page.waitForTimeout(50)
     let innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('(<!---->)')
+    await expect(innerHTML).toBe('<!---->')
 
     // Step 1: change o to a BigInt value
     await page.evaluate(() => {
@@ -54,7 +54,7 @@ test('BigInt - Removal component', async ({ page }) => {
     })
     await page.waitForTimeout(50)
     innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('(456n)')
+    await expect(innerHTML).toBe('456')
 
     // Step 2: change o back to null
     await page.evaluate(() => {
@@ -63,5 +63,5 @@ test('BigInt - Removal component', async ({ page }) => {
     })
     await page.waitForTimeout(50)
     innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('(<!---->)')
+    await expect(innerHTML).toBe('<!---->')
 })
