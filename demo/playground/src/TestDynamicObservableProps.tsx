@@ -1,7 +1,6 @@
 import { $, $$, Dynamic, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-let testit = true
 const TestDynamicObservableProps = (): JSX.Element => {
     const red = { class: 'red' }
     const blue = { class: 'blue' }
@@ -9,7 +8,6 @@ const TestDynamicObservableProps = (): JSX.Element => {
     registerTestObservable('TestDynamicObservableProps', props)
     const toggle = () => {
         props(prev => prev === red ? blue : red)
-        testit = false
     }
     useInterval(toggle, TEST_INTERVAL)
     const ret: JSX.Element = (

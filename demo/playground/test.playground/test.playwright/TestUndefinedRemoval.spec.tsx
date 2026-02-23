@@ -26,25 +26,19 @@ test('Undefined - Removal component', async ({ page }) => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
 
-        // Create the component element using h() function
         const o = $(undefined)
 
         const element = h('div', null,
             h('h3', null, 'Undefined - Removal'),
-            h('p', null, o)
+            h('p', null, () => o())
         )
 
-        // Render to body
         render(element, document.body)
     })
 
-    // Step-by-step verification
     const paragraph = page.locator('p')
-
-    // Initial state verification - should contain <!----> placeholder
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // Expect to find <!----> placeholder for undefined value
     await expect(innerHTML).toBe('<!---->')
 })
 

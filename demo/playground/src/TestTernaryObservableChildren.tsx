@@ -1,7 +1,6 @@
 import { $, $$, Ternary, renderToString } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
-// let testit = true
 
 const TestTernaryObservableChildren = (): JSX.Element => {
     // Track which component is currently active using a single state object
@@ -26,7 +25,6 @@ const TestTernaryObservableChildren = (): JSX.Element => {
                 ...currentState,
                 abActive: newComponent === a
             })
-            // testit = false
         }
         // Expose toggle function globally for manual control
         (globalThis as any).toggleAB = toggle
@@ -45,7 +43,6 @@ const TestTernaryObservableChildren = (): JSX.Element => {
                 ...currentState,
                 cdActive: newComponent === c
             })
-            // testit = false
         }
         // Expose toggle function globally for manual control
         (globalThis as any).toggleCD = toggle

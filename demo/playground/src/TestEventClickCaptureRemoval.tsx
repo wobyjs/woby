@@ -11,6 +11,10 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
         return prev + 1
     })
     onClick(() => increment)
+    
+    // Register the ref for testing
+    registerTestObservable('TestEventClickCaptureRemoval_ref', ref)
+    registerTestObservable('TestEventClickCaptureRemoval_onClick', onClick)
 
     // Fire click event programmatically for testing
     useInterval(() => {

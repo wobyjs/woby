@@ -1,15 +1,38 @@
 import { $, $$, renderToString } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestEventClickCaptureStatic = (): JSX.Element => {
     const o = $(0)
+    const ref = $<HTMLButtonElement>()
     registerTestObservable('TestEventClickCaptureStatic_o', o)
     const increment = () => o(prev => prev + 1)
+    
+    // Register the ref for testing
+    registerTestObservable('TestEventClickCaptureStatic_ref', ref)
+
+    // Fire click events programmatically for testing
+    useInterval(() => {
+        const button = ref()
+        if (button) {
+            // For capture events, we need to trigger the handler directly
+            if (button._onclickcapture) {
+                const mockEvent = {
+                    currentTarget: button,
+                    target: button,
+                    composedPath: () => [button, button.parentNode, document.body, document],
+                    cancelBubble: false,
+                    stopPropagation: () => {},
+                    stopImmediatePropagation: () => {}
+                };
+                button._onclickcapture.call(button, mockEvent);
+            }
+        }
+    }, TEST_INTERVAL)
 
     const ret: JSX.Element = (
         <>
             <h3>Event - Click Capture Static</h3>
-            <p><button onClickCapture={increment}>{o}</button></p>
+            <p><button ref={ref} onClickCapture={increment}>{o}</button></p>
         </>
     )
     

@@ -51,6 +51,16 @@ test('Refs - Nested component', async ({ page }) => {
 
         // Render to body
         render(element, document.body)
+        
+        // Update refs after render to update content
+        setTimeout(() => {
+            const element1 = ref1()
+            const element2 = ref2()
+            if (!element1 || !element2) return
+            const content1 = `Got ref1 - Has parent: ${!!element1.parentElement} - Is connected: ${!!element1.isConnected}`
+            const content2 = `Got ref2 - Has parent: ${!!element2.parentElement} - Is connected: ${!!element2.isConnected}`
+            element1.textContent = `${content1} / ${content2}`
+        }, 10)
     })
 
     // Step-by-step verification

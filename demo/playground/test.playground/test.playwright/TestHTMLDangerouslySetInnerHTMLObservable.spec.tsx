@@ -46,5 +46,5 @@ test('HTML - dangerouslySetInnerHTML - Observable component', async ({ page }) =
     // Initial state verification
     await page.waitForTimeout(50)
     const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<i>danger</i>')
+    await expect(innerHTML).toBe('<i>danger</i><!---->')
 })

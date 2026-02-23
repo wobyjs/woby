@@ -24,14 +24,14 @@ test('TestNestedIfs component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, If } = woby
 
         // Implement component logic based on TestNestedIfs.tsx
 
         // Create the component element using h() function
         const element = h('div', null,
-            h('woby-if', { when: true }, 
-                h('woby-if', { when: true },
+            h(If, { when: true }, 
+                h(If, { when: true },
                     h('div', null, '1'),
                     h('div', null, '2')
                 ),
@@ -44,11 +44,11 @@ test('TestNestedIfs component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const divContainer = page.locator('div').first()
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    const innerHTML = await divContainer.evaluate(el => el.innerHTML)
     // Add proper expectations based on TestNestedIfs.tsx
     await expect(innerHTML).toContain('1')
     await expect(innerHTML).toContain('2')

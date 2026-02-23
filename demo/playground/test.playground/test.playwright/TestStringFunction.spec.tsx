@@ -25,12 +25,9 @@ test('String - Function component', async ({ page }) => {
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
-
-        // Component logic extracted from source file
-        // String function with random values - uses useInterval to update
-        // [Implementation based on source file: TestStringFunction.tsx]
         
-        const { random } = woby
+        // Define random function locally since it's not available in the woby module
+        const random = () => Math.random()
         
         const TestStringFunction = () => {
             const o = $(String(random()))
@@ -63,7 +60,7 @@ test('String - Function component', async ({ page }) => {
     await expect(initialValue).toMatch(/^\d+\.\d+$/)
     
     // Get the observable value from window
-    const observableValue = await page.evaluate(() => window.testTestStringFunction.valueOf())
+    const observableValue = await page.evaluate(() => window.testTestStringFunction())
     await expect(initialValue).toBe(observableValue)
     
     // Step 1: Randomize the value

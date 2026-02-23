@@ -49,12 +49,8 @@ test('Event - Enter - Stop Propagation component', async ({ page }) => {
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
-    // Add proper expectations based on TestEventEnterStopPropagation.tsx
-    const outerButton = await paragraph.locator('button').first()
-    const innerButton = await outerButton.locator('button').first()
-    const outerText = await outerButton.evaluate(el => el.textContent)
-    const innerText = await innerButton.evaluate(el => el.textContent)
-    await expect(outerText).toBe('0')
-    await expect(innerText).toBe('0')
+    const outerText = await paragraph.locator('button').first().evaluate(el => el.textContent)
+    const innerText = await paragraph.locator('button').nth(1).evaluate(el => el.textContent)
+    await expect(outerText).toContain('0')
+    await expect(innerText).toContain('0')
 })

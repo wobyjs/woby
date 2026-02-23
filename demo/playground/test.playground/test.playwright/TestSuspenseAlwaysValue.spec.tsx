@@ -19,7 +19,7 @@ test('Suspense - Always Value component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, Suspense, useResource } = woby
 
         // Implement component logic based on TestSuspenseAlwaysValue.tsx
         

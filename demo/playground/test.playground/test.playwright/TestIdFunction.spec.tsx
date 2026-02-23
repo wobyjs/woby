@@ -32,16 +32,12 @@ test('ID - Function component', async ({ page }) => {
 
         const o = $('foo')
         window.testTestIdFunction = o  // Expose observable for testing
-
         const toggle = () => o(prev => (prev === 'foo') ? 'bar' : 'foo')
-
-        // Set up interval to toggle the observable
-        setInterval(toggle, 100)  // Using 100ms interval instead of TEST_INTERVAL
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'ID - Function'),
-            h('p', { id: o }, 'content')  // Using observable as id attribute
+            h('p', { id: () => o() }, 'content')  // Using observable function as id attribute
         )
 
         // Render to body
@@ -52,17 +48,22 @@ test('ID - Function component', async ({ page }) => {
     const paragraph = page.locator('p')
 
     // Initial state verification
-    await page.waitForTimeout(100)
+    await page.waitForTimeout(50)
     let innerHTML = await paragraph.evaluate(el => el.innerHTML)
     await expect(innerHTML).toBe('content')
 
     // Check initial ID
     const initialId = await paragraph.getAttribute('id')
-    expect(initialId).toMatch(/^(foo|bar)$/)  // Should be either 'foo' or 'bar' depending on timing
+    expect(initialId).toBe('foo')  // Should be 'foo' initially
 
-    // Wait for toggle to occur
-    await page.waitForTimeout(150)
+    // Manually trigger the toggle
+    await page.evaluate(() => {
+        const o = window.testTestIdFunction
+        const toggle = () => o(prev => (prev === 'foo') ? 'bar' : 'foo')
+        toggle()
+    })
+    
+    await page.waitForTimeout(50)
     const updatedId = await paragraph.getAttribute('id')
-    expect(updatedId).toMatch(/^(foo|bar)$/)  // Should have changed
-    expect(updatedId).not.toEqual(initialId)  // Should be different from initial
+    expect(updatedId).toBe('bar')  // Should be 'bar' after toggle
 })

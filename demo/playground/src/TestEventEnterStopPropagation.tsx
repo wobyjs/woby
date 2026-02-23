@@ -1,15 +1,49 @@
 import { $, $$, renderToString } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+
 
 const TestEventEnterStopPropagation = (): JSX.Element => {
-    const outer = $(0) // Static test
-    const inner = $(0) // Static test
-    // No event handlers or intervals for static test
+    const outer = $(0)
+    const inner = $(0)
+    const refOuter = $<HTMLButtonElement>()
+    const refInner = $<HTMLButtonElement>()
+    registerTestObservable('TestEventEnterStopPropagation_outer', outer)
+    registerTestObservable('TestEventEnterStopPropagation_inner', inner)
     
+    // Register refs for testing
+    registerTestObservable('TestEventEnterStopPropagation_refOuter', refOuter);
+    registerTestObservable('TestEventEnterStopPropagation_refInner', refInner);
+    
+    const incrementOuter = () => outer(prev => prev + 1);
+    
+    const incrementInner = event => {
+        event.stopPropagation();
+        inner(prev => prev + 1);
+    };
+
+    // Fire enter events programmatically for testing
+    // Only fire on the inner button to test stopPropagation behavior
+    useInterval(() => {
+        const buttonInner = refInner();
+        if (buttonInner) {
+            const mockEvent = {
+                currentTarget: buttonInner,
+                target: buttonInner,
+                composedPath: () => [buttonInner, buttonInner.parentNode, document.body, document],
+                cancelBubble: false,
+                stopPropagation: () => {},
+                stopImmediatePropagation: () => {}
+            };
+            if (buttonInner._onmouseenter) {
+                buttonInner._onmouseenter.call(buttonInner, mockEvent);
+            }
+        }
+    }, TEST_INTERVAL)
+
     const ret: JSX.Element = (
         <>
             <h3>Event - Enter - Stop Propagation</h3>
-            <p><button>{outer}<button>{inner}</button></button></p>
+            <p><button ref={refOuter} onMouseEnter={incrementOuter}>{outer}<button ref={refInner} onMouseEnter={incrementInner}>{inner}</button></button></p>
         </>
     )
     
@@ -22,10 +56,14 @@ const TestEventEnterStopPropagation = (): JSX.Element => {
 
 TestEventEnterStopPropagation.test = {
     static: true,
+    compareActualValues: true,
     expect: () => {
-        // For static test, return the expected fixed values
-        const expectedFull = '<h3>Event - Enter - Stop Propagation</h3><p><button>0<button>0</button></button></p>'  // For SSR comparison
-        const expected = '<p><button>0<button>0</button></button></p>'   // For main test comparison
+        let expected, expectedFull;
+
+            const outerValue = $$(testObservables['TestEventEnterStopPropagation_outer'])
+            const innerValue = $$(testObservables['TestEventEnterStopPropagation_inner'])
+            expected = `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
+            expectedFull = `<h3>Event - Enter - Stop Propagation</h3><p><button>${outerValue}<button>${innerValue}</button></button></p>`
         
         // Test the SSR value asynchronously
         setTimeout(() => {

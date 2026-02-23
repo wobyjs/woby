@@ -36,11 +36,12 @@ test('Ref - Unmounting component', async ({ page }) => {
     })
 
     // Step-by-step verification
-    const paragraph = page.locator('p')
+    const paragraphs = page.locator('p')
+    const firstParagraph = paragraphs.first()
 
     // Initial state verification
     await page.waitForTimeout(50)
-    const innerHTML = await paragraph.evaluate(el => el.innerHTML)
+    const innerHTML = await firstParagraph.evaluate(el => el.innerHTML)
     // Add proper expectations based on TestRefUnmounting.tsx
     await expect(innerHTML).toBe('No ref')
 })

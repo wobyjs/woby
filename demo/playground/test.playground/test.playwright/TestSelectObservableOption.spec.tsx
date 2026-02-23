@@ -58,12 +58,12 @@ test('Select - Observable Option component', async ({ page }) => {
     await expect(select).toHaveAttribute('name', 'select-observable-option')
 
     // Check that the 'bar' option is selected (since branch starts as true)
-    await expect(page.locator('option[value="bar"]')).toHaveAttribute('selected', '')
+    await expect(select).toHaveValue('bar')
 
     // Verify the exact HTML structure
     const bodyHTML = await page.evaluate(() => document.body.innerHTML)
     expect(bodyHTML).toContain('<select name="select-observable-option">')
-    expect(bodyHTML).toContain('<option value="bar" selected>')
+    expect(bodyHTML).toContain('<option value="bar">')
 
     // Verify the observable value
     const observableValue = await page.evaluate(() => window.testSelectObservableOption())

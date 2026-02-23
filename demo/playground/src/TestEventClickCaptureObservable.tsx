@@ -18,15 +18,19 @@ const TestEventClickCaptureObservable = (): JSX.Element => {
     const ref = $<HTMLButtonElement>()
     registerTestObservable('TestEventClickCaptureObservable_o', o)
     const onClick = $(() => { })
-    const plus2 = () => o(prev => {
-        onClick(() => minus1)
-        return prev + 2
-    })
-    const minus1 = () => o(prev => {
-        onClick(() => plus2)
-        return prev - 1
-    })
+    const plus2 = (event: Event) => {
+        onClick(() => minus1);
+        o(prev => prev + 2);
+    }
+    const minus1 = (event: Event) => {
+        onClick(() => plus2);
+        o(prev => prev - 1);
+    }
     onClick(() => plus2)
+    
+    // Register the ref for testing
+    registerTestObservable('TestEventClickCaptureObservable_ref', ref)
+    registerTestObservable('TestEventClickCaptureObservable_onClick', onClick)
 
     // Fire click event programmatically for testing
     useInterval(() => {

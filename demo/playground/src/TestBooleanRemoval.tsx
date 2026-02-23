@@ -1,18 +1,23 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestBooleanRemoval = (): JSX.Element => {
-    const o = $<boolean | null>(true)
+    const o = $<boolean | string>(true)
     // Store the observable globally so the test can access it
     registerTestObservable('TestBooleanRemoval', o)
-    const toggle = () => o(prev => prev ? null : true)
+    const toggle = () => o(prev => prev === true ? 'removed' : true)
     useInterval(toggle, TEST_INTERVAL)
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Boolean - Removal</h3>
             <p>({o})</p>
         </>
     )
+
+    // Store the component for SSR testing
+    registerTestObservable('TestBooleanRemoval_ssr', ret)
+
+    return ret
 }
 
 TestBooleanRemoval.test = {
@@ -20,14 +25,34 @@ TestBooleanRemoval.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestBooleanRemoval'])
-        if (value === null) {
-            return '<p>(<!---->)</p>'
+        let expected: string
+        if (value === 'removed') {
+            expected = '<p>(removed)</p>'
         } else if (typeof value === 'boolean') {
-            // In Woby, boolean true renders as placeholder, boolean false renders as placeholder
-            return '<p>(<!---->)</p>'
+            expected = '<p>(<!---->)</p>'
         } else {
-            return `<p>(${String(value)})</p>`
+            expected = `<p>(${String(value)})</p>`
         }
+
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestBooleanRemoval_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = `<h3>Boolean - Removal</h3>${expected}`
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+
+        return expected
     }
 }
 

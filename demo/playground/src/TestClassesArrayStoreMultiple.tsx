@@ -1,7 +1,6 @@
 import { $, $$, store, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-let testit = true
 const TestClassesArrayStoreMultiple = (): JSX.Element => {
     const o = $(['red bold', false])
     registerTestObservable('TestClassesArrayStoreMultiple', o)
@@ -13,7 +12,6 @@ const TestClassesArrayStoreMultiple = (): JSX.Element => {
             o[0] = 'red bold'
             o[1] = false
         }
-        testit = false
     }
     useInterval(toggle, TEST_INTERVAL)
     const ret: JSX.Element = (

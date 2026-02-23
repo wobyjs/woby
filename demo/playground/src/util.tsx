@@ -37,14 +37,14 @@ export const randomColor = (): string => {
 }
 
 // Global test observables registry
-export const testObservables: Record<string, Observable<any>> = {}
+export const testObservables: Record<string, Observable<any> | JSX.Child> = {}
 
 // Expose testObservables globally for testing
 if (typeof window !== 'undefined') {
     (window as any).testObservables = testObservables
 }
 
-export const registerTestObservable = (name: string, observable: Observable<any>) => {
+export const registerTestObservable = (name: string, observable: Observable<any> | JSX.Child) => {
     testObservables[name] = observable
 }
 
@@ -97,7 +97,7 @@ export const useTimeout = (callback, delay) => {
 
 let staticIndex = 0
 
-export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component | Constructor<any>) & { test: { static?: boolean, wrap?: boolean, snapshots?: string[], compareActualValues?: boolean, expect?: () => string }, name?: string }, props?: Record<any, any> }): JSX.Element => {
+export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component | Constructor<any>) & { test: { static?: boolean, enable?: () => boolean, wrap?: boolean, snapshots?: string[], compareActualValues?: boolean, expect?: () => string }, name?: string }, props?: Record<any, any> }): JSX.Element => {
     const ref = $<HTMLDivElement>()
     const index = staticIndex++
     let htmlPrev = ''
@@ -114,52 +114,6 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
         // Only convert BigInt values for specific test cases
         let htmlWitRandomBigint = htmlWithoutTitle
 
-        // Convert BigInt values to {random-bigint} format for dynamic tests
-        // Keep static BigInt values as-is
-        if (!isStatic) {
-            htmlWitRandomBigint = htmlWitRandomBigint.replace(/(?<!\d)([0-9]+)n\b/g, '{random-bigint}')
-
-            // For dynamic tests, also convert numbers that look like they could be BigInt values
-            // Convert numbers that are likely BigInt values (small random numbers from randomBigInt())
-            // But exclude small sequential numbers like 0, 1, 2, 3 that are used for counting
-            htmlWitRandomBigint = htmlWitRandomBigint.replace(/(?<!\d)([0-9]+)\b(?!\.)/g, (match, number) => {
-                const num = parseInt(number)
-                // If it's a small number that could be from randomBigInt() but not a typical counter (11-100)
-                if (num >= 11 && num <= 100) {
-                    return '{random-bigint}'
-                }
-                return match
-            })
-            // Also convert numbers inside parentheses that are likely BigInt values
-            htmlWitRandomBigint = htmlWitRandomBigint.replace(/\((\d+)\)/g, (match, number) => {
-                const num = parseInt(number)
-                // If it's a small number that could be from randomBigInt() but not a typical counter (11-100)
-                if (num >= 11 && num <= 100) {
-                    return '({random-bigint})'
-                }
-                return match
-            })
-            // Convert standalone numbers that are likely from BigInt values in dynamic tests
-            // This handles cases where BigInt values have been converted to regular numbers during rendering
-            htmlWitRandomBigint = htmlWitRandomBigint.replace(/<p>(\d+)<\/p>/g, (match, number) => {
-                const num = parseInt(number)
-                // For dynamic BigInt tests, convert numbers in <p> tags to {random-bigint}
-                // This is a heuristic based on the test structure
-                if (componentName === 'TestBigIntObservable' || componentName === 'TestBigIntFunction') {
-                    return '<p>{random-bigint}</p>'
-                }
-                return match
-            })
-            // Handle numbers in parentheses for BigInt removal tests
-            htmlWitRandomBigint = htmlWitRandomBigint.replace(/<p>\((\d+)\)<\/p>/g, (match, number) => {
-                const num = parseInt(number)
-                // For dynamic BigInt removal tests, convert numbers in parentheses to {random-bigint}
-                if (componentName === 'TestBigIntRemoval') {
-                    return '<p>({random-bigint})</p>'
-                }
-                return match
-            })
-        }
 
         // Handle empty placeholders for removal tests
         // But preserve actual empty parentheses for NullRemoval and UndefinedRemoval tests
@@ -176,69 +130,74 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
         const indexPrev = index
         ticks += 1
 
-        // New format: component uses compareActualValues without snapshots, or has an expect function
-        const actualHTMLForNewFormat = getHTML()
-        const actualSnapshot = actualHTMLForNewFormat ? actualHTMLForNewFormat.replace(/<h3>[^<]*<\/h3>/, '') : ''
+        // Use microtask to ensure DOM is updated before assertion
+        queueMicrotask(() => {
 
-        // If the component has an expect function (like our new format), use that for comparison
-        if (Component.test.expect && typeof Component.test.expect === 'function') {
-            // The expect function is being executed - this is the key verification
-            const expectedValue = Component.test.expect()
+            // New format: component uses compareActualValues without snapshots, or has an expect function
+            const actualHTMLForNewFormat = getHTML()
+            const actualSnapshot = actualHTMLForNewFormat ? actualHTMLForNewFormat.replace(/<h3>[^<]*<\/h3>/, '') : ''
 
-            // For static components, verify exact match
-            if (Component.test.static) {
-                // For static tests, DO NOT convert actual values to placeholders
-                // Compare actual literal values directly with expected values
-                const actualForComparison = actualSnapshot
+            if (!Component.test.enable || Component.test.enable())
+                // If the component has an expect function (like our new format), use that for comparison
+                if (Component.test.expect && typeof Component.test.expect === 'function') {
+                    // The expect function is being executed - this is the key verification
+                    const expectedValue = Component.test.expect()
 
-                // console.log('STATIC TEST - Actual (before conversion):', JSON.stringify(actualForComparison))
-                // console.log('STATIC TEST - Expected (before conversion):', JSON.stringify(expectedValue))
-                // console.log('STATIC TEST - Actual (after conversion):', JSON.stringify(actualForComparison))
-                // console.log('STATIC TEST - Expected (unchanged):', JSON.stringify(expectedValue))
-                // console.log('STATIC TEST - Equal:', actualForComparison === expectedValue)
-                if (actualForComparison === expectedValue) {
-                    //temp hide for assertion only
-                    console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
-                } else {
-                    assert(false, `[${Component.name}]: Expected actual '${actualForComparison}' to be equal to function result '${expectedValue}'`)
-                }
-            } else {
-                // For dynamic components with compareActualValues, use the expect function result directly
-                // without placeholder conversion
-                if (Component.test.compareActualValues) {
-                    if (actualSnapshot === expectedValue) {
-                        //temp hide for assertion only
-                        console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
-                    } else {
-                        assert(false, `[${Component.name}]: Expected '${actualSnapshot}' to match function result '${expectedValue}'`)
-                    }
-                } else {
-                    // For other dynamic components, we need to convert both actual and expected to the same format
-                    // using the same placeholder logic as getSnapshot()
-                    // console.log(`${Component.name} expect function executed, returned: ${expectedValue}`)
-                    // console.log('DYNAMIC TEST - Actual (before conversion):', JSON.stringify(actualSnapshot))
-                    // console.log('DYNAMIC TEST - Expected (before conversion):', JSON.stringify(expectedValue))
+                    // For static components, verify exact match
+                    if (Component.test.static) {
+                        // For static tests, DO NOT convert actual values to placeholders
+                        // Compare actual literal values directly with expected values
+                        const actualForComparison = actualSnapshot
 
-                    // For dynamic components with registered observables, compare actual values directly
-                    // Components must use registerTestObservable and return concrete values in expect function
-                    if (expectedValue && expectedValue.trim() !== '') {
-                        if (actualSnapshot === expectedValue) {
-                            // temp hide for assertion only
+                        // console.log('STATIC TEST - Actual (before conversion):', JSON.stringify(actualForComparison))
+                        // console.log('STATIC TEST - Expected (before conversion):', JSON.stringify(expectedValue))
+                        // console.log('STATIC TEST - Actual (after conversion):', JSON.stringify(actualForComparison))
+                        // console.log('STATIC TEST - Expected (unchanged):', JSON.stringify(expectedValue))
+                        // console.log('STATIC TEST - Equal:', actualForComparison === expectedValue)
+                        if (actualForComparison === expectedValue) {
+                            //temp hide for assertion only
                             console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                         } else {
-                            assert(false, `[${Component.name}]: Expected actual '${actualSnapshot}' to match expected '${expectedValue}'`)
+                            assert(false, `[${Component.name}]: Expected actual '${actualForComparison}' to be equal to function result '${expectedValue}'`)
                         }
                     } else {
-                        assert(false, `[${Component.name}]: Expect function returned empty result: '${expectedValue}'`)
-                    }
-                }
-            }
-        } else if (Component.test.compareActualValues) {
-            // For compareActualValues without expect function, do basic validation
-            assert(actualSnapshot.includes('<p>') && actualSnapshot.includes('<\/p>'), `[${Component.name}]: Expected to render a paragraph element`)
-        }
+                        // For dynamic components with compareActualValues, use the expect function result directly
+                        // without placeholder conversion
+                        if (Component.test.compareActualValues) {
+                            if (actualSnapshot === expectedValue) {
+                                //temp hide for assertion only
+                                console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
+                            } else {
+                                assert(false, `[${Component.name}]: Expected '${actualSnapshot}' to match function result '${expectedValue}'`)
+                            }
+                        } else {
+                            // For other dynamic components, we need to convert both actual and expected to the same format
+                            // using the same placeholder logic as getSnapshot()
+                            // console.log(`${Component.name} expect function executed, returned: ${expectedValue}`)
+                            // console.log('DYNAMIC TEST - Actual (before conversion):', JSON.stringify(actualSnapshot))
+                            // console.log('DYNAMIC TEST - Expected (before conversion):', JSON.stringify(expectedValue))
 
-        htmlPrev = actualHTMLForNewFormat
+                            // For dynamic components with registered observables, compare actual values directly
+                            // Components must use registerTestObservable and return concrete values in expect function
+                            if (expectedValue && expectedValue.trim() !== '') {
+                                if (actualSnapshot === expectedValue) {
+                                    // temp hide for assertion only
+                                    console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
+                                } else {
+                                    assert(false, `[${Component.name}]: Expected actual '${actualSnapshot}' to match expected '${expectedValue}'`)
+                                }
+                            } else {
+                                assert(false, `[${Component.name}]: Expect function returned empty result: '${expectedValue}'`)
+                            }
+                        }
+                    }
+                } else if (Component.test.compareActualValues) {
+                    // For compareActualValues without expect function, do basic validation
+                    assert(actualSnapshot.includes('<p>') && actualSnapshot.includes('<\/p>'), `[${Component.name}]: Expected to render a paragraph element`)
+                }
+
+            htmlPrev = actualHTMLForNewFormat
+        }) // Close queueMicrotask
     }
     const noUpdate = (): void => {
         assert(false, `[${Component.name}]: Expected no updates to ever happen`)
@@ -253,7 +212,11 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
         if (!root) return
         tick()
         const timeoutId = setTimeout(yesUpdate, 1500)
-        const onMutation = Component.test.static ? noUpdate : tick
+        const onMutation = Component.test.static ? noUpdate : () => {
+            console.log(`[util.tsx] Mutation detected for ${Component.name}`)
+            // Call tick immediately to see if this works
+            tick()
+        }
         const observer = new MutationObserver(onMutation)
         const options = { attributes: true, childList: true, characterData: true, subtree: true }
         observer.observe(root, options)

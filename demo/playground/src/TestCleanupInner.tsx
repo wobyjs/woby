@@ -1,5 +1,5 @@
-import { $, $$, If } from 'woby'
-import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, If, renderToString } from 'woby'
+import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestCleanupInner = () => {
     const page = $(true)
@@ -34,7 +34,7 @@ const TestCleanupInner = () => {
             </>
         )
     }
-    return () => {
+    const ret = () => {
         const Page = page() ? Page1 : Page2
         return (
             <>
@@ -43,13 +43,38 @@ const TestCleanupInner = () => {
             </>
         )
     }
+
+    // Store the component for SSR testing
+    registerTestObservable('TestCleanupInner_ssr', ret)
+
+    return ret
 }
 
 TestCleanupInner.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        return '<p>page1</p><button>Toggle Page</button>'
+        const expected = '<p>page1</p><button>Toggle Page</button>'
+
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestCleanupInner_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = `<h3>Cleanup - Inner</h3>${expected}`
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+
+        return expected
     }
 }
 

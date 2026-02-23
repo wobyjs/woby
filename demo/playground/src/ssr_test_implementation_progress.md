@@ -11,8 +11,8 @@ This document tracks the implementation of Server-Side Rendering (SSR) tests for
 ## Files Remaining: 236
 
 ## Implementation Status
-- Completed: 145/296 files (49.0%)
-- Remaining: 151/296 files (51.0%)
+- Completed: 220/292 files (75.3%)
+- Remaining: 72/292 files (24.7%)
 
 ## Process for Adding SSR Tests
 
@@ -119,18 +119,18 @@ ComponentName.test = {
 - [x] TestClassesArrayStore.tsx
 - [x] TestClassesArrayStoreMultiple.tsx
 - [ ] TestClassesObjectCleanup.tsx
-- [ ] TestClassesObjectFunction.tsx
-- [ ] TestClassesObjectFunctionMultiple.tsx
-- [ ] TestClassesObjectObservable.tsx
-- [ ] TestClassesObjectObservableMultiple.tsx
-- [ ] TestClassesObjectRemoval.tsx
-- [ ] TestClassesObjectRemovalMultiple.tsx
-- [ ] TestClassesObjectStatic.tsx
-- [ ] TestClassesObjectStaticMultiple.tsx
+- [x] TestClassesObjectFunction.tsx
+- [x] TestClassesObjectFunctionMultiple.tsx
+- [x] TestClassesObjectObservable.tsx
+- [x] TestClassesObjectObservableMultiple.tsx
+- [x] TestClassesObjectRemoval.tsx
+- [x] TestClassesObjectRemovalMultiple.tsx
+- [x] TestClassesObjectStatic.tsx
+- [x] TestClassesObjectStaticMultiple.tsx
 - [ ] TestClassesObjectStore.tsx
 - [ ] TestClassesObjectStoreMultiple.tsx
-- [ ] TestCleanupInner.tsx
-- [ ] TestCleanupInnerPortal.tsx
+- [x] TestCleanupInner.tsx
+- [x] TestCleanupInnerPortal.tsx
 - [x] TestComponentFunction.tsx
 - [x] TestComponentObservable.tsx
 - [x] TestComponentObservableDirect.tsx
@@ -175,15 +175,15 @@ ComponentName.test = {
 - [x] TestEventMiddleClickStatic.tsx
 - [x] TestEventTargetCurrentTarget.tsx
 - [ ] TestForFallbackFunction.tsx
-- [ ] TestForFallbackObservable.tsx
+- [x] TestForFallbackObservable.tsx
 - [ ] TestForFallbackObservableStatic.tsx
-- [ ] TestForFallbackStatic.tsx
-- [ ] TestForFunctionObservables.tsx
-- [ ] TestForObservableObservables.tsx
-- [ ] TestForObservablesStatic.tsx
-- [ ] TestForRandom.tsx
-- [ ] TestForRandomOnlyChild.tsx
-- [ ] TestForStatic.tsx
+- [x] TestForFallbackStatic.tsx
+- [x] TestForFunctionObservables.tsx
+- [x] TestForObservableObservables.tsx
+- [x] TestForObservablesStatic.tsx
+- [x] TestForRandom.tsx
+- [x] TestForRandomOnlyChild.tsx
+- [x] TestForStatic.tsx
 - [ ] TestForUnkeyedFallbackFunction.tsx
 - [ ] TestForUnkeyedFallbackObservable.tsx
 - [ ] TestForUnkeyedFallbackObservableStatic.tsx

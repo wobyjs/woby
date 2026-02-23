@@ -1,5 +1,5 @@
-import { $, $$ } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestABCD = (): JSX.Element => {
     const states = [
@@ -13,12 +13,20 @@ const TestABCD = (): JSX.Element => {
     registerTestObservable('TestABCD', index)
     const increment = () => index(prev => (prev + 1) % states.length)
     useInterval(increment, TEST_INTERVAL)
-    return (
+    
+    const getCurrentElement = () => states[index()]
+    
+    const ret: JSX.Element = (
         <>
             <h3>Children - ABCD</h3>
-            <p>{() => states[index()]}</p>
+            <p>{getCurrentElement}</p>
         </>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestABCD_ssr', ret)
+    
+    return ret
 }
 
 TestABCD.test = {
@@ -27,7 +35,33 @@ TestABCD.test = {
     expect: () => {
         const idx = $$(testObservables['TestABCD'])
         const elements = ['<p><i>a</i></p>', '<p><u>b</u></p>', '<p><b>c</b></p>', '<p><span>d</span></p>']
-        return elements[idx]
+        const expected = elements[idx]
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestABCD_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const fullElements = [
+                        '<h3>Children - ABCD</h3><p><i>a</i></p>',
+                        '<h3>Children - ABCD</h3><p><u>b</u></p>',
+                        '<h3>Children - ABCD</h3><p><b>c</b></p>',
+                        '<h3>Children - ABCD</h3><p><span>d</span></p>'
+                    ]
+                    const expectedFull = fullElements[idx]
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
     }
 }
 

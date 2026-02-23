@@ -699,9 +699,22 @@ const setEventStatic = (() => {
 
             if (valuePrev) element.removeEventListener(type, valuePrev, { capture: true })
 
-            if (value) element.addEventListener(type, value, { capture: true })
-
-            element[key] = value
+            if (isNil(value)) {
+                element[key] = null
+            } else if (isObservable(value)) {
+                // Create a wrapper that resolves the observable when the event fires
+                const wrapper = (event: Event) => {
+                    const resolvedValue = (value as Function)();
+                    if (resolvedValue && typeof resolvedValue === 'function') {
+                        return resolvedValue(event);
+                    }
+                };
+                element.addEventListener(type, wrapper, { capture: true });
+                element[key] = wrapper;
+            } else {
+                if (value) element.addEventListener(type, value, { capture: true })
+                element[key] = value
+            }
 
         } else {
 

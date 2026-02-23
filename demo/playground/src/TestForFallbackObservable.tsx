@@ -1,5 +1,5 @@
-import { $, $$, For } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
+import { $, $$, For, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestForFallbackObservable = (): JSX.Element => {
     const o = $('0.5') // Use fixed value instead of random
@@ -15,7 +15,7 @@ const TestForFallbackObservable = (): JSX.Element => {
     }
     // Store the observable globally so the test can access it
     registerTestObservable('TestForFallbackObservable', o)
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>For - Fallback Observable</h3>
             <For values={[]} fallback={<Fallback />}>
@@ -25,12 +25,39 @@ const TestForFallbackObservable = (): JSX.Element => {
             </For>
         </>
     )
+
+    // Store the component for SSR testing
+    registerTestObservable('TestForFallbackObservable_ssr', ret)
+
+    return ret
 }
 
 TestForFallbackObservable.test = {
     static: true,
     compareActualValues: true,
-    expect: () => `<p>Fallback: 0.5</p>`
+    expect: () => {
+        const expected = `<p>Fallback: 0.5</p>`
+
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestForFallbackObservable_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = `<h3>For - Fallback Observable</h3>${expected}`
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+
+        return expected
+    }
 }
 
 

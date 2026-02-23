@@ -39,7 +39,9 @@ test('If - Function Untracked Narrowed component', async ({ page }) => {
         const element = h('div', null,
             h('h3', null, 'If - Function Untracked Narrowed'),
             h('p', null, '(',
-                h(If, { when: o, children: (value: any) => $$(content).toString() } as any),
+                h(If, { when: o },
+                    h('span', null, () => $$(content).toString())
+                ),
                 ')'
             )
         )
