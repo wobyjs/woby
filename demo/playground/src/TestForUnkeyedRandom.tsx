@@ -9,10 +9,8 @@ const TestForUnkeyedRandom = (): JSX.Element => {
 
     // Update with new random values occasionally to satisfy "at least one update" requirement
     const update = () => {
-        // Update with the same random values to keep them consistent after initial render
-        // Actually, let's update with new random values to simulate dynamic behavior
-        const currentValues = values()
-        values([...currentValues]) // Trigger update with same values
+        // Generate new random values to ensure actual update occurs
+        values([random(), random(), random()])
     }
     // Use interval to ensure updates happen
     useInterval(update, TEST_INTERVAL)

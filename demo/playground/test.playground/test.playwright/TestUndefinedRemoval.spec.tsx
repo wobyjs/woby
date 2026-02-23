@@ -30,7 +30,7 @@ test('Undefined - Removal component', async ({ page }) => {
 
         const element = h('div', null,
             h('h3', null, 'Undefined - Removal'),
-            h('p', null, () => o())
+            h('p', null, o)
         )
 
         render(element, document.body)

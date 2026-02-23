@@ -12,10 +12,10 @@ const TestStylesRemoval = (): JSX.Element => {
             <p style={o}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStylesRemoval_ssr', ret)
-    
+
     return ret
 }
 
@@ -24,7 +24,7 @@ TestStylesRemoval.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestStylesRemoval'])
-        let expected;
+        let expected
         if (value) {
             const styles = []
             for (const [prop, val] of Object.entries(value)) {
@@ -35,14 +35,14 @@ TestStylesRemoval.test = {
         } else {
             expected = '<p style="">content</p>'
         }
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStylesRemoval_ssr']
             if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
-                    let expectedFull;
+                    let expectedFull
                     if (value) {
                         const styles = []
                         for (const [prop, val] of Object.entries(value)) {
@@ -63,7 +63,7 @@ TestStylesRemoval.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

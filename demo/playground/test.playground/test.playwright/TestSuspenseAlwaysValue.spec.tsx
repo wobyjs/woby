@@ -22,7 +22,7 @@ test('Suspense - Always Value component', async ({ page }) => {
         const { $, h, render, Suspense, useResource } = woby
 
         // Implement component logic based on TestSuspenseAlwaysValue.tsx
-        
+
         const element = h(TestSuspenseAlwaysValue, null)
 
         function TestSuspenseAlwaysValue() {

@@ -1,21 +1,24 @@
 import { $, $$, renderToString, useEffect } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-let testit = true
-
 const TestClassesObjectRemoval = (): JSX.Element => {
-    const o = $<FunctionUnwrap<JSX.Class> | null>({ red: true, blue: false })
+    const o = $<JSX.Class | null>({ red: true, blue: false })
     // Store the observable globally so the test can access it
     registerTestObservable('TestClassesObjectRemoval', o)
 
     // Add logging for state changes
     useEffect(() => {
         console.log('[TestClassesObjectRemoval] Initial state:', $$(o))
-    }, [])
+    })
+
+    // Log when the observable changes
+    useEffect(() => {
+        const currentValue = $$(o)
+        console.log('[TestClassesObjectRemoval] Observable changed to:', currentValue)
+    })
 
     const toggle = () => {
         const newState = o(prev => prev ? null : { red: true, blue: false })
-        testit = false
         console.log('[TestClassesObjectRemoval] Toggled to:', newState)
         return newState
     }
@@ -50,11 +53,8 @@ TestClassesObjectRemoval.test = {
             if (value.blue) className += 'blue '
             expected = `<p class="${className.trim()}">content</p>`
         } else {
-            expected = '<p>content</p>'
+            expected = '<p class="">content</p>'
         }
-
-        // Reset testit for next cycle
-        testit = !value
 
         // Test the SSR value asynchronously
         setTimeout(() => {

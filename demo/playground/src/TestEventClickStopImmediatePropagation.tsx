@@ -10,23 +10,23 @@ const TestEventClickStopImmediatePropagation = (): JSX.Element => {
     registerTestObservable('TestEventClickStopImmediatePropagation_inner', inner)
     const onClickOuter = $(() => { })
     const onClickInner = $(() => { })
-    
+
     const incrementOuter = () => {
         outer(prev => prev + 1)
     }
-    
+
     const incrementInner = event => {
         event.stopImmediatePropagation()
         inner(prev => prev + 1)
     }
-    
+
     onClickOuter(() => incrementOuter)
     onClickInner(() => incrementInner)
 
     // Fire click events programmatically for testing
     // Only fire on the inner button to test stopImmediatePropagation behavior
     useInterval(() => {
-        const buttonInner = refInner();
+        const buttonInner = refInner()
         if (buttonInner) {
             // For delegated events, manually trigger the handler
             if (buttonInner._onclick) {
@@ -35,10 +35,10 @@ const TestEventClickStopImmediatePropagation = (): JSX.Element => {
                     target: buttonInner,
                     composedPath: () => [buttonInner, buttonInner.parentNode, document.body, document],
                     cancelBubble: false,
-                    stopPropagation: () => {},
-                    stopImmediatePropagation: () => {}
-                };
-                buttonInner._onclick.call(buttonInner, mockEvent);
+                    stopPropagation: () => { },
+                    stopImmediatePropagation: () => { }
+                }
+                buttonInner._onclick.call(buttonInner, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -49,26 +49,26 @@ const TestEventClickStopImmediatePropagation = (): JSX.Element => {
             <p><button ref={refOuter} onClick={onClickOuter}>{outer}<button ref={refInner} onClick={onClickInner}>{inner}</button></button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventClickStopImmediatePropagation_ssr', ret)
-    
+
     return ret
 }
 
 
 TestEventClickStopImmediatePropagation.test = {
-    static: true,
+    static: false,
     compareActualValues: true,
     expect: () => {
-        let expected, expectedFull;
-   
-            const outerValue = $$(testObservables['TestEventClickStopImmediatePropagation_outer'])
-            const innerValue = $$(testObservables['TestEventClickStopImmediatePropagation_inner'])
+        let expected, expectedFull
 
-            expected = `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
-            expectedFull = `<h3>Event - Click - Stop Immediate Propagation</h3><p><button>${outerValue}<button>${innerValue}</button></button></p>`
-        
+        const outerValue = $$(testObservables['TestEventClickStopImmediatePropagation_outer'])
+        const innerValue = $$(testObservables['TestEventClickStopImmediatePropagation_inner'])
+
+        expected = `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
+        expectedFull = `<h3>Event - Click - Stop Immediate Propagation</h3><p><button>${outerValue}<button>${innerValue}</button></button></p>`
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventClickStopImmediatePropagation_ssr']
@@ -87,7 +87,7 @@ TestEventClickStopImmediatePropagation.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -25,16 +25,16 @@ test('String - Function component', async ({ page }) => {
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render } = woby
-        
+
         // Define random function locally since it's not available in the woby module
         const random = () => Math.random()
-        
+
         const TestStringFunction = () => {
             const o = $(String(random()))
             const testTestStringFunction = o
             window.testTestStringFunction = testTestStringFunction
             const randomize = () => o(String(random()))
-            
+
             return [
                 h('h3', null, 'String - Function'),
                 h('p', null, () => o())
@@ -54,15 +54,15 @@ test('String - Function component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     await expect(heading).toHaveText('String - Function')
-    
+
     // Check initial value is a random string
     const initialValue = await paragraph.evaluate(el => el.innerHTML)
     await expect(initialValue).toMatch(/^\d+\.\d+$/)
-    
+
     // Get the observable value from window
     const observableValue = await page.evaluate(() => window.testTestStringFunction())
     await expect(initialValue).toBe(observableValue)
-    
+
     // Step 1: Randomize the value
     await page.evaluate(() => {
         const o = window.testTestStringFunction

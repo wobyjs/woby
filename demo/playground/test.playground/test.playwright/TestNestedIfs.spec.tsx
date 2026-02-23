@@ -30,7 +30,7 @@ test('TestNestedIfs component', async ({ page }) => {
 
         // Create the component element using h() function
         const element = h('div', null,
-            h(If, { when: true }, 
+            h(If, { when: true },
                 h(If, { when: true },
                     h('div', null, '1'),
                     h('div', null, '2')

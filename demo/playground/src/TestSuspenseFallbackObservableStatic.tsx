@@ -21,10 +21,10 @@ const TestSuspenseFallbackObservableStatic = (): JSX.Element => {
             </Suspense>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSuspenseFallbackObservableStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -34,7 +34,7 @@ TestSuspenseFallbackObservableStatic.test = {
     expect: () => {
         const initialValue = testObservables['TestSuspenseFallbackObservableStatic']
         const expected = `<p>Fallback: ${initialValue}</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSuspenseFallbackObservableStatic_ssr']
@@ -52,7 +52,7 @@ TestSuspenseFallbackObservableStatic.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

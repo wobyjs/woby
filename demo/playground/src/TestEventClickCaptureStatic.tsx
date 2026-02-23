@@ -6,7 +6,7 @@ const TestEventClickCaptureStatic = (): JSX.Element => {
     const ref = $<HTMLButtonElement>()
     registerTestObservable('TestEventClickCaptureStatic_o', o)
     const increment = () => o(prev => prev + 1)
-    
+
     // Register the ref for testing
     registerTestObservable('TestEventClickCaptureStatic_ref', ref)
 
@@ -21,10 +21,10 @@ const TestEventClickCaptureStatic = (): JSX.Element => {
                     target: button,
                     composedPath: () => [button, button.parentNode, document.body, document],
                     cancelBubble: false,
-                    stopPropagation: () => {},
-                    stopImmediatePropagation: () => {}
-                };
-                button._onclickcapture.call(button, mockEvent);
+                    stopPropagation: () => { },
+                    stopImmediatePropagation: () => { }
+                }
+                button._onclickcapture.call(button, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -35,23 +35,23 @@ const TestEventClickCaptureStatic = (): JSX.Element => {
             <p><button ref={ref} onClickCapture={increment}>{o}</button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventClickCaptureStatic_ssr', ret)
-    
+
     return ret
 }
 
 
 TestEventClickCaptureStatic.test = {
-    static: true,
+    static: false,
     expect: () => {
-        const value = testObservables['TestEventClickCaptureStatic_o']?.() ?? 0
-        
+        const value = $$(testObservables['TestEventClickCaptureStatic_o']) ?? 0
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Event - Click Capture Static</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventClickCaptureStatic_ssr']
@@ -70,7 +70,7 @@ TestEventClickCaptureStatic.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

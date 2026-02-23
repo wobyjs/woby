@@ -25,7 +25,7 @@ test('Template - SVG component', async ({ page }) => {
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render, template } = woby
-        
+
         // Define randomColor function locally since it's not available in the util
         const randomColor = () => {
             const letters = '0123456789ABCDEF'

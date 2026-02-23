@@ -12,10 +12,10 @@ const TestStyleFunctionString = (): JSX.Element => {
             <p style={() => o()}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStyleFunctionString_ssr', ret)
-    
+
     return ret
 }
 
@@ -24,7 +24,7 @@ TestStyleFunctionString.test = {
     expect: () => {
         const value = $$(testObservables['TestStyleFunctionString'])
         const expected = `<p style="${value}">content</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStyleFunctionString_ssr']
@@ -42,7 +42,7 @@ TestStyleFunctionString.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

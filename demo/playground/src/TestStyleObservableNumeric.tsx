@@ -12,10 +12,10 @@ const TestStyleObservableNumeric = (): JSX.Element => {
             <p style={o}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStyleObservableNumeric_ssr', ret)
-    
+
     return ret
 }
 
@@ -24,7 +24,7 @@ TestStyleObservableNumeric.test = {
     expect: () => {
         const value = $$(testObservables['TestStyleObservableNumeric'])
         const expected = `<p style="flex-grow: ${value.flexGrow}; width: ${value.width}px;">content</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStyleObservableNumeric_ssr']
@@ -42,7 +42,7 @@ TestStyleObservableNumeric.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -20,8 +20,8 @@ const TestEventClickAndClickCaptureStatic = (): JSX.Element => {
                     target: button,
                     composedPath: () => [button, button.parentNode, document.body, document],
                     cancelBubble: false
-                };
-                button._onclick.call(button, mockEvent);
+                }
+                button._onclick.call(button, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -32,22 +32,22 @@ const TestEventClickAndClickCaptureStatic = (): JSX.Element => {
             <p><button ref={ref} onClick={increment} onClickCapture={captureIncrement}>{o}</button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventClickAndClickCaptureStatic_ssr', ret)
-    
+
     return ret
 }
 
 
 TestEventClickAndClickCaptureStatic.test = {
-    static: true,
+    static: false,
     expect: () => {
-        const value = testObservables['TestEventClickAndClickCaptureStatic_o']?.() ?? 0
-        
+        const value = $$(testObservables['TestEventClickAndClickCaptureStatic_o']) ?? 0
+
         // For client-side test, use the current value
         const expected = `<p><button>${value}</button></p>`   // For main test comparison (current value)
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventClickAndClickCaptureStatic_ssr']
@@ -55,8 +55,8 @@ TestEventClickAndClickCaptureStatic.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     // Extract the button value from SSR result to use for comparison
-                    const match = ssrResult.match(/<button[^>]*>(.*?)<\/button>/);
-                    const ssrValue = match ? match[1] : '0';
+                    const match = ssrResult.match(/<button[^>]*>(.*?)<\/button>/)
+                    const ssrValue = match ? match[1] : '0'
                     const expectedFull = `<h3>Event - Click &amp; Click Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
                     // Handle HTML entity encoding in SSR output
                     if (ssrResult !== expectedFull) {
@@ -69,7 +69,7 @@ TestEventClickAndClickCaptureStatic.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

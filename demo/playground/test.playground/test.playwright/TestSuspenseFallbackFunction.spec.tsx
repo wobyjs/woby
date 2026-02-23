@@ -26,7 +26,7 @@ test('Suspense - Fallback Function component', async ({ page }) => {
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
         const { $, h, render, Suspense, useResource } = woby
-        
+
         function random() {
             return Math.random().toString()
         }
@@ -64,17 +64,17 @@ test('Suspense - Fallback Function component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(100)  // Give time for suspense to show fallback
     await expect(heading).toHaveText('Suspense - Fallback Function')
-    
+
     // Since the fallback shows, we expect to see the fallback content
     const textContent = await paragraph.textContent()
     await expect(textContent).toContain('Fallback: ')
-    
+
     // Verify the exact HTML structure
     const bodyHTML = await page.evaluate(() => document.body.innerHTML)
     // The fallback should be showing since the promise never resolves
     expect(bodyHTML).toContain('<h3>Suspense - Fallback Function</h3>')
     expect(bodyHTML).toContain('Fallback: ')
-    
+
     // Verify the observable value matches what's shown in the fallback
     const observableValue = await page.evaluate(() => window.testSuspenseFallbackFunction())
     const paragraphText = await paragraph.textContent()

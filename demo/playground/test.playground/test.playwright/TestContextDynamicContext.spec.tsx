@@ -22,10 +22,10 @@ test('Dynamic - Context component', async ({ page }) => {
         // Component logic extracted from source file
         // Dynamic context with nested components - uses createContext and useContext
         // [Implementation based on source file: TestContextDynamicContext.tsx]
-        
+
         function TestContextDynamicContext() {
             const Context = createContext('default')
-            
+
             const DynamicFragment = (props) => {
                 const ctx = useContext(Context)
                 const children = props?.children || []
@@ -36,7 +36,7 @@ test('Dynamic - Context component', async ({ page }) => {
                     h(Dynamic, { component: 'p', children: children })
                 ]
             }
-            
+
             return [
                 h('h3', null, 'Dynamic - Context'),
                 h(Context.Provider, { value: 'context' },
@@ -59,7 +59,7 @@ test('Dynamic - Context component', async ({ page }) => {
     // Initial state verification
     await page.waitForTimeout(50)
     await expect(heading).toHaveText('Dynamic - Context')
-    
+
     // Check expected HTML structure matches source exactly
     const bodyHTML = await page.evaluate(() => document.body.innerHTML)
     const expectedHTML = '<h3>Dynamic - Context</h3><p>context</p><p><p>context</p><p><!----></p><p><!----></p><p><!----></p></p><p><p>context</p><p><!----></p><p><!----></p><p><!----></p></p><p><!----></p>'

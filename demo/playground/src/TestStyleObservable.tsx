@@ -12,10 +12,10 @@ const TestStyleObservable = (): JSX.Element => {
             <p style={{ color: o }}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStyleObservable_ssr', ret)
-    
+
     return ret
 }
 
@@ -24,7 +24,7 @@ TestStyleObservable.test = {
     expect: () => {
         const value = $$(testObservables['TestStyleObservable'])
         const expected = `<p style="color: ${value};">content</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStyleObservable_ssr']
@@ -42,7 +42,7 @@ TestStyleObservable.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -29,7 +29,7 @@ test('Refs - Nested component', async ({ page }) => {
         // Implement component logic based on TestRefsNested.tsx
         const ref1 = $()
         const ref2 = $()
-        
+
         const updateRefs = () => {
             const element1 = ref1()
             const element2 = ref2()
@@ -38,7 +38,7 @@ test('Refs - Nested component', async ({ page }) => {
             const content2 = `Got ref2 - Has parent: ${!!element2.parentElement} - Is connected: ${!!element2.isConnected}`
             element1.textContent = `${content1} / ${content2}`
         }
-        
+
         // Simulate the ref assignment
         window.testTestRefsNested_ref1 = ref1
         window.testTestRefsNested_ref2 = ref2
@@ -51,7 +51,7 @@ test('Refs - Nested component', async ({ page }) => {
 
         // Render to body
         render(element, document.body)
-        
+
         // Update refs after render to update content
         setTimeout(() => {
             const element1 = ref1()

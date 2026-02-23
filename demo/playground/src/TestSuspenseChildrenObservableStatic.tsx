@@ -18,10 +18,10 @@ const TestSuspenseChildrenObservableStatic = (): JSX.Element => {
             </Suspense>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSuspenseChildrenObservableStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -31,7 +31,7 @@ TestSuspenseChildrenObservableStatic.test = {
     expect: () => {
         const initialValue = $$(testObservables['TestSuspenseChildrenObservableStatic'])
         const expected = `<p>Children: ${initialValue}</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSuspenseChildrenObservableStatic_ssr']
@@ -49,7 +49,7 @@ TestSuspenseChildrenObservableStatic.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

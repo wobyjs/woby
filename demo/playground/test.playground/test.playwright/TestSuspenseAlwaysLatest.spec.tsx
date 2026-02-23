@@ -25,7 +25,7 @@ test('Suspense - Always Latest component', async ({ page }) => {
         const Fallback = () => {
             return h('p', null, 'Loading...')
         }
-        
+
         const Content = () => {
             // Simulate resource that never resolves
             return h('p', null, 'Content! undefined')

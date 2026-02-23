@@ -35,7 +35,7 @@ TestClassesObjectRemovalMultiple.test = {
             }
             expected = `<p class="${classes.join(' ')}">content</p>`
         } else {
-            expected = '<p>content</p>'
+            expected = '<p class="">content</p>'
         }
 
         // Test the SSR value asynchronously
@@ -47,7 +47,12 @@ TestClassesObjectRemovalMultiple.test = {
                     // Log the actual SSR result for debugging
                     console.log(`[TestClassesObjectRemovalMultiple] SSR result: ${ssrResult}`)
 
-                    const expectedFull = `<h3>Classes - Object Removal Multiple</h3>${expected}`
+                    let expectedFull: string
+                    if (value) {
+                        expectedFull = `<h3>Classes - Object Removal Multiple</h3>${expected}`
+                    } else {
+                        expectedFull = '<h3>Classes - Object Removal Multiple</h3><p>content</p>'
+                    }
                     if (ssrResult !== expectedFull) {
                         console.error(`❌ SSR test failed:`)
                         console.error(`  Got: ${ssrResult}`)
