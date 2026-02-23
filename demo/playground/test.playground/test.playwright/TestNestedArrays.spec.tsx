@@ -70,4 +70,3 @@ test('Nested Arrays component', async ({ page }) => {
     await expect(innerHTML.includes('0')).toBeTruthy()
     await expect(innerHTML.includes('1')).toBeTruthy()
 })
-})

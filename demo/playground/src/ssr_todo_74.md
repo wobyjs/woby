@@ -1,22 +1,21 @@
-- [ ] index.ori.tsx
-- [ ] TestForObservables.tsx
-- [ ] TestForUnkeyedFallbackFunction.tsx
-- [ ] TestForUnkeyedFallbackObservable.tsx
-- [ ] TestForUnkeyedFallbackObservableStatic.tsx
-- [ ] TestForUnkeyedFallbackStatic.tsx
-- [ ] TestForUnkeyedFunctionObservables.tsx
-- [ ] TestForUnkeyedObservableObservables.tsx
-- [ ] TestForUnkeyedObservables.tsx
-- [ ] TestForUnkeyedObservablesStatic.tsx
-- [ ] TestForUnkeyedRandom.tsx
-- [ ] TestForUnkeyedRandomOnlyChild.tsx
-- [ ] TestForUnkeyedStatic.tsx
-- [ ] TestFragmentStatic.tsx
+- [x] TestForObservables.tsx
+- [!] TestForUnkeyedFallbackFunction.tsx (type issues - needs manual fix)
+- [x] TestForUnkeyedFallbackObservable.tsx
+- [x] TestForUnkeyedFallbackObservableStatic.tsx
+- [x] TestForUnkeyedFallbackStatic.tsx
+- [x] TestForUnkeyedFunctionObservables.tsx
+- [x] TestForUnkeyedObservableObservables.tsx
+- [x] TestForUnkeyedObservables.tsx
+- [x] TestForUnkeyedObservablesStatic.tsx
+- [x] TestForUnkeyedRandom.tsx
+- [x] TestForUnkeyedRandomOnlyChild.tsx
+- [x] TestForUnkeyedStatic.tsx
+- [x] TestFragmentStatic.tsx
 - [ ] TestFragmentStaticComponent.tsx
-- [ ] TestFragmentStaticDeep.tsx
-- [ ] TestHMRFor.tsx
-- [ ] TestHTMLDangerouslySetInnerHTMLFunction.tsx
-- [ ] TestHTMLDangerouslySetInnerHTMLFunctionString.tsx
+- [x] TestFragmentStaticDeep.tsx
+- [!] TestHMRFor.tsx (undefined component references - needs manual fix)
+- [x] TestHTMLDangerouslySetInnerHTMLFunction.tsx
+- [x] TestHTMLDangerouslySetInnerHTMLFunctionString.tsx
 - [ ] TestHTMLDangerouslySetInnerHTMLObservable.tsx
 - [ ] TestHTMLDangerouslySetInnerHTMLObservableString.tsx
 - [ ] TestIfChildrenFunction.tsx

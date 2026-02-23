@@ -17,10 +17,10 @@ const TestForObservables = (): JSX.Element => {
             </For>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestForObservables_ssr', ret)
-    
+
     return ret
 }
 
@@ -29,7 +29,7 @@ TestForObservables.test = {
     expect: () => {
         // For static test, return the fixed values
         const expected = `<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestForObservables_ssr']
@@ -47,7 +47,7 @@ TestForObservables.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

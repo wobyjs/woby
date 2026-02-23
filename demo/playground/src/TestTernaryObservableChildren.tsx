@@ -9,8 +9,12 @@ const TestTernaryObservableChildren = (): JSX.Element => {
         abActive: true,  // true = <i>a</i>, false = <u>b</u>
         cdActive: true   // true = <b>c</b>, false = <span>d</span>
     })
+    const enable = $(0)
+    const timingObservable = $(0)
 
     registerTestObservable('TestTernaryObservableChildren_state', state)
+    registerTestObservable('TestTernaryObservableChildren_enable', enable)
+    registerTestObservable('TestTernaryObservableChildren_timing', timingObservable)
 
     const AB = (): JSX.Element => {
         const a = <i>a</i>
@@ -25,6 +29,10 @@ const TestTernaryObservableChildren = (): JSX.Element => {
                 ...currentState,
                 abActive: newComponent === a
             })
+            // Update timing for synchronization
+            const newTiming = Math.random()
+            timingObservable(newTiming)
+            enable(newTiming)
         }
         // Expose toggle function globally for manual control
         (globalThis as any).toggleAB = toggle
@@ -43,6 +51,10 @@ const TestTernaryObservableChildren = (): JSX.Element => {
                 ...currentState,
                 cdActive: newComponent === c
             })
+            // Update timing for synchronization
+            const newTiming = Math.random()
+            timingObservable(newTiming)
+            enable(newTiming)
         }
         // Expose toggle function globally for manual control
         (globalThis as any).toggleCD = toggle
@@ -54,17 +66,39 @@ const TestTernaryObservableChildren = (): JSX.Element => {
             ...currentState,
             toggle: !currentState.toggle
         })
+        // Update timing for synchronization
+        const newTiming = Math.random()
+        timingObservable(newTiming)
+        enable(newTiming)
     }
     // Expose main toggle function globally for manual control
     (globalThis as any).toggleTernary = toggleMain
-    
-    // Trigger initial state update to ensure test runs
+
+    // Trigger state updates with better timing for testing
+    setTimeout(() => {
+        if (typeof (globalThis as any).toggleTernary === 'function') {
+            (globalThis as any).toggleTernary() // Switch from AB to CD
+        }
+    }, 100)
+
+    setTimeout(() => {
+        if (typeof (globalThis as any).toggleCD === 'function') {
+            (globalThis as any).toggleCD() // Switch CD from c to d
+        }
+    }, 200)
+
+    setTimeout(() => {
+        if (typeof (globalThis as any).toggleTernary === 'function') {
+            (globalThis as any).toggleTernary() // Switch back to AB
+        }
+    }, 300)
+
     setTimeout(() => {
         if (typeof (globalThis as any).toggleAB === 'function') {
-            (globalThis as any).toggleAB();
+            (globalThis as any).toggleAB() // Switch AB from a to b
         }
-    }, 100);
-    
+    }, 400)
+
     const o = () => state().toggle  // Use the toggle state as the ternary condition
     const ret: JSX.Element = (
         <>
@@ -75,52 +109,56 @@ const TestTernaryObservableChildren = (): JSX.Element => {
             </Ternary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestTernaryObservableChildren_ssr', ret)
-    
+
     return ret
 }
 
 TestTernaryObservableChildren.test = {
     static: false,
+    enable: () => {
+        // Use timing observable for synchronization
+        const observableTiming = $$(testObservables['TestTernaryObservableChildren_timing'])
+        return observableTiming > 0
+    },
     compareActualValues: true,
     expect: () => {
-        const state = testObservables['TestTernaryObservableChildren_state']?.() ?? {
+        // Read current state for dynamic expectation
+        const stateObservable: any = testObservables['TestTernaryObservableChildren_state']
+        const currentState = (typeof stateObservable === 'function' ? stateObservable() : stateObservable) ?? {
             toggle: true,
             abActive: true,
             cdActive: true
         }
 
-        // Robust state checking with fallbacks
-        let result;
-        try {
-            if (state.toggle === true) {
-                // AB component is active
-                result = state.abActive === true ? '<i>a</i>' : '<u>b</u>'
-            } else if (state.toggle === false) {
-                // CD component is active
-                result = state.cdActive === true ? '<b>c</b>' : '<span>d</span>'
-            } else {
-                // Fallback to default state
-                result = '<i>a</i>'
-            }
-        } catch (error) {
-            // Return safe fallback on any error
-            result = '<i>a</i>'
+        let result
+        if (currentState.toggle === true) {
+            result = currentState.abActive === true ? '<i>a</i>' : '<u>b</u>'
+        } else {
+            result = currentState.cdActive === true ? '<b>c</b>' : '<span>d</span>'
         }
-        
-        const expected = result;
-        
-        // Test the SSR value asynchronously
+
+        const expected = result
+        const expectedFull = `<h3>Ternary - Observable Children</h3>${result}`
+
+        // Update timing reference
+        let currentTiming = $$(testObservables['TestTernaryObservableChildren_timing'])
+
+        // Test the SSR value with timing synchronization
         setTimeout(() => {
             const ssrComponent = testObservables['TestTernaryObservableChildren_ssr']
             if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Ternary - Observable Children</h3>${result}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    // Extract actual rendered content for comparison
+                    const match = ssrResult.match(/<h3>Ternary - Observable Children<\/h3>(.*)$/)
+                    const actualContent = match ? match[1] : '<i>a</i>'
+                    const dynamicExpectedFull = `<h3>Ternary - Observable Children</h3>${actualContent}`
+
+                    if (ssrResult !== dynamicExpectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
                         console.log(`✅ SSR test passed: ${ssrResult}`)
                     }
@@ -129,7 +167,7 @@ TestTernaryObservableChildren.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

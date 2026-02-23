@@ -7,8 +7,24 @@ This document tracks the implementation of Server-Side Rendering (SSR) tests for
 
 ## Files Already Implemented with SSR Tests
 1. [TestABCD.tsx](file:///d:/temp/woby/demo/playground/src/TestABCD.tsx) - ✅ Complete
+2. [TestForObservables.tsx](file:///d:/temp/woby/demo/playground/src/TestForObservables.tsx) - ✅ Complete
+3. [TestFragmentStatic.tsx](file:///d:/temp/woby/demo/playground/src/TestFragmentStatic.tsx) - ✅ Complete
+4. [TestFragmentStaticComponent.tsx](file:///d:/temp/woby/demo/playground/src/TestFragmentStaticComponent.tsx) - ✅ Complete
+5. [TestForUnkeyedFallbackObservable.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedFallbackObservable.tsx) - ✅ Complete
+6. [TestForUnkeyedFallbackObservableStatic.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedFallbackObservableStatic.tsx) - ✅ Complete
+7. [TestForUnkeyedFallbackStatic.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedFallbackStatic.tsx) - ✅ Complete
+8. [TestForUnkeyedFunctionObservables.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedFunctionObservables.tsx) - ✅ Complete
+9. [TestForUnkeyedObservableObservables.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedObservableObservables.tsx) - ✅ Complete
+10. [TestForUnkeyedObservables.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedObservables.tsx) - ✅ Complete
+11. [TestForUnkeyedObservablesStatic.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedObservablesStatic.tsx) - ✅ Complete
+12. [TestForUnkeyedRandom.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedRandom.tsx) - ✅ Complete
+13. [TestForUnkeyedRandomOnlyChild.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedRandomOnlyChild.tsx) - ✅ Complete
+14. [TestForUnkeyedStatic.tsx](file:///d:/temp/woby/demo/playground/src/TestForUnkeyedStatic.tsx) - ✅ Complete
+15. [TestFragmentStaticDeep.tsx](file:///d:/temp/woby/demo/playground/src/TestFragmentStaticDeep.tsx) - ✅ Complete
+16. [TestHTMLDangerouslySetInnerHTMLFunction.tsx](file:///d:/temp/woby/demo/playground/src/TestHTMLDangerouslySetInnerHTMLFunction.tsx) - ✅ Complete
+17. [TestHTMLDangerouslySetInnerHTMLFunctionString.tsx](file:///d:/temp/woby/demo/playground/src/TestHTMLDangerouslySetInnerHTMLFunctionString.tsx) - ✅ Complete
 
-## Files Remaining: 236
+## Files Remaining: 219
 
 ## Implementation Status
 - Completed: 220/292 files (75.3%)

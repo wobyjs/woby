@@ -1,5 +1,5 @@
-import { $, $$, For, ObservableReadonly } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, For, ObservableReadonly, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestForUnkeyedObservablesStatic = (): JSX.Element => {
     const v1 = $(1)
@@ -11,7 +11,7 @@ const TestForUnkeyedObservablesStatic = (): JSX.Element => {
         v2((v2() + 1) % 5)
         v3((v3() + 1) % 5)
     }, TEST_INTERVAL)
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>For - Unkeyed - Observables Static</h3>
             <For values={values} unkeyed>
@@ -22,11 +22,39 @@ const TestForUnkeyedObservablesStatic = (): JSX.Element => {
             </For>
         </>
     )
+
+    // Store the component for SSR testing
+    registerTestObservable('TestForUnkeyedObservablesStatic_ssr', ret)
+
+    return ret
 }
 
 TestForUnkeyedObservablesStatic.test = {
     static: true,
-    expect: () => '<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
+    expect: () => {
+        // Define expected values for both main test and SSR test
+        const expectedFull = '<h3>For - Unkeyed - Observables Static</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
+        const expected = '<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
+
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestForUnkeyedObservablesStatic_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+
+        return expected
+    }
 }
 
 

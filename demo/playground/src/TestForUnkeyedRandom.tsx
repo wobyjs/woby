@@ -1,5 +1,5 @@
-import { $, $$, For, ObservableReadonly } from 'woby'
-import { TestSnapshots, useInterval, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, random } from './util'
+import { $, $$, For, ObservableReadonly, renderToString } from 'woby'
+import { TestSnapshots, useInterval, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 import { useEffect } from 'woby'
 
 const TestForUnkeyedRandom = (): JSX.Element => {
@@ -15,7 +15,7 @@ const TestForUnkeyedRandom = (): JSX.Element => {
     // Use interval to ensure updates happen
     useInterval(update, TEST_INTERVAL)
 
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>For - Unkeyed - Random</h3>
             <For values={values} unkeyed>
@@ -25,15 +25,43 @@ const TestForUnkeyedRandom = (): JSX.Element => {
             </For>
         </>
     )
+
+    // Store the component for SSR testing
+    registerTestObservable('TestForUnkeyedRandom_ssr', ret)
+
+    return ret
 }
 
 TestForUnkeyedRandom.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
+        // Get the actual values from the observable
+        const values = $$(testObservables['TestForUnkeyedRandom']) ?? [0, 0, 0]
+
+        // Define expected values for both main test and SSR test
+        const expectedFull = `<h3>For - Unkeyed - Random</h3>${values.map(value => `<p>Value: ${value}</p>`).join('')}`
+        const expected = values.map(value => `<p>Value: ${value}</p>`).join('')
+
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestForUnkeyedRandom_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+
         // Get the actual values from the observable and return them
-        const values = testObservables['TestForUnkeyedRandom']?.() ?? [0, 0, 0]
-        return values.map(value => `<p>Value: ${value}</p>`).join('')
+        return expected
     }
 }
 
