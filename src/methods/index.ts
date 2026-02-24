@@ -28,7 +28,8 @@ export * from './merge_style'
 export * from './wrap_clone_element'
 export * from './wrap_element'
 export * from './custom_element'
+import { SYMBOL_STACK } from './wrap_element'
 
 /* EXPORT */
 
-export { $, $$, batch, createContext, createDirective, createElement, h, hmr, html, isBatching, isObservable, isObservableWritable, isServer, isStore, lazy, render, renderToString, resolve, store, template, tick, untrack, cloneElement }
+export { $, $$, batch, createContext, createDirective, createElement, h, hmr, html, isBatching, isObservable, isObservableWritable, isServer, isStore, lazy, render, renderToString, resolve, store, template, tick, untrack, cloneElement, SYMBOL_STACK }
