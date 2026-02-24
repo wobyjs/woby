@@ -9,10 +9,10 @@ const TestHTMLDangerouslySetInnerHTMLFunctionString = (): JSX.Element => {
             <p dangerouslySetInnerHTML={{ __html: '<i>danger</i>' }} />
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestHTMLDangerouslySetInnerHTMLFunctionString_ssr', ret)
-    
+
     return ret
 }
 
@@ -22,7 +22,7 @@ TestHTMLDangerouslySetInnerHTMLFunctionString.test = {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>HTML - dangerouslySetInnerHTML - Function String</h3><p><i>danger</i></p>'
         const expected = '<p><i>danger</i></p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestHTMLDangerouslySetInnerHTMLFunctionString_ssr']
@@ -39,7 +39,7 @@ TestHTMLDangerouslySetInnerHTMLFunctionString.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

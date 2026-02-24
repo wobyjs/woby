@@ -30,15 +30,16 @@ test('Error Boundary - Fallback Observable Static component', async ({ page }) =
         // Error boundary with static observable fallback - throws error in child component
         // [Implementation based on source file: TestErrorBoundaryFallbackObservableStatic.tsx]
 
-        const { random } = woby
+        // Define random function inline (from util in woby)
+        const random = () => Math.random()
 
         const TestErrorBoundaryFallbackObservableStatic = () => {
             const Children = () => { throw new Error() }
             const fallbackValue = String(random())
             window.testTestErrorBoundaryFallbackObservableStatic = fallbackValue  // Store the actual value
-            
+
             const Fallback = () => h('p', null, 'Fallback: ', fallbackValue)
-            
+
             return [
                 h('h3', null, 'Error Boundary - Fallback Observable Static'),
                 h(ErrorBoundary, { fallback: h(Fallback) },

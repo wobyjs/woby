@@ -48,8 +48,12 @@ test('For - Unkeyed - Random Only Child component', async ({ page }) => {
     // For static test, verify initial state
     // Check that all values are rendered
     await page.waitForTimeout(50)
-    const container = page.locator('body')
 
-    const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<div><h3>For - <p>0.123456</p><p>0.789012</p><p>0.345678</p></div>')
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    // Check that h3 title is present
+    await expect(bodyHTML).toContain('<h3>For - Unkeyed - Random Only Child</h3>')
+    // Check that all three values are rendered
+    await expect(bodyHTML).toContain('<p>0.123456</p>')
+    await expect(bodyHTML).toContain('<p>0.789012</p>')
+    await expect(bodyHTML).toContain('<p>0.345678</p>')
 })

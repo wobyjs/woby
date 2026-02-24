@@ -1,5 +1,5 @@
-import { $, $$, For } from 'woby'
-import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, For, If, renderToString } from 'woby'
+import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestNestedArrays = (): JSX.Element => {
     const items = $([0, 1, 2])
@@ -17,7 +17,7 @@ const TestNestedArrays = (): JSX.Element => {
     useTimeout(incrementItems, TEST_INTERVAL)
     useTimeout(incrementItems, TEST_INTERVAL * 2)
 
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>Nested Arrays</h3>
             <button onClick={incrementItems}>Increment</button>
@@ -39,6 +39,11 @@ const TestNestedArrays = (): JSX.Element => {
             </ul>
         </>
     )
+
+    // Store the component for SSR testing
+    registerTestObservable('TestNestedArrays_ssr', ret)
+
+    return ret
 }
 
 TestNestedArrays.test = {
@@ -46,8 +51,10 @@ TestNestedArrays.test = {
     compareActualValues: true,
     expect: () => {
         // Dynamically generate the expected HTML based on the current state
-        const itemsState = testObservables['TestNestedArrays']?.() ?? [0, 1, 2]
-        const activeItemState = testObservables['TestNestedArrays-activeItem']?.() ?? 1
+        const itemsObservable = testObservables['TestNestedArrays']
+        const activeItemObservable = testObservables['TestNestedArrays-activeItem']
+        const itemsState = (typeof itemsObservable === 'function' ? itemsObservable() : [0, 1, 2])
+        const activeItemState = (typeof activeItemObservable === 'function' ? activeItemObservable() : 1)
 
         // Generate the list items dynamically
         let html = '<button>Increment</button><ul>'
@@ -64,6 +71,27 @@ TestNestedArrays.test = {
         }
 
         html += '</ul>'
+
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestNestedArrays_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                // If it's a JSX element or function, we can render it to string
+                // If it's a function, we need to call it first to get the element
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h3>Nested Arrays</h3>' + html
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+
         return html
     }
 }

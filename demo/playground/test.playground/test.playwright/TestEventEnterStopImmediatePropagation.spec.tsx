@@ -30,30 +30,33 @@ test('Event - Enter - Stop Immediate Propagation component', async ({ page }) =>
         const inner = $(0)
         window.testEventEnterStopImmediatePropagation_outer = outer
         window.testEventEnterStopImmediatePropagation_inner = inner
-        
+
         const onEnterOuter = $(() => { })
+        const onEnterInner = $(() => { })
+
         const incrementInner = event => {
             event.stopImmediatePropagation()
             inner(prev => prev + 1)
         }
-        
-        // Only use incrementInner (the source only fires inner event)
+
+        // Register event handlers to observables
+        onEnterOuter(() => {})
         onEnterInner(() => incrementInner)
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Event - Enter - Stop Immediate Propagation'),
             h('p', null,
-                h('button', 
-                    { 
-                        onPointerEnter: onEnterOuter 
-                    }, 
-                    '0',
-                    h('button', 
-                        { 
+                h('button',
+                    {
+                        onPointerEnter: onEnterOuter
+                    },
+                    outer,
+                    h('button',
+                        {
                             onPointerEnter: onEnterInner
-                        }, 
-                        '0'
+                        },
+                        inner
                     )
                 )
             )
@@ -64,13 +67,10 @@ test('Event - Enter - Stop Immediate Propagation component', async ({ page }) =>
     })
 
     // For static test, verify initial state
-    const outerButton = page.locator('p > button').first()
-    const innerButton = page.locator('p > button > button').first()
-
     await page.waitForTimeout(50)
-    let outerCount = await outerButton.textContent()
-    let innerCount = await innerButton.textContent()
-    await expect(outerCount).toBe('0')
-    await expect(innerCount).toBe('0')
+    const outerValue = await page.evaluate(() => window.testEventEnterStopImmediatePropagation_outer())
+    const innerValue = await page.evaluate(() => window.testEventEnterStopImmediatePropagation_inner())
+    await expect(outerValue).toBe(0)
+    await expect(innerValue).toBe(0)
 })
 

@@ -22,10 +22,10 @@ const TestFragmentStaticDeep = (): JSX.Element => {
             </>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestFragmentStaticDeep_ssr', ret)
-    
+
     return ret
 }
 
@@ -35,7 +35,7 @@ TestFragmentStaticDeep.test = {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>Fragment - Static Deep</h3><p>first</p><p>second</p><p>deep</p>'
         const expected = '<p>first</p><p>second</p><p>deep</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestFragmentStaticDeep_ssr']
@@ -52,7 +52,7 @@ TestFragmentStaticDeep.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

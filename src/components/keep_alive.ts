@@ -45,9 +45,10 @@ const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, ttl?: Fun
       item.lock = lock
       item.reset?.(stack)
       item.suspended ||= $(false)
+      // Unsuspend immediately to ensure content is visible
       item.suspended(false)
 
-      if (!item.dispose || !item.result) {
+      if (!item.dispose && !item.result) {
 
         runWithSuperRoot(() => {
 
@@ -61,10 +62,9 @@ const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, ttl?: Fun
 
             }
 
+            // Use suspense for all cases to maintain proper reactivity
             useSuspense(item.suspended, () => {
-
               item.result = resolve(children)
-
             }, stack)
 
           })
@@ -79,7 +79,10 @@ const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, ttl?: Fun
 
         if (!hasLock()) return
 
-        item.suspended?.(true)
+        // Only suspend if we have a finite TTL, otherwise keep it alive
+        if (ttl && ttl > 0 && ttl < Infinity) {
+          item.suspended?.(true)
+        }
 
         if (!ttl || ttl <= 0 || ttl >= Infinity) return
 

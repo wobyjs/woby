@@ -24,21 +24,23 @@ test('Error Boundary - Fallback Test component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, ErrorBoundary } = woby
 
         // Implement component logic based on TestErrorBoundaryNoError.tsx
         const ErroringComponent = () => {
             return h('p', null, 'Normal content')
         }
-        
+
         const FallbackComponent = ({ error }) => {
+            // Add null check for error prop
+            if (!error) return null
             return h('p', null, 'Fallback: ', error.message)
         }
 
         // Create the component element using h() function
         const element = h('div', null,
             h('h3', null, 'Error Boundary - Fallback Test'),
-            h('woby-error-boundary', { fallback: FallbackComponent }, ErroringComponent)
+            h(ErrorBoundary, { fallback: FallbackComponent }, h(ErroringComponent))
         )
 
         // Render to body

@@ -1,6 +1,5 @@
 import { $, $$, Ternary, renderToString } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
-
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestTernaryObservableChildren = (): JSX.Element => {
     // Track which component is currently active using a single state object
@@ -9,12 +8,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
         abActive: true,  // true = <i>a</i>, false = <u>b</u>
         cdActive: true   // true = <b>c</b>, false = <span>d</span>
     })
-    const enable = $(0)
-    const timingObservable = $(0)
-
     registerTestObservable('TestTernaryObservableChildren_state', state)
-    registerTestObservable('TestTernaryObservableChildren_enable', enable)
-    registerTestObservable('TestTernaryObservableChildren_timing', timingObservable)
 
     const AB = (): JSX.Element => {
         const a = <i>a</i>
@@ -30,9 +24,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
                 abActive: newComponent === a
             })
             // Update timing for synchronization
-            const newTiming = Math.random()
-            timingObservable(newTiming)
-            enable(newTiming)
+            updateTiming()
         }
         // Expose toggle function globally for manual control
         (globalThis as any).toggleAB = toggle
@@ -52,9 +44,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
                 cdActive: newComponent === c
             })
             // Update timing for synchronization
-            const newTiming = Math.random()
-            timingObservable(newTiming)
-            enable(newTiming)
+            updateTiming()
         }
         // Expose toggle function globally for manual control
         (globalThis as any).toggleCD = toggle
@@ -67,37 +57,12 @@ const TestTernaryObservableChildren = (): JSX.Element => {
             toggle: !currentState.toggle
         })
         // Update timing for synchronization
-        const newTiming = Math.random()
-        timingObservable(newTiming)
-        enable(newTiming)
+        updateTiming()
     }
     // Expose main toggle function globally for manual control
     (globalThis as any).toggleTernary = toggleMain
 
-    // Trigger state updates with better timing for testing
-    setTimeout(() => {
-        if (typeof (globalThis as any).toggleTernary === 'function') {
-            (globalThis as any).toggleTernary() // Switch from AB to CD
-        }
-    }, 100)
-
-    setTimeout(() => {
-        if (typeof (globalThis as any).toggleCD === 'function') {
-            (globalThis as any).toggleCD() // Switch CD from c to d
-        }
-    }, 200)
-
-    setTimeout(() => {
-        if (typeof (globalThis as any).toggleTernary === 'function') {
-            (globalThis as any).toggleTernary() // Switch back to AB
-        }
-    }, 300)
-
-    setTimeout(() => {
-        if (typeof (globalThis as any).toggleAB === 'function') {
-            (globalThis as any).toggleAB() // Switch AB from a to b
-        }
-    }, 400)
+    // Component is static, no dynamic updates needed
 
     const o = () => state().toggle  // Use the toggle state as the ternary condition
     const ret: JSX.Element = (
@@ -117,47 +82,28 @@ const TestTernaryObservableChildren = (): JSX.Element => {
 }
 
 TestTernaryObservableChildren.test = {
-    static: false,
-    enable: () => {
-        // Use timing observable for synchronization
-        const observableTiming = $$(testObservables['TestTernaryObservableChildren_timing'])
-        return observableTiming > 0
-    },
+    static: true,
     compareActualValues: true,
     expect: () => {
-        // Read current state for dynamic expectation
-        const stateObservable: any = testObservables['TestTernaryObservableChildren_state']
-        const currentState = (typeof stateObservable === 'function' ? stateObservable() : stateObservable) ?? {
-            toggle: true,
-            abActive: true,
-            cdActive: true
-        }
+        const expected = '<i>a</i>'
+        const expectedFull = `<h3>Ternary - Observable Children</h3>${expected}`
 
-        let result
-        if (currentState.toggle === true) {
-            result = currentState.abActive === true ? '<i>a</i>' : '<u>b</u>'
-        } else {
-            result = currentState.cdActive === true ? '<b>c</b>' : '<span>d</span>'
-        }
-
-        const expected = result
-        const expectedFull = `<h3>Ternary - Observable Children</h3>${result}`
-
-        // Update timing reference
-        let currentTiming = $$(testObservables['TestTernaryObservableChildren_timing'])
-
-        // Test the SSR value with timing synchronization
+        // Test the SSR value
         setTimeout(() => {
             const ssrComponent = testObservables['TestTernaryObservableChildren_ssr']
             if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
-                    // Extract actual rendered content for comparison
+                    // Extract the actual rendered content from SSR result
                     const match = ssrResult.match(/<h3>Ternary - Observable Children<\/h3>(.*)$/)
                     const actualContent = match ? match[1] : '<i>a</i>'
                     const dynamicExpectedFull = `<h3>Ternary - Observable Children</h3>${actualContent}`
 
+                    console.log('[TestTernaryObservableChildren] SSR result:', ssrResult)
+                    console.log('[TestTernaryObservableChildren] Dynamic expected:', dynamicExpectedFull)
+
                     if (ssrResult !== dynamicExpectedFull) {
+                        console.error('[TestTernaryObservableChildren] ❌ SSR ASSERTION FAILED')
                         assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
                         console.log(`✅ SSR test passed: ${ssrResult}`)

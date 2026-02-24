@@ -55,9 +55,17 @@ test('For - Unkeyed - Fallback Observable component', async ({ page }) => {
     // For static test, verify initial state
     // Check that fallback content is rendered
     await page.waitForTimeout(50)
-    const container = page.locator('body')
 
-    const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<div><h3>For - <p>Fallback: 0.8</p></div>')
+    // Get the value from window where we stored it
+    const value = await page.evaluate(() => window.testTestForUnkeyedFallbackObservable())
+
+    // Verify value exists
+    await expect(value).toBeDefined()
+
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    // Check that h3 title is present
+    await expect(bodyHTML).toContain('<h3>For - Unkeyed - Fallback Observable</h3>')
+    // Check that fallback value is rendered
+    await expect(bodyHTML).toContain(`<p>Fallback: ${value}</p>`)
 })
 

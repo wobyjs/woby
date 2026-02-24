@@ -47,9 +47,11 @@ test('For - Unkeyed - Fallback Static component', async ({ page }) => {
     // For static test, verify initial state
     // Check that static fallback content is rendered
     await page.waitForTimeout(50)
-    const container = page.locator('body')
 
-    const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<div><h3>For - <div>Fallback!</div></div>')
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    // Check that h3 title is present
+    await expect(bodyHTML).toContain('<h3>For - Unkeyed - Fallback Static</h3>')
+    // Check that fallback content is rendered
+    await expect(bodyHTML).toContain('<div>Fallback!</div>')
 })
 

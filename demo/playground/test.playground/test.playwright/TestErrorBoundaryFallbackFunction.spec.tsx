@@ -24,21 +24,22 @@ test('Error Boundary - Fallback Function component', async ({ page }) => {
 
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
-        const { $, h, render } = woby
+        const { $, h, render, ErrorBoundary } = woby
 
         // Component logic extracted from source file
         // Error boundary with function fallback - throws error in child component
         // [Implementation based on source file: TestErrorBoundaryFallbackFunction.tsx]
         
-        const { random, ErrorBoundary } = woby
-        
+        // Define random function inline (from util in woby)
+        const random = () => Math.random()
+
         const TestErrorBoundaryFallbackFunction = () => {
             const Children = () => { throw new Error() }
             const fallbackValue = String(random())
             window.testTestErrorBoundaryFallbackFunction = fallbackValue  // Store the actual value
-            
+
             const Fallback = () => h('p', null, 'Fallback: ', fallbackValue)
-            
+
             return [
                 h('h3', null, 'Error Boundary - Fallback Function'),
                 h(ErrorBoundary, { fallback: Fallback },

@@ -56,9 +56,20 @@ test('For - Random Only Child component', async ({ page }) => {
     // For static test, verify initial state
     // Check that all values are rendered
     await page.waitForTimeout(50)
-    const container = page.locator('body')
 
-    const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<div><h3>For - Random Only Child</h3><p>Value: 0.1</p><p>Value: 0.2</p><p>Value: 0.3</p></div>')
+    // Get the actual values from window where we stored them
+    const values = await page.evaluate(() => window.testTestForRandom ? window.testTestForRandom() : undefined)
+
+    // Verify values exist and are displayed correctly
+    await expect(values).toBeDefined()
+    await expect(values.length).toBe(3)
+
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    // Check that h3 title is present
+    await expect(bodyHTML).toContain('<h3>For - Random Only Child</h3>')
+    // Check that all three values are rendered
+    await expect(bodyHTML).toContain(`<p>Value: ${values[0]}</p>`)
+    await expect(bodyHTML).toContain(`<p>Value: ${values[1]}</p>`)
+    await expect(bodyHTML).toContain(`<p>Value: ${values[2]}</p>`)
 })
 

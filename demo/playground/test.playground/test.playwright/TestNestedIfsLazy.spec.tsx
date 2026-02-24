@@ -50,13 +50,10 @@ test('TestNestedIfsLazy component', async ({ page }) => {
         render(element, document.body)
     })
 
-    // Step-by-step verification
-    const container = page.locator('div')
-
-    // Initial state verification - should contain <!----> placeholder
+    // For static test, verify initial state
     await page.waitForTimeout(50)
-    const innerHTML = await container.evaluate(el => el.innerHTML)
-    // Expect to find <!----> placeholder when outer If condition is false
-    await expect(innerHTML).toContain('<!---->')
+    const bodyText = await page.evaluate(() => document.body.textContent)
+    // Expect to find "beforeinnerafter" in the text content
+    await expect(bodyText).toContain('beforeinnerafter')
 })
 

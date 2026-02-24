@@ -55,6 +55,6 @@ test('For - Fallback Function component', async ({ page }) => {
     const container = page.locator('div')
 
     const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<div><h3>For - <p>Fallback: 0.5</p></div>')
+    await expect(innerHTML).toBe('<h3>For - Fallback Function</h3><p>Fallback: 0.5</p>')
 })
 

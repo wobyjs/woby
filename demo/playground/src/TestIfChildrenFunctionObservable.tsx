@@ -1,6 +1,5 @@
-import { $, $$ } from 'woby'
-import { If } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables } from './util'
+import { $, $$, If, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestIfChildrenFunctionObservable = (): JSX.Element => {
     const o = $<number | false>(Math.random())
@@ -10,7 +9,7 @@ const TestIfChildrenFunctionObservable = (): JSX.Element => {
     const Content = ({ value }): JSX.Element => {
         return <p>Value: {value}</p>
     }
-    return (
+    const ret: JSX.Element = (
         <>
             <h3>If - Children Function Observable</h3>
             <If when={o}>
@@ -18,6 +17,11 @@ const TestIfChildrenFunctionObservable = (): JSX.Element => {
             </If>
         </>
     )
+
+    // Store the component for SSR testing
+    registerTestObservable('TestIfChildrenFunctionObservable_ssr', ret)
+
+    return ret
 }
 
 TestIfChildrenFunctionObservable.test = {
@@ -25,7 +29,29 @@ TestIfChildrenFunctionObservable.test = {
     compareActualValues: true,
     expect: () => {
         const val = $$(testObservables['TestIfChildrenFunctionObservable'])
-        return val !== false ? `<p>Value: ${val}</p>` : '<!---->'
+
+        // Define expected values for both main test and SSR test
+        const expectedFull = val !== false ? `<h3>If - Children Function Observable</h3><p>Value: ${val}</p>` : `<h3>If - Children Function Observable</h3><!---->`
+        const expected = val !== false ? `<p>Value: ${val}</p>` : '<!---->'
+
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestIfChildrenFunctionObservable_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+
+        return expected
     }
 }
 

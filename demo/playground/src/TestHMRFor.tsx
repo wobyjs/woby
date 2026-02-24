@@ -24,10 +24,10 @@ const TestHMRFor = () => {
             <p>next</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestHMRFor_ssr', ret)
-    
+
     return ret
 }
 
@@ -37,11 +37,11 @@ TestHMRFor.test = {
     expect: () => {
         const values = $$(testObservables['TestHMRFor'])
         const buttons = values.map((value, index) => `<button>${value}, ${index}</button>`).join('')
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>HMR - For</h3><p>prev</p>${buttons}<p>next</p>`
         const expected = `<p>prev</p>${buttons}<p>next</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestHMRFor_ssr']
@@ -58,7 +58,7 @@ TestHMRFor.test = {
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

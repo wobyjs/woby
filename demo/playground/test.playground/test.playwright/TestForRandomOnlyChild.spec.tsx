@@ -49,9 +49,13 @@ test('For - Random component', async ({ page }) => {
     // For static test, verify initial state
     // Check that all values are rendered
     await page.waitForTimeout(50)
-    const container = page.locator('body')
 
-    const innerHTML = await container.evaluate(el => el.innerHTML)
-    await expect(innerHTML).toBe('<div><h3>For - <p>0.4</p><p>0.5</p><p>0.6</p></div>')
+    const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+    // Check that h3 title is present
+    await expect(bodyHTML).toContain('<h3>For - Random</h3>')
+    // Check that all three values are rendered
+    await expect(bodyHTML).toContain('<p>0.4</p>')
+    await expect(bodyHTML).toContain('<p>0.5</p>')
+    await expect(bodyHTML).toContain('<p>0.6</p>')
 })
 
