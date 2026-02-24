@@ -38,3 +38,14 @@ export type {
 
 export const ObservableSymbol = SYMBOL_OBSERVABLE
 export * as JSX from './types'
+
+// Add HTML utility types for custom elements
+export * from './types/html-boolean'
+export * from './types/html-number'
+export * from './types/html-date'
+export * from './types/html-bigint'
+export * from './types/html-object'
+export * from './types/html-length'
+export * from './types/html-box'
+export * from './types/html-color'
+export * from './types/html-style'
