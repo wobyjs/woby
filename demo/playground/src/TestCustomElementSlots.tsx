@@ -7,11 +7,12 @@
  * - Slot fallback content
  * - Slot content distribution
  */
-import { $, $$, customElement, defaults, HtmlString } from 'woby'
+import { $, $$, customElement, defaults, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 // Custom element with slot support
 const SlotElement = defaults(() => ({
-    title: $('Slot Element', HtmlString),
+    title: $('Slot Element', ""),
     showFallback: $(false)
 }), ({ title, showFallback, children }) => {
     return (
@@ -77,28 +78,29 @@ const NamedSlotElement = defaults(() => ({
 customElement('slot-element', SlotElement)
 customElement('named-slot-element', NamedSlotElement)
 
-// Test component
-const TestCustomElementSlots = () => {
+// Test component is defined in the SSR version below
+
+const TestCustomElementSlotsWithSSR = (): JSX.Element => {
     const showFallback = $(true)
     const headerText = $('Custom Header')
     const footerText = $('Custom Footer')
-
-    return (
+    
+    const ret: JSX.Element = (
         <div>
             <h1>Custom Element Slots Test</h1>
 
             {/* Basic slot test */}
             <h2>1. Basic Slot Functionality</h2>
-            <slot-element title="Element with Children">
+            <Dynamic tag="slot-element" title="Element with Children">
                 <p>This content goes into the slot</p>
                 <button>Slot Button</button>
-            </slot-element>
+            </Dynamic>
 
-            <slot-element title="Element without Children" showFallback={showFallback} />
+            <Dynamic tag="slot-element" title="Element without Children" showFallback={showFallback} />
 
             {/* TSX slot usage */}
             <h2>2. TSX Slot Usage</h2>
-            <SlotElement title="TSX Slot Test">
+            <SlotElement title={$("TSX Slot Test")}>
                 <div>
                     <p>TSX-provided slot content</p>
                     <ul>
@@ -110,7 +112,7 @@ const TestCustomElementSlots = () => {
 
             {/* Named slots concept */}
             <h2>3. Named Slots Concept</h2>
-            <named-slot-element header={headerText} footer={footerText}>
+            <Dynamic tag="named-slot-element" header={headerText} footer={footerText}>
                 <div data-slot="header">
                     <h4>Custom Header Content</h4>
                 </div>
@@ -119,17 +121,49 @@ const TestCustomElementSlots = () => {
                 <div data-slot="footer">
                     <em>Custom Footer Content</em>
                 </div>
-            </named-slot-element>
+            </Dynamic>
 
             {/* Mixed usage with slots */}
             <h2>4. Mixed Usage with Slots</h2>
-            <SlotElement title="Outer Element">
-                <slot-element title="Nested Slot Element">
+            <SlotElement title={$("Outer Element")}>
+                <Dynamic tag="slot-element" title="Nested Slot Element">
                     <p>Nested slot content</p>
-                </slot-element>
+                </Dynamic>
             </SlotElement>
         </div>
     )
+    
+    // Store the component for SSR testing
+    registerTestObservable('TestCustomElementSlots_ssr', ret)
+    
+    return ret
 }
 
-export default TestCustomElementSlots
+TestCustomElementSlotsWithSSR.test = {
+    static: true,
+    expect: () => {
+        const expected = '<h1>Custom Element Slots Test</h1><h2>1. Basic Slot Functionality</h2><slot-element title="Element with Children"><p>This content goes into the slot</p><button>Slot Button</button></slot-element><slot-element title="Element without Children" showFallback=""></slot-element><h2>2. TSX Slot Usage</h2><slot-element title="TSX Slot Test"><div><p>TSX-provided slot content</p><ul><li>Item 1</li><li>Item 2</li></ul></div></slot-element><h2>3. Named Slots Concept</h2><named-slot-element header="Custom Header" footer="Custom Footer"><div data-slot="header"><h4>Custom Header Content</h4></div><p>Main content area</p><p>More main content</p><div data-slot="footer"><em>Custom Footer Content</em></div></named-slot-element><h2>4. Mixed Usage with Slots</h2><slot-element title="Outer Element"><slot-element title="Nested Slot Element"><p>Nested slot content</p></slot-element></slot-element>'
+        
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestCustomElementSlots_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = '<h1>Custom Element Slots Test</h1><h2>1. Basic Slot Functionality</h2><slot-element title="Element with Children"><p>This content goes into the slot</p><button>Slot Button</button></slot-element><slot-element title="Element without Children" showFallback=""></slot-element><h2>2. TSX Slot Usage</h2><slot-element title="TSX Slot Test"><div><p>TSX-provided slot content</p><ul><li>Item 1</li><li>Item 2</li></ul></div></slot-element><h2>3. Named Slots Concept</h2><named-slot-element header="Custom Header" footer="Custom Footer"><div data-slot="header"><h4>Custom Header Content</h4></div><p>Main content area</p><p>More main content</p><div data-slot="footer"><em>Custom Footer Content</em></div></named-slot-element><h2>4. Mixed Usage with Slots</h2><slot-element title="Outer Element"><slot-element title="Nested Slot Element"><p>Nested slot content</p></slot-element></slot-element>'
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+        
+        return expected
+    }
+}
+
+export default () => <TestSnapshots Component={TestCustomElementSlotsWithSSR} />

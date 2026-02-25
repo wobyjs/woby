@@ -266,7 +266,11 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
 
             rKeys.forEach(k => this.removeAttribute(k))
 
-            if (!this.props[SYMBOL_JSX]) {
+            // Always use shadow DOM for custom elements to properly handle slot projection
+            // This ensures children are projected through slots rather than duplicated
+            const useShadowDOM = true
+
+            if (useShadowDOM) {
                 // prepare observable attributes mentioned in observedAttributes, maybe or not in props
                 aKeys.forEach(k => this.props[k] = $('')) //props types is difficult
                 aKeys.forEach(k => !this.hasAttribute(k) && setAttribute(this, k, this.props[k], new Stack()))
@@ -290,23 +294,48 @@ export const customElement = <P>(tagName: string, children: JSX.Component<P>, ..
 
             observer.observe(this, { attributes: true, attributeOldValue: true })
 
-            if (!this.props[SYMBOL_JSX]) {
-                // Capture existing child elements to pass as children prop
-                const existingChildren = this.childNodes.length > 0 ?
-                    Array.from(this.childNodes).map(node => {
-                        // Remove the node from this element and return it
-                        this.removeChild(node)
-                        return node
-                    }) :
-                    undefined
-
-                // Add existing children to props if they exist
-                if (existingChildren && existingChildren.length > 0) {
-                    (this.props as any).children = existingChildren.length === 1 ?
-                        existingChildren[0] :
-                        existingChildren
+            if (useShadowDOM) {
+                // Check if shadow root already exists to prevent multiple creation
+                if (this.shadowRoot) {
+                    console.log(`Shadow root already exists for ${tagName}`)
+                    return
                 }
 
+                console.log(`Creating shadow root for ${tagName}, children:`, children)
+                const shadowRoot = this.attachShadow({ mode: 'open' })
+                console.log(`Shadow root created:`, shadowRoot)
+
+                // Remove children from props temporarily to prevent rendering in shadow DOM mode
+                let originalChildren = undefined
+                if ((this.props as any).children) {
+                    originalChildren = (this.props as any).children
+                    delete (this.props as any).children // Temporarily remove children for shadow DOM
+                }
+
+                // Render the custom element component into a temporary container first
+                const componentResult = createElement(children, this.props)
+
+                // Restore children if they existed
+                if (originalChildren !== undefined) {
+                    (this.props as any).children = originalChildren
+                }
+
+                console.log(`Component result:`, componentResult)
+
+                // Now append the component result directly to shadow root
+                // The component should contain a <slot> element in the right place
+                try {
+                    setChild(shadowRoot as any, componentResult, FragmentUtils.make(), new Stack())
+                    console.log(`Component rendered to shadow root`)
+
+                    // The component contains the slot where children should be projected
+                } catch (e) {
+                    console.error(`Error rendering to shadow root:`, e)
+                    // Fallback to rendering to the element directly
+                    setChild(this, componentResult, FragmentUtils.make(), new Stack())
+                }
+            } else {
+                // For TSX usage, render directly to the element without shadow DOM
                 setChild(this, createElement(children, this.props), FragmentUtils.make(), new Stack())
             }
 

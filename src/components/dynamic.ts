@@ -25,9 +25,9 @@ const Dynamic = <P = {}>({ component, props, children }: { component: Component<
     } else {
         // If component is a string tag name, create element directly
         if (isString(component)) {
-            return createElement(component, props, children);
+            return createElement(component, $$(props), children);
         } else {
-            return createElement<P>(component, props, children);
+            return createElement<P>(component, $$(props), children);
         }
     }
 }

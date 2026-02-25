@@ -10,7 +10,6 @@ import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { customElement } from './custom_element'
 import { Stack } from 'soby'
-import { SYMBOL_JSX } from '../constants'
 
 
 /* MAIN */
@@ -48,7 +47,7 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
             const child = createNode(component) as HTMLElement //TSC
 
             if (!!ce)
-                (child as InstanceType<ReturnType<typeof customElement>>).props = { ..._props, [SYMBOL_JSX]: true }
+                (child as InstanceType<ReturnType<typeof customElement>>).props = { ..._props }
 
             if (isSVG) child['isSVG'] = true
 
@@ -61,19 +60,7 @@ const createElement = <P = { children?: Child }>(component: Component<P>, _props
                 }
 
                 if (hasChildren || ce?.__children__) {
-                    // For custom elements using shadow DOM, don't render the component content here
-                    // The component content will be rendered in the connectedCallback
-                    // Only set children if it's not a custom element or if it doesn't use shadow DOM
-                    if (!ce) {
-                        setChild(child, children, FragmentUtils.make(), stack)
-                    } else {
-                        // For custom elements, just set the children as light DOM
-                        // The component content will be rendered in shadow DOM later
-                        if (hasChildren) {
-                            setChild(child, children, FragmentUtils.make(), stack)
-                        }
-                        // Don't render the component content here - it will be rendered in connectedCallback
-                    }
+                    setChild(child, !!ce ? createElement(ce.__children__, (child as InstanceType<ReturnType<typeof customElement>>).props) : children, FragmentUtils.make(), stack)
                 }
 
             })

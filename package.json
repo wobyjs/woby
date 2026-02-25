@@ -122,7 +122,6 @@
     "dev": "npm run dev:playground",
     "prod": "npm run prod:playground",
     "//prepublishOnly": "tsex prepare",
-    "commit": "cz",
     "changelog": "git-cliff -o CHANGELOG.md",
     "changelog1": "auto-changelog --commit-limit false --output CHANGELOG.md",
     "release:automatic": "semantic-release --extends ../semantic-release.config.js",

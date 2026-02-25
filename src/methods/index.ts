@@ -8,6 +8,10 @@ import createContext from './create_context'
 import createDirective from './create_directive'
 import createElement from './create_element'
 import cloneElement from './clone_element'
+import { defaults } from './defaults'
+import { assign } from './assign'
+import { isJsxProp } from './is_jsx_prop'
+import { make } from './make'
 import h from './h'
 import hmr from './hmr'
 import html from './html'
@@ -32,4 +36,4 @@ import { SYMBOL_STACK } from './wrap_element'
 
 /* EXPORT */
 
-export { $, $$, batch, createContext, createDirective, createElement, h, hmr, html, isBatching, isObservable, isObservableWritable, isServer, isStore, lazy, render, renderToString, resolve, store, template, tick, untrack, cloneElement, SYMBOL_STACK }
+export { $, $$, batch, createContext, createDirective, createElement, defaults, assign, isJsxProp, make, h, hmr, html, isBatching, isObservable, isObservableWritable, isServer, isStore, lazy, render, renderToString, resolve, store, template, tick, untrack, cloneElement, SYMBOL_STACK }
