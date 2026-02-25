@@ -18,10 +18,10 @@ const TestSwitchCaseFunction = (): JSX.Element => {
             </Switch>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSwitchCaseFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -29,7 +29,7 @@ TestSwitchCaseFunction.test = {
     static: true,
     expect: () => {
         const expected = '<p>Case: 0.123456</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSwitchCaseFunction_ssr']
@@ -38,16 +38,16 @@ TestSwitchCaseFunction.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Switch - Case Function</h3><p>Case: 0.123456</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSwitchCaseFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSwitchCaseFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSwitchCaseFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -11,10 +11,10 @@ const TestSymbolFunction = (): JSX.Element => {
             <p>{() => o()}</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSymbolFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -22,7 +22,7 @@ TestSymbolFunction.test = {
     static: true,
     expect: () => {
         const expected = '<p><!----></p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSymbolFunction_ssr']
@@ -31,16 +31,16 @@ TestSymbolFunction.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Symbol - Function</h3><p><!----></p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSymbolFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSymbolFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSymbolFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

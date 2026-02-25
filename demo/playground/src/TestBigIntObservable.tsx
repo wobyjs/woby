@@ -11,10 +11,10 @@ const TestBigIntObservable = (): JSX.Element => {
             <p>{o}</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestBigIntObservable_ssr', ret)
-    
+
     return ret
 }
 
@@ -25,7 +25,7 @@ TestBigIntObservable.test = {
         const value = $$(testObservables['TestBigIntObservable'])
         // Return value without 'n' suffix to match actual rendering
         const expected = `<p>${value}</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestBigIntObservable_ssr']
@@ -34,16 +34,16 @@ TestBigIntObservable.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>BigInt - Observable</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestBigIntObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestBigIntObservable] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestBigIntObservable] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

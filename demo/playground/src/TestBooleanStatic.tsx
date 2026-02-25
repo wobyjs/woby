@@ -8,10 +8,10 @@ const TestBooleanStatic = (): JSX.Element => {
             <p>truefalse</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestBooleanStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -19,7 +19,7 @@ TestBooleanStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p>truefalse</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestBooleanStatic_ssr']
@@ -28,16 +28,16 @@ TestBooleanStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Boolean - Static</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestBooleanStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestBooleanStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestBooleanStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

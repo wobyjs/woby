@@ -10,10 +10,10 @@ const TestSVGClassObject = (): JSX.Element => {
             </svg>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSVGClassObject_ssr', ret)
-    
+
     return ret
 }
 
@@ -21,7 +21,7 @@ TestSVGClassObject.test = {
     static: true,
     expect: () => {
         const expected = '<svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSVGClassObject_ssr']
@@ -30,16 +30,16 @@ TestSVGClassObject.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>SVG - Class Object</h3><svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSVGClassObject] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSVGClassObject] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSVGClassObject] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

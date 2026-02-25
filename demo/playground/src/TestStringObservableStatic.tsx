@@ -9,12 +9,12 @@ const TestStringObservableStatic = (): JSX.Element => {
             <p>{initialValue}</p>
         </>
     )
-    
+
     // Store the component for SSR testing - only in environments where function is available
     if (typeof registerTestObservable !== 'undefined') {
         registerTestObservable('TestStringObservableStatic_ssr', ret)
     }
-    
+
     return ret
 }
 
@@ -22,7 +22,7 @@ TestStringObservableStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p>0.123456</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStringObservableStatic_ssr']
@@ -31,16 +31,16 @@ TestStringObservableStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>String - Observable Static</h3><p>0.123456</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStringObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStringObservableStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStringObservableStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

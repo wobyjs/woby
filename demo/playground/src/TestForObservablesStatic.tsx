@@ -42,12 +42,12 @@ TestForObservablesStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>For - Observables Static</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestForObservablesStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestForObservablesStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestForObservablesStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)

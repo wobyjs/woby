@@ -23,10 +23,10 @@ const TestChildren = (): JSX.Element => {
             </A>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestChildren_ssr', ret)
-    
+
     return ret
 }
 
@@ -34,7 +34,7 @@ TestChildren.test = {
     static: true,
     expect: () => {
         const expected = '<div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestChildren_ssr']
@@ -43,16 +43,16 @@ TestChildren.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Children</h3><div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestChildren] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestChildren] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestChildren] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

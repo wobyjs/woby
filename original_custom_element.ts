@@ -14,10 +14,8 @@ import { SYMBOL_JSX } from '../constants'
 import { setChild, setAttribute, setProp } from "../utils/setters"
 import createElement from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
-import { Stack, isObservableWritable, SYMBOL_OBSERVABLE_WRITABLE, Observable } from "soby"
+import { Stack } from "soby"
 import useEffect from "../hooks/use_effect"
-import { kebabToCamelCase, camelToKebabCase } from "../utils/string"
-import { isObject, isFunction } from "../utils/lang"
 
 /**
  * ElementAttributes type helper
@@ -58,10 +56,6 @@ type ElementAttributePattern<P> =
  */
 const kebabToCamelCase = (str: string): string => {
     return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
-}
-
-const camelToKebabCase = (str: string): string => {
-    return str.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`)
 }
 
 /**
@@ -244,73 +238,21 @@ const matchesWildcard = (attributeName: string, patterns: string[]): boolean => 
  * // <counter-element value={$(0)} style-color="red"></counter-element>
  * ```
  */
-export const customElement = <P>(tagName: string, component: JSX.Component<P>) => {
+export const customElement = <P>(tagName: string, children: JSX.Component<P>, ...attributes: ElementAttributePattern<P>[]) => {
     /**
      * Custom Element Class
      * 
      * Extends HTMLElement to create a custom element with reactive properties.
      */
     const C = class extends HTMLElement {
-        /** Reference to the component function */
-        static __component__ = component;
+        /** Reference to the children component function */
+        static __children__ = children;
 
         /** List of observed attributes */
-        static observedAttributes: string[] = []
+        static observedAttributes: string[] = attributes ?? ['*'] as any
 
         /** Component props */
-        public props: P
-        public propDict: Record<string, string>
-        public slots: HTMLSlotElement
-
-        constructor(props?: P) {
-            super()
-            this.props = !!props ? props : {} as P
-
-            // Check if we're in JSX context by checking for the SYMBOL_JSX
-            const isJSXContext = (this.props as any)[SYMBOL_JSX]
-
-            if (!isJSXContext) { // Not in JSX context, use shadow DOM
-                const shadowRoot = this.attachShadow({ mode: 'open' })
-
-                // Create slot element for content projection if children is not already a slot
-                if (!(this.props as any).children || !($$(this.props["children"]) instanceof HTMLSlotElement)) {
-                    this.slots = document.createElement('slot') as unknown as HTMLSlotElement
-                    if ((this.props as any).children) {
-                        // Store existing children
-                        const existingChildren = (this.props as any).children;
-                        (this.props as any).children = $(this.slots)
-
-                        // Move existing child nodes to the slot
-                        while (this.firstChild) {
-                            this.slots.appendChild(this.firstChild)
-                        }
-                    } else {
-                        (this.props as any).children = $(this.slots)
-
-                        // Move existing child nodes to the slot
-                        while (this.firstChild) {
-                            this.slots.appendChild(this.firstChild)
-                        }
-                    }
-                }
-
-                // Render the component to shadow DOM
-                const componentResult = createElement(component, this.props)
-                setChild(shadowRoot as any, componentResult, FragmentUtils.make(), new Stack())
-            } else {
-                // For JSX context, render directly
-                setChild(this, createElement(component, this.props), FragmentUtils.make(), new Stack())
-            }
-
-            if (!this.propDict) {
-                this.propDict = {}
-                Object.keys(this.props).forEach((k) => {
-                    const c = camelToKebabCase(k)
-                    this.propDict[c] = k
-                    this.propDict[k] = c
-                })
-            }
-        }
+        public props: P = {} as P
 
         /**
          * Called when the element is added to the document
@@ -318,42 +260,85 @@ export const customElement = <P>(tagName: string, component: JSX.Component<P>) =
          * Sets up attribute observation and initializes the element.
          */
         connectedCallback() {
-            // Get the observable attributes from the props
             const { observedAttributes } = C
-            const { props: p } = this
-            const aKeys = Object.keys(p).filter(k =>
-                k !== 'children' && isObservable(p[k])
-            )
-            const rKeys = Object.keys(p).filter(k => isFunction(p[k]) || isObject(p[k]))
+            const rKeys = Object.keys(this.props).filter(attrName => !matchesWildcard(attrName, observedAttributes))
+            const aKeys = observedAttributes.filter(attrName => !attrName.includes('*'))
 
             rKeys.forEach(k => this.removeAttribute(k))
 
-            // Set initial attributes based on props (first time)
-            for (const k of aKeys as any) {
-                if (!this.attributes[this.propDict[k]]) {
-                    setProp(this, this.propDict[k], p[k], new Stack())
-                }
+            // Always use shadow DOM for custom elements to properly handle slot projection
+            // This ensures children are projected through slots rather than duplicated
+            const useShadowDOM = true
+
+            if (useShadowDOM) {
+                // prepare observable attributes mentioned in observedAttributes, maybe or not in props
+                aKeys.forEach(k => this.props[k] = $('')) //props types is difficult
+                aKeys.forEach(k => !this.hasAttribute(k) && setAttribute(this, k, this.props[k], new Stack()))
             }
 
-            // Process existing attributes and map them to props
-            for (const attr of this.attributes as any) {
+            // aKeys.forEach(k => !this.hasAttribute(k) && this.setAttribute(k, $(0)))
+
+            for (const attr of this.attributes as any)
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
-            }
 
-            // Set up mutation observer to track attribute changes
             const observer = new MutationObserver(mutations => {
                 mutations.forEach(m => {
                     if (m.type === 'attributes') {
                         const name = m.attributeName
                         const newValue = this.getAttribute(name)
                         const oldValue = m.oldValue
-                        // Map attribute changes to prop changes
                         this.attributeChangedCallback1(name, oldValue, newValue)
                     }
                 })
             })
 
             observer.observe(this, { attributes: true, attributeOldValue: true })
+
+            if (useShadowDOM) {
+                // Check if shadow root already exists to prevent multiple creation
+                if (this.shadowRoot) {
+                    console.log(`Shadow root already exists for ${tagName}`)
+                    return
+                }
+
+                console.log(`Creating shadow root for ${tagName}, children:`, children)
+                const shadowRoot = this.attachShadow({ mode: 'open' })
+                console.log(`Shadow root created:`, shadowRoot)
+
+                // Remove children from props temporarily to prevent rendering in shadow DOM mode
+                let originalChildren = undefined
+                if ((this.props as any).children) {
+                    originalChildren = (this.props as any).children
+                    delete (this.props as any).children // Temporarily remove children for shadow DOM
+                }
+
+                // Render the custom element component into a temporary container first
+                const componentResult = createElement(children, this.props)
+
+                // Restore children if they existed
+                if (originalChildren !== undefined) {
+                    (this.props as any).children = originalChildren
+                }
+
+                console.log(`Component result:`, componentResult)
+
+                // Now append the component result directly to shadow root
+                // The component should contain a <slot> element in the right place
+                try {
+                    setChild(shadowRoot as any, componentResult, FragmentUtils.make(), new Stack())
+                    console.log(`Component rendered to shadow root`)
+
+                    // The component contains the slot where children should be projected
+                } catch (e) {
+                    console.error(`Error rendering to shadow root:`, e)
+                    // Fallback to rendering to the element directly
+                    setChild(this, componentResult, FragmentUtils.make(), new Stack())
+                }
+            } else {
+                // For TSX usage, render directly to the element without shadow DOM
+                setChild(this, createElement(children, this.props), FragmentUtils.make(), new Stack())
+            }
+
         }
 
         /**
@@ -368,22 +353,20 @@ export const customElement = <P>(tagName: string, component: JSX.Component<P>) =
         attributeChangedCallback1(name, oldValue, newValue) {
             if (oldValue === newValue) return
 
-            if (newValue === '[object Object]') return // Skip object literals
+            if (!matchesWildcard(name, C.observedAttributes)) return
 
-            const { props } = this
-
-            // Check if this is a nested property (contains $ or .)
-            if (name.includes('$') || name.includes('.')) {
-                // Handle nested properties (including style properties)
+            // Check if this is a nested property (contains dashes)
+            if (name.includes('-')) {
+                // Handle nested properties
                 setNestedProperty(this, name, newValue)
 
                 // Also update any observable in the nested path
-                const propName = kebabToCamelCase(name.replace(/\$/g, '.').replace(/\./g, '.'))
-                setObservableValue(props, propName, newValue)
+                const nestedValue = getNestedProperty(this.props, name)
+                setObservableValue(this.props, name, newValue)
             } else {
-                // Handle flat properties (convert kebab-case attribute name to camelCase property name)
-                const propName = kebabToCamelCase(name)
-                setObservableValue(this.props, propName, newValue)
+                // Handle flat properties (existing behavior)
+                const val = this.props[name]
+                setObservableValue(this.props, name, newValue)
             }
         }
     }

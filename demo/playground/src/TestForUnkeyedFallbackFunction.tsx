@@ -48,12 +48,12 @@ TestForUnkeyedFallbackFunction.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>For - Unkeyed - Fallback Function</h3><p>Fallback: ${value}</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestForUnkeyedFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestForUnkeyedFallbackFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestForUnkeyedFallbackFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)

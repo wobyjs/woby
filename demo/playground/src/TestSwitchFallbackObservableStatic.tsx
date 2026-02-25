@@ -12,10 +12,10 @@ const TestSwitchFallbackObservableStatic = (): JSX.Element => {
             </Switch>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSwitchFallbackObservableStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -23,7 +23,7 @@ TestSwitchFallbackObservableStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p>Fallback: 0.123456</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSwitchFallbackObservableStatic_ssr']
@@ -32,16 +32,16 @@ TestSwitchFallbackObservableStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Switch - Fallback Observable Static</h3><p>Fallback: 0.123456</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSwitchFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSwitchFallbackObservableStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSwitchFallbackObservableStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

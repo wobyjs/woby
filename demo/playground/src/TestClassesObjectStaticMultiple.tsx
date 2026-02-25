@@ -8,10 +8,10 @@ const TestClassesObjectStaticMultiple = (): JSX.Element => {
             <p class={{ 'red bold': true }}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestClassesObjectStaticMultiple_ssr', ret)
-    
+
     return ret
 }
 
@@ -19,7 +19,7 @@ TestClassesObjectStaticMultiple.test = {
     static: true,
     expect: () => {
         const expected = '<p class="red bold">content</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestClassesObjectStaticMultiple_ssr']
@@ -28,16 +28,16 @@ TestClassesObjectStaticMultiple.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Classes - Object Static Multiple</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestClassesObjectStaticMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassesObjectStaticMultiple] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassesObjectStaticMultiple] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -8,10 +8,10 @@ const TestIdStatic = (): JSX.Element => {
             <p id="foo">content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestIdStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -19,7 +19,7 @@ TestIdStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p id="foo">content</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestIdStatic_ssr']
@@ -28,16 +28,16 @@ TestIdStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>ID - Static</h3><p id="foo">content</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestIdStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestIdStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestIdStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

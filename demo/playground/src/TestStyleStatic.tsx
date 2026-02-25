@@ -8,10 +8,10 @@ const TestStyleStatic = (): JSX.Element => {
             <p style={{ color: 'green' }}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStyleStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -19,7 +19,7 @@ TestStyleStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p style="color: green;">content</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStyleStatic_ssr']
@@ -28,16 +28,16 @@ TestStyleStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Style - Static</h3><p style="color: green;">content</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStyleStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStyleStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStyleStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

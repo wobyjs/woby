@@ -74,15 +74,15 @@ TestClassesObjectRemoval.test = {
                         '<h3>Classes - Object Removal</h3><p>content</p>'
 
                     if (ssrResult === expectedFull) {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassesObjectRemoval] SSR test passed: ${ssrResult}`)
                     } else {
                         console.error(`❌ SSR test failed:`)
                         console.error(`  Got: ${ssrResult}`)
                         console.error(`  Expected: ${expectedFull}`)
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestClassesObjectRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassesObjectRemoval] SSR render error: ${err}`)
                 })
             }
         }, 0)

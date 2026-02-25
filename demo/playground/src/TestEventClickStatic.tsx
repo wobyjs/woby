@@ -18,8 +18,8 @@ const TestEventClickStatic = (): JSX.Element => {
                     target: button,
                     composedPath: () => [button, button.parentNode, document.body, document],
                     cancelBubble: false
-                };
-                button._onclick.call(button, mockEvent);
+                }
+                button._onclick.call(button, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -30,10 +30,10 @@ const TestEventClickStatic = (): JSX.Element => {
             <p><button ref={ref} onClick={increment}>{o}</button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventClickStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -43,11 +43,11 @@ TestEventClickStatic.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestEventClickStatic_o'])
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Event - Click Static</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventClickStatic_ssr']
@@ -57,16 +57,16 @@ TestEventClickStatic.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventClickStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventClickStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventClickStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

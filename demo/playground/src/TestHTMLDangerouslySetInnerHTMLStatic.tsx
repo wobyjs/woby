@@ -8,10 +8,10 @@ const TestHTMLDangerouslySetInnerHTMLStatic = (): JSX.Element => {
             <p dangerouslySetInnerHTML={{ __html: '<i>danger</i>' }} />
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestHTMLDangerouslySetInnerHTMLStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -19,7 +19,7 @@ TestHTMLDangerouslySetInnerHTMLStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p><i>danger</i></p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestHTMLDangerouslySetInnerHTMLStatic_ssr']
@@ -28,16 +28,16 @@ TestHTMLDangerouslySetInnerHTMLStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>HTML - dangerouslySetInnerHTML - Static</h3><p><i>danger</i></p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestHTMLDangerouslySetInnerHTMLStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestHTMLDangerouslySetInnerHTMLStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestHTMLDangerouslySetInnerHTMLStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -57,12 +57,12 @@ TestClassesObjectRemovalMultiple.test = {
                         console.error(`❌ SSR test failed:`)
                         console.error(`  Got: ${ssrResult}`)
                         console.error(`  Expected: ${expectedFull}`)
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestClassesObjectRemovalMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassesObjectRemovalMultiple] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassesObjectRemovalMultiple] SSR render error: ${err}`)
                 })
             }
         }, 0)

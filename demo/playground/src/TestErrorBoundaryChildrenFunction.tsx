@@ -24,10 +24,10 @@ const TestErrorBoundaryChildrenFunction = (): JSX.Element => {
             </ErrorBoundary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestErrorBoundaryChildrenFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -35,11 +35,11 @@ TestErrorBoundaryChildrenFunction.test = {
     static: true,
     expect: () => {
         const value = $$(testObservables['TestErrorBoundaryChildrenFunction'])
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Error Boundary - Children Function</h3><p>Children: ${value}</p>`  // For SSR comparison
         const expected = `<p>Children: ${value}</p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestErrorBoundaryChildrenFunction_ssr']
@@ -49,16 +49,16 @@ TestErrorBoundaryChildrenFunction.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestErrorBoundaryChildrenFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestErrorBoundaryChildrenFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestErrorBoundaryChildrenFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

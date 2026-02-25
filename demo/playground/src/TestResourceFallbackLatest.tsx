@@ -18,10 +18,10 @@ const TestResourceFallbackLatest = (): JSX.Element => {
             </ErrorBoundary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestResourceFallbackLatest_ssr', ret)
-    
+
     return ret
 }
 
@@ -29,7 +29,7 @@ TestResourceFallbackLatest.test = {
     static: true,
     expect: () => {
         const expected = '<p>Error!</p><p>Error!</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestResourceFallbackLatest_ssr']
@@ -38,16 +38,16 @@ TestResourceFallbackLatest.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Resource - Fallback Latest</h3><p>Error!</p><p>Error!</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestResourceFallbackLatest] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestResourceFallbackLatest] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestResourceFallbackLatest] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

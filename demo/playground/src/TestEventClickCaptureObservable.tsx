@@ -19,15 +19,15 @@ const TestEventClickCaptureObservable = (): JSX.Element => {
     registerTestObservable('TestEventClickCaptureObservable_o', o)
     const onClick = $(() => { })
     const plus2 = (event: Event) => {
-        onClick(() => minus1);
-        o(prev => prev + 2);
+        onClick(() => minus1)
+        o(prev => prev + 2)
     }
     const minus1 = (event: Event) => {
-        onClick(() => plus2);
-        o(prev => prev - 1);
+        onClick(() => plus2)
+        o(prev => prev - 1)
     }
     onClick(() => plus2)
-    
+
     // Register the ref for testing
     registerTestObservable('TestEventClickCaptureObservable_ref', ref)
     registerTestObservable('TestEventClickCaptureObservable_onClick', onClick)
@@ -43,10 +43,10 @@ const TestEventClickCaptureObservable = (): JSX.Element => {
                     target: button,
                     composedPath: () => [button, button.parentNode, document.body, document],
                     cancelBubble: false,
-                    stopPropagation: () => {},
-                    stopImmediatePropagation: () => {}
-                };
-                button._onclickcapture.call(button, mockEvent);
+                    stopPropagation: () => { },
+                    stopImmediatePropagation: () => { }
+                }
+                button._onclickcapture.call(button, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -57,10 +57,10 @@ const TestEventClickCaptureObservable = (): JSX.Element => {
             <p><button ref={ref} onClickCapture={onClick}>{o}</button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventClickCaptureObservable_ssr', ret)
-    
+
     return ret
 }
 
@@ -73,7 +73,7 @@ TestEventClickCaptureObservable.test = {
         const observable = testObservables['TestEventClickCaptureObservable_o']
         let currentValue = 0
         let expected, expectedFull
-        
+
         if (observable) {
             currentValue = $$(observable)
             // Check that the value is following the expected pattern
@@ -84,7 +84,7 @@ TestEventClickCaptureObservable.test = {
             expected = `<p><button>0</button></p>`
             expectedFull = `<h3>Event - Click Capture Observable</h3><p><button>0</button></p>`
         }
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventClickCaptureObservable_ssr']
@@ -94,16 +94,16 @@ TestEventClickCaptureObservable.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventClickCaptureObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventClickCaptureObservable] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventClickCaptureObservable] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

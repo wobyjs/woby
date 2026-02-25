@@ -35,10 +35,10 @@ const TestChildOverReexecution = (): JSX.Element => {
             {count}
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestChildOverReexecution_ssr', ret)
-    
+
     return ret
 }
 
@@ -53,7 +53,7 @@ TestChildOverReexecution.test = {
         } else {
             expected = `<div>1</div>0`
         }
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestChildOverReexecution_ssr']
@@ -61,25 +61,25 @@ TestChildOverReexecution.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     // Extract the actual execution count from SSR result
-                    const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/);
+                    const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/)
                     if (match) {
-                        const ssrExecutions = parseInt(match[1]);
-                        const ssrCount = parseInt(match[2]);
-                        const expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`;
+                        const ssrExecutions = parseInt(match[1])
+                        const ssrCount = parseInt(match[2])
+                        const expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`
                         if (ssrResult === expectedFull) {
-                            console.log(`✅ SSR test passed: ${ssrResult}`);
+                            console.log(`✅ [TestChildOverReexecution] SSR test passed: ${ssrResult}`)
                         } else {
-                            assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`);
+                            assert(false, `[TestChildOverReexecution] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                         }
                     } else {
-                        assert(false, `SSR result format unexpected: ${ssrResult}`);
+                        assert(false, `SSR result format unexpected: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`);
-                });
+                    console.error(`[TestChildOverReexecution] SSR render error: ${err}`)
+                })
             }
         }, 0)
-        
+
         return expected
     }
 }

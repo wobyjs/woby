@@ -43,12 +43,12 @@ TestSuspenseFallbackFunction.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Suspense - Fallback Function</h3><p>Fallback: ${initialValue}</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSuspenseFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSuspenseFallbackFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSuspenseFallbackFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)

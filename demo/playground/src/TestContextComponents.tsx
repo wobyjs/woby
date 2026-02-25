@@ -24,10 +24,10 @@ const TestContextComponents = (): JSX.Element => {
             </Context.Provider>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestContextComponents_ssr', ret)
-    
+
     return ret
 }
 
@@ -37,7 +37,7 @@ TestContextComponents.test = {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>Context - Components</h3><p>outer</p><p>inner</p><p>outer</p>'  // For SSR comparison
         const expected = '<p>outer</p><p>inner</p><p>outer</p>'   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestContextComponents_ssr']
@@ -47,16 +47,16 @@ TestContextComponents.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestContextComponents] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestContextComponents] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestContextComponents] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

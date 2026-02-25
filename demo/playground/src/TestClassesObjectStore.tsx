@@ -54,12 +54,12 @@ TestClassesObjectStore.test = {
                     const dynamicExpectedFull = `<h3>Classes - Object Store</h3><p class="${actualClass}">content</p>`
 
                     if (ssrResult !== dynamicExpectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+                        assert(false, `[TestClassesObjectStore] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassesObjectStore] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassesObjectStore] SSR render error: ${err}`)
                 })
             }
         }, 0)

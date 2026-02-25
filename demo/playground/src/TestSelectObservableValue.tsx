@@ -87,10 +87,10 @@ TestSelectObservableValue.test = {
                         console.error('[TestSelectObservableValue] ❌ SSR ASSERTION FAILED')
                         assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSelectObservableValue] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSelectObservableValue] SSR render error: ${err}`)
                 })
             }
         }, 0)

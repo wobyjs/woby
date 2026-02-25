@@ -15,10 +15,10 @@ const TestEventTargetCurrentTarget = (): JSX.Element => {
             </div>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventTargetCurrentTarget_ssr', ret)
-    
+
     return ret
 }
 
@@ -28,7 +28,7 @@ TestEventTargetCurrentTarget.test = {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>Event - Target - Current Target</h3><div><p>paragraph</p><ul><li>one</li><li>two</li><li>three</li></ul></div>'  // For SSR comparison
         const expected = '<div><p>paragraph</p><ul><li>one</li><li>two</li><li>three</li></ul></div>'   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventTargetCurrentTarget_ssr']
@@ -38,16 +38,16 @@ TestEventTargetCurrentTarget.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventTargetCurrentTarget] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventTargetCurrentTarget] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventTargetCurrentTarget] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

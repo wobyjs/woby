@@ -12,10 +12,10 @@ const TestClassesArrayFunctionMultiple = (): JSX.Element => {
             <p class={() => o()}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestClassesArrayFunctionMultiple_ssr', ret)
-    
+
     return ret
 }
 
@@ -25,11 +25,11 @@ TestClassesArrayFunctionMultiple.test = {
     expect: () => {
         const value = $$(testObservables['TestClassesArrayFunctionMultiple'])
         const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : (value || '')
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Classes - Array Function Multiple</h3><p class="${classes}">content</p>`  // For SSR comparison
         const expected = `<p class="${classes}">content</p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestClassesArrayFunctionMultiple_ssr']
@@ -39,16 +39,16 @@ TestClassesArrayFunctionMultiple.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestClassesArrayFunctionMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassesArrayFunctionMultiple] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassesArrayFunctionMultiple] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

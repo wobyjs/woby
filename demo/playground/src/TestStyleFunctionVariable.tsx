@@ -12,10 +12,10 @@ const TestStyleFunctionVariable = (): JSX.Element => {
             <p style={{ color: 'var(--color)', '--color': () => o() }}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStyleFunctionVariable_ssr', ret)
-    
+
     return ret
 }
 
@@ -24,7 +24,7 @@ TestStyleFunctionVariable.test = {
     expect: () => {
         const value = $$(testObservables['TestStyleFunctionVariable'])
         const expected = `<p style="color: var(--color); --color: ${value};">content</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStyleFunctionVariable_ssr']
@@ -33,16 +33,16 @@ TestStyleFunctionVariable.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Style - Function Variable</h3><p style="color: var(--color); --color: ${value};">content</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStyleFunctionVariable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStyleFunctionVariable] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStyleFunctionVariable] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

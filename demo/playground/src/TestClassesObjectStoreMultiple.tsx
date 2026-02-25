@@ -68,15 +68,15 @@ TestClassesObjectStoreMultiple.test = {
                     const expectedFull = `<h3>Classes - Object Store Multiple</h3><p class="${expectedClass.trim()}">content</p>`
 
                     if (ssrResult === expectedFull) {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassesObjectStoreMultiple] SSR test passed: ${ssrResult}`)
                     } else {
                         console.error(`❌ SSR test failed:`)
                         console.error(`  Got: ${ssrResult}`)
                         console.error(`  Expected: ${expectedFull}`)
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestClassesObjectStoreMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassesObjectStoreMultiple] SSR render error: ${err}`)
                 })
             }
         }, 0)

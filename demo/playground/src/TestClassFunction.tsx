@@ -13,10 +13,10 @@ const TestClassFunction = (): JSX.Element => {
             <p class={{ red: () => o() }}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestClassFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -26,7 +26,7 @@ TestClassFunction.test = {
     expect: () => {
         const value = $$(testObservables['TestClassFunction'])
         const expected = value ? '<p class="red">content</p>' : '<p class="">content</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestClassFunction_ssr']
@@ -35,16 +35,16 @@ TestClassFunction.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = value ? '<h3>Class - Function Boolean</h3><p class="red">content</p>' : '<h3>Class - Function Boolean</h3><p>content</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestClassFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

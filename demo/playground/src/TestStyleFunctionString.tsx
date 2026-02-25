@@ -33,12 +33,12 @@ TestStyleFunctionString.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Style - Function String</h3><p style="${value}">content</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStyleFunctionString] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStyleFunctionString] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStyleFunctionString] SSR render error: ${err}`)
                 })
             }
         }, 0)

@@ -10,10 +10,10 @@ const TestAttributeFunctionBoolean = (): JSX.Element => {
             <p data-red={() => !o()}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestAttributeFunctionBoolean_ssr', ret)
-    
+
     return ret
 }
 
@@ -30,7 +30,7 @@ TestAttributeFunctionBoolean.test = {
         } else {
             expected = '<p data-red="false">content</p>'
         }
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestAttributeFunctionBoolean_ssr']
@@ -39,16 +39,16 @@ TestAttributeFunctionBoolean.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Attribute - Function Boolean</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestAttributeFunctionBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestAttributeFunctionBoolean] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestAttributeFunctionBoolean] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

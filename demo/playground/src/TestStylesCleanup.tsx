@@ -9,10 +9,10 @@ const TestStylesCleanup = (): JSX.Element => {
             <p style={styles}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStylesCleanup_ssr', ret)
-    
+
     return ret
 }
 
@@ -20,7 +20,7 @@ TestStylesCleanup.test = {
     static: true,
     expect: () => {
         const expected = '<p style="color: orange; font-weight: bold;">content</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStylesCleanup_ssr']
@@ -29,16 +29,16 @@ TestStylesCleanup.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Styles - Observable Cleanup</h3><p style="color: orange; font-weight: bold;">content</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStylesCleanup] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStylesCleanup] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStylesCleanup] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

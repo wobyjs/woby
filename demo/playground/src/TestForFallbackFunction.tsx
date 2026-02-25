@@ -26,10 +26,10 @@ const TestForFallbackFunction = (): JSX.Element => {
             </For>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestForFallbackFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -40,7 +40,7 @@ TestForFallbackFunction.test = {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>For - Fallback Function</h3><p>Fallback: 0.5</p>'  // For SSR comparison
         const expected = '<p>Fallback: 0.5</p>'   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestForFallbackFunction_ssr']
@@ -50,16 +50,16 @@ TestForFallbackFunction.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestForFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestForFallbackFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestForFallbackFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

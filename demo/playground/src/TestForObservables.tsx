@@ -38,12 +38,12 @@ TestForObservables.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>For - Observables</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestForObservables] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestForObservables] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestForObservables] SSR render error: ${err}`)
                 })
             }
         }, 0)

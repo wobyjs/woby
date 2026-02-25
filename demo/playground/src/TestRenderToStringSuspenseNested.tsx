@@ -39,12 +39,12 @@ TestRenderToStringSuspenseNested.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<div><h3>renderToString - Suspense Nested</h3><p>123123</p><p>123123</p></div>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestRenderToStringSuspenseNested] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestRenderToStringSuspenseNested] SSR render error: ${err}`)
                 })
             }
         }, 0)

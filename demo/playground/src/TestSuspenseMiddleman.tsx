@@ -13,10 +13,10 @@ const TestSuspenseMiddleman = (): JSX.Element => {
             </Suspense>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSuspenseMiddleman_ssr', ret)
-    
+
     return ret
 }
 
@@ -24,7 +24,7 @@ TestSuspenseMiddleman.test = {
     static: true,
     expect: () => {
         const expected = '<p>Middleman!</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSuspenseMiddleman_ssr']
@@ -33,16 +33,16 @@ TestSuspenseMiddleman.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Suspense - Middleman</h3><p>Middleman!</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSuspenseMiddleman] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSuspenseMiddleman] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSuspenseMiddleman] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -10,10 +10,10 @@ const TestIdRemoval = (): JSX.Element => {
             <p id={o}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestIdRemoval_ssr', ret)
-    
+
     return ret
 }
 
@@ -23,7 +23,7 @@ TestIdRemoval.test = {
     expect: () => {
         const value = $$(testObservables['TestIdRemoval'])
         const expected = value ? `<p id="${value}">content</p>` : '<p>content</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestIdRemoval_ssr']
@@ -32,16 +32,16 @@ TestIdRemoval.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = value ? `<h3>ID - Removal</h3><p id="${value}">content</p>` : '<h3>ID - Removal</h3><p>content</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestIdRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestIdRemoval] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestIdRemoval] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

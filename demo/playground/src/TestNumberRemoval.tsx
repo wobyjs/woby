@@ -36,12 +36,12 @@ TestNumberRemoval.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Number - Removal</h3>' + expected
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestNumberRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestNumberRemoval] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestNumberRemoval] SSR render error: ${err}`)
                 })
             }
         }, 0)

@@ -13,12 +13,12 @@ const TestStringRemoval = (): JSX.Element => {
             <p>({o})</p>
         </>
     )
-    
+
     // Store the component for SSR testing - only in environments where function is available
     if (typeof registerTestObservable !== 'undefined') {
         registerTestObservable('TestStringRemoval_ssr', ret)
     }
-    
+
     return ret
 }
 
@@ -28,27 +28,27 @@ TestStringRemoval.test = {
     expect: () => {
         const val = $$(testObservables['TestStringRemoval'])
         const expected = val !== null ? `<p>(${val})</p>` : '<p>(<!---->)</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStringRemoval_ssr']
             if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = val !== null ? 
-                        `<h3>String - Removal</h3><p>(${val})</p>` : 
+                    const expectedFull = val !== null ?
+                        `<h3>String - Removal</h3><p>(${val})</p>` :
                         '<h3>String - Removal</h3><p>(<!---->)</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStringRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStringRemoval] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStringRemoval] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

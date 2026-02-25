@@ -12,10 +12,10 @@ const TestClassesArrayObservableMultiple = (): JSX.Element => {
             <p class={o}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestClassesArrayObservableMultiple_ssr', ret)
-    
+
     return ret
 }
 
@@ -26,7 +26,7 @@ TestClassesArrayObservableMultiple.test = {
         const value = $$(testObservables['TestClassesArrayObservableMultiple'])
         const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : (value || '')
         const expected = `<p class="${classes}">content</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestClassesArrayObservableMultiple_ssr']
@@ -35,16 +35,16 @@ TestClassesArrayObservableMultiple.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Classes - Array Observable Multiple</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestClassesArrayObservableMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassesArrayObservableMultiple] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassesArrayObservableMultiple] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -15,10 +15,10 @@ const TestTernaryFunction = (): JSX.Element => {
             </Ternary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestTernaryFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -28,7 +28,7 @@ TestTernaryFunction.test = {
     expect: () => {
         const value = !testObservables['TestTernaryFunction']?.() // since it uses !o()
         const expected = `<p>${value ? 'true' : 'false'}</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestTernaryFunction_ssr']
@@ -37,16 +37,16 @@ TestTernaryFunction.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Ternary - Function</h3><p>${value ? 'true' : 'false'}</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestTernaryFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestTernaryFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestTernaryFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -12,10 +12,10 @@ const TestStyleObservableString = (): JSX.Element => {
             <p style={o}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStyleObservableString_ssr', ret)
-    
+
     return ret
 }
 
@@ -24,7 +24,7 @@ TestStyleObservableString.test = {
     expect: () => {
         const value = $$(testObservables['TestStyleObservableString'])
         const expected = `<p style="${value}">content</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStyleObservableString_ssr']
@@ -33,16 +33,16 @@ TestStyleObservableString.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Style - Observable String</h3><p style="${value}">content</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStyleObservableString] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStyleObservableString] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStyleObservableString] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

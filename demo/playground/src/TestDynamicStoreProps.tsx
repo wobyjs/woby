@@ -94,12 +94,12 @@ TestDynamicStoreProps.test = {
 
                     if (ssrResult !== dynamicExpectedFull) {
                         console.error('[TestDynamicStoreProps] ❌ SSR ASSERTION FAILED')
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+                        assert(false, `[TestDynamicStoreProps] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestDynamicStoreProps] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestDynamicStoreProps] SSR render error: ${err}`)
                 })
             }
         }, 0)

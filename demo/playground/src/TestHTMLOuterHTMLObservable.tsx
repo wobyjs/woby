@@ -11,10 +11,10 @@ const TestHTMLOuterHTMLObservable = (): JSX.Element => {
             <p outerHTML={o} />
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestHTMLOuterHTMLObservable_ssr', ret)
-    
+
     return ret
 }
 
@@ -22,7 +22,7 @@ TestHTMLOuterHTMLObservable.test = {
     static: true,
     expect: () => {
         const expected = '<p></p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestHTMLOuterHTMLObservable_ssr']
@@ -31,16 +31,16 @@ TestHTMLOuterHTMLObservable.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>HTML - outerHTML - Observable</h3><p></p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestHTMLOuterHTMLObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestHTMLOuterHTMLObservable] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestHTMLOuterHTMLObservable] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

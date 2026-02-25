@@ -81,12 +81,12 @@ TestStylesStore.test = {
 
                     if (ssrResult !== dynamicExpectedFull) {
                         console.error('[TestStylesStore] ❌ SSR ASSERTION FAILED')
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+                        assert(false, `[TestStylesStore] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStylesStore] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStylesStore] SSR render error: ${err}`)
                 })
             }
         }, 0)

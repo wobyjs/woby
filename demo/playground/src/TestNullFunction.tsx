@@ -73,12 +73,12 @@ TestNullFunction.test = {
 
                     if (ssrResult !== dynamicExpectedFull) {
                         console.error('[TestNullFunction] ❌ SSR ASSERTION FAILED')
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+                        assert(false, `[TestNullFunction] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestNullFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestNullFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)

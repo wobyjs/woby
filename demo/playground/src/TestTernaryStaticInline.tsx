@@ -9,10 +9,10 @@ const TestTernaryStaticInline = (): JSX.Element => {
             <Ternary when={false}><p>true (2)</p><p>false (2)</p></Ternary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestTernaryStaticInline_ssr', ret)
-    
+
     return ret
 }
 
@@ -20,7 +20,7 @@ TestTernaryStaticInline.test = {
     static: true,
     expect: () => {
         const expected = '<p>true (1)</p><p>false (2)</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestTernaryStaticInline_ssr']
@@ -29,16 +29,16 @@ TestTernaryStaticInline.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Ternary - Static Inline</h3><p>true (1)</p><p>false (2)</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestTernaryStaticInline] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestTernaryStaticInline] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestTernaryStaticInline] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

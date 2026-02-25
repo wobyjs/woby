@@ -104,12 +104,12 @@ TestNestedIfsLazy.test = {
                     // Use dynamic matching to avoid timing mismatches
                     if (ssrResult !== dynamicExpectedFull) {
                         console.error('[TestNestedIfsLazy] ❌ SSR ASSERTION FAILED')
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+                        assert(false, `[TestNestedIfsLazy] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestNestedIfsLazy] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestNestedIfsLazy] SSR render error: ${err}`)
                 })
             }
         }, 100)  // Add small delay to ensure timing synchronization

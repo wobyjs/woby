@@ -28,12 +28,12 @@ TestFragmentStaticComponent.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Fragment - Static Component</h3><p>content</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestFragmentStaticComponent] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestFragmentStaticComponent] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestFragmentStaticComponent] SSR render error: ${err}`)
                 })
             }
         }, 0)

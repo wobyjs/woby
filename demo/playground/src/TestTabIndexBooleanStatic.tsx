@@ -9,10 +9,10 @@ const TestTabIndexBooleanStatic = (): JSX.Element => {
             <p tabIndex={false}>false</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestTabIndexBooleanStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -20,7 +20,7 @@ TestTabIndexBooleanStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p tabindex="0">true</p><p>false</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestTabIndexBooleanStatic_ssr']
@@ -29,16 +29,16 @@ TestTabIndexBooleanStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>TabIndex - Boolean - Static</h3><p tabindex="0">true</p><p>false</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestTabIndexBooleanStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestTabIndexBooleanStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestTabIndexBooleanStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

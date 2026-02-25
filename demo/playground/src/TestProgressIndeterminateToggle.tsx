@@ -37,12 +37,12 @@ TestProgressIndeterminateToggle.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Progress - Indeterminate Toggle</h3>' + expected
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestProgressIndeterminateToggle] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestProgressIndeterminateToggle] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestProgressIndeterminateToggle] SSR render error: ${err}`)
                 })
             }
         }, 0)

@@ -23,10 +23,10 @@ const TestErrorBoundaryFallbackFunction = (): JSX.Element => {
             </ErrorBoundary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestErrorBoundaryFallbackFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -35,11 +35,11 @@ TestErrorBoundaryFallbackFunction.test = {
     compareActualValues: true,
     expect: () => {
         const fallbackValue = $$(testObservables['TestErrorBoundaryFallbackFunction'])
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Error Boundary - Fallback Function</h3><p>Fallback: ${fallbackValue}</p>`  // For SSR comparison
         const expected = `<p>Fallback: ${fallbackValue}</p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestErrorBoundaryFallbackFunction_ssr']
@@ -49,16 +49,16 @@ TestErrorBoundaryFallbackFunction.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestErrorBoundaryFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestErrorBoundaryFallbackFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestErrorBoundaryFallbackFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

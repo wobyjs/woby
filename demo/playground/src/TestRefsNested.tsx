@@ -19,10 +19,10 @@ const TestRefsNested = (): JSX.Element => {
             <p ref={[ref1, [null, [undefined, ref2]]]}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestRefsNested_ssr', ret)
-    
+
     return ret
 }
 
@@ -30,7 +30,7 @@ TestRefsNested.test = {
     static: true,
     expect: () => {
         const expected = '<p>Got ref1 - Has parent: true - Is connected: true / Got ref2 - Has parent: true - Is connected: true</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestRefsNested_ssr']
@@ -39,16 +39,16 @@ TestRefsNested.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Refs - Nested</h3><p>Got ref1 - Has parent: true - Is connected: true / Got ref2 - Has parent: true - Is connected: true</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestRefsNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestRefsNested] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestRefsNested] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

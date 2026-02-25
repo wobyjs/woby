@@ -47,12 +47,12 @@ TestForFallbackObservableStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>For - Fallback Observable Static</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestForFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestForFallbackObservableStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestForFallbackObservableStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)

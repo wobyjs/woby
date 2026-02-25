@@ -12,10 +12,10 @@ const TestEventMiddleClickStatic = (): JSX.Element => {
             <p><button onClick={increment}>{o}</button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventMiddleClickStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -24,11 +24,11 @@ TestEventMiddleClickStatic.test = {
     static: true,
     expect: () => {
         const value = testObservables['TestEventMiddleClickStatic_o']?.() ?? 0
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>Event - Middle Click Static</h3><p><button>0</button></p>'  // For SSR comparison
         const expected = '<p><button>0</button></p>'   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventMiddleClickStatic_ssr']
@@ -38,16 +38,16 @@ TestEventMiddleClickStatic.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventMiddleClickStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventMiddleClickStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventMiddleClickStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         // For static test, expect the initial value (0) since no updates should happen
         return expected
     }

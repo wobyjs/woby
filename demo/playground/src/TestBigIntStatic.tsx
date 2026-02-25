@@ -8,10 +8,10 @@ const TestBigIntStatic = (): JSX.Element => {
             <p>{123123n}</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestBigIntStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -19,7 +19,7 @@ TestBigIntStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p>123123</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestBigIntStatic_ssr']
@@ -28,16 +28,16 @@ TestBigIntStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>BigInt - Static</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestBigIntStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestBigIntStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestBigIntStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

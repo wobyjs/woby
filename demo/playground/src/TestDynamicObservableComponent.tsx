@@ -17,10 +17,10 @@ const TestDynamicObservableComponent = (): JSX.Element => {
             </Dynamic>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestDynamicObservableComponent_ssr', ret)
-    
+
     return ret
 }
 
@@ -29,11 +29,11 @@ TestDynamicObservableComponent.test = {
     compareActualValues: true,
     expect: () => {
         const level = $$(testObservables['TestDynamicObservableComponent'])
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Dynamic - Observable Component</h3><h${level}>Level: ${$$(level)}</h${level}>`  // For SSR comparison
         const expected = `<h${level}>Level: ${$$(level)}</h${level}>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestDynamicObservableComponent_ssr']
@@ -43,16 +43,16 @@ TestDynamicObservableComponent.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestDynamicObservableComponent] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestDynamicObservableComponent] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestDynamicObservableComponent] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

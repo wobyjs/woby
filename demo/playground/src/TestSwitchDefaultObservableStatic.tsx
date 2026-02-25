@@ -18,10 +18,10 @@ const TestSwitchDefaultObservableStatic = (): JSX.Element => {
             </Switch>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSwitchDefaultObservableStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -29,7 +29,7 @@ TestSwitchDefaultObservableStatic.test = {
     static: true,
     expect: () => {
         const expected = '<p>Default: 0.123456</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSwitchDefaultObservableStatic_ssr']
@@ -38,16 +38,16 @@ TestSwitchDefaultObservableStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Switch - Default Observable Static</h3><p>Default: 0.123456</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSwitchDefaultObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSwitchDefaultObservableStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSwitchDefaultObservableStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

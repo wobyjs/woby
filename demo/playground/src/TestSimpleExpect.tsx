@@ -11,12 +11,12 @@ const TestSimpleExpect = (): JSX.Element => {
             <p>{value}</p>
         </>
     )
-    
+
     // Store the component for SSR testing - only in environments where function is available
     if (typeof registerTestObservable !== 'undefined') {
         registerTestObservable('TestSimpleExpect_ssr', ret)
     }
-    
+
     return ret
 }
 
@@ -26,7 +26,7 @@ TestSimpleExpect.test = {
     expect: () => {
         const value = $$(testObservables['TestSimpleExpect'])
         const expected = `<p>${value}</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSimpleExpect_ssr']
@@ -35,16 +35,16 @@ TestSimpleExpect.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Simple Expect Test</h3><p>Hello World</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSimpleExpect] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSimpleExpect] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSimpleExpect] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

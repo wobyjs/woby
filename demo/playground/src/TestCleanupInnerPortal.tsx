@@ -28,12 +28,12 @@ TestCleanupInnerPortal.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expected) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expected}`)
+                        assert(false, `[TestCleanupInnerPortal] SSR mismatch: got ${ssrResult}, expected ${expected}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestCleanupInnerPortal] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestCleanupInnerPortal] SSR render error: ${err}`)
                 })
             }
         }, 0)

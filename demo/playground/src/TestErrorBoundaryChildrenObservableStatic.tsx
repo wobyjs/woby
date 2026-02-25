@@ -18,15 +18,15 @@ const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
     const ret: JSX.Element = (
         <>
             <h3>Error Boundary - Children Observable Static</h3>
-            <ErrorBoundary fallback={<Fallback />}> 
+            <ErrorBoundary fallback={<Fallback />}>
                 <Children />
             </ErrorBoundary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestErrorBoundaryChildrenObservableStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -35,11 +35,11 @@ TestErrorBoundaryChildrenObservableStatic.test = {
     compareActualValues: true,
     expect: () => {
         const childrenValue = $$(testObservables['TestErrorBoundaryChildrenObservableStatic'])
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Error Boundary - Children Observable Static</h3><p>Children: ${childrenValue}</p>`  // For SSR comparison
         const expected = `<p>Children: ${childrenValue}</p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestErrorBoundaryChildrenObservableStatic_ssr']
@@ -49,16 +49,16 @@ TestErrorBoundaryChildrenObservableStatic.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestErrorBoundaryChildrenObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestErrorBoundaryChildrenObservableStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestErrorBoundaryChildrenObservableStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

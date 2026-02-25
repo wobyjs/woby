@@ -9,10 +9,10 @@ const TestClassesArrayNestedStatic = (): JSX.Element => {
             <p class={o}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestClassesArrayNestedStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -22,7 +22,7 @@ TestClassesArrayNestedStatic.test = {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>Classes - Array Nested Static</h3><p class="red bold italic">content</p>'  // For SSR comparison
         const expected = '<p class="red bold italic">content</p>'   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestClassesArrayNestedStatic_ssr']
@@ -32,16 +32,16 @@ TestClassesArrayNestedStatic.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestClassesArrayNestedStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestClassesArrayNestedStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestClassesArrayNestedStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

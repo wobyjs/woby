@@ -82,12 +82,12 @@ TestNestedArrays.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Nested Arrays</h3>' + html
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestNestedArrays] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestNestedArrays] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestNestedArrays] SSR render error: ${err}`)
                 })
             }
         }, 0)

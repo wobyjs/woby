@@ -11,10 +11,10 @@ const TestHTMLTextContentFunction = (): JSX.Element => {
             <p textContent={() => o()} />
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestHTMLTextContentFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -22,7 +22,7 @@ TestHTMLTextContentFunction.test = {
     static: true,
     expect: () => {
         const expected = '<p></p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestHTMLTextContentFunction_ssr']
@@ -31,16 +31,16 @@ TestHTMLTextContentFunction.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>HTML - textContent - Function</h3><p></p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestHTMLTextContentFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestHTMLTextContentFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestHTMLTextContentFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -12,10 +12,10 @@ const TestCheckboxIndeterminateToggle = (): JSX.Element => {
             <input type="checkbox" checked indeterminate={o} />
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestCheckboxIndeterminateToggle_ssr', ret)
-    
+
     return ret
 }
 
@@ -23,7 +23,7 @@ TestCheckboxIndeterminateToggle.test = {
     static: true,
     expect: () => {
         const expected = '<input type="checkbox"><input type="checkbox">'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestCheckboxIndeterminateToggle_ssr']
@@ -32,16 +32,16 @@ TestCheckboxIndeterminateToggle.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestCheckboxIndeterminateToggle] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestCheckboxIndeterminateToggle] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestCheckboxIndeterminateToggle] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

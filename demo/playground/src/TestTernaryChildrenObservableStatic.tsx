@@ -33,10 +33,10 @@ const TestTernaryChildrenObservableStatic = (): JSX.Element => {
             </Ternary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestTernaryChildrenObservableStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -47,7 +47,7 @@ TestTernaryChildrenObservableStatic.test = {
         const trueValue = $$(testObservables['TestTernaryChildrenObservableStatic_true'])
         const falseValue = $$(testObservables['TestTernaryChildrenObservableStatic_false'])
         const expected = `<p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestTernaryChildrenObservableStatic_ssr']
@@ -56,16 +56,16 @@ TestTernaryChildrenObservableStatic.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Ternary - Children Observable Static</h3><p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestTernaryChildrenObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestTernaryChildrenObservableStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestTernaryChildrenObservableStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

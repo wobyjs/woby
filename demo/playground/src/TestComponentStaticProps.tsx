@@ -9,10 +9,10 @@ const TestComponentStaticProps = ({ value }: { value: number }): JSX.Element => 
             <p>{value}</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestComponentStaticProps_ssr', ret)
-    
+
     return ret
 }
 
@@ -21,11 +21,11 @@ TestComponentStaticProps.test = {
     compareActualValues: true,
     expect: () => {
         const propValue = $$(testObservables['TestComponentStaticProps'])
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Component - Static Props</h3><p>${propValue}</p>`  // For SSR comparison
         const expected = `<p>${propValue}</p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestComponentStaticProps_ssr']
@@ -35,16 +35,16 @@ TestComponentStaticProps.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestComponentStaticProps] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestComponentStaticProps] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestComponentStaticProps] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

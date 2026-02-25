@@ -84,7 +84,7 @@ const TestCustomElementSlotsWithSSR = (): JSX.Element => {
     const showFallback = $(true)
     const headerText = $('Custom Header')
     const footerText = $('Custom Footer')
-    
+
     const ret: JSX.Element = (
         <div>
             <h1>Custom Element Slots Test</h1>
@@ -132,10 +132,10 @@ const TestCustomElementSlotsWithSSR = (): JSX.Element => {
             </SlotElement>
         </div>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestCustomElementSlots_ssr', ret)
-    
+
     return ret
 }
 
@@ -143,7 +143,7 @@ TestCustomElementSlotsWithSSR.test = {
     static: true,
     expect: () => {
         const expected = '<h1>Custom Element Slots Test</h1><h2>1. Basic Slot Functionality</h2><slot-element title="Element with Children"><p>This content goes into the slot</p><button>Slot Button</button></slot-element><slot-element title="Element without Children" showFallback=""></slot-element><h2>2. TSX Slot Usage</h2><slot-element title="TSX Slot Test"><div><p>TSX-provided slot content</p><ul><li>Item 1</li><li>Item 2</li></ul></div></slot-element><h2>3. Named Slots Concept</h2><named-slot-element header="Custom Header" footer="Custom Footer"><div data-slot="header"><h4>Custom Header Content</h4></div><p>Main content area</p><p>More main content</p><div data-slot="footer"><em>Custom Footer Content</em></div></named-slot-element><h2>4. Mixed Usage with Slots</h2><slot-element title="Outer Element"><slot-element title="Nested Slot Element"><p>Nested slot content</p></slot-element></slot-element>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestCustomElementSlots_ssr']
@@ -152,16 +152,16 @@ TestCustomElementSlotsWithSSR.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h1>Custom Element Slots Test</h1><h2>1. Basic Slot Functionality</h2><slot-element title="Element with Children"><p>This content goes into the slot</p><button>Slot Button</button></slot-element><slot-element title="Element without Children" showFallback=""></slot-element><h2>2. TSX Slot Usage</h2><slot-element title="TSX Slot Test"><div><p>TSX-provided slot content</p><ul><li>Item 1</li><li>Item 2</li></ul></div></slot-element><h2>3. Named Slots Concept</h2><named-slot-element header="Custom Header" footer="Custom Footer"><div data-slot="header"><h4>Custom Header Content</h4></div><p>Main content area</p><p>More main content</p><div data-slot="footer"><em>Custom Footer Content</em></div></named-slot-element><h2>4. Mixed Usage with Slots</h2><slot-element title="Outer Element"><slot-element title="Nested Slot Element"><p>Nested slot content</p></slot-element></slot-element>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestCustomElementSlots] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestCustomElementSlots] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestCustomElementSlots] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

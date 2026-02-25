@@ -8,10 +8,10 @@ const TestStyleStaticNumeric = (): JSX.Element => {
             <p style={{ flexGrow: 1, height: 50 }}>content</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestStyleStaticNumeric_ssr', ret)
-    
+
     return ret
 }
 
@@ -19,7 +19,7 @@ TestStyleStaticNumeric.test = {
     static: true,
     expect: () => {
         const expected = '<p style="flex-grow: 1; height: 50px;">content</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestStyleStaticNumeric_ssr']
@@ -28,16 +28,16 @@ TestStyleStaticNumeric.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Style - Static Numeric</h3><p style="flex-grow: 1; height: 50px;">content</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStyleStaticNumeric] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStyleStaticNumeric] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStyleStaticNumeric] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -36,12 +36,12 @@ TestNumberFunction.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Number - Function</h3>' + expected
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestNumberFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestNumberFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestNumberFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)

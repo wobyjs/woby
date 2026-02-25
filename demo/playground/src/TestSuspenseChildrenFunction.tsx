@@ -18,10 +18,10 @@ const TestSuspenseChildrenFunction = (): JSX.Element => {
             </Suspense>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSuspenseChildrenFunction_ssr', ret)
-    
+
     return ret
 }
 
@@ -32,9 +32,9 @@ TestSuspenseChildrenFunction.test = {
         // Get the actual random value that was registered
         const initialValue = testObservables['TestSuspenseChildrenFunction']
         const actualValue = initialValue ? (typeof initialValue === 'function' ? initialValue() : initialValue) : 'unknown'
-        const valueForTest = actualValue;
+        const valueForTest = actualValue
         const expected = `<p>Children: ${valueForTest}</p>`
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponentTemp = testObservables['TestSuspenseChildrenFunction_ssr']
@@ -42,20 +42,20 @@ TestSuspenseChildrenFunction.test = {
                 const elementToRender = typeof ssrComponentTemp === 'function' ? ssrComponentTemp() : ssrComponentTemp
                 renderToString(elementToRender).then(ssrResult => {
                     // Extract the actual value from the SSR result
-                    const match = ssrResult.match(/<p>Children: ([^<]+)<\/p>/);
-                    const actualValue = match ? match[1] : 'unknown';
+                    const match = ssrResult.match(/<p>Children: ([^<]+)<\/p>/)
+                    const actualValue = match ? match[1] : 'unknown'
                     const expectedFull = `<h3>Suspense - Children Function</h3><p>Children: ${actualValue}</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSuspenseChildrenFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSuspenseChildrenFunction] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSuspenseChildrenFunction] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         // For the main test, we need to return the actual expected value
         return `<p>Children: ${valueForTest}</p>`
     }

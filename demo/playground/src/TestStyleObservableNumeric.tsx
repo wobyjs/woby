@@ -33,12 +33,12 @@ TestStyleObservableNumeric.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Style - Observable Numeric</h3><p style="flex-grow: ${value.flexGrow}; width: ${value.width}px;">content</p>`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStyleObservableNumeric] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStyleObservableNumeric] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStyleObservableNumeric] SSR render error: ${err}`)
                 })
             }
         }, 0)

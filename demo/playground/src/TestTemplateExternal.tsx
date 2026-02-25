@@ -16,10 +16,10 @@ const TestTemplateExternal = (): JSX.Element => {
             <Templated class="blue" color="red" />
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestTemplateExternal_ssr', ret)
-    
+
     return ret
 }
 
@@ -27,7 +27,7 @@ TestTemplateExternal.test = {
     static: true,
     expect: () => {
         const expected = '<div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestTemplateExternal_ssr']
@@ -36,16 +36,16 @@ TestTemplateExternal.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Template - External</h3><div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestTemplateExternal] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestTemplateExternal] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestTemplateExternal] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

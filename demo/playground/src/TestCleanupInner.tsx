@@ -64,12 +64,12 @@ TestCleanupInner.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = `<h3>Cleanup - Inner</h3>${expected}`
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestCleanupInner] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestCleanupInner] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestCleanupInner] SSR render error: ${err}`)
                 })
             }
         }, 0)

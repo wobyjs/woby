@@ -11,7 +11,7 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
         return prev + 1
     })
     onClick(() => increment)
-    
+
     // Register the ref for testing
     registerTestObservable('TestEventClickCaptureRemoval_ref', ref)
     registerTestObservable('TestEventClickCaptureRemoval_onClick', onClick)
@@ -27,10 +27,10 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
                     target: button,
                     composedPath: () => [button, button.parentNode, document.body, document],
                     cancelBubble: false,
-                    stopPropagation: () => {},
-                    stopImmediatePropagation: () => {}
-                };
-                button._onclickcapture.call(button, mockEvent);
+                    stopPropagation: () => { },
+                    stopImmediatePropagation: () => { }
+                }
+                button._onclickcapture.call(button, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -41,10 +41,10 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
             <p><button ref={ref} onClickCapture={onClick}>{o}</button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventClickCaptureRemoval_ssr', ret)
-    
+
     return ret
 }
 
@@ -53,11 +53,11 @@ TestEventClickCaptureRemoval.test = {
     static: false,
     expect: () => {
         const value = testObservables['TestEventClickCaptureRemoval_o']?.() ?? 0
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Event - Click Capture Removal</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventClickCaptureRemoval_ssr']
@@ -67,16 +67,16 @@ TestEventClickCaptureRemoval.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventClickCaptureRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventClickCaptureRemoval] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventClickCaptureRemoval] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

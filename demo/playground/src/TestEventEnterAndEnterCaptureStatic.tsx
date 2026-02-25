@@ -17,13 +17,13 @@ const TestEventEnterAndEnterCaptureStatic = (): JSX.Element => {
                 target: button,
                 composedPath: () => [button, button.parentNode, document.body, document],
                 cancelBubble: false
-            };
-            
+            }
+
             if (button._onpointerenter) {
-                button._onpointerenter.call(button, mockEvent);
+                button._onpointerenter.call(button, mockEvent)
             }
             if (button._onpointerentercapture) {
-                button._onpointerentercapture.call(button, mockEvent);
+                button._onpointerentercapture.call(button, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -34,10 +34,10 @@ const TestEventEnterAndEnterCaptureStatic = (): JSX.Element => {
             <p><button ref={ref} onPointerEnter={increment} onPointerEnterCapture={increment}>{o}</button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventEnterAndEnterCaptureStatic_ssr', ret)
-    
+
     return ret
 }
 
@@ -48,14 +48,14 @@ TestEventEnterAndEnterCaptureStatic.test = {
     expect: () => {
         const observable = testObservables['TestEventEnterAndEnterCaptureStatic_o']
         let value = 0
-        
+
         if (observable) {
             value = $$(observable)
         }
-        
+
         // For client-side test, use the current value
         const expected = `<p><button>${value}</button></p>`   // For main test comparison (current value)
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventEnterAndEnterCaptureStatic_ssr']
@@ -63,21 +63,21 @@ TestEventEnterAndEnterCaptureStatic.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     // Extract the button value from SSR result to use for comparison
-                    const match = ssrResult.match(/<button[^>]*>(.*?)<\/button>/);
-                    const ssrValue = match ? match[1] : '0';
+                    const match = ssrResult.match(/<button[^>]*>(.*?)<\/button>/)
+                    const ssrValue = match ? match[1] : '0'
                     const expectedFull = `<h3>Event - Enter &amp; Enter Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
                     // Handle HTML entity encoding in SSR output
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventEnterAndEnterCaptureStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventEnterAndEnterCaptureStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventEnterAndEnterCaptureStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -17,10 +17,10 @@ const TestErrorBoundary = (): JSX.Element => {
             </ErrorBoundary>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestErrorBoundary_ssr', ret)
-    
+
     return ret
 }
 
@@ -31,7 +31,7 @@ TestErrorBoundary.test = {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>Error Boundary</h3><p>Error caught: Custom error</p>'  // For SSR comparison
         const expected = '<p>Error caught: Custom error</p>'   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestErrorBoundary_ssr']
@@ -41,16 +41,16 @@ TestErrorBoundary.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestErrorBoundary] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestErrorBoundary] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestErrorBoundary] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

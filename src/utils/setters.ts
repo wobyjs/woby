@@ -667,11 +667,11 @@ const setEventStatic = (() => {
             } else if (isObservable(value)) {
                 // Create a wrapper that resolves the observable when the event fires
                 element[delegated[0]] = (event: Event) => {
-                    const resolvedValue = (value as Function)();
+                    const resolvedValue = (value as Function)()
                     if (resolvedValue && typeof resolvedValue === 'function') {
-                        return resolvedValue(event);
+                        return resolvedValue(event)
                     }
-                };
+                }
             } else {
                 element[delegated[0]] = value
             }
@@ -704,13 +704,13 @@ const setEventStatic = (() => {
             } else if (isObservable(value)) {
                 // Create a wrapper that resolves the observable when the event fires
                 const wrapper = (event: Event) => {
-                    const resolvedValue = (value as Function)();
+                    const resolvedValue = (value as Function)()
                     if (resolvedValue && typeof resolvedValue === 'function') {
-                        return resolvedValue(event);
+                        return resolvedValue(event)
                     }
-                };
-                element.addEventListener(type, wrapper, { capture: true });
-                element[key] = wrapper;
+                }
+                element.addEventListener(type, wrapper, { capture: true })
+                element[key] = wrapper
             } else {
                 if (value) element.addEventListener(type, value, { capture: true })
                 element[key] = value
@@ -724,11 +724,11 @@ const setEventStatic = (() => {
             } else if (isObservable(value)) {
                 // Create a wrapper that resolves the observable when the event fires
                 element[event] = (event: Event) => {
-                    const resolvedValue = (value as Function)();
+                    const resolvedValue = (value as Function)()
                     if (resolvedValue && typeof resolvedValue === 'function') {
-                        return resolvedValue(event);
+                        return resolvedValue(event)
                     }
-                };
+                }
             } else {
                 element[event] = value
             }

@@ -7,7 +7,7 @@ const TestEventClickRemoval = (): JSX.Element => {
     registerTestObservable('TestEventClickRemoval_o', o)
     registerTestObservable('TestEventClickRemoval_ref', ref)
     const onClick = $(() => { })
-    registerTestObservable('TestEventClickRemoval_onClick', onClick);
+    registerTestObservable('TestEventClickRemoval_onClick', onClick)
     const increment = () => o(prev => {
         onClick(() => null)
         return prev + 1
@@ -18,9 +18,9 @@ const TestEventClickRemoval = (): JSX.Element => {
     setTimeout(() => {
         useInterval(() => {
             const button = ref()
-            const testObservables = window.testObservables || {};
-            const onClickObservable = testObservables.TestEventClickRemoval_onClick;
-            
+            const testObservables = window.testObservables || {}
+            const onClickObservable = testObservables.TestEventClickRemoval_onClick
+
             if (button && onClickObservable) {
                 // For delegated events, we need to manually trigger the handler
                 // since button.click() only triggers direct onclick handlers
@@ -30,23 +30,23 @@ const TestEventClickRemoval = (): JSX.Element => {
                         target: button,
                         composedPath: () => [button, button.parentNode, document.body, document],
                         cancelBubble: false
-                    };
-                    button._onclick.call(button, mockEvent);
+                    }
+                    button._onclick.call(button, mockEvent)
                 } else {
                     // Fallback to regular click if no delegated handler
-                    button.click();
+                    button.click()
                 }
             }
-        }, TEST_INTERVAL);
-    }, 500); // Start interval after 500ms
-    
+        }, TEST_INTERVAL)
+    }, 500) // Start interval after 500ms
+
     // Final verification after all clicks
     setTimeout(() => {
-        const finalValue = o();
+        const finalValue = o()
         if (finalValue !== 1) {
-            console.error('❌ Event handler removal test failed: expected 1, got', finalValue);
+            console.error('❌ Event handler removal test failed: expected 1, got', finalValue)
         }
-    }, 3000); // After 3 seconds (enough time for 4 clicks at 500ms intervals)
+    }, 3000) // After 3 seconds (enough time for 4 clicks at 500ms intervals)
 
     const ret: JSX.Element = (
         <>
@@ -54,10 +54,10 @@ const TestEventClickRemoval = (): JSX.Element => {
             <p><button ref={ref} onClick={onClick}>{o}</button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventClickRemoval_ssr', ret)
-    
+
     return ret
 }
 
@@ -66,11 +66,11 @@ TestEventClickRemoval.test = {
     static: false,
     expect: () => {
         const value = testObservables['TestEventClickRemoval_o']?.() ?? 0
-        
+
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Event - Click Removal</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventClickRemoval_ssr']
@@ -80,16 +80,16 @@ TestEventClickRemoval.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventClickRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventClickRemoval] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventClickRemoval] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         // Verify event handler removal behavior after 4 programmatic clicks
         // The button should increment from 0 to 1, then stop (handler removed)
         if (value > 1) {
@@ -99,7 +99,7 @@ TestEventClickRemoval.test = {
         } else {
             console.log(`ℹ️  Initial state: button value is ${value} after 4 clicks`)
         }
-        
+
         return expected
     }
 }

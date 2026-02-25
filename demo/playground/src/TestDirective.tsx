@@ -18,10 +18,10 @@ const TestDirective = (): JSX.Element => {
             </Model.Provider>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestDirective_ssr', ret)
-    
+
     return ret
 }
 
@@ -31,7 +31,7 @@ TestDirective.test = {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>Directive</h3><input value="bar - baz">'  // For SSR comparison
         const expected = '<input value="bar - baz">'   // For main test comparison
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestDirective_ssr']
@@ -41,16 +41,16 @@ TestDirective.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestDirective] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestDirective] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestDirective] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

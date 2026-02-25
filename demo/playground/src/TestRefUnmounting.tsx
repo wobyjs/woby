@@ -10,10 +10,10 @@ const TestRefUnmounting = (): JSX.Element => {
             <p>content</p> {/* Static content, not conditional */}
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestRefUnmounting_ssr', ret)
-    
+
     return ret
 }
 
@@ -22,7 +22,7 @@ TestRefUnmounting.test = {
     wrap: false,
     expect: () => {
         const expected = '<p>No ref</p><p>content</p> '
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestRefUnmounting_ssr']
@@ -31,16 +31,16 @@ TestRefUnmounting.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Ref - Unmounting</h3><p>No ref</p><p>content</p> '
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestRefUnmounting] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestRefUnmounting] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestRefUnmounting] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

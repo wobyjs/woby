@@ -17,10 +17,10 @@ const TestSelectStaticOption = (): JSX.Element => {
             </select>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSelectStaticOption_ssr', ret)
-    
+
     return ret
 }
 
@@ -28,7 +28,7 @@ TestSelectStaticOption.test = {
     static: true,
     expect: () => {
         const expected = '<select name="select-static-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSelectStaticOption_ssr']
@@ -37,16 +37,16 @@ TestSelectStaticOption.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Select - Static Option</h3><select name="select-static-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSelectStaticOption] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSelectStaticOption] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSelectStaticOption] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

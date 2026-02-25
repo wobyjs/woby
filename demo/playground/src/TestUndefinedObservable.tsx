@@ -13,10 +13,10 @@ const TestUndefinedObservable = (): JSX.Element => {
             <p>{o}</p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestUndefinedObservable_ssr', ret)
-    
+
     return ret
 }
 
@@ -25,7 +25,7 @@ TestUndefinedObservable.test = {
     expect: () => {
         const value = $$(testObservables['TestUndefinedObservable'])
         const expected = value !== undefined ? `<p>${value}</p>` : '<p><!----></p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestUndefinedObservable_ssr']
@@ -34,16 +34,16 @@ TestUndefinedObservable.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = value !== undefined ? `<h3>Undefined - Observable</h3><p>${value}</p>` : '<h3>Undefined - Observable</h3><p><!----></p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestUndefinedObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestUndefinedObservable] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestUndefinedObservable] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

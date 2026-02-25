@@ -60,12 +60,12 @@ TestEventClickAndClickCaptureStatic.test = {
                     const expectedFull = `<h3>Event - Click &amp; Click Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
                     // Handle HTML entity encoding in SSR output
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventClickAndClickCaptureStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventClickAndClickCaptureStatic] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventClickAndClickCaptureStatic] SSR render error: ${err}`)
                 })
             }
         }, 0)

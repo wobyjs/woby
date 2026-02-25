@@ -19,10 +19,10 @@ const TestSuspenseAlwaysLatest = (): JSX.Element => {
             </Suspense>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSuspenseAlwaysLatest_ssr', ret)
-    
+
     return ret
 }
 
@@ -30,7 +30,7 @@ TestSuspenseAlwaysLatest.test = {
     static: true,
     expect: () => {
         const expected = '<p>Loading...</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSuspenseAlwaysLatest_ssr']
@@ -39,16 +39,16 @@ TestSuspenseAlwaysLatest.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Suspense - Always Latest</h3><p>Loading...</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSuspenseAlwaysLatest] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSuspenseAlwaysLatest] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSuspenseAlwaysLatest] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -15,10 +15,10 @@ const TestSVGAttributeRemoval = (): JSX.Element => {
             </svg>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestSVGAttributeRemoval_ssr', ret)
-    
+
     return ret
 }
 
@@ -27,10 +27,10 @@ TestSVGAttributeRemoval.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestSVGAttributeRemoval'])
-        const expected = value ? 
+        const expected = value ?
             `<svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20" version="${value}"></circle></svg>` :
             '<svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestSVGAttributeRemoval_ssr']
@@ -41,16 +41,16 @@ TestSVGAttributeRemoval.test = {
                         `<h3>SVG - Attribute Removal</h3><svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20" version="${value}"></circle></svg>` :
                         '<h3>SVG - Attribute Removal</h3><svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestSVGAttributeRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestSVGAttributeRemoval] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestSVGAttributeRemoval] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

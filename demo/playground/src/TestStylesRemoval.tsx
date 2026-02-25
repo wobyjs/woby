@@ -54,12 +54,12 @@ TestStylesRemoval.test = {
                         expectedFull = '<h3>Styles - Removal</h3><p>content</p>'
                     }
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestStylesRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestStylesRemoval] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestStylesRemoval] SSR render error: ${err}`)
                 })
             }
         }, 0)

@@ -9,33 +9,33 @@ const TestEventEnterStopPropagation = (): JSX.Element => {
     const refInner = $<HTMLButtonElement>()
     registerTestObservable('TestEventEnterStopPropagation_outer', outer)
     registerTestObservable('TestEventEnterStopPropagation_inner', inner)
-    
+
     // Register refs for testing
-    registerTestObservable('TestEventEnterStopPropagation_refOuter', refOuter);
-    registerTestObservable('TestEventEnterStopPropagation_refInner', refInner);
-    
-    const incrementOuter = () => outer(prev => prev + 1);
-    
+    registerTestObservable('TestEventEnterStopPropagation_refOuter', refOuter)
+    registerTestObservable('TestEventEnterStopPropagation_refInner', refInner)
+
+    const incrementOuter = () => outer(prev => prev + 1)
+
     const incrementInner = event => {
-        event.stopPropagation();
-        inner(prev => prev + 1);
-    };
+        event.stopPropagation()
+        inner(prev => prev + 1)
+    }
 
     // Fire enter events programmatically for testing
     // Only fire on the inner button to test stopPropagation behavior
     useInterval(() => {
-        const buttonInner = refInner();
+        const buttonInner = refInner()
         if (buttonInner) {
             const mockEvent = {
                 currentTarget: buttonInner,
                 target: buttonInner,
                 composedPath: () => [buttonInner, buttonInner.parentNode, document.body, document],
                 cancelBubble: false,
-                stopPropagation: () => {},
-                stopImmediatePropagation: () => {}
-            };
+                stopPropagation: () => { },
+                stopImmediatePropagation: () => { }
+            }
             if (buttonInner._onmouseenter) {
-                buttonInner._onmouseenter.call(buttonInner, mockEvent);
+                buttonInner._onmouseenter.call(buttonInner, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -46,10 +46,10 @@ const TestEventEnterStopPropagation = (): JSX.Element => {
             <p><button ref={refOuter} onMouseEnter={incrementOuter}>{outer}<button ref={refInner} onMouseEnter={incrementInner}>{inner}</button></button></p>
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestEventEnterStopPropagation_ssr', ret)
-    
+
     return ret
 }
 
@@ -58,13 +58,13 @@ TestEventEnterStopPropagation.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        let expected, expectedFull;
+        let expected, expectedFull
 
-            const outerValue = $$(testObservables['TestEventEnterStopPropagation_outer'])
-            const innerValue = $$(testObservables['TestEventEnterStopPropagation_inner'])
-            expected = `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
-            expectedFull = `<h3>Event - Enter - Stop Propagation</h3><p><button>${outerValue}<button>${innerValue}</button></button></p>`
-        
+        const outerValue = $$(testObservables['TestEventEnterStopPropagation_outer'])
+        const innerValue = $$(testObservables['TestEventEnterStopPropagation_inner'])
+        expected = `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
+        expectedFull = `<h3>Event - Enter - Stop Propagation</h3><p><button>${outerValue}<button>${innerValue}</button></button></p>`
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestEventEnterStopPropagation_ssr']
@@ -74,16 +74,16 @@ TestEventEnterStopPropagation.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestEventEnterStopPropagation] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestEventEnterStopPropagation] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestEventEnterStopPropagation] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

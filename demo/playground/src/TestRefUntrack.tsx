@@ -17,10 +17,10 @@ const TestRefUntrack = (): JSX.Element => {
             <Reffed />
         </>
     )
-    
+
     // Store the component for SSR testing
     registerTestObservable('TestRefUntrack_ssr', ret)
-    
+
     return ret
 }
 
@@ -28,7 +28,7 @@ TestRefUntrack.test = {
     static: true,
     expect: () => {
         const expected = '<p>0</p>'
-        
+
         // Test the SSR value asynchronously
         setTimeout(() => {
             const ssrComponent = testObservables['TestRefUntrack_ssr']
@@ -37,16 +37,16 @@ TestRefUntrack.test = {
                 renderToString(elementToRender).then(ssrResult => {
                     const expectedFull = '<h3>Ref - Untrack</h3><p>0</p>'
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `[TestRefUntrack] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestRefUntrack] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestRefUntrack] SSR render error: ${err}`)
                 })
             }
         }, 0)
-        
+
         return expected
     }
 }

@@ -104,12 +104,12 @@ TestTernaryObservableChildren.test = {
 
                     if (ssrResult !== dynamicExpectedFull) {
                         console.error('[TestTernaryObservableChildren] ❌ SSR ASSERTION FAILED')
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+                        assert(false, `[TestTernaryObservableChildren] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
                     } else {
-                        console.log(`✅ SSR test passed: ${ssrResult}`)
+                        console.log(`✅ [TestTernaryObservableChildren] SSR test passed: ${ssrResult}`)
                     }
                 }).catch(err => {
-                    console.error(`SSR render error: ${err}`)
+                    console.error(`[TestTernaryObservableChildren] SSR render error: ${err}`)
                 })
             }
         }, 0)
