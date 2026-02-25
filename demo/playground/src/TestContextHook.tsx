@@ -1,4 +1,4 @@
-import { $, $$, createContext, useContext, renderToString } from 'woby'
+import { $, $$, createContext, useContext, renderToString, jsx } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestContextHook = (): JSX.Element => {
@@ -17,6 +17,17 @@ const TestContextHook = (): JSX.Element => {
                 </Context.Provider>
                 <Reader />
             </Context.Provider>
+
+            {/* Context.Provider with function children test */}
+            <h3>Context.Provider(value, () =&gt; ) Test</h3>
+            {() => jsx(Context.Provider, {
+                value: "function-value",
+                children: () => {
+                    const value = useContext(Context)
+                    return <p>Function provider: {value}</p>
+                }
+            })
+            }
         </>
     )
 
@@ -30,8 +41,8 @@ TestContextHook.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Context - Hook</h3><p>outer</p><p>inner</p><p>outer</p>'  // For SSR comparison
-        const expected = '<p>outer</p><p>inner</p><p>outer</p>'   // For main test comparison
+        const expectedFull = '<h3>Context - Hook</h3><p>outer</p><p>inner</p><p>outer</p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Function provider: function-value</p>'  // For SSR comparison
+        const expected = '<p>outer</p><p>inner</p><p>outer</p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Function provider: function-value</p>'   // For main test comparison
 
         // Test the SSR value asynchronously
         setTimeout(() => {

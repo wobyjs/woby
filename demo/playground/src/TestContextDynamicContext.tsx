@@ -1,4 +1,4 @@
-import { $, $$, createContext, useContext, Dynamic, renderToString } from 'woby'
+import { $, $$, createContext, useContext, Dynamic, renderToString, jsx } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestContextDynamicContext = () => {
@@ -25,6 +25,21 @@ const TestContextDynamicContext = () => {
                     <DynamicFragment />
                 </DynamicFragment>
             </Context.Provider>
+
+            {/* Context.Provider with function children test */}
+            <h3>Context.Provider(value, () =&gt; ) Test</h3>
+            {() => jsx(Context.Provider, {
+                value: "dynamic-function-value",
+                children: () => {
+                    const ctxValue = useContext(Context)
+                    return (
+                        <>
+                            <p>Dynamic function provider: {ctxValue}</p>
+                            <p>Dynamic content: {ctxValue}</p>
+                        </>
+                    )
+                }
+            })}
         </>
     )
 
@@ -39,8 +54,8 @@ TestContextDynamicContext.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Dynamic - Context</h3><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p>'  // For SSR comparison
-        const expected = '<p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p>'   // For main test comparison
+        const expectedFull = '<h3>Dynamic - Context</h3><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p>'  // For SSR comparison
+        const expected = '<p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p>'   // For main test comparison
 
         // Test the SSR value asynchronously
         setTimeout(() => {

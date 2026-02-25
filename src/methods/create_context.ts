@@ -17,8 +17,10 @@ function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> 
   const Provider = ({ value, children }: { value: T, children: Child }): Child => {
 
     return context({ [symbol]: value }, () => {
-      [children].flat().forEach(c => c instanceof HTMLElement && (c[symbol] = value))
-      return resolve(children)
+      // If children is a function, execute it to get the actual content
+      const actualChildren = typeof children === 'function' ? children() : children;
+      [actualChildren].flat().forEach(c => c instanceof HTMLElement && (c[symbol] = value))
+      return resolve(actualChildren)
 
     })
 
