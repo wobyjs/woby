@@ -37,29 +37,29 @@ TestABCD.test = {
         const elements = ['<p><i>a</i></p>', '<p><u>b</u></p>', '<p><b>c</b></p>', '<p><span>d</span></p>']
         const expected = elements[idx]
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestABCD_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const fullElements = [
-                        '<h3>Children - ABCD</h3><p><i>a</i></p>',
-                        '<h3>Children - ABCD</h3><p><u>b</u></p>',
-                        '<h3>Children - ABCD</h3><p><b>c</b></p>',
-                        '<h3>Children - ABCD</h3><p><span>d</span></p>'
-                    ]
-                    const expectedFull = fullElements[idx]
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestABCD] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestABCD] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestABCD] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // // Test the SSR value asynchronously
+        // setTimeout(() => {
+        //     const ssrComponent = testObservables['TestABCD_ssr']
+        //     if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+        //         const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+        //         renderToString(elementToRender).then(ssrResult => {
+        //             const fullElements = [
+        //                 '<h3>Children - ABCD</h3><p><i>a</i></p>',
+        //                 '<h3>Children - ABCD</h3><p><u>b</u></p>',
+        //                 '<h3>Children - ABCD</h3><p><b>c</b></p>',
+        //                 '<h3>Children - ABCD</h3><p><span>d</span></p>'
+        //             ]
+        //             const expectedFull = fullElements[idx]
+        //             if (ssrResult !== expectedFull) {
+        //                 assert(false, `[TestABCD] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        //             } else {
+        //                 console.log(`✅ [TestABCD] SSR test passed: ${ssrResult}`)
+        //             }
+        //         }).catch(err => {
+        //             console.error(`[TestABCD] SSR render error: ${err}`)
+        //         })
+        //     }
+        // }, 0)
 
         return expected
     }

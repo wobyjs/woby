@@ -4,11 +4,15 @@ import { BaseNode } from '../methods/ssr.obj'
 // Enhanced mock implementations for SSR without happy-dom
 // These implementations better support the html`` template pattern from index.tsx
 
-export const createComment = ((content: string) => ({
-    nodeType: 8,
-    textContent: content,
-    toString: () => `<!--${content}-->`
-})) as any as FN<[string], Comment>
+export const createComment = ((content: string) => {
+    const node = {
+        nodeType: 8,
+        textContent: content,
+        parentNode: null as any,
+        toString: () => `<!--${content}-->`
+    }
+    return node
+}) as any as FN<[string], Comment>
 
 export const createHTMLNode = ((tagName: string) => {
     class HTMLNode extends BaseNode {
@@ -133,11 +137,15 @@ export const createSVGNode = ((tagName: string) => {
     return new SVGNode()
 }) as any as FN<[string], SVGElement>
 
-export const createText = ((text: string) => ({
-    nodeType: 3,
-    textContent: String(text),
-    toString: () => String(text)
-})) as any as FN<[string], Text>
+export const createText = ((text: string) => {
+    const node = {
+        nodeType: 3,
+        textContent: String(text),
+        parentNode: null as any,
+        toString: () => String(text)
+    }
+    return node
+}) as any as FN<[string], Text>
 
 export const createDocumentFragment = (() => {
     class DocumentFragmentNode extends BaseNode {
