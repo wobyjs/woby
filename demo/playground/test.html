@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Custom Element Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .test-section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Custom Element Comprehensive Tests</h1>
+
+    <div class="test-section">
+        <h2>1. Basic Custom Element Test</h2>
+        <p>This section tests basic custom element functionality.</p>
+
+        <!-- We'll inject the Woby script and create elements dynamically -->
+        <div id="basic-test"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Slot Functionality Test</h2>
+        <p>This section tests slot functionality in custom elements.</p>
+
+        <div id="slot-test"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Context API Test</h2>
+        <p>This section tests context functionality with custom elements.</p>
+
+        <div id="context-test"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Nested Components Test</h2>
+        <p>This section tests nested component functionality.</p>
+
+        <div id="nested-test"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Comprehensive Test</h2>
+        <p>This section tests all features together.</p>
+
+        <div id="comprehensive-test"></div>
+    </div>
+
+    <!-- <script type="module">
+        // Import Woby
+        import * as Woby from 'woby'
+        const { $, $$, render, defaults, customElement, createContext, useMountedContext, HtmlString, HtmlNumber, HtmlBoolean } = Woby
+
+        // Test 1: Basic Custom Element
+        const BasicElement = defaults(() => ({
+            title: $('Basic Element', HtmlString),
+            count: $(0, HtmlNumber),
+            active: $(false, HtmlBoolean),
+            color: $('blue')
+        }), ({ title, count, active, color, children }) => {
+            return (
+                <div style={{
+                    border: '2px solid ' + $$(color),
+                    padding: '10px',
+                    backgroundColor: $$(active) ? '#e0e0e0' : 'white'
+                }}>
+                    <h2>{$$(title)}</h2>
+                    <p>Count: {$$(count)}</p>
+                    <p>Active: {$$(active) ? 'Yes' : 'No'}</p>
+                    <div>{children}</div>
+                </div>
+            )
+        })
+
+        customElement('basic-element', BasicElement)
+
+        const basicTest = (
+            <div>
+                <h3>TSX Usage:</h3>
+                <BasicElement
+                    title="Test Element"
+                    count={42}
+                    active={true}
+                    color="green"
+                >
+                    <p>This is child content from TSX</p>
+                </BasicElement>
+
+                <h3 style={{ marginTop: '20px' }}>Custom Element Usage:</h3>
+                <basic-element
+                    title="HTML Attribute Title"
+                    count="100"
+                    active="true"
+                    color="red"
+                    style$margin-top="20px"
+                >
+                    <p>This is child content from HTML</p>
+                </basic-element>
+            </div>
+        )
+
+        render(basicTest, document.getElementById('basic-test'))
+
+        // Test 2: Slot Functionality
+        const SlotElement = defaults(() => ({
+            title: $('Slot Element', HtmlString),
+            showFallback: $(false)
+        }), ({ title, showFallback, children }) => {
+            return (
+                <div style={{ border: '2px solid purple', padding: '15px', margin: '10px' }}>
+                    <h3>{$$(title)}</h3>
+                    <div style={{ backgroundColor: '#f0f0f0', padding: '10px', margin: '5px 0' }}>
+                        {children ? children : (
+                            $$(showFallback) ?
+                                <p style={{ color: 'gray' }}>Fallback content</p> :
+                                null
+                        )}
+                    </div>
+                </div>
+            )
+        })
+
+        customElement('slot-element', SlotElement)
+
+        const slotTest = (
+            <div>
+                <SlotElement title="Element with Children">
+                    <p>This content goes into the slot</p>
+                    <button>Slot Button</button>
+                </SlotElement>
+
+                <slot-element title="HTML Element with Children">
+                    <p>HTML slot content</p>
+                </slot-element>
+            </div>
+        )
+
+        render(slotTest, document.getElementById('slot-test'))
+
+        // Test 3: Context API
+        const ThemeContext = createContext('light')
+        const CounterContext = createContext(0)
+
+        const useTheme = () => useMountedContext(ThemeContext)
+        const useCounter = () => useMountedContext(CounterContext)
+
+        const ContextConsumer = defaults(() => ({
+            label: $('Consumer')
+        }), ({ label }) => {
+            const theme = useTheme()
+            const counter = useCounter()
+
+            return (
+                <div style={{
+                    border: '1px solid gray',
+                    padding: '8px',
+                    margin: '5px',
+                    backgroundColor: $$(theme) === 'dark' ? '#333' : '#fff',
+                    color: $$(theme) === 'dark' ? '#fff' : '#000'
+                }}>
+                    <strong>{$$(label)}:</strong>
+                    <ul>
+                        <li>Theme: {$$(theme)}</li>
+                        <li>Counter: {$$(counter)}</li>
+                    </ul>
+                </div>
+            )
+        })
+
+        customElement('context-consumer', ContextConsumer)
+
+        const contextTest = (
+            <ThemeContext.Provider value="dark">
+                <CounterContext.Provider value={100}>
+                    <ContextConsumer label="TSX Consumer" />
+                    <context-consumer label="HTML Consumer" />
+                </CounterContext.Provider>
+            </ThemeContext.Provider>
+        )
+
+        render(contextTest, document.getElementById('context-test'))
+
+        // Test 4: Nested Components
+        const LeafElement = defaults(() => ({
+            text: $('Leaf Element', HtmlString),
+            number: $(0, HtmlNumber)
+        }), ({ text, number }) => {
+            return (
+                <div style={{
+                    border: '1px solid #ccc',
+                    padding: '5px',
+                    margin: '2px',
+                    backgroundColor: '#f9f9f9'
+                }}>
+                    <small>Leaf: {$$(text)} ({$$(number)})</small>
+                </div>
+            )
+        })
+
+        const IntermediateElement = defaults(() => ({
+            title: $('Intermediate', HtmlString),
+            active: $(false, HtmlBoolean)
+        }), ({ title, active, children }) => {
+            return (
+                <div style={{
+                    border: '2px solid #666',
+                    padding: '10px',
+                    margin: '5px',
+                    backgroundColor: $$(active) ? '#e6f3ff' : '#fff'
+                }}>
+                    <h4>{$$(title)}</h4>
+                    <div style={{ marginLeft: '15px' }}>
+                        {children}
+                    </div>
+                </div>
+            )
+        })
+
+        customElement('leaf-element', LeafElement)
+        customElement('intermediate-element', IntermediateElement)
+
+        const nestedTest = (
+            <div>
+                <h3>TSX Nesting:</h3>
+                <IntermediateElement title="TSX Intermediate" active={true}>
+                    <LeafElement text="Nested Leaf" number={100} />
+                </IntermediateElement>
+
+                <h3 style={{ marginTop: '20px' }}>HTML Nesting:</h3>
+                <intermediate-element title="HTML Intermediate" active="true">
+                    <leaf-element text="HTML Leaf" number="200"></leaf-element>
+                </intermediate-element>
+            </div>
+        )
+
+        render(nestedTest, document.getElementById('nested-test'))
+
+        console.log('✅ All custom element tests rendered successfully')
+    </script> -->
+</body>
+
+</html>

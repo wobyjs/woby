@@ -1,0 +1,49 @@
+import { $, $$, renderToString } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+
+const TestBooleanObservable = (): JSX.Element => {
+    const o = $(true)
+    const toggle = () => o(prev => !prev)
+    useInterval(toggle, TEST_INTERVAL)
+    const ret: JSX.Element = (
+        <>
+            <h3>Boolean - Observable</h3>
+            <p>{o}</p>
+        </>
+    )
+
+    // Store the component for SSR testing
+    registerTestObservable('TestBooleanObservable_ssr', ret)
+
+    return ret
+}
+
+TestBooleanObservable.test = {
+    static: true,
+    expect: () => {
+        const expected = '<p><!----></p>'
+
+        // Test the SSR value asynchronously
+        setTimeout(() => {
+            const ssrComponent = testObservables['TestBooleanObservable_ssr']
+            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
+                renderToString(elementToRender).then(ssrResult => {
+                    const expectedFull = `<h3>Boolean - Observable</h3>${expected}`
+                    if (ssrResult !== expectedFull) {
+                        assert(false, `[TestBooleanObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                    } else {
+                        console.log(`✅ [TestBooleanObservable] SSR test passed: ${ssrResult}`)
+                    }
+                }).catch(err => {
+                    console.error(`[TestBooleanObservable] SSR render error: ${err}`)
+                })
+            }
+        }, 0)
+
+        return expected
+    }
+}
+
+
+export default () => <TestSnapshots Component={TestBooleanObservable} />
