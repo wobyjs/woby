@@ -26,9 +26,9 @@ TestAttributeFunctionBoolean.test = {
         const attrValue = !value
         let expected: string
         if (attrValue) {
-            expected = '<P data-red="true">content</P>'
+            expected = '<p data-red="true">content</p>'
         } else {
-            expected = '<P data-red="false">content</P>'
+            expected = '<p data-red="false">content</p>'
         }
 
         const ssrComponent = testObservables['TestAttributeFunctionBoolean_ssr']

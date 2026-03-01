@@ -22,7 +22,7 @@ TestAttributeRemoval.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestAttributeRemoval'])
-        const expected = value ? `<P data-color="${value}">content</P>` : '<P>content</P>'
+        const expected = value ? `<p data-color="${value}">content</p>` : '<p>content</p>'
 
         const ssrComponent = testObservables['TestAttributeRemoval_ssr']
         const ssrResult = renderToString(ssrComponent)

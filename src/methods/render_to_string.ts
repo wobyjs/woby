@@ -117,7 +117,7 @@ function constructNodeHTML(node: BaseNode): string {
 
         // Handle self-closing tags
         const selfClosingTags = ['BR', 'HR', 'IMG', 'INPUT', 'META', 'LINK']
-        if (('tagName' in node) && selfClosingTags.includes((node as any).tagName.toUpperCase())) {
+        if (('tagName' in node) && selfClosingTags.includes((node as any).tagName.toLowerCase())) {
             return `<${(node as any).tagName}${attrStr}>`
         }
 

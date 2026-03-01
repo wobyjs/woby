@@ -28,7 +28,7 @@ TestBigIntObservable.test = {
 
         const ssrComponent = testObservables['TestBigIntObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>BigInt - Observable</h3>${expected}`
+        const expectedFull = `<H3>BigInt - Observable</H3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestBigIntObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

@@ -87,7 +87,7 @@ const createHTMLNode = ((tagName: string) => {
 
             // Handle self-closing tags
             if (['br', 'hr', 'img', 'input', 'meta', 'link'].includes(this.tagName.toLowerCase())) {
-                return `<${this.tagName}${attrStr} />`
+                return `<${this.tagName.toLowerCase()}${attrStr} />`
             }
 
             // Build children string
@@ -102,7 +102,7 @@ const createHTMLNode = ((tagName: string) => {
                 return String(child)
             }).join('')
 
-            return `<${this.tagName}${attrStr}>${children}</${this.tagName}>`
+            return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
         }
     }
 
@@ -142,7 +142,7 @@ const createSVGNode = ((tagName: string) => {
                 return String(child)
             }).join('')
 
-            return `<${this.tagName}${attrStr}>${children}</${this.tagName}>`
+            return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
         }
     }
 

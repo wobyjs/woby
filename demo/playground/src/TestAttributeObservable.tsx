@@ -25,7 +25,7 @@ TestAttributeObservable.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestAttributeObservable'])
-        const expected = `<P data-color="${value}">content</P>`
+        const expected = `<p data-color="${value}">content</p>`
 
         const ssrComponent = testObservables['TestAttributeObservable_ssr']
         const ssrResult = renderToString(ssrComponent)

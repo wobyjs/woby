@@ -24,9 +24,9 @@ TestAttributeObservableBoolean.test = {
         const value = $$(testObservables['TestAttributeObservableBoolean'])
         let expected: string
         if (value) {
-            expected = '<P data-red="true">content</P>'
+            expected = '<p data-red="true">content</p>'
         } else {
-            expected = '<P data-red="false">content</P>'
+            expected = '<p data-red="false">content</p>'
         }
 
         const ssrComponent = testObservables['TestAttributeObservableBoolean_ssr']

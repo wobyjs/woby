@@ -22,7 +22,7 @@ TestAttributeStatic.test = {
 
         const ssrComponent = testObservables['TestAttributeStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>Attribute - Static</h3>${expected}`
+        const expectedFull = `<H3>Attribute - Static</H3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {
