@@ -9,7 +9,7 @@ const TestForUnkeyedObservableObservables = (): JSX.Element => {
     const v5 = $(5)
     const values = [v1, v2, v3, v4, v5]  // Static array instead of observable array
     // Remove dynamic updates for static test
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>For - Unkeyed - Observable Observables</h3>
             <For values={values} unkeyed>
@@ -33,22 +33,13 @@ TestForUnkeyedObservableObservables.test = {
         const expectedFull = '<h3>For - Unkeyed - Observable Observables</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p><p>Value: 4</p><p>Value: 5</p>'
         const expected = '<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p><p>Value: 4</p><p>Value: 5</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestForUnkeyedObservableObservables_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestForUnkeyedObservableObservables] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestForUnkeyedObservableObservables] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestForUnkeyedObservableObservables] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestForUnkeyedObservableObservables_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestForUnkeyedObservableObservables] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestForUnkeyedObservableObservables] SSR test passed: ${ssrResult}`)
+        }
 
         // For static test, return the fixed values
         return expected

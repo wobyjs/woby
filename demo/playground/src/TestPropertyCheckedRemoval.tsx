@@ -3,7 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestPropertyCheckedRemoval = (): JSX.Element => {
     // Static value for static test - set to true to have checked attribute
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Property - Checked Removal</h3>
             <p><input type="checkbox" checked={true} /></p>
@@ -23,24 +23,14 @@ TestPropertyCheckedRemoval.test = {
         const expectedFull = '<h3>Property - Checked Removal</h3><p><input type="checkbox"></p>'  // For SSR comparison (checked property does not render as attribute in SSR)
         const expected = '<p><input type="checkbox"></p>'   // For main DOM test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestPropertyCheckedRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestPropertyCheckedRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestPropertyCheckedRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestPropertyCheckedRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value synchronously
+        const ssrComponent = testObservables['TestPropertyCheckedRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestPropertyCheckedRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestPropertyCheckedRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected  // This is what the DOM test framework compares against
     }

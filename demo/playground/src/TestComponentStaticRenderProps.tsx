@@ -4,7 +4,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 const TestComponentStaticRenderProps = ({ value }: { value: number }): JSX.Element => {
     const propValue = random()
     registerTestObservable('TestComponentStaticRenderProps', propValue)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Component - Static Render Props</h3>
             <p>{propValue}</p>
@@ -24,27 +24,16 @@ TestComponentStaticRenderProps.test = {
         const propValue = testObservables['TestComponentStaticRenderProps']
 
         // Define expected values for both main test and SSR test
-        const expectedFull = `<h3>Component - Static Render Props</h3><p>${propValue}</p>`  // For SSR comparison
-        const expected = `<p>${propValue}</p>`   // For main test comparison
+        const expectedFull = `<h3>Component - Static Render Props</h3><p>${String(propValue)}</p>`  // For SSR comparison
+        const expected = `<p>${String(propValue)}</p>`   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestComponentStaticRenderProps_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestComponentStaticRenderProps] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestComponentStaticRenderProps] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestComponentStaticRenderProps] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestComponentStaticRenderProps_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestComponentStaticRenderProps] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestComponentStaticRenderProps] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

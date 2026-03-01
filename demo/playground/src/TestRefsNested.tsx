@@ -13,7 +13,7 @@ const TestRefsNested = (): JSX.Element => {
         const content2 = `Got ref2 - Has parent: ${!!element2.parentElement} - Is connected: ${!!element2.isConnected}`
         element1.textContent = `${content1} / ${content2}`
     }, { sync: true })
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Refs - Nested</h3>
             <p ref={[ref1, [null, [undefined, ref2]]]}>content</p>
@@ -31,23 +31,14 @@ TestRefsNested.test = {
     expect: () => {
         const expected = '<p>Got ref1 - Has parent: true - Is connected: true / Got ref2 - Has parent: true - Is connected: true</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestRefsNested_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Refs - Nested</h3><p>Got ref1 - Has parent: true - Is connected: true / Got ref2 - Has parent: true - Is connected: true</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestRefsNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestRefsNested] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestRefsNested] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestRefsNested_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Refs - Nested</h3><p>Got ref1 - Has parent: true - Is connected: true / Got ref2 - Has parent: true - Is connected: true</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestRefsNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestRefsNested] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

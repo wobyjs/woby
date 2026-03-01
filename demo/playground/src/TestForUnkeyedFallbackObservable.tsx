@@ -15,7 +15,7 @@ const TestForUnkeyedFallbackObservable = (): JSX.Element => {
             </>
         )
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>For - Unkeyed - Fallback Observable</h3>
             <For values={[]} fallback={<Fallback />} unkeyed>
@@ -42,22 +42,13 @@ TestForUnkeyedFallbackObservable.test = {
         const expectedFull = `<h3>For - Unkeyed - Fallback Observable</h3><p>Fallback: ${oValue}</p>`
         const expected = `<p>Fallback: ${oValue}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestForUnkeyedFallbackObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestForUnkeyedFallbackObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestForUnkeyedFallbackObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestForUnkeyedFallbackObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestForUnkeyedFallbackObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestForUnkeyedFallbackObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestForUnkeyedFallbackObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -2,7 +2,7 @@ import { $, $$, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestStringStatic = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>String - Static</h3>
             <p>{'string'}</p>
@@ -20,23 +20,15 @@ TestStringStatic.test = {
     expect: () => {
         const expected = '<p>string</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStringStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>String - Static</h3><p>string</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStringStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStringStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStringStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStringStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>String - Static</h3><p>string</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestStringStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestStringStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

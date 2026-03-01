@@ -7,7 +7,7 @@ const TestClassFunction = (): JSX.Element => {
     registerTestObservable('TestClassFunction', o)
     const toggle = () => o(prev => !prev)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Class - Function Boolean</h3>
             <p class={{ red: () => o() }}>content</p>
@@ -27,23 +27,14 @@ TestClassFunction.test = {
         const value = $$(testObservables['TestClassFunction'])
         const expected = value ? '<p class="red">content</p>' : '<p class="">content</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassFunction_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = value ? '<h3>Class - Function Boolean</h3><p class="red">content</p>' : '<h3>Class - Function Boolean</h3><p>content</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassFunction] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassFunction] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestClassFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = value ? '<h3>Class - Function Boolean</h3><p class="red">content</p>' : '<h3>Class - Function Boolean</h3><p>content</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -16,7 +16,7 @@ const TestClassesObjectStore = (): JSX.Element => {
         testit = false
     }
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Object Store</h3>
             <p class={o}>content</p>
@@ -42,27 +42,18 @@ TestClassesObjectStore.test = {
         // Reset testit for next cycle
         testit = false
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassesObjectStore_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Create dynamic expected based on actual SSR result
-                    const classMatch = ssrResult.match(/<p class="([^"]*)">/)
-                    const actualClass = classMatch ? classMatch[1] : ''
-                    const dynamicExpectedFull = `<h3>Classes - Object Store</h3><p class="${actualClass}">content</p>`
+        const ssrComponent = testObservables['TestClassesObjectStore_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Create dynamic expected based on actual SSR result
+        const classMatch = ssrResult.match(/<p class="([^"]*)">/)
+        const actualClass = classMatch ? classMatch[1] : ''
+        const dynamicExpectedFull = `<h3>Classes - Object Store</h3><p class="${actualClass}">content</p>`
 
-                    if (ssrResult !== dynamicExpectedFull) {
-                        assert(false, `[TestClassesObjectStore] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassesObjectStore] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesObjectStore] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        if (ssrResult !== dynamicExpectedFull) {
+            assert(false, `[TestClassesObjectStore] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+        } else {
+            console.log(`✅ [TestClassesObjectStore] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

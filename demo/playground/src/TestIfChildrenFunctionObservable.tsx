@@ -9,7 +9,7 @@ const TestIfChildrenFunctionObservable = (): JSX.Element => {
     const Content = ({ value }): JSX.Element => {
         return <p>Value: {value}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>If - Children Function Observable</h3>
             <If when={o}>
@@ -34,22 +34,13 @@ TestIfChildrenFunctionObservable.test = {
         const expectedFull = val !== false ? `<h3>If - Children Function Observable</h3><p>Value: ${val}</p>` : `<h3>If - Children Function Observable</h3><!---->`
         const expected = val !== false ? `<p>Value: ${val}</p>` : '<!---->'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestIfChildrenFunctionObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestIfChildrenFunctionObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestIfChildrenFunctionObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestIfChildrenFunctionObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestIfChildrenFunctionObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestIfChildrenFunctionObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestIfChildrenFunctionObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

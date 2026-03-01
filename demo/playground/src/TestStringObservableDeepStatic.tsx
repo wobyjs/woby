@@ -30,23 +30,14 @@ TestStringObservableDeepStatic.test = {
     expect: () => {
         const expected = '<p>0.123456</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStringObservableDeepStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>String - Observable Deep Static</h3><p>0.123456</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStringObservableDeepStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStringObservableDeepStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStringObservableDeepStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestStringObservableDeepStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>String - Observable Deep Static</h3><p>0.123456</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestStringObservableDeepStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestStringObservableDeepStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

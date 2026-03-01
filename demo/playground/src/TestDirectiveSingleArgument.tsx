@@ -10,7 +10,7 @@ const TestDirectiveSingleArgument = (): JSX.Element => {
         }, { sync: true })
     }
     const Model = createDirective('model', model)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Directive - Single Argument</h3>
             <Model.Provider>
@@ -32,24 +32,13 @@ TestDirectiveSingleArgument.test = {
         const expectedFull = '<h3>Directive - Single Argument</h3><input value="bar">'  // For SSR comparison
         const expected = '<input value="bar">'   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestDirectiveSingleArgument_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestDirectiveSingleArgument] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestDirectiveSingleArgument] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestDirectiveSingleArgument] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestDirectiveSingleArgument_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestDirectiveSingleArgument] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestDirectiveSingleArgument] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

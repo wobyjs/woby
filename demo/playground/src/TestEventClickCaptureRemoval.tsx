@@ -35,7 +35,7 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
         }
     }, TEST_INTERVAL)
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Event - Click Capture Removal</h3>
             <p><button ref={ref} onClickCapture={onClick}>{o}</button></p>
@@ -58,24 +58,13 @@ TestEventClickCaptureRemoval.test = {
         const expectedFull = `<h3>Event - Click Capture Removal</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestEventClickCaptureRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestEventClickCaptureRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestEventClickCaptureRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestEventClickCaptureRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestEventClickCaptureRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestEventClickCaptureRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestEventClickCaptureRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

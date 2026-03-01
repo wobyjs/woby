@@ -33,7 +33,7 @@ const TestEventClickObservable = (): JSX.Element => {
         }
     }, TEST_INTERVAL)
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Event - Click Observable</h3>
             <p><button ref={ref} onClick={onClick}>{o}</button></p>
@@ -56,24 +56,13 @@ TestEventClickObservable.test = {
         const expectedFull = `<h3>Event - Click Observable</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
             const ssrComponent = testObservables['TestEventClickObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestEventClickObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestEventClickObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestEventClickObservable] SSR render error: ${err}`)
-                })
+            const ssrResult = renderToString(ssrComponent)
+            if (ssrResult !== expectedFull) {
+                assert(false, `[TestEventClickObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            } else {
+                console.log(`✅ [TestEventClickObservable] SSR test passed: ${ssrResult}`)
             }
-        }, 0)
 
         return expected
     }

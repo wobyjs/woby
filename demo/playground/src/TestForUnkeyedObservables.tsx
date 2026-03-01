@@ -7,7 +7,7 @@ const TestForUnkeyedObservables = (): JSX.Element => {
     const v3 = $(3)
     const values = [v1, v2, v3]
     // Remove dynamic updates for static test
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>For - Unkeyed - Observables</h3>
             <For values={values} unkeyed>
@@ -31,22 +31,13 @@ TestForUnkeyedObservables.test = {
         const expectedFull = '<h3>For - Unkeyed - Observables</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
         const expected = '<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestForUnkeyedObservables_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestForUnkeyedObservables] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestForUnkeyedObservables] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestForUnkeyedObservables] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestForUnkeyedObservables_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestForUnkeyedObservables] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestForUnkeyedObservables] SSR test passed: ${ssrResult}`)
+        }
 
         // For static test, return the fixed values
         return expected

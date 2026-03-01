@@ -4,7 +4,7 @@ import { TestSnapshots, registerTestObservable, testObservables, assert } from '
 const TestAttributeObservableBoolean = (): JSX.Element => {
     const o = $(false)
     registerTestObservable('TestAttributeObservableBoolean', o)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Attribute - Observable Boolean</h3>
             <p data-red={o}>content</p>
@@ -29,23 +29,14 @@ TestAttributeObservableBoolean.test = {
             expected = '<p data-red="false">content</p>'
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestAttributeObservableBoolean_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Attribute - Observable Boolean</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestAttributeObservableBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestAttributeObservableBoolean] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestAttributeObservableBoolean] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestAttributeObservableBoolean_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Attribute - Observable Boolean</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestAttributeObservableBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestAttributeObservableBoolean] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

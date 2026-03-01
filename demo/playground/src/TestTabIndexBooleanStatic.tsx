@@ -2,7 +2,7 @@ import { $, $$, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestTabIndexBooleanStatic = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>TabIndex - Boolean - Static</h3>
             <p tabIndex={true}>true</p>
@@ -21,23 +21,14 @@ TestTabIndexBooleanStatic.test = {
     expect: () => {
         const expected = '<p tabindex="0">true</p><p>false</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestTabIndexBooleanStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>TabIndex - Boolean - Static</h3><p tabindex="0">true</p><p>false</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestTabIndexBooleanStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestTabIndexBooleanStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestTabIndexBooleanStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestTabIndexBooleanStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>TabIndex - Boolean - Static</h3><p tabindex="0">true</p><p>false</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestTabIndexBooleanStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestTabIndexBooleanStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

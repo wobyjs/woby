@@ -5,7 +5,7 @@ const TestSimpleExpect = (): JSX.Element => {
     const value = $("Hello World")
     // Store the observable globally so the test can access it
     registerTestObservable('TestSimpleExpect', value)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Simple Expect Test</h3>
             <p>{value}</p>
@@ -27,23 +27,14 @@ TestSimpleExpect.test = {
         const value = $$(testObservables['TestSimpleExpect'])
         const expected = `<p>${value}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSimpleExpect_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Simple Expect Test</h3><p>Hello World</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSimpleExpect] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSimpleExpect] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSimpleExpect] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestSimpleExpect_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Simple Expect Test</h3><p>Hello World</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSimpleExpect] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSimpleExpect] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

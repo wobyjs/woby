@@ -2,9 +2,8 @@
 
 import * as Woby from 'woby'
 import type { JSX, Observable } from 'woby'
-import { $$, Dynamic, ErrorBoundary, For, If, KeepAlive, Portal, Suspense, Switch, Ternary } from 'woby'
-import { useContext, useEffect, useMemo, usePromise, useResource } from 'woby'
-import { $, batch, createContext, createDirective, html, hmr, lazy, render, renderToString, store, template } from 'woby'
+import { useEffect } from 'woby'
+import { $, } from 'woby'
 
 globalThis.Woby = Woby
 
@@ -50,37 +49,46 @@ export const registerTestObservable = (name: string, observable: Observable<any>
 
 // Custom useInterval that runs 4 times then stops to prevent spam
 export const useInterval = (callback, delay) => {
-    const count = $(0)
-    const maxCount = 4 // Run 4 times then stop
+    let count =0
+    const id = setInterval(()=>{
+        callback()
+        count++
 
-    useEffect(() => {
-        if (count() >= maxCount) return
+if(count>4)
+    clearInterval(id)
+    }, delay)
 
-        let intervalId
+    // const count = $(0)
+    // const maxCount = 4 // Run 4 times then stop
 
-        const tick = () => {
-            callback()
-            count(count() + 1)
+    // useEffect(() => {
+    //     if (count() >= maxCount) return
 
-            // Stop after reaching max count
-            if (count() >= maxCount) {
-                if (intervalId) {
-                    clearInterval(intervalId)
-                }
-            }
-        }
+    //     let intervalId
 
-        if (delay && count() < maxCount) {
-            intervalId = setInterval(tick, delay)
-        }
+    //     const tick = () => {
+    //         callback()
+    //         count(count() + 1)
 
-        // Cleanup function
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId)
-            }
-        }
-    })
+    //         // Stop after reaching max count
+    //         if (count() >= maxCount) {
+    //             if (intervalId) {
+    //                 clearInterval(intervalId)
+    //             }
+    //         }
+    //     }
+
+    //     if (delay && count() < maxCount) {
+    //         intervalId = setInterval(tick, delay)
+    //     }
+
+    //     // Cleanup function
+    //     return () => {
+    //         if (intervalId) {
+    //             clearInterval(intervalId)
+    //         }
+    //     }
+    // })
 }
 
 // Custom useTimeout that runs once with limit support

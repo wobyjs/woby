@@ -9,7 +9,7 @@ const TestForUnkeyedFallbackObservableStatic = (): JSX.Element => {
             </>
         )
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>For - Unkeyed - Fallback Observable Static</h3>
             <For values={[]} fallback={<Fallback />} unkeyed>
@@ -33,22 +33,13 @@ TestForUnkeyedFallbackObservableStatic.test = {
         const expectedFull = '<h3>For - Unkeyed - Fallback Observable Static</h3><p>Fallback: 0.123456</p>'
         const expected = '<p>Fallback: 0.123456</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestForUnkeyedFallbackObservableStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestForUnkeyedFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestForUnkeyedFallbackObservableStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestForUnkeyedFallbackObservableStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestForUnkeyedFallbackObservableStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestForUnkeyedFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestForUnkeyedFallbackObservableStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -2,7 +2,7 @@ import { $, $$, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestStyleStaticNumeric = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Style - Static Numeric</h3>
             <p style={{ flexGrow: 1, height: 50 }}>content</p>
@@ -20,23 +20,17 @@ TestStyleStaticNumeric.test = {
     expect: () => {
         const expected = '<p style="flex-grow: 1; height: 50px;">content</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStyleStaticNumeric_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Style - Static Numeric</h3><p style="flex-grow: 1; height: 50px;">content</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStyleStaticNumeric] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStyleStaticNumeric] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStyleStaticNumeric] SSR render error: ${err}`)
-                })
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStyleStaticNumeric_ssr']
+        if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+            const ssrResult = renderToString(ssrComponent)
+            const expectedFull = '<h3>Style - Static Numeric</h3><p style="flex-grow: 1; height: 50px;">content</p>'
+            if (ssrResult !== expectedFull) {
+                assert(false, `[TestStyleStaticNumeric] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            } else {
+                console.log(`✅ [TestStyleStaticNumeric] SSR test passed: ${ssrResult}`)
             }
-        }, 0)
+        }
 
         return expected
     }

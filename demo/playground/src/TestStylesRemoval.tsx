@@ -1,4 +1,5 @@
 import { $, $$, renderToString } from 'woby'
+import type { FunctionUnwrap } from './util'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestStylesRemoval = (): JSX.Element => {
@@ -6,7 +7,7 @@ const TestStylesRemoval = (): JSX.Element => {
     registerTestObservable('TestStylesRemoval', o)
     const toggle = () => o(prev => prev ? null : { color: 'orange', fontWeight: 'normal' })
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Styles - Removal</h3>
             <p style={o}>content</p>
@@ -36,33 +37,27 @@ TestStylesRemoval.test = {
             expected = '<p style="">content</p>'
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStylesRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    let expectedFull
-                    if (value) {
-                        const styles = []
-                        for (const [prop, val] of Object.entries(value)) {
-                            const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase()
-                            styles.push(`${cssProp}: ${val};`)
-                        }
-                        expectedFull = `<h3>Styles - Removal</h3><p style="${styles.join(' ')}">content</p>`
-                    } else {
-                        expectedFull = '<h3>Styles - Removal</h3><p>content</p>'
-                    }
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStylesRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStylesRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStylesRemoval] SSR render error: ${err}`)
-                })
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStylesRemoval_ssr']
+        if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+            const ssrResult = renderToString(ssrComponent)
+            let expectedFull
+            if (value) {
+                const styles = []
+                for (const [prop, val] of Object.entries(value)) {
+                    const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase()
+                    styles.push(`${cssProp}: ${val};`)
+                }
+                expectedFull = `<h3>Styles - Removal</h3><p style="${styles.join(' ')}">content</p>`
+            } else {
+                expectedFull = '<h3>Styles - Removal</h3><p>content</p>'
             }
-        }, 0)
+            if (ssrResult !== expectedFull) {
+                assert(false, `[TestStylesRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            } else {
+                console.log(`✅ [TestStylesRemoval] SSR test passed: ${ssrResult}`)
+            }
+        }
 
         return expected
     }

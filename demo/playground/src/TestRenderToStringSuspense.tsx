@@ -8,7 +8,7 @@ const TestRenderToStringSuspense = (): JSX.Element => {
     const Content = () => {
         return <p>{o}{o()}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <div>
             <h3>renderToString - Suspense</h3>
             <Suspense>
@@ -28,23 +28,14 @@ TestRenderToStringSuspense.test = {
     expect: () => {
         const expected = '<div><p>123123</p></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestRenderToStringSuspense_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<div><h3>renderToString - Suspense</h3><p>123123</p></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestRenderToStringSuspense] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestRenderToStringSuspense] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestRenderToStringSuspense] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestRenderToStringSuspense_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<div><h3>renderToString - Suspense</h3><p>123123</p></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestRenderToStringSuspense] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestRenderToStringSuspense] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

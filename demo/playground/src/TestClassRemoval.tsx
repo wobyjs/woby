@@ -7,7 +7,7 @@ const TestClassRemoval = (): JSX.Element => {
     registerTestObservable('TestClassRemoval', o)
     const toggle = () => o(prev => prev ? null : true)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Class - Removal</h3>
             <p class={{ red: o }}>content</p>
@@ -27,23 +27,14 @@ TestClassRemoval.test = {
         const value = $$(testObservables['TestClassRemoval'])
         const expected = value ? '<p class="red">content</p>' : '<p class="">content</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = value ? '<h3>Class - Removal</h3><p class="red">content</p>' : '<h3>Class - Removal</h3><p>content</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestClassRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = value ? '<h3>Class - Removal</h3><p class="red">content</p>' : '<h3>Class - Removal</h3><p>content</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -6,7 +6,7 @@ const TestTernaryObservable = (): JSX.Element => {
     registerTestObservable('TestTernaryObservable', o)
     const toggle = () => o(prev => !prev)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Ternary - Observable</h3>
             <Ternary when={o}>
@@ -29,23 +29,14 @@ TestTernaryObservable.test = {
         const value = testObservables['TestTernaryObservable']?.() ?? true
         const expected = `<p>${value ? 'true' : 'false'}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestTernaryObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Ternary - Observable</h3><p>${value ? 'true' : 'false'}</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestTernaryObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestTernaryObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestTernaryObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestTernaryObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Ternary - Observable</h3><p>${value ? 'true' : 'false'}</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestTernaryObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestTernaryObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

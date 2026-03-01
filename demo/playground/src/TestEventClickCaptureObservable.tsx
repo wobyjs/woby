@@ -51,7 +51,7 @@ const TestEventClickCaptureObservable = (): JSX.Element => {
         }
     }, TEST_INTERVAL)
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Event - Click Capture Observable</h3>
             <p><button ref={ref} onClickCapture={onClick}>{o}</button></p>
@@ -85,24 +85,13 @@ TestEventClickCaptureObservable.test = {
             expectedFull = `<h3>Event - Click Capture Observable</h3><p><button>0</button></p>`
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestEventClickCaptureObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestEventClickCaptureObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestEventClickCaptureObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestEventClickCaptureObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestEventClickCaptureObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestEventClickCaptureObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestEventClickCaptureObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

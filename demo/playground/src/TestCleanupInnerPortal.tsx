@@ -21,22 +21,13 @@ TestCleanupInnerPortal.test = {
     expect: () => {
         const expected = '<!---->'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestCleanupInnerPortal_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expected) {
-                        assert(false, `[TestCleanupInnerPortal] SSR mismatch: got ${ssrResult}, expected ${expected}`)
-                    } else {
-                        console.log(`✅ [TestCleanupInnerPortal] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestCleanupInnerPortal] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestCleanupInnerPortal_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expected) {
+            assert(false, `[TestCleanupInnerPortal] SSR mismatch: got ${ssrResult}, expected ${expected}`)
+        } else {
+            console.log(`✅ [TestCleanupInnerPortal] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

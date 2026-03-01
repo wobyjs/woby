@@ -11,7 +11,7 @@ const TestPortalMountObservable = (): JSX.Element => {
         document.body.appendChild(container)
     }
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Portal - Mount Observable</h3>
             <Portal mount={container}>
@@ -33,24 +33,14 @@ TestPortalMountObservable.test = {
         const expectedFull = '<h3>Portal - Mount Observable</h3><!---->'  // For SSR comparison (portal renders as comment)
         const expected = '<!---->'   // For main DOM test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestPortalMountObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestPortalMountObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestPortalMountObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestPortalMountObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value synchronously
+        const ssrComponent = testObservables['TestPortalMountObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestPortalMountObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestPortalMountObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected  // This is what the DOM test framework compares against
     }

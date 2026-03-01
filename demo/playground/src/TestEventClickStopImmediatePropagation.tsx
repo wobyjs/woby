@@ -43,7 +43,7 @@ const TestEventClickStopImmediatePropagation = (): JSX.Element => {
         }
     }, TEST_INTERVAL)
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Event - Click - Stop Immediate Propagation</h3>
             <p><button ref={refOuter} onClick={onClickOuter}>{outer}<button ref={refInner} onClick={onClickInner}>{inner}</button></button></p>
@@ -69,24 +69,13 @@ TestEventClickStopImmediatePropagation.test = {
         expected = `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
         expectedFull = `<h3>Event - Click - Stop Immediate Propagation</h3><p><button>${outerValue}<button>${innerValue}</button></button></p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestEventClickStopImmediatePropagation_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestEventClickStopImmediatePropagation] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestEventClickStopImmediatePropagation] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestEventClickStopImmediatePropagation] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestEventClickStopImmediatePropagation_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestEventClickStopImmediatePropagation] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestEventClickStopImmediatePropagation] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

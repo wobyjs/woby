@@ -11,7 +11,7 @@ const TestSuspenseNeverRead = (): JSX.Element => {
         })
         return <p>Content!</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Suspense - Never Read</h3>
             <Suspense fallback={<Fallback />}>
@@ -31,23 +31,15 @@ TestSuspenseNeverRead.test = {
     expect: () => {
         const expected = '<p>Content!</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSuspenseNeverRead_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Suspense - Never Read</h3><p>Content!</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSuspenseNeverRead] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSuspenseNeverRead] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSuspenseNeverRead] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestSuspenseNeverRead_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Suspense - Never Read</h3><p>Content!</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSuspenseNeverRead] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSuspenseNeverRead] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

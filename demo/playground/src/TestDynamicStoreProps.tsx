@@ -38,7 +38,7 @@ const TestDynamicStoreProps = (): JSX.Element => {
     useInterval(toggle, TEST_INTERVAL)
 
     // Register the class tracker for test access
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Dynamic - Store Props</h3>
             <div class={props.class} data-test="TestDynamicStoreProps-class">
@@ -76,33 +76,24 @@ TestDynamicStoreProps.test = {
         let currentTiming = $$(testObservables['TestDynamicStoreProps_timing'])
         timing = currentTiming
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestDynamicStoreProps_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Extract the class and paragraph values from SSR result to use for comparison
-                    // Extract the actual paragraph value from SSR result
-                    const pMatch = ssrResult.match(/<p>([0-9]+)<\/p>/)
-                    const actualPValue = pMatch ? parseInt(pMatch[1]) : 1
+        const ssrComponent = testObservables['TestDynamicStoreProps_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Extract the class and paragraph values from SSR result to use for comparison
+        // Extract the actual paragraph value from SSR result
+        const pMatch = ssrResult.match(/<p>([0-9]+)<\/p>/)
+        const actualPValue = pMatch ? parseInt(pMatch[1]) : 1
 
-                    // Create dynamic expected based on actual rendered content
-                    const classMatch = ssrResult.match(/<div class="([^"]*)"/)
-                    const actualClass = classMatch ? classMatch[1] : 'red'
-                    const dynamicExpectedFull = `<h3>Dynamic - Store Props</h3><div class="${actualClass}" data-test="TestDynamicStoreProps-class"><p>${actualPValue}</p></div>`
+        // Create dynamic expected based on actual rendered content
+        const classMatch = ssrResult.match(/<div class="([^"]*)"/)
+        const actualClass = classMatch ? classMatch[1] : 'red'
+        const dynamicExpectedFull = `<h3>Dynamic - Store Props</h3><div class="${actualClass}" data-test="TestDynamicStoreProps-class"><p>${actualPValue}</p></div>`
 
-                    if (ssrResult !== dynamicExpectedFull) {
-                        console.error('[TestDynamicStoreProps] ❌ SSR ASSERTION FAILED')
-                        assert(false, `[TestDynamicStoreProps] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
-                    } else {
-                        console.log(`✅ [TestDynamicStoreProps] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestDynamicStoreProps] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        if (ssrResult !== dynamicExpectedFull) {
+            console.error('[TestDynamicStoreProps] ❌ SSR ASSERTION FAILED')
+            assert(false, `[TestDynamicStoreProps] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+        } else {
+            console.log(`✅ [TestDynamicStoreProps] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

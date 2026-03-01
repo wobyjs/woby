@@ -20,7 +20,7 @@ const TestTernaryChildrenObservableStatic = (): JSX.Element => {
         o()
         return <p>False: {falseValue}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Ternary - Children Observable Static</h3>
             <Ternary when={true}>
@@ -48,23 +48,14 @@ TestTernaryChildrenObservableStatic.test = {
         const falseValue = $$(testObservables['TestTernaryChildrenObservableStatic_false'])
         const expected = `<p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestTernaryChildrenObservableStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Ternary - Children Observable Static</h3><p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestTernaryChildrenObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestTernaryChildrenObservableStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestTernaryChildrenObservableStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestTernaryChildrenObservableStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Ternary - Children Observable Static</h3><p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestTernaryChildrenObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestTernaryChildrenObservableStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -4,7 +4,7 @@ import { TestSnapshots, registerTestObservable, testObservables, assert } from '
 const TestAttributeFunctionBoolean = (): JSX.Element => {
     const o = $(true)
     registerTestObservable('TestAttributeFunctionBoolean', o)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Attribute - Function Boolean</h3>
             <p data-red={() => !o()}>content</p>
@@ -31,23 +31,14 @@ TestAttributeFunctionBoolean.test = {
             expected = '<p data-red="false">content</p>'
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestAttributeFunctionBoolean_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Attribute - Function Boolean</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestAttributeFunctionBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestAttributeFunctionBoolean] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestAttributeFunctionBoolean] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestAttributeFunctionBoolean_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Attribute - Function Boolean</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestAttributeFunctionBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestAttributeFunctionBoolean] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

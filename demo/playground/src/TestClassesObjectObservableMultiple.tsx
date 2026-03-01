@@ -6,7 +6,7 @@ const TestClassesObjectObservableMultiple = (): JSX.Element => {
     registerTestObservable('TestClassesObjectObservableMultiple', o)
     const toggle = () => o(prev => prev['red bold'] ? { 'red bold': false, blue: true } : { 'red bold': true, blue: false })
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Object Observable Multiple</h3>
             <p class={o}>content</p>
@@ -27,23 +27,15 @@ TestClassesObjectObservableMultiple.test = {
         const classes = typeof value === 'object' ? Object.keys(value).filter(k => value[k]).join(' ') : (value || '')
         const expected = `<p class="${classes}">content</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassesObjectObservableMultiple_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Classes - Object Observable Multiple</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassesObjectObservableMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassesObjectObservableMultiple] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesObjectObservableMultiple] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestClassesObjectObservableMultiple_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Classes - Object Observable Multiple</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassesObjectObservableMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassesObjectObservableMultiple] SSR test passed: ${ssrResult}`)
+        }
+
 
         return expected
     }

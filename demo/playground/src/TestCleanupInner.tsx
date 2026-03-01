@@ -56,23 +56,14 @@ TestCleanupInner.test = {
     expect: () => {
         const expected = '<p>page1</p><button>Toggle Page</button>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestCleanupInner_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Cleanup - Inner</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestCleanupInner] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestCleanupInner] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestCleanupInner] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestCleanupInner_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Cleanup - Inner</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestCleanupInner] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestCleanupInner] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

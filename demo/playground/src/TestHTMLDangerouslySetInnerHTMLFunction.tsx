@@ -4,7 +4,7 @@ import { TestSnapshots, registerTestObservable, testObservables, assert } from '
 const TestHTMLDangerouslySetInnerHTMLFunction = (): JSX.Element => {
     // Static value for static test
     const htmlContent = { __html: '<i>danger</i>' }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>HTML - dangerouslySetInnerHTML - Function</h3>
             <p dangerouslySetInnerHTML={() => htmlContent} />
@@ -24,22 +24,13 @@ TestHTMLDangerouslySetInnerHTMLFunction.test = {
         const expectedFull = '<h3>HTML - dangerouslySetInnerHTML - Function</h3><p><i>danger</i></p>'
         const expected = '<p><i>danger</i></p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestHTMLDangerouslySetInnerHTMLFunction_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestHTMLDangerouslySetInnerHTMLFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestHTMLDangerouslySetInnerHTMLFunction] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestHTMLDangerouslySetInnerHTMLFunction] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestHTMLDangerouslySetInnerHTMLFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestHTMLDangerouslySetInnerHTMLFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestHTMLDangerouslySetInnerHTMLFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

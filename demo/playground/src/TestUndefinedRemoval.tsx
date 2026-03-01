@@ -7,7 +7,7 @@ const TestUndefinedRemoval = (): JSX.Element => {
     registerTestObservable('TestUndefinedRemoval', o)
     const toggle = () => o(prev => (prev === undefined) ? '' : undefined)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Undefined - Removal</h3>
             <p>({o})</p>
@@ -27,23 +27,14 @@ TestUndefinedRemoval.test = {
         const value = $$(testObservables['TestUndefinedRemoval'])
         const expected = value !== undefined ? `<p>(${value})</p>` : '<p>(<!---->)</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestUndefinedRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = value !== undefined ? `<h3>Undefined - Removal</h3><p>(${value})</p>` : '<h3>Undefined - Removal</h3><p>(<!---->)</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestUndefinedRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestUndefinedRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestUndefinedRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestUndefinedRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = value !== undefined ? `<h3>Undefined - Removal</h3><p>(${value})</p>` : '<h3>Undefined - Removal</h3><p>(<!---->)</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestUndefinedRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestUndefinedRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

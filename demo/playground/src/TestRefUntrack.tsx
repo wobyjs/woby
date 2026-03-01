@@ -11,7 +11,7 @@ const TestRefUntrack = (): JSX.Element => {
         return <p ref={ref}>content</p>
     })
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Ref - Untrack</h3>
             <Reffed />
@@ -29,23 +29,14 @@ TestRefUntrack.test = {
     expect: () => {
         const expected = '<p>0</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestRefUntrack_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Ref - Untrack</h3><p>0</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestRefUntrack] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestRefUntrack] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestRefUntrack] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestRefUntrack_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Ref - Untrack</h3><p>0</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestRefUntrack] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestRefUntrack] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

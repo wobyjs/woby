@@ -9,7 +9,7 @@ const TestTemplateExternal = (): JSX.Element => {
             </div>
         )
     })
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Template - External</h3>
             <Templated class="red" color="blue" />
@@ -28,23 +28,14 @@ TestTemplateExternal.test = {
     expect: () => {
         const expected = '<div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestTemplateExternal_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Template - External</h3><div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestTemplateExternal] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestTemplateExternal] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestTemplateExternal] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestTemplateExternal_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Template - External</h3><div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestTemplateExternal] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestTemplateExternal] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

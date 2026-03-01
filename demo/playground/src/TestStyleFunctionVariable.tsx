@@ -6,7 +6,7 @@ const TestStyleFunctionVariable = (): JSX.Element => {
     registerTestObservable('TestStyleFunctionVariable', o)
     const toggle = () => o(prev => (prev === 'orange') ? 'green' : 'orange')
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Style - Function Variable</h3>
             <p style={{ color: 'var(--color)', '--color': () => o() }}>content</p>
@@ -25,23 +25,15 @@ TestStyleFunctionVariable.test = {
         const value = $$(testObservables['TestStyleFunctionVariable'])
         const expected = `<p style="color: var(--color); --color: ${value};">content</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStyleFunctionVariable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Style - Function Variable</h3><p style="color: var(--color); --color: ${value};">content</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStyleFunctionVariable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStyleFunctionVariable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStyleFunctionVariable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStyleFunctionVariable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Style - Function Variable</h3><p style="color: var(--color); --color: ${value};">content</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestStyleFunctionVariable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestStyleFunctionVariable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

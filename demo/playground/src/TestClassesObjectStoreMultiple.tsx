@@ -19,7 +19,7 @@ const TestClassesObjectStoreMultiple = (): JSX.Element => {
         testit = false  // Signal that state has changed
     }
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Object Store Multiple</h3>
             <p class={o}>content</p>
@@ -51,35 +51,26 @@ TestClassesObjectStoreMultiple.test = {
             testit = true
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassesObjectStoreMultiple_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Extract the actual class from SSR result for comparison
-                    const classMatch = ssrResult.match(/<p class="([^"]*)">/)
-                    const actualClass = classMatch ? classMatch[1] : ''
+        const ssrComponent = testObservables['TestClassesObjectStoreMultiple_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Extract the actual class from SSR result for comparison
+        const classMatch = ssrResult.match(/<p class="([^"]*)">/)
+        const actualClass = classMatch ? classMatch[1] : ''
 
-                    // Create expected result based on current store state
-                    let expectedClass = ''
-                    if (value['red bold']) expectedClass += 'red bold '
-                    if (value.blue) expectedClass += 'blue '
-                    const expectedFull = `<h3>Classes - Object Store Multiple</h3><p class="${expectedClass.trim()}">content</p>`
+        // Create expected result based on current store state
+        let expectedClass = ''
+        if (value['red bold']) expectedClass += 'red bold '
+        if (value.blue) expectedClass += 'blue '
+        const expectedFull = `<h3>Classes - Object Store Multiple</h3><p class="${expectedClass.trim()}">content</p>`
 
-                    if (ssrResult === expectedFull) {
-                        console.log(`✅ [TestClassesObjectStoreMultiple] SSR test passed: ${ssrResult}`)
-                    } else {
-                        console.error(`❌ SSR test failed:`)
-                        console.error(`  Got: ${ssrResult}`)
-                        console.error(`  Expected: ${expectedFull}`)
-                        assert(false, `[TestClassesObjectStoreMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesObjectStoreMultiple] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        if (ssrResult === expectedFull) {
+            console.log(`✅ [TestClassesObjectStoreMultiple] SSR test passed: ${ssrResult}`)
+        } else {
+            console.error(`❌ SSR test failed:`)
+            console.error(`  Got: ${ssrResult}`)
+            console.error(`  Expected: ${expectedFull}`)
+            assert(false, `[TestClassesObjectStoreMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        }
 
         return expected
     }

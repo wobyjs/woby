@@ -65,7 +65,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
     // Component is static, no dynamic updates needed
 
     const o = () => state().toggle  // Use the toggle state as the ternary condition
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Ternary - Observable Children</h3>
             <Ternary when={o}>
@@ -89,30 +89,24 @@ TestTernaryObservableChildren.test = {
         const expectedFull = `<h3>Ternary - Observable Children</h3>${expected}`
 
         // Test the SSR value
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestTernaryObservableChildren_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Extract the actual rendered content from SSR result
-                    const match = ssrResult.match(/<h3>Ternary - Observable Children<\/h3>(.*)$/)
-                    const actualContent = match ? match[1] : '<i>a</i>'
-                    const dynamicExpectedFull = `<h3>Ternary - Observable Children</h3>${actualContent}`
+        const ssrComponent = testObservables['TestTernaryObservableChildren_ssr']
+        if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+            const ssrResult = renderToString(ssrComponent)
+            // Extract the actual rendered content from SSR result
+            const match = ssrResult.match(/<h3>Ternary - Observable Children<\/h3>(.*)$/)
+            const actualContent = match ? match[1] : '<i>a</i>'
+            const dynamicExpectedFull = `<h3>Ternary - Observable Children</h3>${actualContent}`
 
-                    console.log('[TestTernaryObservableChildren] SSR result:', ssrResult)
-                    console.log('[TestTernaryObservableChildren] Dynamic expected:', dynamicExpectedFull)
+            console.log('[TestTernaryObservableChildren] SSR result:', ssrResult)
+            console.log('[TestTernaryObservableChildren] Dynamic expected:', dynamicExpectedFull)
 
-                    if (ssrResult !== dynamicExpectedFull) {
-                        console.error('[TestTernaryObservableChildren] ❌ SSR ASSERTION FAILED')
-                        assert(false, `[TestTernaryObservableChildren] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
-                    } else {
-                        console.log(`✅ [TestTernaryObservableChildren] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestTernaryObservableChildren] SSR render error: ${err}`)
-                })
+            if (ssrResult !== dynamicExpectedFull) {
+                console.error('[TestTernaryObservableChildren]❌ SSR ASSERTION FAILED')
+                assert(false, `[TestTernaryObservableChildren] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+            } else {
+                console.log(`✅ [TestTernaryObservableChildren] SSR test passed: ${ssrResult}`)
             }
-        }, 0)
+        }
 
         return expected
     }

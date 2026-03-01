@@ -31,7 +31,7 @@ const TestSelectObservableValue = (): JSX.Element => {
         updateTiming()
     }
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Select - Observable Value</h3>
             <select ref={ref} name="select-observable-value" value={value}>
@@ -69,31 +69,22 @@ TestSelectObservableValue.test = {
         // Update timing to current value to prevent future mismatches
         timing = currentTiming
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSelectObservableValue_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Extract the actual select content from SSR result
-                    const selectMatch = ssrResult.match(/<select[^>]*>.*?<\/select>/s)
-                    const actualSelect = selectMatch ? selectMatch[0] : ''
-                    const dynamicExpectedFull = `<h3>Select - Observable Value</h3>${actualSelect}`
+        const ssrComponent = testObservables['TestSelectObservableValue_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Extract the actual select content from SSR result
+        const selectMatch = ssrResult.match(/<select[^>]*>.*?<\/select>/s)
+        const actualSelect = selectMatch ? selectMatch[0] : ''
+        const dynamicExpectedFull = `<h3>Select - Observable Value</h3>${actualSelect}`
 
-                    console.log('[TestSelectObservableValue] SSR result:', ssrResult)
-                    console.log('[TestSelectObservableValue] Dynamic expected:', dynamicExpectedFull)
+        console.log('[TestSelectObservableValue] SSR result:', ssrResult)
+        console.log('[TestSelectObservableValue] Dynamic expected:', dynamicExpectedFull)
 
-                    if (ssrResult !== dynamicExpectedFull) {
-                        console.error('[TestSelectObservableValue] ❌ SSR ASSERTION FAILED')
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSelectObservableValue] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSelectObservableValue] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        if (ssrResult !== dynamicExpectedFull) {
+            console.error('[TestSelectObservableValue] ❌ SSR ASSERTION FAILED')
+            assert(false, `SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+        } else {
+            console.log(`✅ [TestSelectObservableValue] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

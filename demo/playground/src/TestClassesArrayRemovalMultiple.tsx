@@ -7,7 +7,7 @@ const TestClassesArrayRemovalMultiple = (): JSX.Element => {
     registerTestObservable('TestClassesArrayRemovalMultiple', o)
     const toggle = () => o(prev => prev ? null : ['red bold', false])
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Array Removal Multiple</h3>
             <p class={o}>content</p>
@@ -32,23 +32,14 @@ TestClassesArrayRemovalMultiple.test = {
             expected = `<p class="${classes}">content</p>`
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
             const ssrComponent = testObservables['TestClassesArrayRemovalMultiple_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = value ? `<h3>Classes - Array Removal Multiple</h3>${expected}` : '<h3>Classes - Array Removal Multiple</h3><p>content</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassesArrayRemovalMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassesArrayRemovalMultiple] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesArrayRemovalMultiple] SSR render error: ${err}`)
-                })
+            const ssrResult = renderToString(ssrComponent)
+            const expectedFull = value ? `<h3>Classes - Array Removal Multiple</h3>${expected}` : '<h3>Classes - Array Removal Multiple</h3><p>content</p>'
+            if (ssrResult !== expectedFull) {
+                assert(false, `[TestClassesArrayRemovalMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            } else {
+                console.log(`✅ [TestClassesArrayRemovalMultiple] SSR test passed: ${ssrResult}`)
             }
-        }, 0)
 
         return expected
     }

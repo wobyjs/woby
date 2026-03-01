@@ -4,7 +4,7 @@ import { TestSnapshots, registerTestObservable, testObservables, assert } from '
 const TestAttributeRemoval = (): JSX.Element => {
     const o = $<string | null>(null)  // Start with null to test removal
     registerTestObservable('TestAttributeRemoval', o)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Attribute - Removal</h3>
             <p data-color={o}>content</p>
@@ -24,23 +24,14 @@ TestAttributeRemoval.test = {
         const value = $$(testObservables['TestAttributeRemoval'])
         const expected = value ? `<p data-color="${value}">content</p>` : '<p>content</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestAttributeRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Attribute - Removal</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestAttributeRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestAttributeRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestAttributeRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestAttributeRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Attribute - Removal</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestAttributeRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestAttributeRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

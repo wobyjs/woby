@@ -11,7 +11,7 @@ const TestIfFallbackObservableStatic = (): JSX.Element => {
         o()
         return <p>Fallback: {initialValue}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>If - Fallback Observable Static</h3>
             <If when={false} fallback={<Fallback />}>Children</If>
@@ -34,22 +34,13 @@ TestIfFallbackObservableStatic.test = {
         const expectedFull = `<h3>If - Fallback Observable Static</h3><p>Fallback: ${initialValue}</p>`
         const expected = `<p>Fallback: ${initialValue}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestIfFallbackObservableStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestIfFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestIfFallbackObservableStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestIfFallbackObservableStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestIfFallbackObservableStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestIfFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestIfFallbackObservableStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

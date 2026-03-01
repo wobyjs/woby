@@ -5,7 +5,7 @@ const TestSwitchCaseFunction = (): JSX.Element => {
     const Case = () => {
         return <p>Case: 0.123456</p>  // Static value
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Switch - Case Function</h3>
             <Switch when={0}>
@@ -30,23 +30,15 @@ TestSwitchCaseFunction.test = {
     expect: () => {
         const expected = '<p>Case: 0.123456</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSwitchCaseFunction_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Switch - Case Function</h3><p>Case: 0.123456</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSwitchCaseFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSwitchCaseFunction] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSwitchCaseFunction] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestSwitchCaseFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Switch - Case Function</h3><p>Case: 0.123456</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSwitchCaseFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSwitchCaseFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

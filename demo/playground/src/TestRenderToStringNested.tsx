@@ -9,7 +9,7 @@ const TestRenderToStringNested = (): JSX.Element => {
         })
         return <p>{o}{resource.value}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <div>
             <h3>renderToString - Nested</h3>
             <Suspense>
@@ -29,23 +29,14 @@ TestRenderToStringNested.test = {
     expect: () => {
         const expected = '<div><p>123123&lt;div&gt;&lt;h3&gt;renderToString&lt;/h3&gt;&lt;p&gt;123&lt;/p&gt;&lt;/div&gt;</p></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestRenderToStringNested_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<div><h3>renderToString - Nested</h3><p>123123&lt;div&gt;&lt;h3&gt;renderToString&lt;/h3&gt;&lt;p&gt;123&lt;/p&gt;&lt;/div&gt;</p></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestRenderToStringNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestRenderToStringNested] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestRenderToStringNested] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestRenderToStringNested_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<div><h3>renderToString - Nested</h3><p>123123&lt;div&gt;&lt;h3&gt;renderToString&lt;/h3&gt;&lt;p&gt;123&lt;/p&gt;&lt;/div&gt;</p></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestRenderToStringNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestRenderToStringNested] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

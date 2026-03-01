@@ -24,23 +24,14 @@ TestIfFunctionUntrackedUnnarrowed.test = {
     expect: () => {
         const expected = '<p>(0)</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestIfFunctionUntrackedUnnarrowed_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>If - Function Untracked Unnarrowed</h3><p>(0)</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestIfFunctionUntrackedUnnarrowed] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestIfFunctionUntrackedUnnarrowed] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestIfFunctionUntrackedUnnarrowed] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestIfFunctionUntrackedUnnarrowed_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>If - Function Untracked Unnarrowed</h3><p>(0)</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestIfFunctionUntrackedUnnarrowed] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestIfFunctionUntrackedUnnarrowed] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

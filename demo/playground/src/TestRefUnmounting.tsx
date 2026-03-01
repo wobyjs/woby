@@ -3,7 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestRefUnmounting = (): JSX.Element => {
     const message = $('No ref') // Static value
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Ref - Unmounting</h3>
             <p>{message}</p>
@@ -23,23 +23,14 @@ TestRefUnmounting.test = {
     expect: () => {
         const expected = '<p>No ref</p><p>content</p> '
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestRefUnmounting_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Ref - Unmounting</h3><p>No ref</p><p>content</p> '
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestRefUnmounting] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestRefUnmounting] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestRefUnmounting] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestRefUnmounting_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Ref - Unmounting</h3><p>No ref</p><p>content</p> '
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestRefUnmounting] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestRefUnmounting] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

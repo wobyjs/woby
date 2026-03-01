@@ -2,7 +2,7 @@ import { $, $$, Switch, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSwitchStatic = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Switch - Static</h3>
             <Switch when={2}>
@@ -33,23 +33,14 @@ TestSwitchStatic.test = {
     expect: () => {
         const expected = '<p>2</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSwitchStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Switch - Static</h3><p>2</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSwitchStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSwitchStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSwitchStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestSwitchStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Switch - Static</h3><p>2</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSwitchStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSwitchStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

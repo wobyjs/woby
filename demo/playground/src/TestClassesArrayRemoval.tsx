@@ -7,7 +7,7 @@ const TestClassesArrayRemoval = (): JSX.Element => {
     registerTestObservable('TestClassesArrayRemoval', o)
     const toggle = () => o(prev => prev ? null : ['red', false])
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Array Removal</h3>
             <p class={o}>content</p>
@@ -32,23 +32,14 @@ TestClassesArrayRemoval.test = {
             expected = `<p class="${classes}">content</p>`
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
             const ssrComponent = testObservables['TestClassesArrayRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = value ? `<h3>Classes - Array Removal</h3>${expected}` : '<h3>Classes - Array Removal</h3><p>content</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassesArrayRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassesArrayRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesArrayRemoval] SSR render error: ${err}`)
-                })
+            const ssrResult = renderToString(ssrComponent)
+            const expectedFull = value ? `<h3>Classes - Array Removal</h3>${expected}` : '<h3>Classes - Array Removal</h3><p>content</p>'
+            if (ssrResult !== expectedFull) {
+                assert(false, `[TestClassesArrayRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            } else {
+                console.log(`✅ [TestClassesArrayRemoval] SSR test passed: ${ssrResult}`)
             }
-        }, 0)
 
         return expected
     }

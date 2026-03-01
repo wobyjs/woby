@@ -7,7 +7,7 @@ const TestClassesObjectRemovalMultiple = (): JSX.Element => {
     registerTestObservable('TestClassesObjectRemovalMultiple', o)
     const toggle = () => o(prev => prev ? null : { 'red bold': true, blue: false })
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Object Removal Multiple</h3>
             <p class={o}>content</p>
@@ -38,34 +38,25 @@ TestClassesObjectRemovalMultiple.test = {
             expected = '<p class="">content</p>'
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassesObjectRemovalMultiple_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Log the actual SSR result for debugging
-                    console.log(`[TestClassesObjectRemovalMultiple] SSR result: ${ssrResult}`)
+        const ssrComponent = testObservables['TestClassesObjectRemovalMultiple_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Log the actual SSR result for debugging
+        console.log(`[TestClassesObjectRemovalMultiple] SSR result: ${ssrResult}`)
 
-                    let expectedFull: string
-                    if (value) {
-                        expectedFull = `<h3>Classes - Object Removal Multiple</h3>${expected}`
-                    } else {
-                        expectedFull = '<h3>Classes - Object Removal Multiple</h3><p>content</p>'
-                    }
-                    if (ssrResult !== expectedFull) {
-                        console.error(`❌ SSR test failed:`)
-                        console.error(`  Got: ${ssrResult}`)
-                        console.error(`  Expected: ${expectedFull}`)
-                        assert(false, `[TestClassesObjectRemovalMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassesObjectRemovalMultiple] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesObjectRemovalMultiple] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        let expectedFull: string
+        if (value) {
+            expectedFull = `<h3>Classes - Object Removal Multiple</h3>${expected}`
+        } else {
+            expectedFull = '<h3>Classes - Object Removal Multiple</h3><p>content</p>'
+        }
+        if (ssrResult !== expectedFull) {
+            console.error(`❌ SSR test failed:`)
+            console.error(`  Got: ${ssrResult}`)
+            console.error(`  Expected: ${expectedFull}`)
+            assert(false, `[TestClassesObjectRemovalMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassesObjectRemovalMultiple] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

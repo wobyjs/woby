@@ -10,7 +10,7 @@ const TestDirectiveRef = (): JSX.Element => {
         }, { sync: true })
     }
     const Model = createDirective('model', model)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Directive - Ref</h3>
             <input ref={Model.ref('bar')} value="foo" />
@@ -30,24 +30,13 @@ TestDirectiveRef.test = {
         const expectedFull = '<h3>Directive - Ref</h3><input value="bar">'  // For SSR comparison
         const expected = '<input value="bar">'   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestDirectiveRef_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestDirectiveRef] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestDirectiveRef] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestDirectiveRef] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestDirectiveRef_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestDirectiveRef] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestDirectiveRef] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -2,7 +2,7 @@ import { $, $$, If, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestNestedIfs = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <If when={true}>
                 <If when={true}>
@@ -27,24 +27,14 @@ TestNestedIfs.test = {
         const expectedFull = '<div>1</div><div>2</div><div>Footer</div>'  // For SSR comparison
         const expected = '<div>1</div><div>2</div><div>Footer</div>'   // For main DOM test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestNestedIfs_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestNestedIfs] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestNestedIfs] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestNestedIfs] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value synchronously
+        const ssrComponent = testObservables['TestNestedIfs_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestNestedIfs] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestNestedIfs] SSR test passed: ${ssrResult}`)
+        }
 
         return expected  // This is what the DOM test framework compares against
     }

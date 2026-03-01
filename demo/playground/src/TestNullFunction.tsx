@@ -24,7 +24,7 @@ const TestNullFunction = (): JSX.Element => {
         updateTiming()
     }
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Null - Function</h3>
             <p>{() => o()}</p>
@@ -57,31 +57,23 @@ TestNullFunction.test = {
         // Update timing to current value to prevent future mismatches
         timing = currentTiming
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestNullFunction_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Extract the actual rendered content from SSR result
-                    const match = ssrResult.match(/<h3>Null - Function<\/h3>(.*)$/)
-                    const actualContent = match ? match[1] : '<p><!----></p>'
-                    const dynamicExpectedFull = `<h3>Null - Function</h3>${actualContent}`
+        // Test the SSR value synchronously
+        const ssrComponent = testObservables['TestNullFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Extract the actual rendered content from SSR result
+        const match = ssrResult.match(/<h3>Null - Function<\/h3>(.*)$/)
+        const actualContent = match ? match[1] : '<p><!----></p>'
+        const dynamicExpectedFull = `<h3>Null - Function</h3>${actualContent}`
 
-                    console.log('[TestNullFunction] SSR result:', ssrResult)
-                    console.log('[TestNullFunction] Dynamic expected:', dynamicExpectedFull)
+        console.log('[TestNullFunction] SSR result:', ssrResult)
+        console.log('[TestNullFunction] Dynamic expected:', dynamicExpectedFull)
 
-                    if (ssrResult !== dynamicExpectedFull) {
-                        console.error('[TestNullFunction] ❌ SSR ASSERTION FAILED')
-                        assert(false, `[TestNullFunction] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
-                    } else {
-                        console.log(`✅ [TestNullFunction] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestNullFunction] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        if (ssrResult !== dynamicExpectedFull) {
+            console.error('[TestNullFunction] ❌ SSR ASSERTION FAILED')
+            assert(false, `[TestNullFunction] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+        } else {
+            console.log(`✅ [TestNullFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

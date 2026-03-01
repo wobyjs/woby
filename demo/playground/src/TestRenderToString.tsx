@@ -3,7 +3,7 @@ import { TestSnapshots, registerTestObservable, testObservables, assert } from '
 
 const TestRenderToString = (): JSX.Element => {
     // Static component that returns the expected structure
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <div>
             <h3>renderToString</h3>
             <p>123</p>
@@ -21,23 +21,14 @@ TestRenderToString.test = {
     expect: () => {
         const expected = '<div><p>123</p></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestRenderToString_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<div><h3>renderToString</h3><p>123</p></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestRenderToString] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestRenderToString] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestRenderToString] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestRenderToString_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<div><h3>renderToString</h3><p>123</p></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestRenderToString] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestRenderToString] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

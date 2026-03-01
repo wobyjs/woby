@@ -3,7 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestResourceFallbackLatest = (): JSX.Element => {
     const resource = useResource(() => { throw new Error('Some error') })
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Resource - Fallback Latest</h3>
             <ErrorBoundary fallback={<p>Error!</p>}>
@@ -30,23 +30,14 @@ TestResourceFallbackLatest.test = {
     expect: () => {
         const expected = '<p>Error!</p><p>Error!</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestResourceFallbackLatest_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Resource - Fallback Latest</h3><p>Error!</p><p>Error!</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestResourceFallbackLatest] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestResourceFallbackLatest] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestResourceFallbackLatest] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestResourceFallbackLatest_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Resource - Fallback Latest</h3><p>Error!</p><p>Error!</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestResourceFallbackLatest] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestResourceFallbackLatest] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

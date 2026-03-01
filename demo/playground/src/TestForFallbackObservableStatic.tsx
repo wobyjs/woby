@@ -16,7 +16,7 @@ const TestForFallbackObservableStatic = (): JSX.Element => {
             </>
         )
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>For - Fallback Observable Static</h3>
             <For values={[]} fallback={<Fallback />}>
@@ -39,23 +39,14 @@ TestForFallbackObservableStatic.test = {
     expect: () => {
         const expected = `<p>Fallback: 0.5</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestForFallbackObservableStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>For - Fallback Observable Static</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestForFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestForFallbackObservableStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestForFallbackObservableStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestForFallbackObservableStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>For - Fallback Observable Static</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestForFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestForFallbackObservableStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

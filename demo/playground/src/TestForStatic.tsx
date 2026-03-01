@@ -3,7 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestForStatic = (): JSX.Element => {
     const values = [1, 2, 3]
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>For - Static</h3>
             <For values={values}>
@@ -25,23 +25,14 @@ TestForStatic.test = {
     expect: () => {
         const expected = '<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestForStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>For - Static</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestForStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestForStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestForStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestForStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>For - Static</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestForStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestForStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

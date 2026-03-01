@@ -3,7 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const TestStylesCleanup = (): JSX.Element => {
     const styles = { color: 'orange', fontWeight: 'bold' }  // Static value
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Styles - Observable Cleanup</h3>
             <p style={styles}>content</p>
@@ -21,23 +21,15 @@ TestStylesCleanup.test = {
     expect: () => {
         const expected = '<p style="color: orange; font-weight: bold;">content</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStylesCleanup_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Styles - Observable Cleanup</h3><p style="color: orange; font-weight: bold;">content</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStylesCleanup] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStylesCleanup] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStylesCleanup] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStylesCleanup_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Styles - Observable Cleanup</h3><p style="color: orange; font-weight: bold;">content</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestStylesCleanup] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestStylesCleanup] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -6,7 +6,7 @@ const TestStyleObservableString = (): JSX.Element => {
     registerTestObservable('TestStyleObservableString', o)
     const toggle = () => o(prev => (prev === 'color: green') ? 'color: orange' : 'color: green')
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Style - Observable String</h3>
             <p style={o}>content</p>
@@ -25,23 +25,15 @@ TestStyleObservableString.test = {
         const value = $$(testObservables['TestStyleObservableString'])
         const expected = `<p style="${value}">content</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStyleObservableString_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Style - Observable String</h3><p style="${value}">content</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStyleObservableString] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStyleObservableString] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStyleObservableString] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStyleObservableString_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Style - Observable String</h3><p style="${value}">content</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestStyleObservableString] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestStyleObservableString] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

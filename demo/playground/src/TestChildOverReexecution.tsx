@@ -26,7 +26,7 @@ const TestChildOverReexecution = (): JSX.Element => {
         return () => clearInterval(interval)
     })
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Child - OverReexecution</h3>
             <div>
@@ -54,31 +54,22 @@ TestChildOverReexecution.test = {
             expected = `<div>1</div>0`
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestChildOverReexecution_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Extract the actual execution count from SSR result
-                    const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/)
-                    if (match) {
-                        const ssrExecutions = parseInt(match[1])
-                        const ssrCount = parseInt(match[2])
-                        const expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`
-                        if (ssrResult === expectedFull) {
-                            console.log(`✅ [TestChildOverReexecution] SSR test passed: ${ssrResult}`)
-                        } else {
-                            assert(false, `[TestChildOverReexecution] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                        }
-                    } else {
-                        assert(false, `SSR result format unexpected: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestChildOverReexecution] SSR render error: ${err}`)
-                })
+        const ssrComponent = testObservables['TestChildOverReexecution_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Extract the actual execution count from SSR result
+        const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/)
+        if (match) {
+            const ssrExecutions = parseInt(match[1])
+            const ssrCount = parseInt(match[2])
+            const expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`
+            if (ssrResult === expectedFull) {
+                console.log(`✅ [TestChildOverReexecution] SSR test passed: ${ssrResult}`)
+            } else {
+                assert(false, `[TestChildOverReexecution] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
             }
-        }, 0)
+        } else {
+            assert(false, `SSR result format unexpected: ${ssrResult}`)
+        }
 
         return expected
     }

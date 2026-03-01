@@ -13,7 +13,7 @@ const TestSuspenseFallbackObservableStatic = (): JSX.Element => {
     const Fallback = (): JSX.Element => {
         return <p>Fallback: {initialValue}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Suspense - Fallback Observable Static</h3>
             <Suspense fallback={<Fallback />}>
@@ -33,25 +33,17 @@ TestSuspenseFallbackObservableStatic.test = {
     compareActualValues: true,
     expect: () => {
         const initialValue = testObservables['TestSuspenseFallbackObservableStatic']
-        const expected = `<p>Fallback: ${initialValue}</p>`
+        const expected = `<p>Fallback: ${String(initialValue)}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSuspenseFallbackObservableStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Suspense - Fallback Observable Static</h3><p>Fallback: ${initialValue}</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSuspenseFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSuspenseFallbackObservableStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSuspenseFallbackObservableStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestSuspenseFallbackObservableStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Suspense - Fallback Observable Static</h3><p>Fallback: ${String(initialValue)}</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSuspenseFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSuspenseFallbackObservableStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

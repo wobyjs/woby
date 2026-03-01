@@ -8,7 +8,7 @@ const TestRenderToStringSuspenseNested = (): JSX.Element => {
     const Content = () => {
         return <p>{o}{o()}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <div>
             <h3>renderToString - Suspense Nested</h3>
             <Suspense>
@@ -31,23 +31,14 @@ TestRenderToStringSuspenseNested.test = {
     expect: () => {
         const expected = '<div><p>123123</p><p>123123</p></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestRenderToStringSuspenseNested_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<div><h3>renderToString - Suspense Nested</h3><p>123123</p><p>123123</p></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestRenderToStringSuspenseNested] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestRenderToStringSuspenseNested] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestRenderToStringSuspenseNested_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<div><h3>renderToString - Suspense Nested</h3><p>123123</p><p>123123</p></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestRenderToStringSuspenseNested] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

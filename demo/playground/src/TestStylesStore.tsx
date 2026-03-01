@@ -31,7 +31,7 @@ const TestStylesStore = (): JSX.Element => {
     }
     useInterval(toggle, TEST_INTERVAL)
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Styles - Store</h3>
             <p style={styles}>content</p>
@@ -65,31 +65,25 @@ TestStylesStore.test = {
         // Update timing to current value to prevent future mismatches
         timing = currentTiming
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStylesStore_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Extract the actual style values from SSR result
-                    const styleMatch = ssrResult.match(/<p style="([^"]*)">/)
-                    const actualStyle = styleMatch ? styleMatch[1] : ''
-                    const dynamicExpectedFull = `<h3>Styles - Store</h3><p style="${actualStyle}">content</p>`
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStylesStore_ssr']
+        if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+            const ssrResult = renderToString(ssrComponent)
+            // Extract the actual style values from SSR result
+            const styleMatch = ssrResult.match(/<p style="([^"]*)">/)
+            const actualStyle = styleMatch ? styleMatch[1] : ''
+            const dynamicExpectedFull = `<h3>Styles - Store</h3><p style="${actualStyle}">content</p>`
 
-                    console.log('[TestStylesStore] SSR result:', ssrResult)
-                    console.log('[TestStylesStore] Dynamic expected:', dynamicExpectedFull)
+            console.log('[TestStylesStore] SSR result:', ssrResult)
+            console.log('[TestStylesStore] Dynamic expected:', dynamicExpectedFull)
 
-                    if (ssrResult !== dynamicExpectedFull) {
-                        console.error('[TestStylesStore] ❌ SSR ASSERTION FAILED')
-                        assert(false, `[TestStylesStore] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStylesStore] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStylesStore] SSR render error: ${err}`)
-                })
+            if (ssrResult !== dynamicExpectedFull) {
+                console.error('[TestStylesStore]❌ SSR ASSERTION FAILED')
+                assert(false, `[TestStylesStore] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+            } else {
+                console.log(`✅ [TestStylesStore] SSR test passed: ${ssrResult}`)
             }
-        }, 0)
+        }
 
         return expected
     }

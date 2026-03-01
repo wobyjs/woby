@@ -5,7 +5,7 @@ const TestSuspenseWhen = (): JSX.Element => {
     const Content = () => {
         return <p>Content!</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Suspense - When</h3>
             <Suspense when={true} fallback={<p>Loading...</p>}>
@@ -26,23 +26,15 @@ TestSuspenseWhen.test = {
         // Suspense may show fallback initially even when when={true}, so use the actual rendered value
         const expected = '<p>Loading...</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSuspenseWhen_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Suspense - When</h3><p>Loading...</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSuspenseWhen] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSuspenseWhen] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSuspenseWhen] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestSuspenseWhen_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Suspense - When</h3><p>Loading...</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSuspenseWhen] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSuspenseWhen] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

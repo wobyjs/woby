@@ -7,7 +7,7 @@ const TestUndefinedFunction = (): JSX.Element => {
     registerTestObservable('TestUndefinedFunction', o)
     const toggle = () => o(prev => (prev === undefined) ? '' : undefined)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Undefined - Function</h3>
             <p>{() => o()}</p>
@@ -26,23 +26,14 @@ TestUndefinedFunction.test = {
         const value = $$(testObservables['TestUndefinedFunction'])
         const expected = value !== undefined ? `<p>${value}</p>` : '<p><!----></p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestUndefinedFunction_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = value !== undefined ? `<h3>Undefined - Function</h3><p>${value}</p>` : '<h3>Undefined - Function</h3><p><!----></p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestUndefinedFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestUndefinedFunction] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestUndefinedFunction] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestUndefinedFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = value !== undefined ? `<h3>Undefined - Function</h3><p>${value}</p>` : '<h3>Undefined - Function</h3><p><!----></p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestUndefinedFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestUndefinedFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

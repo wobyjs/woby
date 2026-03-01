@@ -6,7 +6,7 @@ const TestClassesObjectObservable = (): JSX.Element => {
     registerTestObservable('TestClassesObjectObservable', o)
     const toggle = () => o(prev => prev.red ? { red: false, blue: true } : { red: true, blue: false })
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Object Observable</h3>
             <p class={o}>content</p>
@@ -27,23 +27,14 @@ TestClassesObjectObservable.test = {
         const classes = typeof value === 'object' ? Object.keys(value).filter(k => value[k]).join(' ') : (value || '')
         const expected = `<p class="${classes}">content</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassesObjectObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Classes - Object Observable</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassesObjectObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassesObjectObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesObjectObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestClassesObjectObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Classes - Object Observable</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassesObjectObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassesObjectObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

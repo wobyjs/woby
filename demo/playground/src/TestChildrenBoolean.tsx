@@ -5,7 +5,7 @@ const TestChildrenBoolean = (): JSX.Element => {
     const Custom = ({ children }) => {
         return <p>{Number(children)}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Children - Boolean</h3>
             <Custom>{true}</Custom>
@@ -24,23 +24,14 @@ TestChildrenBoolean.test = {
     expect: () => {
         const expected = '<p>1</p><p>0</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestChildrenBoolean_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Children - Boolean</h3><p>1</p><p>0</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestChildrenBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestChildrenBoolean] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestChildrenBoolean] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestChildrenBoolean_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Children - Boolean</h3><p>1</p><p>0</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestChildrenBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestChildrenBoolean] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

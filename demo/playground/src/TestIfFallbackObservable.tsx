@@ -26,7 +26,7 @@ const TestIfFallbackObservable = (): JSX.Element => {
         useInterval(randomize, TEST_INTERVAL)
         return <p>Fallback: {o}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>If - Fallback Observable</h3>
             <If when={false} fallback={<Fallback />}>Children</If>
@@ -61,31 +61,22 @@ TestIfFallbackObservable.test = {
         // Update timing to current value to prevent future mismatches
         timing = currentTiming
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestIfFallbackObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Extract the actual fallback value from SSR result
-                    const fallbackMatch = ssrResult.match(/<p>Fallback: ([^<]+)<\/p>/)
-                    const actualFallback = fallbackMatch ? fallbackMatch[1] : ''
-                    const dynamicExpectedFull = `<h3>If - Fallback Observable</h3><p>Fallback: ${actualFallback}</p>`
+        const ssrComponent = testObservables['TestIfFallbackObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Extract the actual fallback value from SSR result
+        const fallbackMatch = ssrResult.match(/<p>Fallback: ([^<]+)<\/p>/)
+        const actualFallback = fallbackMatch ? fallbackMatch[1] : ''
+        const dynamicExpectedFull = `<h3>If - Fallback Observable</h3><p>Fallback: ${actualFallback}</p>`
 
-                    console.log('[TestIfFallbackObservable] SSR result:', ssrResult)
-                    console.log('[TestIfFallbackObservable] Dynamic expected:', dynamicExpectedFull)
+        console.log('[TestIfFallbackObservable] SSR result:', ssrResult)
+        console.log('[TestIfFallbackObservable] Dynamic expected:', dynamicExpectedFull)
 
-                    if (ssrResult !== dynamicExpectedFull) {
-                        console.error('[TestIfFallbackObservable] ❌ SSR ASSERTION FAILED')
-                        assert(false, `[TestIfFallbackObservable] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
-                    } else {
-                        console.log(`✅ [TestIfFallbackObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestIfFallbackObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        if (ssrResult !== dynamicExpectedFull) {
+            console.error('[TestIfFallbackObservable] ❌ SSR ASSERTION FAILED')
+            assert(false, `[TestIfFallbackObservable] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+        } else {
+            console.log(`✅ [TestIfFallbackObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

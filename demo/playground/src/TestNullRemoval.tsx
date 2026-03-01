@@ -7,7 +7,7 @@ const TestNullRemoval = (): JSX.Element => {
     registerTestObservable('TestNullRemoval', o)
     const toggle = () => o(prev => (prev === null) ? '' : null)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Null - Removal</h3>
             <p>({o})</p>
@@ -27,25 +27,15 @@ TestNullRemoval.test = {
         const value = $$(testObservables['TestNullRemoval'])
         const expected = value !== null ? `<p>(${value})</p>` : '<p>(<!---->)</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestNullRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Null - Removal</h3>' + expected
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestNullRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestNullRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestNullRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value synchronously
+        const ssrComponent = testObservables['TestNullRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Null - Removal</h3>' + expected
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestNullRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestNullRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

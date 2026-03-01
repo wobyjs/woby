@@ -6,7 +6,7 @@ const TestStyleObservable = (): JSX.Element => {
     registerTestObservable('TestStyleObservable', o)
     const toggle = () => o(prev => (prev === 'green') ? 'orange' : 'green')
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Style - Observable</h3>
             <p style={{ color: o }}>content</p>
@@ -25,23 +25,15 @@ TestStyleObservable.test = {
         const value = $$(testObservables['TestStyleObservable'])
         const expected = `<p style="color: ${value};">content</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStyleObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Style - Observable</h3><p style="color: ${value};">content</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStyleObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStyleObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStyleObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStyleObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Style - Observable</h3><p style="color: ${value};">content</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestStyleObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestStyleObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

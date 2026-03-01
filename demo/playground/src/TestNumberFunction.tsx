@@ -6,7 +6,7 @@ const TestNumberFunction = (): JSX.Element => {
     registerTestObservable('TestNumberFunction', o)
     const randomize = () => o(random())
     useInterval(randomize, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Number - Function</h3>
             <p>{() => o()}</p>
@@ -26,25 +26,15 @@ TestNumberFunction.test = {
         const value = $$(testObservables['TestNumberFunction'])
         const expected = `<p>${value}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestNumberFunction_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Number - Function</h3>' + expected
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestNumberFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestNumberFunction] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestNumberFunction] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value synchronously
+        const ssrComponent = testObservables['TestNumberFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Number - Function</h3>' + expected
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestNumberFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestNumberFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

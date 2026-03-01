@@ -15,23 +15,14 @@ TestSymbolStatic.test = {
     expect: () => {
         const expected = '<p></p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSymbolStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Symbol - Static</h3><p></p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSymbolStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSymbolStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSymbolStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestSymbolStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Symbol - Static</h3><p></p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSymbolStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSymbolStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

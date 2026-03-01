@@ -17,7 +17,7 @@ const TestContextDynamicContext = () => {
         )
     }
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Dynamic - Context</h3>
             <Context.Provider value="context">
@@ -57,24 +57,13 @@ TestContextDynamicContext.test = {
         const expectedFull = '<h3>Dynamic - Context</h3><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p>'  // For SSR comparison
         const expected = '<p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p>'   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestContextDynamicContext_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestContextDynamicContext] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestContextDynamicContext] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestContextDynamicContext] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestContextDynamicContext_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestContextDynamicContext] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestContextDynamicContext] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

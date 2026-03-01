@@ -13,7 +13,7 @@ const TestSuspenseFallbackFunction = (): JSX.Element => {
     const Fallback = (): JSX.Element => {
         return <p>Fallback: {initialValue}</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Suspense - Fallback Function</h3>
             <Suspense fallback={Fallback}>
@@ -33,25 +33,17 @@ TestSuspenseFallbackFunction.test = {
     compareActualValues: true,
     expect: () => {
         const initialValue = testObservables['TestSuspenseFallbackFunction']
-        const expected = `<p>Fallback: ${initialValue}</p>`
+        const expected = `<p>Fallback: ${String(initialValue)}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSuspenseFallbackFunction_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Suspense - Fallback Function</h3><p>Fallback: ${initialValue}</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSuspenseFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSuspenseFallbackFunction] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSuspenseFallbackFunction] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestSuspenseFallbackFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Suspense - Fallback Function</h3><p>Fallback: ${String(initialValue)}</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSuspenseFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSuspenseFallbackFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

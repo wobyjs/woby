@@ -7,7 +7,7 @@ const TestClassObservable = (): JSX.Element => {
     registerTestObservable('TestClassObservable', o)
     const toggle = () => o(prev => !prev)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Class - Observable</h3>
             <p class={{ red: o }}>content</p>
@@ -27,23 +27,14 @@ TestClassObservable.test = {
         const value = $$(testObservables['TestClassObservable'])
         const expected = value ? '<p class="red">content</p>' : '<p class="">content</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = value ? '<h3>Class - Observable</h3><p class="red">content</p>' : '<h3>Class - Observable</h3><p>content</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestClassObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = value ? '<h3>Class - Observable</h3><p class="red">content</p>' : '<h3>Class - Observable</h3><p>content</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -4,7 +4,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 const TestBigIntRemoval = (): JSX.Element => {
     const o = $<bigint | null>(null)
     registerTestObservable('TestBigIntRemoval', o)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>BigInt - Removal</h3>
             <p>({o})</p>
@@ -23,23 +23,14 @@ TestBigIntRemoval.test = {
     expect: () => {
         const expected = '<p>(<!---->)</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestBigIntRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>BigInt - Removal</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestBigIntRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestBigIntRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestBigIntRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestBigIntRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>BigInt - Removal</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestBigIntRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestBigIntRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

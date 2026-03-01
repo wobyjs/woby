@@ -5,7 +5,7 @@ const TestBooleanFunction = (): JSX.Element => {
     const o = $(true)
     const toggle = () => o(prev => !prev)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Boolean - Function</h3>
             <p>{() => o()}</p>
@@ -23,23 +23,14 @@ TestBooleanFunction.test = {
     expect: () => {
         const expected = '<p><!----></p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestBooleanFunction_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Boolean - Function</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestBooleanFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestBooleanFunction] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestBooleanFunction] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestBooleanFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Boolean - Function</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestBooleanFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestBooleanFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

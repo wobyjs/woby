@@ -23,7 +23,7 @@ const TestClassesObjectRemoval = (): JSX.Element => {
         return newState
     }
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Object Removal</h3>
             <p class={o}>content</p>
@@ -56,36 +56,27 @@ TestClassesObjectRemoval.test = {
             expected = '<p class="">content</p>'
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassesObjectRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    // Log the actual SSR result for debugging
-                    console.log(`[TestClassesObjectRemoval] SSR result: ${ssrResult}`)
+        const ssrComponent = testObservables['TestClassesObjectRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        // Log the actual SSR result for debugging
+        console.log(`[TestClassesObjectRemoval] SSR result: ${ssrResult}`)
 
-                    // Create expected result based on current store state
-                    let expectedClass = ''
-                    if (value && value.red) expectedClass += 'red '
-                    if (value && value.blue) expectedClass += 'blue '
-                    const expectedFull = value ?
-                        `<h3>Classes - Object Removal</h3><p class="${expectedClass.trim()}">content</p>` :
-                        '<h3>Classes - Object Removal</h3><p>content</p>'
+        // Create expected result based on current store state
+        let expectedClass = ''
+        if (value && value.red) expectedClass += 'red '
+        if (value && value.blue) expectedClass += 'blue '
+        const expectedFull = value ?
+            `<h3>Classes - Object Removal</h3><p class="${expectedClass.trim()}">content</p>` :
+            '<h3>Classes - Object Removal</h3><p>content</p>'
 
-                    if (ssrResult === expectedFull) {
-                        console.log(`✅ [TestClassesObjectRemoval] SSR test passed: ${ssrResult}`)
-                    } else {
-                        console.error(`❌ SSR test failed:`)
-                        console.error(`  Got: ${ssrResult}`)
-                        console.error(`  Expected: ${expectedFull}`)
-                        assert(false, `[TestClassesObjectRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesObjectRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        if (ssrResult === expectedFull) {
+            console.log(`✅ [TestClassesObjectRemoval] SSR test passed: ${ssrResult}`)
+        } else {
+            console.error(`❌ SSR test failed:`)
+            console.error(`  Got: ${ssrResult}`)
+            console.error(`  Expected: ${expectedFull}`)
+            assert(false, `[TestClassesObjectRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        }
 
         return expected
     }

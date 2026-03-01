@@ -7,7 +7,7 @@ const TestStringObservable = (): JSX.Element => {
     registerTestObservable('TestStringObservable', o)
     const randomize = () => o(String(random()))
     useInterval(randomize, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>String - Observable</h3>
             <p>{o}</p>
@@ -29,23 +29,17 @@ TestStringObservable.test = {
         const value = $$(testObservables['TestStringObservable'])
         const expected = `<p>${value}</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestStringObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>String - Observable</h3><p>${value}</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestStringObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestStringObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestStringObservable] SSR render error: ${err}`)
-                })
+        // Test the SSR value
+        const ssrComponent = testObservables['TestStringObservable_ssr']
+        if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
+            const ssrResult = renderToString(ssrComponent)
+            const expectedFull = `<h3>String - Observable</h3><p>${value}</p>`
+            if (ssrResult !== expectedFull) {
+                assert(false, `[TestStringObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            } else {
+                console.log(`✅ [TestStringObservable] SSR test passed: ${ssrResult}`)
             }
-        }, 0)
+        }
 
         return expected
     }

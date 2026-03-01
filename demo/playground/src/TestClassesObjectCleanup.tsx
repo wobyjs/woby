@@ -6,7 +6,7 @@ const TestClassesObjectCleanup = (): JSX.Element => {
     registerTestObservable('TestClassesObjectCleanup', o)
     const toggle = () => o(prev => prev.red ? { blue: true } : { red: true })
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Object Cleanup</h3>
             <p class={o}>content</p>
@@ -27,23 +27,14 @@ TestClassesObjectCleanup.test = {
         const classes = typeof value === 'object' ? Object.keys(value).filter(k => value[k]).join(' ') : (value || '')
         const expected = `<p class="${classes}">content</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassesObjectCleanup_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Classes - Object Cleanup</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassesObjectCleanup] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassesObjectCleanup] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesObjectCleanup] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestClassesObjectCleanup_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Classes - Object Cleanup</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassesObjectCleanup] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassesObjectCleanup] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

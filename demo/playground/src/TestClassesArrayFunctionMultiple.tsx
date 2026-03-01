@@ -6,7 +6,7 @@ const TestClassesArrayFunctionMultiple = (): JSX.Element => {
     registerTestObservable('TestClassesArrayFunctionMultiple', o)
     const toggle = () => o(prev => prev[0] ? [false, 'blue'] : ['red bold', false])
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Classes - Array Function Multiple</h3>
             <p class={() => o()}>content</p>
@@ -30,24 +30,13 @@ TestClassesArrayFunctionMultiple.test = {
         const expectedFull = `<h3>Classes - Array Function Multiple</h3><p class="${classes}">content</p>`  // For SSR comparison
         const expected = `<p class="${classes}">content</p>`   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestClassesArrayFunctionMultiple_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestClassesArrayFunctionMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestClassesArrayFunctionMultiple] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestClassesArrayFunctionMultiple] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestClassesArrayFunctionMultiple_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassesArrayFunctionMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassesArrayFunctionMultiple] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

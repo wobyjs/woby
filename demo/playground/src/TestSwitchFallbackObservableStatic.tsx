@@ -2,7 +2,7 @@ import { $, $$, Switch, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSwitchFallbackObservableStatic = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Switch - Fallback Observable Static</h3>
             <Switch when={-1} fallback={<p>Fallback: 0.123456</p>}>
@@ -24,23 +24,15 @@ TestSwitchFallbackObservableStatic.test = {
     expect: () => {
         const expected = '<p>Fallback: 0.123456</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSwitchFallbackObservableStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Switch - Fallback Observable Static</h3><p>Fallback: 0.123456</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSwitchFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSwitchFallbackObservableStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSwitchFallbackObservableStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value
+        const ssrComponent = testObservables['TestSwitchFallbackObservableStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Switch - Fallback Observable Static</h3><p>Fallback: 0.123456</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSwitchFallbackObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSwitchFallbackObservableStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -7,7 +7,7 @@ const TestBooleanRemoval = (): JSX.Element => {
     registerTestObservable('TestBooleanRemoval', o)
     const toggle = () => o(prev => prev === true ? 'removed' : true)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Boolean - Removal</h3>
             <p>({o})</p>
@@ -34,23 +34,14 @@ TestBooleanRemoval.test = {
             expected = `<p>(${String(value)})</p>`
         }
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestBooleanRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>Boolean - Removal</h3>${expected}`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestBooleanRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestBooleanRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestBooleanRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestBooleanRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Boolean - Removal</h3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestBooleanRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestBooleanRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

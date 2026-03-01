@@ -67,7 +67,7 @@ const TestCustomElementBasicTSX = (): JSX.Element => {
     const active = $(true)
     const color = $('green')
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <div>
             <h2>1. TSX Usage</h2>
             <BasicElement
@@ -92,23 +92,14 @@ TestCustomElementBasicTSX.test = {
     expect: () => {
         const expected = '<div><h2>1. TSX Usage</h2><div style="border: 2px solid green; padding: 10px; background-color: rgb(224, 224, 224);"><h2>Test Element</h2><div><p>This is child content from TSX</p></div><p>Count: 42</p><p>Active: Yes</p></div></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestCustomElementBasicTSX_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<div><h2>1. TSX Usage</h2><div style="border: 2px solid green; padding: 10px; background-color: rgb(224, 224, 224);"><h2>Test Element</h2><div><p>This is child content from TSX</p></div><p>Count: 42</p><p>Active: Yes</p></div></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestCustomElementBasicTSX] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestCustomElementBasicTSX] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestCustomElementBasicTSX] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestCustomElementBasicTSX_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<div><h2>1. TSX Usage</h2><div style="border: 2px solid green; padding: 10px; background-color: rgb(224, 224, 224);"><h2>Test Element</h2><div><p>This is child content from TSX</p></div><p>Count: 42</p><p>Active: Yes</p></div></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestCustomElementBasicTSX] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestCustomElementBasicTSX] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }
@@ -116,7 +107,7 @@ TestCustomElementBasicTSX.test = {
 
 // 2. Custom Element Usage Test
 const TestCustomElementBasicHTML = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <div>
             <h2>2. Custom Element in TSX</h2>
             <basic-element
@@ -142,23 +133,14 @@ TestCustomElementBasicHTML.test = {
     expect: () => {
         const expected = '<div><h2>2. Custom Element in TSX</h2><basic-element><p>This is child content from HTML</p></basic-element></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestCustomElementBasicHTML_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<div><h2>2. Custom Element in TSX</h2><basic-element><p>This is child content from HTML</p></basic-element></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestCustomElementBasicHTML] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestCustomElementBasicHTML] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestCustomElementBasicHTML] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestCustomElementBasicHTML_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<div><h2>2. Custom Element in TSX</h2><basic-element><p>This is child content from HTML</p></basic-element></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestCustomElementBasicHTML] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestCustomElementBasicHTML] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }
@@ -166,7 +148,7 @@ TestCustomElementBasicHTML.test = {
 
 // 3. Mixed Usage Test
 const TestCustomElementBasicMixed = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <div>
             <h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2>
             <Dynamic
@@ -195,23 +177,14 @@ TestCustomElementBasicMixed.test = {
     expect: () => {
         const expected = '<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element><basic-element><p>Nested content</p></basic-element></basic-element></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestCustomElementBasicMixed_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element><basic-element><p>Nested content</p></basic-element></basic-element></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestCustomElementBasicMixed] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestCustomElementBasicMixed] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestCustomElementBasicMixed] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestCustomElementBasicMixed_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element><basic-element><p>Nested content</p></basic-element></basic-element></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestCustomElementBasicMixed] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestCustomElementBasicMixed] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }
@@ -219,7 +192,7 @@ TestCustomElementBasicMixed.test = {
 
 // 4. Pure HTML Custom Element Usage Test
 const TestCustomElementBasicPureHTML = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <div>
             <h2>4. Pure HTML Custom Element</h2>
             <basic-element
@@ -251,23 +224,14 @@ TestCustomElementBasicPureHTML.test = {
 </div>`
         const expected = '<div><h2>4. Pure HTML Custom Element</h2><basic-element><p>This is child content from pure HTML custom element</p></basic-element></div>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestCustomElementBasicPureHTML_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<div><h2>4. Pure HTML Custom Element</h2><basic-element><p>This is child content from pure HTML custom element</p></basic-element></div>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestCustomElementBasicPureHTML] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestCustomElementBasicPureHTML] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestCustomElementBasicPureHTML] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestCustomElementBasicPureHTML_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<div><h2>4. Pure HTML Custom Element</h2><basic-element><p>This is child content from pure HTML custom element</p></basic-element></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestCustomElementBasicPureHTML] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestCustomElementBasicPureHTML] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -15,7 +15,7 @@ const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
     const Fallback = (): JSX.Element => {
         return <p>Fallback!</p>
     }
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Error Boundary - Children Observable Static</h3>
             <ErrorBoundary fallback={<Fallback />}>
@@ -40,24 +40,13 @@ TestErrorBoundaryChildrenObservableStatic.test = {
         const expectedFull = `<h3>Error Boundary - Children Observable Static</h3><p>Children: ${childrenValue}</p>`  // For SSR comparison
         const expected = `<p>Children: ${childrenValue}</p>`   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestErrorBoundaryChildrenObservableStatic_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestErrorBoundaryChildrenObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestErrorBoundaryChildrenObservableStatic] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestErrorBoundaryChildrenObservableStatic] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestErrorBoundaryChildrenObservableStatic_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestErrorBoundaryChildrenObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestErrorBoundaryChildrenObservableStatic] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

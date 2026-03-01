@@ -6,7 +6,7 @@ const TestIfChildrenObservable = (): JSX.Element => {
     registerTestObservable('TestIfChildrenObservable', o)
     const randomize = () => o(String(random()))
     useInterval(randomize, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>If - Children Observable</h3>
             <If when={true}>{o}</If>
@@ -29,22 +29,13 @@ TestIfChildrenObservable.test = {
         const expectedFull = `<h3>If - Children Observable</h3>${value}`
         const expected = value
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestIfChildrenObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestIfChildrenObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestIfChildrenObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestIfChildrenObservable] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestIfChildrenObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestIfChildrenObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestIfChildrenObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

@@ -2,7 +2,7 @@ import { $, $$, Switch, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSwitchObservableComplex = (): JSX.Element => {
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Switch - Observable Complex</h3>
             <Switch when={0}>
@@ -52,23 +52,14 @@ TestSwitchObservableComplex.test = {
     expect: () => {
         const expected = '<p>1 - 0</p><p>2 - 2</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSwitchObservableComplex_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Switch - Observable Complex</h3><p>1 - 0</p><p>2 - 2</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSwitchObservableComplex] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSwitchObservableComplex] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSwitchObservableComplex] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestSwitchObservableComplex_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Switch - Observable Complex</h3><p>1 - 0</p><p>2 - 2</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSwitchObservableComplex] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSwitchObservableComplex] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

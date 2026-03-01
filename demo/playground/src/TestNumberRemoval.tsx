@@ -6,7 +6,7 @@ const TestNumberRemoval = (): JSX.Element => {
     registerTestObservable('TestNumberRemoval', o)
     const randomize = () => o(prev => prev ? null : random())
     useInterval(randomize, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Number - Removal</h3>
             <p>({o})</p>
@@ -26,25 +26,15 @@ TestNumberRemoval.test = {
         const val = $$(testObservables['TestNumberRemoval'])
         const expected = val !== null ? `<p>(${val})</p>` : '<p>(<!---->)</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestNumberRemoval_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Number - Removal</h3>' + expected
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestNumberRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestNumberRemoval] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestNumberRemoval] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        // Test the SSR value synchronously
+        const ssrComponent = testObservables['TestNumberRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Number - Removal</h3>' + expected
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestNumberRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestNumberRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

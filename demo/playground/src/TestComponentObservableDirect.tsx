@@ -8,7 +8,7 @@ const TestComponentObservableDirect = (): JSX.Element => {
     const randomize = () => o(getRandom())
     useInterval(randomize, TEST_INTERVAL)
 
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Component - Observable Direct</h3>
             <p>{o}</p>
@@ -31,24 +31,13 @@ TestComponentObservableDirect.test = {
         const expectedFull = `<h3>Component - Observable Direct</h3><p>${value}</p>`  // For SSR comparison
         const expected = `<p>${value}</p>`   // For main test comparison
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestComponentObservableDirect_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                // If it's a JSX element or function, we can render it to string
-                // If it's a function, we need to call it first to get the element
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestComponentObservableDirect] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestComponentObservableDirect] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestComponentObservableDirect] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestComponentObservableDirect_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestComponentObservableDirect] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestComponentObservableDirect] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

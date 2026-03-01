@@ -6,7 +6,7 @@ const TestHTMLFunctionStaticRegistry = (): JSX.Element => {
         return <p>content</p>
     }
     html.register({ If, P })
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>HTML - Function - Static Registry</h3>
             {html`
@@ -28,23 +28,14 @@ TestHTMLFunctionStaticRegistry.test = {
     expect: () => {
         const expected = '<p>content</p>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestHTMLFunctionStaticRegistry_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>HTML - Function - Static Registry</h3><p>content</p>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestHTMLFunctionStaticRegistry] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestHTMLFunctionStaticRegistry] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestHTMLFunctionStaticRegistry] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestHTMLFunctionStaticRegistry_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>HTML - Function - Static Registry</h3><p>content</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestHTMLFunctionStaticRegistry] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestHTMLFunctionStaticRegistry] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

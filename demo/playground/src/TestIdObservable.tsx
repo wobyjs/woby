@@ -6,7 +6,7 @@ const TestIdObservable = (): JSX.Element => {
     registerTestObservable('TestIdObservable', o)
     const toggle = () => o(prev => (prev === 'foo') ? 'bar' : 'foo')
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>ID - Observable</h3>
             <p id={o}>content</p>
@@ -25,23 +25,14 @@ TestIdObservable.test = {
         const value = $$(testObservables['TestIdObservable'])
         const expected = `<p id="${value}">content</p>`
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
             const ssrComponent = testObservables['TestIdObservable_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = `<h3>ID - Observable</h3><p id="${value}">content</p>`
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestIdObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestIdObservable] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestIdObservable] SSR render error: ${err}`)
-                })
+            const ssrResult = renderToString(ssrComponent)
+            const expectedFull = `<h3>ID - Observable</h3><p id="${value}">content</p>`
+            if (ssrResult !== expectedFull) {
+                assert(false, `[TestIdObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            } else {
+                console.log(`✅ [TestIdObservable] SSR test passed: ${ssrResult}`)
             }
-        }, 0)
 
         return expected
     }

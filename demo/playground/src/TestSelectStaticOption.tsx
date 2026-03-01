@@ -6,7 +6,7 @@ const TestSelectStaticOption = (): JSX.Element => {
     // Comment out assertion to prevent console.assert errors
     // const assert = () => console.assert(ref()?.value === 'bar')
     // useTimeout(assert, 1)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Select - Static Option</h3>
             <select ref={ref} name="select-static-option">
@@ -29,23 +29,14 @@ TestSelectStaticOption.test = {
     expect: () => {
         const expected = '<select name="select-static-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSelectStaticOption_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Select - Static Option</h3><select name="select-static-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSelectStaticOption] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSelectStaticOption] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSelectStaticOption] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestSelectStaticOption_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Select - Static Option</h3><select name="select-static-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSelectStaticOption] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSelectStaticOption] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

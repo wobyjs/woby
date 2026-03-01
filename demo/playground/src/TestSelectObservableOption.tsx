@@ -13,7 +13,7 @@ const TestSelectObservableOption = (): JSX.Element => {
     // }
     const toggle = () => branch(prev => !prev)
     useInterval(toggle, TEST_INTERVAL)
-    const ret: JSX.Element = (
+    const ret: JSX.Element = () => (
         <>
             <h3>Select - Observable Option</h3>
             <select ref={ref} name="select-observable-option">
@@ -36,23 +36,14 @@ TestSelectObservableOption.test = {
     expect: () => {
         const expected = '<select name="select-observable-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
 
-        // Test the SSR value asynchronously
-        setTimeout(() => {
-            const ssrComponent = testObservables['TestSelectObservableOption_ssr']
-            if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
-                const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
-                    const expectedFull = '<h3>Select - Observable Option</h3><select name="select-observable-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
-                    if (ssrResult !== expectedFull) {
-                        assert(false, `[TestSelectObservableOption] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-                    } else {
-                        console.log(`✅ [TestSelectObservableOption] SSR test passed: ${ssrResult}`)
-                    }
-                }).catch(err => {
-                    console.error(`[TestSelectObservableOption] SSR render error: ${err}`)
-                })
-            }
-        }, 0)
+        const ssrComponent = testObservables['TestSelectObservableOption_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Select - Observable Option</h3><select name="select-observable-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestSelectObservableOption] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestSelectObservableOption] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }
