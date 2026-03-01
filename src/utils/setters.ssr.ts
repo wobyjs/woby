@@ -16,8 +16,11 @@ import { resolveChild, resolveClass, resolveStyle } from './resolvers'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
 import { setNestedAttribute } from './nested'
+import { useEnvironment, showEnvLog } from '../components/environment_context'
 
 export const setAttributeStatic = (() => {
+    if (showEnvLog)
+        console.log('ENV setAttributeStatic: ', useEnvironment())
 
     const attributesBoolean = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls', 'default', 'disabled', 'formnovalidate', 'hidden', 'indeterminate', 'ismap', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open', 'playsinline', 'readonly', 'required', 'reversed', 'seamless', 'selected'])
     const attributeCamelCasedRe = /e(r[HRWrv]|[Vawy])|Con|l(e[Tcs]|c)|s(eP|y)|a(t[rt]|u|v)|Of|Ex|f[XYa]|gt|hR|d[Pg]|t[TXYd]|[UZq]/ //URL: https://regex101.com/r/I8Wm4S/1
@@ -31,6 +34,10 @@ export const setAttributeStatic = (() => {
     }
 
     return (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
+        if (showEnvLog)
+            console.log('ENV setAttributeStatic return: ', useEnvironment())
+
+        
         // Handle nested properties with "." or "$" syntax
         if (key.includes('.') || key.includes('$')) {
             setNestedAttribute(element, key, value)
@@ -164,7 +171,9 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
 }
 
 export const setChildStatic = (parent: any, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, stack: Stack): void => {
-
+    if (showEnvLog)
+        console.log('ENV setChildStatic: ', useEnvironment())
+    
     if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
 
     const prev = FragmentUtils.getChildren(fragment)

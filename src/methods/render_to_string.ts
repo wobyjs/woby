@@ -4,28 +4,33 @@ import { setChild } from '../utils/setters.ssr'
 // import { isArray } from '../utils/lang'
 import { BaseNode } from './ssr.obj'
 import { createHTMLNode } from '../utils/creators.ssr'
-import { $$, resolve } from './soby'
+import { $$, context, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'
 import { isFunction } from '../utils/lang'
+import { EnvironmentContext, useEnvironment } from '../components/environment_context'
 
 export const renderToString = (child: Child): string => {
-    // Create a container for SSR using HTMLNode
-    const container = createHTMLNode('div')
-    const stack = new Error()
+    return EnvironmentContext.Provider('ssr', () => {
 
-    // Use a fragment for the root
-    const fragment = FragmentUtils.make()
+        console.log('ENV renderToString:', useEnvironment())
+        // Create a container for SSR using HTMLNode
+        const container = createHTMLNode('div')
+        const stack = new Error()
 
-    // Set the child content
-    setChild(container, child, fragment, stack)
+        // Use a fragment for the root
+        const fragment = FragmentUtils.make()
 
-    // Get the rendered content from the container's children
-    const children = Array.from(container.childNodes || [])
-    const childrenContent = children.map((child: any) => {
-        return getNodeContent(child)
-    }).join('')
+        // Set the child content
+        setChild(container, child, fragment, stack)
 
-    return childrenContent
+        // Get the rendered content from the container's children
+        const children = Array.from(container.childNodes || [])
+        const childrenContent = children.map((child: any) => {
+            return getNodeContent(child)
+        }).join('')
+
+        return childrenContent
+    })
 }
 
 // Helper function to get content from node objects

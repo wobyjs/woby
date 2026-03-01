@@ -6,6 +6,7 @@ import { createText } from '../utils/creators'
 import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { Observable, Stack } from '../soby'
+import {useEnvironment, showEnvLog} from '../components/environment_context'
 
 // const replaceSelf = <T extends { [SYMBOL_DOM]: HTMLElement | HTMLElement[] } & Observable<HTMLElement>>(value: T, newNode: HTMLElement | HTMLElement[]) => {
 //   const node = value[SYMBOL_DOM]
@@ -26,6 +27,9 @@ import { Observable, Stack } from '../soby'
 // }
 
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
+  if (showEnvLog)
+    console.log('ENV resolveChild: ', useEnvironment())
+
   if (isArray(value)) {
 
     const [values, hasObservables] = resolveArraysAndStatics(value)

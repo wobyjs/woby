@@ -18,6 +18,7 @@ import { normalizePropertyPath, setNestedAttribute } from '../utils/nested'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
 import { isJsx } from '../jsx-runtime'
+import { useEnvironment, showEnvLog } from '../components/environment_context'
 
 export const setAttributeStatic = (() => {
 
@@ -391,6 +392,9 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
 export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
     const cd = child
+
+    if (showEnvLog)
+        console.log('ENV setChild: ', useEnvironment())
     resolveChild(cd, (child, dynamic, stack) => setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack), false, stack)
 }
 
