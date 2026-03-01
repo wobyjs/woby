@@ -107,7 +107,7 @@ function constructNodeHTML(node: BaseNode): string {
         return `<!---->`
     } else if (node.nodeType === 1) {
         // Element node - check if it has tagName property (HTMLNode or SVGNode)
-        const tagName = ('tagName' in node) ? (node as any).tagName : 'div'
+        const tagName = ('tagName' in node) ? (node as any).tagName.toLowerCase() : 'div'
 
         // Build attributes string
         const attrs = Object.entries(node.attributes || {})
@@ -118,7 +118,7 @@ function constructNodeHTML(node: BaseNode): string {
         // Handle self-closing tags
         const selfClosingTags = ['BR', 'HR', 'IMG', 'INPUT', 'META', 'LINK']
         if (('tagName' in node) && selfClosingTags.includes((node as any).tagName.toLowerCase())) {
-            return `<${(node as any).tagName}${attrStr}>`
+            return `<${(node as any).tagName.toLowerCase()}${attrStr}>`
         }
 
         // Build children string
@@ -126,7 +126,7 @@ function constructNodeHTML(node: BaseNode): string {
             return getNodeContent(child)
         }).join('')
 
-        return `<${tagName}${attrStr}>${childrenContent}</${tagName}>`
+        return `<${tagName.toLowerCase()}${attrStr}>${childrenContent}</${tagName.toLowerCase()}>`
     }
 
     // Default case

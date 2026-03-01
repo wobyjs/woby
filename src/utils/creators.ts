@@ -90,7 +90,7 @@ const createHTMLNodeSSR = ((tagName: string) => {
                 return String(child)
             }).join('')
 
-            return `<${this.tagName}${attrStr}>${children}</${this.tagName}>`
+            return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
         }
     }
 
@@ -130,7 +130,7 @@ const createSVGNodeSSR = ((tagName: string) => {
                 return String(child)
             }).join('')
 
-            return `<${this.tagName}${attrStr}>${children}</${this.tagName}>`
+            return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
         }
     }
 

@@ -140,9 +140,9 @@ export class HTMLElement extends Element implements VoidHTMLAttributes<globalThi
             .join(' ')
         const attrStr = attrs ? ` ${attrs}` : ''
 
-        // Handle self-closing tags
-        if (['BR', 'HR', 'IMG', 'INPUT', 'META', 'LINK'].includes(this.tagName)) {
-            return `<${this.tagName}${attrStr} />`
+        // Handle self-closing tags - convert to lowercase for comparison
+        if (['br', 'hr', 'img', 'input', 'meta', 'link'].includes(this.tagName.toLowerCase())) {
+            return `<${this.tagName.toLowerCase()}${attrStr} />`
         }
 
         // Build children string
@@ -157,7 +157,7 @@ export class HTMLElement extends Element implements VoidHTMLAttributes<globalThi
             return String(child)
         }).join('')
 
-        return `<${this.tagName}${attrStr}>${children}</${this.tagName}>`
+        return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
     }
 
     // Getter for innerText

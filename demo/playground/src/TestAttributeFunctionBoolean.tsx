@@ -33,7 +33,7 @@ TestAttributeFunctionBoolean.test = {
 
         const ssrComponent = testObservables['TestAttributeFunctionBoolean_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<H3>Attribute - Function Boolean</H3>${expected}`
+        const expectedFull = `<h3>Attribute - Function Boolean</h3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeFunctionBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

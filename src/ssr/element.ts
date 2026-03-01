@@ -15,6 +15,32 @@ export class Element extends BaseNode {
         this.attributes = {}
     }
 
+    // Getter for innerHTML
+    get innerHTML(): string {
+        return this.childNodes.map((child: any) => {
+            if (typeof child === 'object' && child !== null) {
+                if ('outerHTML' in child) {
+                    return child.outerHTML
+                } else if ('textContent' in child) {
+                    return child.textContent
+                }
+            }
+            return String(child)
+        }).join('')
+    }
+
+    // Setter for innerHTML
+    set innerHTML(content: string) {
+        // Clear existing children
+        this.childNodes = []
+        // Add as text node
+        this.appendChild({
+            nodeType: 3,
+            textContent: String(content),
+            toString: () => String(content)
+        })
+    }
+
     // Basic Element methods that should be available
     getAttribute(name: string): string | null {
         return this.attributes[name] ?? null

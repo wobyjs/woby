@@ -29,7 +29,7 @@ TestAttributeObservable.test = {
 
         const ssrComponent = testObservables['TestAttributeObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<H3>Attribute - Observable</H3>${expected}`
+        const expectedFull = `<h3>Attribute - Observable</h3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

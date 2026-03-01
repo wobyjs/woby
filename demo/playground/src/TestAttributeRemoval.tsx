@@ -26,7 +26,7 @@ TestAttributeRemoval.test = {
 
         const ssrComponent = testObservables['TestAttributeRemoval_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<H3>Attribute - Removal</H3>${expected}`
+        const expectedFull = `<h3>Attribute - Removal</h3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

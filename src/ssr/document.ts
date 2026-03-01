@@ -104,6 +104,20 @@ const createHTMLNode = ((tagName: string) => {
 
             return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
         }
+
+        // Getter for innerHTML
+        get innerHTML() {
+            return this.childNodes.map((child: any) => {
+                if (typeof child === 'object' && child !== null) {
+                    if ('outerHTML' in child) {
+                        return child.outerHTML
+                    } else if ('textContent' in child) {
+                        return child.textContent
+                    }
+                }
+                return String(child)
+            }).join('')
+        }
     }
 
     return new HTMLNode()
@@ -143,6 +157,20 @@ const createSVGNode = ((tagName: string) => {
             }).join('')
 
             return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
+        }
+
+        // Getter for innerHTML
+        get innerHTML() {
+            return this.childNodes.map((child: any) => {
+                if (typeof child === 'object' && child !== null) {
+                    if ('outerHTML' in child) {
+                        return child.outerHTML
+                    } else if ('textContent' in child) {
+                        return child.textContent
+                    }
+                }
+                return String(child)
+            }).join('')
         }
     }
 
