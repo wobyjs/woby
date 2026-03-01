@@ -24,14 +24,14 @@ TestAttributeObservableBoolean.test = {
         const value = $$(testObservables['TestAttributeObservableBoolean'])
         let expected: string
         if (value) {
-            expected = '<p data-red="true">content</p>'
+            expected = '<P data-red="true">content</P>'
         } else {
-            expected = '<p data-red="false">content</p>'
+            expected = '<P data-red="false">content</P>'
         }
 
         const ssrComponent = testObservables['TestAttributeObservableBoolean_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>Attribute - Observable Boolean</h3>${expected}`
+        const expectedFull = `<H3>Attribute - Observable Boolean</H3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeObservableBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

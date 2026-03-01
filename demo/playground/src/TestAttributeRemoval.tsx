@@ -22,11 +22,11 @@ TestAttributeRemoval.test = {
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestAttributeRemoval'])
-        const expected = value ? `<p data-color="${value}">content</p>` : '<p>content</p>'
+        const expected = value ? `<P data-color="${value}">content</P>` : '<P>content</P>'
 
         const ssrComponent = testObservables['TestAttributeRemoval_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>Attribute - Removal</h3>${expected}`
+        const expectedFull = `<H3>Attribute - Removal</H3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

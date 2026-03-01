@@ -26,14 +26,14 @@ TestAttributeFunctionBoolean.test = {
         const attrValue = !value
         let expected: string
         if (attrValue) {
-            expected = '<p data-red="true">content</p>'
+            expected = '<P data-red="true">content</P>'
         } else {
-            expected = '<p data-red="false">content</p>'
+            expected = '<P data-red="false">content</P>'
         }
 
         const ssrComponent = testObservables['TestAttributeFunctionBoolean_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>Attribute - Function Boolean</h3>${expected}`
+        const expectedFull = `<H3>Attribute - Function Boolean</H3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeFunctionBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {
