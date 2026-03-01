@@ -14,7 +14,7 @@ const TestABCD = (): JSX.Element => {
     const increment = () => index(prev => (prev + 1) % states.length)
     useInterval(increment, TEST_INTERVAL)
 
-    const getCurrentElement = () => states[index()]
+    const getCurrentElement =  ()=>states[index()]
 
     const ret: JSX.Element = () => (
         <>
@@ -46,14 +46,14 @@ TestABCD.test = {
             '<h3>Children - ABCD</h3><p><b>c</b></p>',
             '<h3>Children - ABCD</h3><p><span>d</span></p>'
         ]
-        // Actual SSR wraps in CONTEXT-PROVIDER and duplicates content
-        const duplicatedElements = [
-            '<H3>Children - ABCDChildren - ABCD</H3><P><I>aa</I><I>aa</I></P>',
-            '<H3>Children - ABCDChildren - ABCD</H3><P><U>bb</U><U>bb</U></P>',
-            '<H3>Children - ABCDChildren - ABCD</H3><P><B>cc</B><B>cc</B></P>',
-            '<H3>Children - ABCDChildren - ABCD</H3><P><SPAN>dd</SPAN><SPAN>dd</SPAN></P>'
+        // Actual SSR output format
+        const actualElements = [
+            '<H3>Children - ABCD</H3><P><I>a</I></P>',
+            '<H3>Children - ABCD</H3><P><U>b</U></P>',
+            '<H3>Children - ABCD</H3><P><B>c</B></P>',
+            '<H3>Children - ABCD</H3><P><SPAN>d</SPAN></P>'
         ]
-        const expectedFull = `<CONTEXT-PROVIDER value="ssr">${duplicatedElements[idx]}</CONTEXT-PROVIDER>`
+        const expectedFull = actualElements[idx]
         if (ssrResult !== expectedFull) {
             assert(false, `[TestABCD] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

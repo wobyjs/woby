@@ -94,7 +94,12 @@ export class BaseNode {
 
         // Set the parent node
         if (child) {
+            try{
             child.parentNode = this
+            }
+            catch{
+                debugger
+            }
         }
 
         this.childNodes.push(child)

@@ -1,6 +1,6 @@
 import { FragmentUtils } from '../utils/fragment'
 import type { Child } from '../types'
-import { setChild } from '../utils/setters.ssr'
+import { setChild } from '../utils/setters'
 // import { isArray } from '../utils/lang'
 import { BaseNode } from './ssr.obj'
 import { createHTMLNode } from '../utils/creators.ssr'
@@ -30,7 +30,7 @@ export const renderToString = (child: Child): string => {
         }).join('')
 
         return childrenContent
-    })
+    }) as string
 }
 
 // Helper function to get content from node objects

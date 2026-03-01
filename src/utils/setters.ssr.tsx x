@@ -101,6 +101,9 @@ export const setAttribute = (element: HTMLElement, key: string, value: FunctionM
 export const setChildReplacementFunction = (parent: HTMLElement, fragment: Fragment, child: (() => Child), stack: Stack): void => {
 
     useRenderEffect((stack) => {
+        const isSSR = useEnvironment() === 'ssr'
+        if(showEnvLog)
+            console.log('ENV setChildReplacementFunction: ', useEnvironment())
 
         let valueNext = child()
 
@@ -259,7 +262,10 @@ export const setChildStatic = (parent: any, fragment: Fragment, fragmentOnly: bo
             FragmentUtils.pushFragment(fragmentNext, fragment)
 
             resolveChild(child, (child, dynamic, stack) => {
-
+                const isSSR = useEnvironment() === 'ssr'
+                if(showEnvLog)
+                    console.log('ENV setChildStatic resolveChild: ', useEnvironment())
+        
                 setChildStatic(parent, fragment, fragmentOnly, child, dynamic, stack)
 
             }, false, stack)

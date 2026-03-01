@@ -17,15 +17,13 @@ const TestAttributeBooleanStatic = (): JSX.Element => {
 }
 
 TestAttributeBooleanStatic.test = {
-    static: false,
+    static: true,
     expect: () => {
         const expected = '<p disabled="">content</p><p>content</p>'
 
         const ssrComponent = testObservables['TestAttributeBooleanStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
-        // Actual SSR wraps in CONTEXT-PROVIDER and duplicates content
-        const duplicatedExpected = `<H3>Attribute Boolan - StaticAttribute Boolan - Static</H3><P disabled="">contentcontent</P><P>contentcontent</P>`
-        const expectedFull = `<CONTEXT-PROVIDER value="ssr">${duplicatedExpected}</CONTEXT-PROVIDER>`
+        const expectedFull = `<H3>Attribute Boolan - Static</H3><P disabled="">content</P><P>content</P>`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeBooleanStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

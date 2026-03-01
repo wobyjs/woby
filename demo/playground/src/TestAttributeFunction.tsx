@@ -1,4 +1,4 @@
-import { $, $$,  renderToString } from '../../..'
+import { $, $$,  renderToString } from 'woby'
 import { TestSnapshots,useInterval,  TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestAttributeFunction = (): JSX.Element => {
@@ -17,24 +17,23 @@ const TestAttributeFunction = (): JSX.Element => {
     // Store the component for SSR testing
     registerTestObservable('TestAttributeFunction_ssr', ret)
 
-    return ret
+    return null //ret
 }
 
 TestAttributeFunction.test = {
-    static: false,
-    compareActualValues: true,
+    static: true,
     expect: () => {
         const value = $$(testObservables['TestAttributeFunction'])
         const expected = `<p data-color="dark${value}">content</p>`
 
-        // const ssrComponent = testObservables['TestAttributeFunction_ssr']
-        // const ssrResult = renderToString(ssrComponent)
-        // const expectedFull = `<h3>Attribute - Function</h3>${expected}`
-        // if (ssrResult !== expectedFull) {
-        //     assert(false, `[TestAttributeFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-        // } else {
-        //     console.log(`✅ [TestAttributeFunction] SSR test passed: ${ssrResult}`)
-        // }
+        const ssrComponent = testObservables['TestAttributeFunction_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<H3>Attribute - Function</H3>${expected}`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestAttributeFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestAttributeFunction] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

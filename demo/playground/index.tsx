@@ -2,9 +2,10 @@
 
 import * as Woby from 'woby'
 import type { JSX } from 'woby'
-import { $, render, createContext, useContext, Dynamic, createDirective, useEffect, useMemo, store, ErrorBoundary, For, If, KeepAlive, lazy, Suspense, useTimeout, Portal, usePromise, hmr, useResource, Ternary, Switch, renderToString } from 'woby'
+import { $,DEBUGGER, render, createContext, useContext, Dynamic, createDirective, useEffect, useMemo, store, ErrorBoundary, For, If, KeepAlive, lazy, Suspense, useTimeout, Portal, usePromise, hmr, useResource, Ternary, Switch, renderToString } from 'woby'
 import { random, randomColor } from './src/util'
 
+DEBUGGER.debug=true
 // Assign individual exports to global scope
 globalThis.$ = $
 globalThis.render = render
@@ -336,9 +337,9 @@ globalThis.Woby = Woby
 /* MAIN */
 
 const tests = [
-    TestABCD,
+    // TestABCD,
     // TestAttributeBooleanStatic,
-    // TestAttributeFunction,
+    TestAttributeFunction,
     // TestAttributeFunctionBoolean,
     // TestAttributeObservable,
     // TestAttributeObservableBoolean,

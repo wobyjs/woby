@@ -10,19 +10,20 @@
 
 import { untrack } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
-import { createComment, createHTMLNode, createSVGNode, createText } from '../utils/creators'
-import { createHTMLNode as createHTMLNodeSSR, createSVGNode as createSVGNodeSSR } from '../utils/creators.ssr'
+import { createComment as createCommentDOM, createHTMLNode as createHTMLNodeDOM, createSVGNode as createSVGNodeDOM, createText as createTextDOM } from '../utils/creators'
+import { createHTMLNode as createHTMLNodeSSR, createSVGNode as createSVGNodeSSR, createComment as createCommentSSR, createText as createTextSSR } from '../utils/creators.ssr'
 import { isClass, isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters'
-import { setChild as setChildSSR, setProps as setPropsSSR } from '../utils/setters.ssr'
+import { setChild as setChildSSR, setProps as setPropsSSR } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { customElement } from './custom_element'
 import { Stack } from 'soby'
 import { customElements as ces } from './ssr.obj'
-import { isSSR } from '../constants'
+// import { isSSR } from '../constants'
+import {useEnvironment,showEnvLog}from '../components/environment_context'
 
-if (isSSR) globalThis.customElements = ces as any
+// if (isSSR) globalThis.customElements = ces as any
 
 /**
  * Creates an element from a component, props, and children
@@ -68,108 +69,109 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         throw new Error('Providing "children" both as a prop and as rest arguments is forbidden')
 
     }
+    const isSSR = useEnvironment() === 'ssr'
 
     // Use different logic based on SSR mode
-    if (isSSR) {
-        // SSR-specific logic
-        const props = _props ?? {}
+    // if (isSSR) {
+    //     // SSR-specific logic
+    //     const props = _props ?? {}
 
-        if (isFunction(component)) {
+    //     if (isFunction(component)) {
 
-            const props = _props ?? {}
+    //         const props = _props ?? {}
 
-            return wrapElement(() => {
+    //         return wrapElement(() => {
 
-                return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
+    //             return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
 
-            })
+    //         })
 
-        } else if (isString(component)) {
+    //     } else if (isString(component)) {
 
-            const isSVG = isSVGElement(component)
-            const createNode = isSVG ? createSVGNodeSSR : createHTMLNodeSSR
+    //         const isSVG = isSVGElement(component)
+    //         const createNode = isSVG ? createSVGNodeSSR : createHTMLNodeSSR
 
-            return wrapElement((): Child => {
-                // Check if we're in SSR mode (no customElements API)
-                const isSSRMode = typeof customElements === 'undefined'
-                let ce = null
+    //         return wrapElement((): Child => {
+    //             // Check if we're in SSR mode (no customElements API)
+    //             const isSSRMode = typeof customElements === 'undefined'
+    //             let ce = null
 
-                // Only try to get custom element if we're not in SSR mode
-                if (!isSSRMode) {
-                    ce = customElements.get(component) as ReturnType<typeof customElement>
-                }
+    //             // Only try to get custom element if we're not in SSR mode
+    //             if (!isSSRMode) {
+    //                 ce = customElements.get(component) as ReturnType<typeof customElement>
+    //             }
 
-                const child = createNode(component) as HTMLElement //TSC
+    //             const child = createNode(component) as HTMLElement //TSC
 
-                // Check if this is our custom element class (SSR version)
-                if (!!ce) {
-                    // For SSR custom elements, we need to handle them differently
-                    if (typeof ce === 'function' && (ce as any).__component__) {
-                        // This is our SSR custom element, just pass props directly
-                        (child as any).props = { ..._props }
-                    } else {
-                        // This is a regular custom element - cast to any to avoid TypeScript errors
-                        (child as any).props = { ..._props }
-                    }
-                }
+    //             // Check if this is our custom element class (SSR version)
+    //             if (!!ce) {
+    //                 // For SSR custom elements, we need to handle them differently
+    //                 if (typeof ce === 'function' && (ce as any).__component__) {
+    //                     // This is our SSR custom element, just pass props directly
+    //                     (child as any).props = { ..._props }
+    //                 } else {
+    //                     // This is a regular custom element - cast to any to avoid TypeScript errors
+    //                     (child as any).props = { ..._props }
+    //                 }
+    //             }
 
-                if (isSVG) child['isSVG'] = true
+    //             if (isSVG) child['isSVG'] = true
 
-                const stack = new Error()
+    //             const stack = new Error()
 
-                untrack(() => {
-                    if (_props) {
-                        // For custom elements, remove children from props to avoid duplication
-                        if (!!ce) {
-                            const { children, ...np } = _props as any
-                            setPropsSSR(child, np as any, stack)
-                        } else {
-                            // For regular elements, remove children from props if we have separate children arguments
-                            const propsToSet = hasChildren && isObject(_props) && 'children' in _props
-                                ? Object.fromEntries(Object.entries(_props).filter(([key]) => key !== 'children'))
-                                : _props
-                            setPropsSSR(child, propsToSet as any, stack)
-                        }
-                    }
+    //             untrack(() => {
+    //                 if (_props) {
+    //                     // For custom elements, remove children from props to avoid duplication
+    //                     if (!!ce) {
+    //                         const { children, ...np } = _props as any
+    //                         setPropsSSR(child, np as any, stack)
+    //                     } else {
+    //                         // For regular elements, remove children from props if we have separate children arguments
+    //                         const propsToSet = hasChildren && isObject(_props) && 'children' in _props
+    //                             ? Object.fromEntries(Object.entries(_props).filter(([key]) => key !== 'children'))
+    //                             : _props
+    //                         setPropsSSR(child, propsToSet as any, stack)
+    //                     }
+    //                 }
 
-                    // Set children for both regular HTML elements and custom elements
-                    // Only process children once - either from separate arguments or from props, not both
-                    if (hasChildren) {
-                        // Process children passed as separate arguments (preferred method)
-                        if (ce && typeof ce === 'function' && (ce as any).__component__) {
-                            setChildSSR(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
-                        } else {
-                            // For regular HTML elements, just set the children directly
-                            setChildSSR(child, children, FragmentUtils.make(), stack)
-                        }
-                    } else if (_props && isObject(_props) && 'children' in _props && !isVoidChild((_props as any).children)) {
-                        // Only process children from props if no separate children were passed
-                        // Handle children from props
-                        const propsChildren = (_props as any).children as Child
-                        // For SSR custom elements, we need to handle them differently
-                        if (ce && typeof ce === 'function' && (ce as any).__component__) {
-                            setChildSSR(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : propsChildren, FragmentUtils.make(), stack)
-                        } else {
-                            // For regular HTML elements, just set the children directly
-                            setChildSSR(child, propsChildren, FragmentUtils.make(), stack)
-                        }
-                    }
-                })
+    //                 // Set children for both regular HTML elements and custom elements
+    //                 // Only process children once - either from separate arguments or from props, not both
+    //                 if (hasChildren) {
+    //                     // Process children passed as separate arguments (preferred method)
+    //                     if (ce && typeof ce === 'function' && (ce as any).__component__) {
+    //                         setChildSSR(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : children, FragmentUtils.make(), stack)
+    //                     } else {
+    //                         // For regular HTML elements, just set the children directly
+    //                         setChildSSR(child, children, FragmentUtils.make(), stack)
+    //                     }
+    //                 } else if (_props && isObject(_props) && 'children' in _props && !isVoidChild((_props as any).children)) {
+    //                     // Only process children from props if no separate children were passed
+    //                     // Handle children from props
+    //                     const propsChildren = (_props as any).children as Child
+    //                     // For SSR custom elements, we need to handle them differently
+    //                     if (ce && typeof ce === 'function' && (ce as any).__component__) {
+    //                         setChildSSR(child, !!ce ? createElement((ce as any).__component__, (child as any).props) : propsChildren, FragmentUtils.make(), stack)
+    //                     } else {
+    //                         // For regular HTML elements, just set the children directly
+    //                         setChildSSR(child, propsChildren, FragmentUtils.make(), stack)
+    //                     }
+    //                 }
+    //             })
 
-                return child
+    //             return child
 
-            })
+    //         })
 
-        } else if (isNode(component)) {
+    //     } else if (isNode(component)) {
 
-            return wrapElement(() => component)
+    //         return wrapElement(() => component)
 
-        } else {
+    //     } else {
 
-            throw new Error('Invalid component')
+    //         throw new Error('Invalid component')
 
-        }
-    } else {
+    //     }
+    // } else {
         // Client-side logic
         const props = _props ?? {}
 
@@ -186,10 +188,16 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
             const isComment = component === 'comment'
             const isText = component === 'text'
 
-            const createNode = isSVG ? createSVGNode : createHTMLNode
+            const createNode = isSVG ? (isSSR?createSVGNodeSSR : createSVGNodeDOM) : (isSSR?createHTMLNodeSSR : createHTMLNodeDOM)
+            const createComment= isSSR?createCommentDOM : createCommentSSR
+            const createText = isSSR ? createTextDOM : createTextSSR
             const create = isComment ? () => createComment((props as any).data ?? '') : isText ? () => createText((props as any).data ?? '') : createNode
 
             return wrapElement((): Child => {
+                const isSSR = useEnvironment() === 'ssr'
+                if(showEnvLog)
+                    console.log('ENV createElement wrapElement: ', useEnvironment())
+
                 // Check if this is a custom element
                 const ce = isSSR ? ces.get(component) : customElements.get(component) as ReturnType<typeof customElement>
 
@@ -233,5 +241,5 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
             throw new Error('Invalid component')
 
         }
-    }
+    // }
 }

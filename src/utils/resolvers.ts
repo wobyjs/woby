@@ -2,11 +2,12 @@ import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE
 import { isObservable } from '../methods/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { $$ } from '../methods/soby'
-import { createText } from '../utils/creators'
+import { createText as createTextDOM } from '../utils/creators'
+import { createText as createTextSSR } from '../utils/creators.ssr'
 import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { Observable, Stack } from '../soby'
-import {useEnvironment, showEnvLog} from '../components/environment_context'
+import {useEnvironment, EnvironmentContext, showEnvLog} from '../components/environment_context'
 
 // const replaceSelf = <T extends { [SYMBOL_DOM]: HTMLElement | HTMLElement[] } & Observable<HTMLElement>>(value: T, newNode: HTMLElement | HTMLElement[]) => {
 //   const node = value[SYMBOL_DOM]
@@ -27,8 +28,10 @@ import {useEnvironment, showEnvLog} from '../components/environment_context'
 // }
 
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
+  const env=useEnvironment()
   if (showEnvLog)
-    console.log('ENV resolveChild: ', useEnvironment())
+    console.log('ENV resolveChild: ', env)
+  const isSSR = env === 'ssr'
 
   if (isArray(value)) {
 
@@ -40,14 +43,16 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
   }
   else if (isFunction(value)) {
 
-    if (!isFunctionReactive(value)) {
+    if (!isFunctionReactive(value) || isSSR) { //SSR one time only
 
       if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
         (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
-      const newValue = $$(value)
-      // if (!replaceSelf(value as any, newValue as any))
-      resolveChild(newValue, setter, _dynamic, stack)
+        // EnvironmentContext.Provider(env, () => {
+          const newValue = value()
+          // if (!replaceSelf(value as any, newValue as any))
+          resolveChild(newValue, setter, _dynamic, stack)
+        // })
 
     } else {
 
@@ -65,6 +70,8 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
     }
 
   } else {
+    if (showEnvLog)
+      console.log('ENV resolveChild: ', useEnvironment())
 
     setter(value, _dynamic, stack)
 
@@ -157,6 +164,11 @@ export const resolveArraysAndStatics = (() => {
   const DUMMY_RESOLVED = []
 
   const resolveArraysAndStaticsInner = (values: any[], resolved: any[], hasObservables: boolean): [any[], boolean] => {
+    const isSSR = useEnvironment() === 'ssr'
+    if(showEnvLog)
+      console.log('ENV resolveArraysAndStaticsInner', useEnvironment())
+
+    const createText = isSSR ? createTextSSR :createTextDOM
 
     for (let i = 0, l = values.length; i < l; i++) {
 

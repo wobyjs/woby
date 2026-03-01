@@ -55,7 +55,7 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
         if (!$$(condition)) return
 
         // In SSR mode, we don't pass the portal to avoid issues
-        return isSSR ? render(children, null) : render(children, portal as Element)
+        return isSSR ? renderToString(children, null) : render(children, portal as Element)
 
     }, stack)
 

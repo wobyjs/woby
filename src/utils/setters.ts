@@ -8,7 +8,8 @@ import { untrack } from '../methods/soby'
 import { context, with as _with, batch, Observable, SYMBOL_OBSERVABLE_WRITABLE } from '../soby'
 import { SYMBOL_STORE_OBSERVABLE } from '../soby'
 import { classesToggle } from '../utils/classlist'
-import { createText, createComment } from '../utils/creators'
+import { createText as createTextDOM, createComment as createCommentDOM } from '../utils/creators'
+import { createText as createTextSSR, createComment as createCommentSSR } from '../utils/creators.ssr'
 import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isObject, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
@@ -75,8 +76,8 @@ export const setAttributeStatic = (() => {
 })()
 
 export const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
-
-    if (isFunction(value) && isFunctionReactive(value))
+    const isSSR = useEnvironment() === 'ssr'
+    if (isFunction(value) && isFunctionReactive(value) && !isSSR)
         if (isObservable(value) && value[SYMBOL_OBSERVABLE_WRITABLE]?.options?.toHtml) {
             useRenderEffect(() => {
                 const unwrappedValue = value()
@@ -112,6 +113,8 @@ export const setChildReplacementFunction = (parent: HTMLElement | Node, fragment
 }
 
 export const setChildReplacementText = (child: string, childPrev: Node): Node => {
+    const isSSR = useEnvironment() === 'ssr'
+    const createText = isSSR ? createTextSSR : createTextDOM
 
     if (childPrev.nodeType === 3) {
 
@@ -206,6 +209,12 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
     const prevFirst = prevIsArray ? prev[0] : prev
     const prevLast = prevIsArray ? prev[prevLength - 1] : prev
     const prevSibling = prevLast?.nextSibling || null
+
+    
+    const isSSR = useEnvironment() === 'ssr'
+    const createText = isSSR ? createTextSSR : createTextDOM
+    const createComment= isSSR?createCommentDOM : createCommentSSR
+
 
     if (prevLength === 0) { // Fast path for appending a node the first time
 
@@ -401,8 +410,9 @@ export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fra
 export const setClassStatic = classesToggle
 
 export const setClass = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean>, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
 
-    if (isFunction(value) && isFunctionReactive(value)) {
+    if (isFunction(value) && isFunctionReactive(value) && !isSSR) {
 
         useRenderEffect(() => {
 
@@ -435,8 +445,9 @@ export const setClassBooleanStatic = (element: HTMLElement, value: boolean, key:
 }
 
 export const setClassBoolean = (element: HTMLElement, value: boolean, key: FunctionMaybe<null | undefined | boolean | string>, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
 
-    if (isFunction(key) && isFunctionReactive(key)) {
+    if (isFunction(key) && isFunctionReactive(key) && !isSSR) {
 
         let keyPrev: null | undefined | boolean | string
 
@@ -573,8 +584,9 @@ export const setClassesStatic = (element: HTMLElement, object: null | undefined 
 }
 
 export const setClasses = (element: HTMLElement, object: Classes, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
 
-    if (isFunction(object) || isArray(object)) {
+    if (isFunction(object) || isArray(object) && !isSSR) {
 
         let objectPrev: Record<string, boolean> | undefined
 
@@ -809,8 +821,9 @@ export const setPropertyStatic = (element: HTMLElement | Comment, key: string, v
 }
 
 export const setProperty = (element: HTMLElement | Comment, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
 
-    if (isFunction(value) && isFunctionReactive(value)) {
+    if (isFunction(value) && isFunctionReactive(value) && !isSSR) {
 
         useRenderEffect(() => {
 
@@ -876,8 +889,9 @@ export const setStyleStatic = (() => {
 })()
 
 export const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | number | string>, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
 
-    if (isFunction(value) && isFunctionReactive(value)) {
+    if (isFunction(value) && isFunctionReactive(value) && !isSSR) {
 
         useRenderEffect(() => {
 
@@ -952,8 +966,9 @@ export const setStylesStatic = (element: HTMLElement, object: null | undefined |
 }
 
 export const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
 
-    if (isFunction(object) || isArray(object)) {
+    if (isFunction(object) || isArray(object ) && !isSSR) {
 
         let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
 
@@ -977,6 +992,8 @@ export const setStyles = (element: HTMLElement, object: FunctionMaybe<null | und
 
 
 export const setTemplateAccessor = (element: HTMLElement, key: string, value: TemplateActionProxy): void => {
+    const isSSR = useEnvironment() === 'ssr'
+    const createText = isSSR ? createTextSSR : createTextDOM
 
     if (key === 'children') {
 
