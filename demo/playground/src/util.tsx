@@ -49,13 +49,13 @@ export const registerTestObservable = (name: string, observable: Observable<any>
 
 // Custom useInterval that runs 4 times then stops to prevent spam
 export const useInterval = (callback, delay) => {
-    let count =0
-    const id = setInterval(()=>{
+    let count = 0
+    const id = setInterval(() => {
         callback()
         count++
 
-if(count>4)
-    clearInterval(id)
+        if (count > 4)
+            clearInterval(id)
     }, delay)
 
     // const count = $(0)
@@ -225,10 +225,19 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
             // Call tick immediately to see if this works
             tick()
         }
-        const observer = new MutationObserver(onMutation)
-        const options = { attributes: true, childList: true, characterData: true, subtree: true }
-        observer.observe(root, options)
-        return () => observer.disconnect()
+        // Check if MutationObserver exists (browser environment)
+        let observer: MutationObserver | null = null
+        if (typeof MutationObserver !== 'undefined' && root instanceof Node) {
+            observer = new MutationObserver(onMutation)
+            const options = { attributes: true, childList: true, characterData: true, subtree: true }
+            observer.observe(root, options)
+        }
+        return () => {
+            clearTimeout(timeoutId)
+            if (observer) {
+                observer.disconnect()
+            }
+        }
     })
     return (
         <div>

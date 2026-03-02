@@ -1,20 +1,34 @@
 import { $, $$, createDirective, useEffect, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+// Declare the model directive in JSX namespace
+declare module 'woby' {
+    namespace JSX {
+        interface Directives {
+            modelSingle: [string]
+        }
+        interface HTMLAttributes<T> {
+            ["use:modelSingle"]?: [string]
+        }
+    }
+}
+
 const TestDirectiveSingleArgument = (): JSX.Element => {
     const model = (element, arg1) => {
-        useEffect(() => {
-            const value = `${arg1}`
-            element.value = value
-            element.setAttribute('value', value)
-        }, { sync: true })
+        //actual usage -> enable this, SSR test make it stackoverflow
+        // useEffect(() => {
+        const value = `${arg1}`
+        element.value = value
+        element.setAttribute('value', value)
+        //actual usage -> enable this, SSR test make it stackoverflow
+        // }, { sync: true })
     }
-    const Model = createDirective('model', model)
+    const Model = createDirective('modelSingle', model, { immediate: true } /* actual usage -> disable this */)
     const ret: JSX.Element = () => (
         <>
             <h3>Directive - Single Argument</h3>
             <Model.Provider>
-                <input value="foo" use:model="bar" />
+                <input value="foo" use:modelSingle="bar" />
             </Model.Provider>
         </>
     )

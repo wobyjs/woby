@@ -1,20 +1,21 @@
 import { useBoolean } from '../hooks/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { render } from '../methods/render'
-import { renderToString } from '../methods/render_to_string'
 import { $$ } from '../methods/soby'
 import { createHTMLNode as createHTMLNodeDOM } from '../utils/creators'
 import { createHTMLNode as createHTMLNodeSSR } from '../utils/creators.ssr'
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
 import { useEnvironment } from '../components/environment_context'
+import { setChild } from '../utils/setters'
+import { FragmentUtils } from '../utils/fragment'
 
 
 export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Child, when?: FunctionMaybe<boolean>, wrapper?: Child, children?: Child }): ChildWithMetadata<{ portal: HTMLElement }> => {
     const isSSR = useEnvironment() === 'ssr'
 
     const createHTMLNode = isSSR ? createHTMLNodeSSR : createHTMLNodeDOM
-    const portal = $$(wrapper) || createHTMLNode('div'))
+    const portal = $$(wrapper) || createHTMLNode('div')
 
     // Use different validation based on environment
     if (isSSR) {
@@ -27,40 +28,46 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
 
     const stack = new Error()
 
-    useRenderEffect(() => {
+    if (!isSSR) {
+        useRenderEffect(() => {
 
-        if (!$$(condition)) return
+            if (!$$(condition)) return
 
-        // Use different parent selection based on environment
-        const parent: any = isSSR ?
-            ($$(mount) as any || createHTMLNode('div')) :
-            ($$(mount) || document.body)
+            // Use different parent selection based on environment
+            const parent: any = ($$(mount) || document.body)
 
-        // Use different validation based on environment
-        if (isSSR) {
-            if (!('appendChild' in (parent as HTMLElement))) throw new Error('Invalid mount node')
-        } else {
-            if (!(parent instanceof Element)) throw new Error('Invalid mount node')
-        }
+            // Use different validation based on environment
+            if (isSSR) {
+                if (!('appendChild' in (parent as HTMLElement))) throw new Error('Invalid mount node')
+            } else {
+                if (!(parent instanceof Element)) throw new Error('Invalid mount node')
+            }
 
-        parent.insertBefore(portal, null)
+            parent.insertBefore(portal, null)
 
-        return (): void => {
+            return (): void => {
 
-            parent.removeChild(portal)
+                parent.removeChild(portal)
 
-        }
+            }
 
-    }, stack)
+        }, stack)
 
-    useRenderEffect(() => {
+        useRenderEffect(() => {
 
-        if (!$$(condition)) return
+            if (!$$(condition)) return
 
-        // In SSR mode, we don't pass the portal to avoid issues
-        isSSR ? renderToString(children) : render(children, portal as Element)
+            // In SSR mode, we don't pass the portal to avoid issues
+            render(children, portal as Element)
 
-    }, stack)
+        }, stack)
+    }
+    else {
+        const parent: any = ($$(mount) as any || createHTMLNode('div'))
+        setChild(parent, children, FragmentUtils.make(), stack)
+        // renderToString(parent) // render on callee
+
+    }
 
     return assign(() => $$(condition) || children, { metadata: { portal: portal as HTMLElement } })
 

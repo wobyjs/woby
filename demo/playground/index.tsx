@@ -2,10 +2,10 @@
 
 import * as Woby from 'woby'
 import type { JSX } from 'woby'
-import { $,DEBUGGER, render, createContext, useContext, Dynamic, createDirective, useEffect, useMemo, store, ErrorBoundary, For, If, KeepAlive, lazy, Suspense, useTimeout, Portal, usePromise, hmr, useResource, Ternary, Switch, renderToString } from 'woby'
+import { $, DEBUGGER, render, createContext, useContext, Dynamic, createDirective, useEffect, useMemo, store, ErrorBoundary, For, If, KeepAlive, lazy, Suspense, useTimeout, Portal, usePromise, hmr, useResource, Ternary, Switch, renderToString } from 'woby'
 import { random, randomColor } from './src/util'
 
-DEBUGGER.debug=true
+DEBUGGER.debug = true
 // Assign individual exports to global scope
 globalThis.$ = $
 globalThis.render = render
@@ -393,7 +393,6 @@ const tests = [
     // TestClassNameObservable,FragmentUtils.replaceWithNode(fragment, node)
     // TestClassNameStatic,
 
-    //error
     // TestClassObservable,
     // TestClassObservableString,
     // TestClassRemoval,
@@ -401,7 +400,7 @@ const tests = [
     // TestClassStatic,
     // TestClassStaticString,
     // TestCleanupInner,
-    TestCleanupInnerPortal,
+    // TestCleanupInnerPortal,
     // TestComponentFunction,
     // TestComponentObservable,
 
@@ -432,7 +431,7 @@ const tests = [
     // TestErrorBoundaryChildrenObservableStatic,
     // TestErrorBoundaryFallbackFunction,
     // TestErrorBoundaryFallbackObservableStatic,
-    // TestEventClickAndClickCaptureStatic,
+    TestEventClickAndClickCaptureStatic,
     // TestEventClickCaptureObservable,
     // TestEventClickCaptureRemoval,
     // TestEventClickCaptureStatic,

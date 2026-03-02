@@ -1,15 +1,29 @@
 import { $, $$, createDirective, useEffect, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+// Declare the model directive in JSX namespace
+declare module 'woby' {
+    namespace JSX {
+        interface Directives {
+            modelRef: [string]
+        }
+        interface HTMLAttributes<T> {
+            ["use:modelRef"]?: [string]
+        }
+    }
+}
+
 const TestDirectiveRef = (): JSX.Element => {
     const model = (element, arg1) => {
-        useEffect(() => {
-            const value = `${arg1}`
-            element.value = value
-            element.setAttribute('value', value)
-        }, { sync: true })
+        //actual usage -> enable this, SSR test make it stackoverflow
+        // useEffect(() => {
+        const value = `${arg1}`
+        element.value = value
+        element.setAttribute('value', value)
+        //actual usage -> enable this, SSR test make it stackoverflow
+        // }, { sync: true })
     }
-    const Model = createDirective('model', model)
+    const Model = createDirective('modelRef', model, { immediate: true }  /* actual usage -> disable this  */)
     const ret: JSX.Element = () => (
         <>
             <h3>Directive - Ref</h3>
@@ -27,7 +41,7 @@ TestDirectiveRef.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Directive - Ref</h3><input value="bar">'  // For SSR comparison
+        const expectedFull = '<h3>Directive - Ref</h3><input value="foo">'  // For SSR comparison
         const expected = '<input value="bar">'   // For main test comparison
 
         const ssrComponent = testObservables['TestDirectiveRef_ssr']

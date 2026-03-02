@@ -21,6 +21,8 @@ export class BaseNode {
     classList: {
         toggle: (className: string, force?: boolean) => boolean
     }
+    // Event listener implementation
+    _eventListeners: Map<string, Array<(event: any) => void>>
 
     constructor(nodeType: number) {
         this.nodeType = nodeType
@@ -32,36 +34,70 @@ export class BaseNode {
         // Initialize classList with toggle method
         this.classList = {
             toggle: (className: string, force?: boolean): boolean => {
-                const currentClass = this.attributes['class'] || '';
-                const classes = currentClass ? currentClass.split(' ').filter(c => c) : [];
-                const index = classes.indexOf(className);
-                const hasClass = index !== -1;
-                
+                const currentClass = this.attributes['class'] || ''
+                const classes = currentClass ? currentClass.split(' ').filter(c => c) : []
+                const index = classes.indexOf(className)
+                const hasClass = index !== -1
+
                 // If force is not provided, toggle the class
                 if (force === undefined) {
                     if (hasClass) {
-                        classes.splice(index, 1);
+                        classes.splice(index, 1)
                     } else {
-                        classes.push(className);
+                        classes.push(className)
                     }
                 } else {
                     // If force is provided, add or remove based on force value
                     if (force && !hasClass) {
-                        classes.push(className);
+                        classes.push(className)
                     } else if (!force && hasClass) {
-                        classes.splice(index, 1);
+                        classes.splice(index, 1)
                     }
                 }
-                
+
                 // Update the class attribute
-                const newClass = classes.join(' ');
+                const newClass = classes.join(' ')
                 if (newClass !== currentClass) {
-                    this.setAttribute('class', newClass);
+                    this.setAttribute('class', newClass)
                 }
-                
-                return force !== undefined ? force : !hasClass;
+
+                return force !== undefined ? force : !hasClass
             }
-        };
+        }
+        // Initialize event listeners map
+        this._eventListeners = new Map()
+    }
+
+    addEventListener(type: string, listener: (event: any) => void) {
+        if (!this._eventListeners.has(type)) {
+            this._eventListeners.set(type, [])
+        }
+        const listeners = this._eventListeners.get(type)!
+        if (!listeners.includes(listener)) {
+            listeners.push(listener)
+        }
+    }
+
+    removeEventListener(type: string, listener: (event: any) => void) {
+        if (this._eventListeners.has(type)) {
+            const listeners = this._eventListeners.get(type)!
+            const index = listeners.indexOf(listener)
+            if (index > -1) {
+                listeners.splice(index, 1)
+            }
+        }
+    }
+
+    dispatchEvent(event: any) {
+        const eventType = event.type
+        if (this._eventListeners.has(eventType)) {
+            const listeners = this._eventListeners.get(eventType)!
+            for (const listener of listeners) {
+                listener(event)
+            }
+        }
+        // Return true to indicate the event was not cancelled
+        return true
     }
 
     appendChild(child: any) {
@@ -69,7 +105,7 @@ export class BaseNode {
 
         // Set the parent node
         if (child) {
-                child.parentNode = this
+            child.parentNode = this
         }
 
         this.childNodes.push(child)
@@ -166,7 +202,7 @@ export class BaseNode {
 
         // Remove the parent reference from old child
         oldChild.parentNode = null
-        
+
         // Set the parent node for new child
         if (newChild) {
             newChild.parentNode = this

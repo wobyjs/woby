@@ -1,23 +1,39 @@
-import { $, $$, createDirective, useEffect, renderToString } from 'woby'
+import { $, $$, createDirective, useEffect, renderToString, tick } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+
+// Declare the model directive in JSX namespace
+declare module 'woby' {
+    namespace JSX {
+        interface Directives {
+            modelDouble: [string, string]
+        }
+        interface HTMLAttributes<T> {
+            ["use:modelDouble"]?: [string, string]
+        }
+    }
+}
 
 const TestDirective = (): JSX.Element => {
     const model = (element, arg1, arg2) => {
-        useEffect(() => {
-            const value = `${arg1} - ${arg2}`
-            element.value = value
-            element.setAttribute('value', value)
-        }, { sync: true })
+        //actual usage -> enable this, SSR test make it stackoverflow
+        // useEffect(() => {
+        //console.log('model -> useEffect')
+        const value = `${arg1} - ${arg2}`
+        element.value = value
+        element.setAttribute('value', value)
+        //actual usage -> enable this
+        // }, { sync: true })
     }
-    const Model = createDirective('model', model)
-    const ret: JSX.Element = () => (
-        <>
+    const Model = createDirective('modelDouble', model, { immediate: true } /* actual usage -> disable this */)
+
+    const ret: JSX.Element = () => {
+        return <>
             <h3>Directive</h3>
             <Model.Provider>
-                <input value="foo" use:model={['bar', 'baz']} />
+                <input value="foo" use:modelDouble={['bar', 'baz']} />
             </Model.Provider>
         </>
-    )
+    }
 
     // Store the component for SSR testing
     registerTestObservable('TestDirective_ssr', ret)

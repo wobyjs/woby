@@ -41,8 +41,8 @@ TestContextHook.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Context - Hook</h3><p>outer</p><p>inner</p><p>outer</p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Function provider: function-value</p>'  // For SSR comparison
-        const expected = '<p>outer</p><p>inner</p><p>outer</p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Function provider: function-value</p>'   // For main test comparison
+        const expectedFull = '<h3>Context - Hook</h3><context-provider value="outer" symbol="Symbol()"><p>outer</p><context-provider value="inner" symbol="Symbol()"><p>inner</p></context-provider><p>outer</p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="function-value" symbol="Symbol()"><p>Function provider: function-value</p></context-provider>'  // For SSR comparison
+        const expected = '<context-provider value="outer"><p>outer</p><context-provider value="inner"><p>inner</p></context-provider><p>outer</p></context-provider><h3>Context.Provider(value, () =&gt; ) Test</h3><context-provider value="function-value"><p>Function provider: function-value</p></context-provider>'   // For main test comparison
 
         const ssrComponent = testObservables['TestContextHook_ssr']
         const ssrResult = renderToString(ssrComponent)

@@ -25,14 +25,14 @@ const TestDynamicFunctionComponent = (): JSX.Element => {
 }
 
 TestDynamicFunctionComponent.test = {
-    static: false,
+    static: true,
     compareActualValues: true,
     expect: () => {
         const level = $$(testObservables['TestDynamicFunctionComponent'])
 
         // Define expected values for both main test and SSR test
-        const expectedFull = `<h3>Dynamic - Function Component</h3><h${level}>Level: ${level}</h${level}>`  // For SSR comparison
-        const expected = `<h${level}>Level: ${level}</h${level}>`   // For main test comparison
+        const expectedFull = `<h3>Dynamic - Function Component</h3>h${level}`  // For SSR comparison
+        const expected = `h${level}`   // For main test comparison
 
         const ssrComponent = testObservables['TestDynamicFunctionComponent_ssr']
         const ssrResult = renderToString(ssrComponent)

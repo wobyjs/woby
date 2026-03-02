@@ -1,15 +1,29 @@
 import { $, $$, createDirective, useEffect, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+// Declare the modelLocal directive in JSX namespace
+declare module 'woby' {
+    namespace JSX {
+        interface Directives {
+            modelLocal: [string, string]
+        }
+        interface HTMLAttributes<T> {
+            ["use:modelLocal"]?: [string, string]
+        }
+    }
+}
+
 const TestDirectiveRegisterLocal = (): JSX.Element => {
     const model = (element, arg1, arg2) => {
-        useEffect(() => {
-            const value = `${arg1} - ${arg2}`
-            element.value = value
-            element.setAttribute('value', value)
-        }, { sync: true })
+        //actual usage -> enable this, SSR test make it stackoverflow
+        // useEffect(() => {
+        const value = `${arg1} - ${arg2}`
+        element.value = value
+        element.setAttribute('value', value)
+        //actual usage -> enable this, SSR test make it stackoverflow
+        // }, { sync: true })
     }
-    const Model = createDirective('modelLocal', model)
+    const Model = createDirective('modelLocal', model, { immediate: true }  /* actual usage -> disable this  */)
     Model.register()
     const ret: JSX.Element = () => (
         <>

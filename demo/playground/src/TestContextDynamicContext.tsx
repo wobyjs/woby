@@ -54,8 +54,8 @@ TestContextDynamicContext.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Dynamic - Context</h3><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p>'  // For SSR comparison
-        const expected = '<p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><h3>Context.Provider(value, () =&gt; ) Test</h3><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p>'   // For main test comparison
+        const expectedFull = '<h3>Dynamic - Context</h3><context-provider value="context" symbol="Symbol()"><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="dynamic-function-value" symbol="Symbol()"><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p></context-provider>'  // For SSR comparison
+        const expected = '<context-provider value="context"><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p></context-provider><h3>Context.Provider(value, () =&gt; ) Test</h3><context-provider value="dynamic-function-value"><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p></context-provider>'   // For main test comparison
 
         const ssrComponent = testObservables['TestContextDynamicContext_ssr']
         const ssrResult = renderToString(ssrComponent)

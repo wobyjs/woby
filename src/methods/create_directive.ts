@@ -14,8 +14,10 @@ export const createDirective = <T extends keyof JSX.Directives>(name: T, fn: Dir
   const symbol = (SYMBOLS_DIRECTIVES[name] ||= Symbol())
 
   const Provider = ({ children }: { children: Child }): Child => {
+    console.log('createDirective -> Provider')
 
     return context({ [symbol]: data }, () => {
+      console.log('createDirective -> Provider -> context')
 
       return resolve(children)
 
@@ -24,6 +26,7 @@ export const createDirective = <T extends keyof JSX.Directives>(name: T, fn: Dir
   }
 
   const ref = (...args: ExtractArray<JSX.Directives[T]>) => {
+    console.log('createDirective -> ref')
 
     return (element: Element): void => {
 
@@ -34,6 +37,7 @@ export const createDirective = <T extends keyof JSX.Directives>(name: T, fn: Dir
   }
 
   const register = (): void => {
+    console.log('createDirective -> register')
 
     if (symbol in DIRECTIVES) throw new Error('Directive "name" is already registered')
 

@@ -1,7 +1,7 @@
 import { $, $$, If, renderToString } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-const TestCleanupInner = () => {
+export const TestCleanupInner = () => {
     const page = $(true)
     registerTestObservable('TestCleanupInner', page)
     const togglePage = () => page(prev => !prev)

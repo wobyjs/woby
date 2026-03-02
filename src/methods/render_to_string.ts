@@ -7,12 +7,12 @@ import { createHTMLNode } from '../utils/creators.ssr'
 import { $$, context, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'
 import { isFunction } from '../utils/lang'
-import { EnvironmentContext, useEnvironment } from '../components/environment_context'
+import { EnvironmentContext, useEnvironment, showEnvLog } from '../components/environment_context'
 
 export const renderToString = (child: Child): string => {
     return EnvironmentContext.Provider('ssr', () => {
-
-        console.log('ENV renderToString:', useEnvironment())
+        if (showEnvLog)
+            console.log('ENV renderToString:', useEnvironment())
         // Create a container for SSR using HTMLNode
         const container = createHTMLNode('div')
         const stack = new Error()
@@ -20,12 +20,15 @@ export const renderToString = (child: Child): string => {
         // Use a fragment for the root
         const fragment = FragmentUtils.make()
 
+        console.log('renderToString -> setChild')
         // Set the child content
         setChild(container, child, fragment, stack)
 
         // Get the rendered content from the container's children
         const children = Array.from(container.childNodes || [])
         const childrenContent = children.map((child: any) => {
+            console.log('getNodeContent(child)', getNodeContent(child))
+
             return getNodeContent(child)
         }).join('')
 

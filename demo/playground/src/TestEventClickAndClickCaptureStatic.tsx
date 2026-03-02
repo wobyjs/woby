@@ -53,7 +53,7 @@ TestEventClickAndClickCaptureStatic.test = {
         // Extract the button value from SSR result to use for comparison
         const match = ssrResult.match(/<button[^>]*>(.*?)<\/button>/)
         const ssrValue = match ? match[1] : '0'
-        const expectedFull = `<h3>Event - Click &amp; Click Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
+        const expectedFull = `<h3>Event - Click & Click Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
         // Handle HTML entity encoding in SSR output
         if (ssrResult !== expectedFull) {
             assert(false, `[TestEventClickAndClickCaptureStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
