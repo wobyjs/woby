@@ -213,7 +213,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
     
     const isSSR = useEnvironment() === 'ssr'
     const createText = isSSR ? createTextSSR : createTextDOM
-    const createComment= isSSR?createCommentDOM : createCommentSSR
+    const createComment= isSSR?createCommentSSR : createCommentDOM
 
 
     if (prevLength === 0) { // Fast path for appending a node the first time
@@ -239,9 +239,9 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
             const node = child as Node
 
             if (!fragmentOnly) {
-
+try{
                 parent.insertBefore(node, null)
-
+}catch{debugger}
             }
 
             FragmentUtils.replaceWithNode(fragment, node)
@@ -359,9 +359,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
                     for (const node of next) parent.appendChild(node)
 
                 } else {
-
                     parent.appendChild(next)
-
                 }
 
             }
@@ -602,7 +600,7 @@ export const setClasses = (element: HTMLElement, object: Classes, stack: Stack):
 
     } else {
 
-        setClassesStatic(element, object, null, stack)
+        setClassesStatic(element, object as any, null, stack)
 
     }
 

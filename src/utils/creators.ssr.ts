@@ -1,5 +1,5 @@
 import type { FN } from '../types'
-import { BaseNode } from '../methods/ssr.obj'
+import { BaseNode } from '../ssr/base_node'
 
 // Enhanced mock implementations for SSR without happy-dom
 // These implementations better support the html`` template pattern from index.tsx
@@ -18,13 +18,24 @@ export const createHTMLNode = ((tagName: string) => {
     class HTMLNode extends BaseNode {
         tagName: string
         style: any
-        className: string
+        #className: string
 
         constructor() {
             super(1)
             this.tagName = tagName.toUpperCase()
             this.style = {}
-            this.className = ''
+            this.#className = ''
+        }
+
+        set className(value: string) {
+            this.#className = value
+            // Also update the attributes object to keep them in sync
+            // Directly update the attributes to avoid circular calls
+            this.attributes['class'] = value
+        }
+
+        get className(): string {
+            return this.#className
         }
 
         // Override setAttribute for special HTML handling
@@ -33,8 +44,10 @@ export const createHTMLNode = ((tagName: string) => {
             if (name === 'style') {
                 this.style = value
             } else if (name === 'class' || name === 'className') {
+                // Use the setter to ensure synchronization
                 this.className = value
             }
+            // Always call the parent setAttribute to ensure the attribute is stored in this.attributes
             super.setAttribute(name, value)
         }
 
@@ -102,12 +115,25 @@ export const createSVGNode = ((tagName: string) => {
         tagName: string
         isSVG: boolean
         style: any
+        #className: string
 
         constructor() {
             super(1)
             this.tagName = tagName.toUpperCase()
             this.isSVG = true
             this.style = {}
+            this.#className = ''
+        }
+
+        set className(value: string) {
+            this.#className = value
+            // Also update the attributes object to keep them in sync
+            // Directly update the attributes to avoid circular calls
+            this.attributes['class'] = value
+        }
+
+        get className(): string {
+            return this.#className
         }
 
         // Getter for outerHTML

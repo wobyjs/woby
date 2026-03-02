@@ -3,7 +3,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 import TestCleanupInner from './TestCleanupInner'
 
 const TestCleanupInnerPortal = () => {
-    const ret = (
+    const ret = () => (
         <Portal mount={document.body}>
             <TestCleanupInner />
         </Portal>
@@ -12,7 +12,7 @@ const TestCleanupInnerPortal = () => {
     // Store the component for SSR testing
     registerTestObservable('TestCleanupInnerPortal_ssr', ret)
 
-    return ret
+    return null //ret
 }
 
 TestCleanupInnerPortal.test = {

@@ -16,6 +16,10 @@ const TestABCD = (): JSX.Element => {
 
     const getCurrentElement =  ()=>states[index()]
 
+     //why must fn component ?
+     //ret is shared with browser & ssr
+     //return component directly pin jsx to use browser env
+     //same for states
     const ret: JSX.Element = () => (
         <>
             <h3>Children - ABCD</h3>
@@ -48,10 +52,10 @@ TestABCD.test = {
         ]
         // Actual SSR output format
         const actualElements = [
-            '<H3>Children - ABCD</H3><P><I>a</I></P>',
-            '<H3>Children - ABCD</H3><P><U>b</U></P>',
-            '<H3>Children - ABCD</H3><P><B>c</B></P>',
-            '<H3>Children - ABCD</H3><P><SPAN>d</SPAN></P>'
+            '<h3>Children - ABCD</h3><p><i>a</i></p>',
+            '<h3>Children - ABCD</h3><p><u>b</u></p>',
+            '<h3>Children - ABCD</h3><p><b>c</b></p>',
+            '<h3>Children - ABCD</h3><p><span>d</span></p>'
         ]
         const expectedFull = actualElements[idx]
         if (ssrResult !== expectedFull) {

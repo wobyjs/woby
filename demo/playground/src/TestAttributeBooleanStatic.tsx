@@ -23,7 +23,7 @@ TestAttributeBooleanStatic.test = {
 
         const ssrComponent = testObservables['TestAttributeBooleanStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<H3>Attribute Boolan - Static</H3><P disabled="">content</P><P>content</P>`
+        const expectedFull = `<h3>Attribute Boolan - Static</h3><p disabled="">content</p><p>content</p>`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeBooleanStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

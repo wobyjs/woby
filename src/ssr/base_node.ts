@@ -17,6 +17,10 @@ export class BaseNode {
     _mutations$: any
     // List of observers watching this node
     _observers: Array<{ observer: any, options: MutationObserverInit }> = []
+    // ClassList implementation
+    classList: {
+        toggle: (className: string, force?: boolean) => boolean
+    }
 
     constructor(nodeType: number) {
         this.nodeType = nodeType
@@ -25,6 +29,39 @@ export class BaseNode {
         this.parentNode = null
         // Create observable for mutations
         this._mutations$ = $([])
+        // Initialize classList with toggle method
+        this.classList = {
+            toggle: (className: string, force?: boolean): boolean => {
+                const currentClass = this.attributes['class'] || '';
+                const classes = currentClass ? currentClass.split(' ').filter(c => c) : [];
+                const index = classes.indexOf(className);
+                const hasClass = index !== -1;
+                
+                // If force is not provided, toggle the class
+                if (force === undefined) {
+                    if (hasClass) {
+                        classes.splice(index, 1);
+                    } else {
+                        classes.push(className);
+                    }
+                } else {
+                    // If force is provided, add or remove based on force value
+                    if (force && !hasClass) {
+                        classes.push(className);
+                    } else if (!force && hasClass) {
+                        classes.splice(index, 1);
+                    }
+                }
+                
+                // Update the class attribute
+                const newClass = classes.join(' ');
+                if (newClass !== currentClass) {
+                    this.setAttribute('class', newClass);
+                }
+                
+                return force !== undefined ? force : !hasClass;
+            }
+        };
     }
 
     appendChild(child: any) {
@@ -32,13 +69,7 @@ export class BaseNode {
 
         // Set the parent node
         if (child) {
-            try {
                 child.parentNode = this
-            }
-            catch (ex) {
-                console.error(ex)
-                debugger
-            }
         }
 
         this.childNodes.push(child)

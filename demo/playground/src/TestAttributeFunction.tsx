@@ -29,7 +29,7 @@ TestAttributeFunction.test = {
         const ssrComponent = testObservables['TestAttributeFunction_ssr']
         const ssrResult = renderToString(ssrComponent)
         const currentValue = $$(testObservables['TestAttributeFunction'])
-        const expectedFull = `<H3>Attribute - Function</H3><P data-color="dark${currentValue}">content</P>`
+        const expectedFull = `<h3>Attribute - Function</h3><p data-color="dark${currentValue}">content</p>`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestAttributeFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

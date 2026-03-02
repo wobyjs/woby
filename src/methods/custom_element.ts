@@ -39,7 +39,8 @@ import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from 
 import { ObservableMaybe, Child, Component } from "../types"
 import { useLightDom } from "../hooks/use_attached"
 import { mark } from "../utils/mark"
-import { customElements as ces, document as doc } from './ssr.obj'
+import { customElements as ces } from '../ssr/custom_elements'
+import { document as doc } from '../ssr/document'
 
 if (isSSR) {
     globalThis.customElements = ces as any

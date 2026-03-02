@@ -337,16 +337,16 @@ globalThis.Woby = Woby
 /* MAIN */
 
 const tests = [
-    TestABCD,
-    TestAttributeBooleanStatic,
-    TestAttributeFunction,
-    TestAttributeFunctionBoolean,
-    TestAttributeObservable,
-    TestAttributeObservableBoolean,
-    TestAttributeRemoval,
-    TestAttributeStatic,
-    TestBigIntFunction,
-    TestBigIntObservable,
+    // TestABCD,
+    // TestAttributeBooleanStatic,
+    // TestAttributeFunction,
+    // TestAttributeFunctionBoolean,
+    // TestAttributeObservable,
+    // TestAttributeObservableBoolean,
+    // TestAttributeRemoval,
+    // TestAttributeStatic,
+    // TestBigIntFunction,
+    // TestBigIntObservable,
 
     // TestBigIntRemoval,
     // TestBigIntStatic,
@@ -390,9 +390,10 @@ const tests = [
     // TestClassFunction,
     // TestClassFunctionString,
     // TestClassNameFunction,
-    // TestClassNameObservable,
+    // TestClassNameObservable,FragmentUtils.replaceWithNode(fragment, node)
     // TestClassNameStatic,
 
+    //error
     // TestClassObservable,
     // TestClassObservableString,
     // TestClassRemoval,
@@ -400,7 +401,7 @@ const tests = [
     // TestClassStatic,
     // TestClassStaticString,
     // TestCleanupInner,
-    // TestCleanupInnerPortal,
+    TestCleanupInnerPortal,
     // TestComponentFunction,
     // TestComponentObservable,
 

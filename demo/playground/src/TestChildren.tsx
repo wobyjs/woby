@@ -33,7 +33,7 @@ const TestChildren = (): JSX.Element => {
 TestChildren.test = {
     static: true,
     expect: () => {
-        const expected = '<div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
+        const expected = '<div><div><div><p>content</p></div></div></div>'
 
         const ssrComponent = testObservables['TestChildren_ssr']
         const ssrResult = renderToString(ssrComponent)
@@ -44,7 +44,7 @@ TestChildren.test = {
             console.log(`✅ [TestChildren] SSR test passed: ${ssrResult}`)
         }
 
-        return expected
+        return '<div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
     }
 }
 

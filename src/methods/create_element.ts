@@ -19,7 +19,7 @@ import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { customElement } from './custom_element'
 import { Stack } from 'soby'
-import { customElements as ces } from './ssr.obj'
+import { customElements as ces } from '../ssr/custom_elements'
 // import { isSSR } from '../constants'
 import {useEnvironment,showEnvLog}from '../components/environment_context'
 

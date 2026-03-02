@@ -11,7 +11,7 @@ import { wrapCloneElement, CloneableType } from '../methods/wrap_clone_element'
 import { createElement } from '../index'
 import { isObject, isString } from '../utils/lang'
 import { isSSR, SYMBOL_CLONE, SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
-import { customElements as ces } from '../methods/ssr.obj'
+import { customElements as ces } from '../ssr/custom_elements'
 import {useEnvironment, showEnvLog} from '../components/environment_context'
 
 const wrapJsx = <P>(props: P) => {

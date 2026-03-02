@@ -21,7 +21,7 @@ const TestBooleanObservable = (): JSX.Element => {
 TestBooleanObservable.test = {
     static: true,
     expect: () => {
-        const expected = '<p><!----></p>'
+        const expected = '<p></p>'
 
         const ssrComponent = testObservables['TestBooleanObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
@@ -32,7 +32,7 @@ TestBooleanObservable.test = {
             console.log(`✅ [TestBooleanObservable] SSR test passed: ${ssrResult}`)
         }
 
-        return expected
+        return '<p><!----></p>'
     }
 }
 
