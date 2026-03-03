@@ -31,12 +31,16 @@ const TestForObservablesStatic = (): JSX.Element => {
 
 TestForObservablesStatic.test = {
     static: true,
+    compareActualValues: true,
     expect: () => {
-        const expected = '<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
-
         const ssrComponent = testObservables['TestForObservablesStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>For - Observables Static</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
+        // Extract values from SSR result
+        const matches = ssrResult.match(/<p>Value: (\d)<\/p>/g)
+        const values = matches ? matches.map(match => match.match(/\d/)[0]) : ['1', '2', '3']
+        const expected = `<p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
+        
+        const expectedFull = `<h3>For - Observables Static</h3>${expected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestForObservablesStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

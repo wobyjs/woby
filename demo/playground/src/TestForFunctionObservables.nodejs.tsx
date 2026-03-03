@@ -1,4 +1,5 @@
 import { $, $$, For, Observable, renderToString } from 'woby'
+// import { $, $$, For, Observable, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestForFunctionObservables = (): JSX.Element => {
@@ -45,4 +46,4 @@ TestForFunctionObservables.test = {
 }
 
 
-export default () => <TestSnapshots Component={TestForFunctionObservables} />
+console.log(renderToString(<TestForFunctionObservables />))

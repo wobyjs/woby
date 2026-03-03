@@ -19,8 +19,8 @@ const TestEventEnterAndEnterCaptureStatic = (): JSX.Element => {
                 cancelBubble: false
             }
 
-            if (button._onpointerenter) {
-                button._onpointerenter.call(button, mockEvent)
+            if (button.onpointerenter) {
+                button.onpointerenter.call(button, mockEvent)
             }
             if (button._onpointerentercapture) {
                 button._onpointerentercapture.call(button, mockEvent)
@@ -61,7 +61,7 @@ TestEventEnterAndEnterCaptureStatic.test = {
         // Extract the button value from SSR result to use for comparison
         const match = ssrResult.match(/<button[^>]*>(.*?)<\/button>/)
         const ssrValue = match ? match[1] : '0'
-        const expectedFull = `<h3>Event - Enter &amp; Enter Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
+        const expectedFull = `<h3>Event - Enter & Enter Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
         // Handle HTML entity encoding in SSR output
         if (ssrResult !== expectedFull) {
             assert(false, `[TestEventEnterAndEnterCaptureStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)

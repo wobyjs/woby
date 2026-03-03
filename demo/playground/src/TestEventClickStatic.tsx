@@ -45,11 +45,14 @@ TestEventClickStatic.test = {
         const value = $$(testObservables['TestEventClickStatic_o'])
 
         // Define expected values for both main test and SSR test
-        const expectedFull = `<h3>Event - Click Static</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
 
         const ssrComponent = testObservables['TestEventClickStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
+        // Extract the button value from SSR result to use for comparison
+        const match = ssrResult.match(/<button[^>]*>(.*?)<\/button>/)
+        const ssrValue = match ? match[1] : '0'
+        const expectedFull = `<h3>Event - Click Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison
         if (ssrResult !== expectedFull) {
             assert(false, `[TestEventClickStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

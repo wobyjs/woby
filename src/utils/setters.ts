@@ -645,14 +645,16 @@ export const setEventStatic = (() => {
         onkeydown: ['_onkeydown', false],
         onkeyup: ['_onkeyup', false],
         onmousedown: ['_onmousedown', false],
-        onmouseenter: ['_onmouseenter', false],
-        onmouseleave: ['_onmouseleave', false],
+        // onmouseenter: ['_onmouseenter', false], //not bubbling event
+        // onmouseleave: ['_onmouseleave', false], //not bubbling event
         onmousemove: ['_onmousemove', false],
         onmouseout: ['_onmouseout', false],
         onmouseover: ['_onmouseover', false],
         onmouseup: ['_onmouseup', false],
         onpointerdown: ['_onpointerdown', false],
         onpointermove: ['_onpointermove', false],
+        // onpointerenter: ['_onpointerenter', false], //not bubbling event 
+        // onpointerleave: ['_onpointerleave', false], //not bubbling event 
         onpointerout: ['_onpointerout', false],
         onpointerover: ['_onpointerover', false],
         onpointerup: ['_onpointerup', false],

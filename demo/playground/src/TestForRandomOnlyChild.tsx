@@ -29,11 +29,11 @@ TestForRandomOnlyChild.test = {
     compareActualValues: true,
     expect: () => {
         const values = $$(testObservables['TestForRandomOnlyChild'])
-        const expected = `<p>${values[0]}</p><p>${values[1]}</p><p>${values[2]}</p>`
+        const expected = `<p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
 
         const ssrComponent = testObservables['TestForRandomOnlyChild_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>For - Random</h3>${expected}`
+        const expectedFull = `<h3>For - Random</h3><p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestForRandomOnlyChild] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

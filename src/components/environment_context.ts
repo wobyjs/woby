@@ -8,4 +8,4 @@ export type EnvironmentType = 'browser' | 'ssr' | 'via'
 export const EnvironmentContext = { Provider: <C extends () => R, R>(env: EnvironmentType, callback) => context({ [EnvironmentToken]: env }, callback) }
 export const useEnvironment = () => context(EnvironmentToken) //useContext(EnvironmentContext)
 
-export const showEnvLog = true
+export const showEnvLog = false

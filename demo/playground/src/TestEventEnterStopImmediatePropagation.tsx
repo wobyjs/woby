@@ -40,8 +40,8 @@ const TestEventEnterStopImmediatePropagation = (): JSX.Element => {
                 stopPropagation: () => { },
                 stopImmediatePropagation: () => { }
             }
-            if (buttonInner._onpointerenter) {
-                buttonInner._onpointerenter.call(buttonInner, mockEvent)
+            if (buttonInner.onpointerenter) {
+                buttonInner.onpointerenter.call(buttonInner, mockEvent)
             }
         }
     }, TEST_INTERVAL)
@@ -49,7 +49,12 @@ const TestEventEnterStopImmediatePropagation = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
             <h3>Event - Enter - Stop Immediate Propagation</h3>
-            <p><button ref={refOuter} onPointerEnter={onEnterOuter}>{outer}<button ref={refInner} onPointerEnter={onEnterInner}>{inner}</button></button></p>
+            <p>
+                <button ref={refOuter} onPointerEnter={onEnterOuter}>
+                    {outer}
+                    <button ref={refInner} onPointerEnter={onEnterInner}>{inner}</button>
+                </button>
+            </p>
         </>
     )
 
@@ -61,7 +66,7 @@ const TestEventEnterStopImmediatePropagation = (): JSX.Element => {
 
 
 TestEventEnterStopImmediatePropagation.test = {
-    static: true,
+    static: false,
     compareActualValues: true,
     expect: () => {
         let expected, expectedFull

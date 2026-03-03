@@ -55,7 +55,7 @@ const TestEventEnterStopPropagation = (): JSX.Element => {
 
 
 TestEventEnterStopPropagation.test = {
-    static: true,
+    static: false,
     compareActualValues: true,
     expect: () => {
         let expected, expectedFull
