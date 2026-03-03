@@ -1,0 +1,8 @@
+764c764
+< setEventStatic(element, event, $(value))
+---
+> setEventStatic(element, event, $$(value))
+1097c1097
+< setEvent(element, key.toLowerCase(), value)
+---
+> setEvent(element, key.toLowerCase(), value, stack)

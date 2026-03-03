@@ -756,13 +756,12 @@ export const setEventStatic = (() => {
 export const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>, stack: Stack): void => {
     const isSSR = useEnvironment() === 'ssr'
 
-    // if (isFunction(value) && isFunctionReactive(value) /* && !isSSR */) {
-    if (isObservable(value))
+    if (isFunction(value) && isFunctionReactive(value) && !isSSR) {
         useRenderEffect(() => {
-            setEventStatic(element, event, $$(value) as any)
+            setEventStatic(element, event, value())
         }, stack)
-    else {
-        setEventStatic(element, event, value)
+    } else {
+        setEventStatic(element, event, $(value))
     }
 }
 
@@ -1095,7 +1094,7 @@ export const setProp = (element: HTMLElement | Comment, key: string, value: any,
 
         } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
 
-            setEvent(element, key.toLowerCase(), value, stack)
+            setEvent(element, key.toLowerCase(), value)
 
         } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
 
@@ -1127,3 +1126,4 @@ export const setProps = (element: HTMLElement | Comment, object: Record<string, 
     }
 
 }
+

@@ -56,13 +56,13 @@ TestEventClickObservable.test = {
         const expectedFull = `<h3>Event - Click Observable</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
 
-            const ssrComponent = testObservables['TestEventClickObservable_ssr']
-            const ssrResult = renderToString(ssrComponent)
-            if (ssrResult !== expectedFull) {
-                assert(false, `[TestEventClickObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-            } else {
-                console.log(`✅ [TestEventClickObservable] SSR test passed: ${ssrResult}`)
-            }
+        const ssrComponent = testObservables['TestEventClickObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestEventClickObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        } else {
+            console.log(`✅ [TestEventClickObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

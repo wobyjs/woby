@@ -34,7 +34,7 @@ const TestEventClickRemoval = (): JSX.Element => {
                     button._onclick.call(button, mockEvent)
                 } else {
                     // Fallback to regular click if no delegated handler
-                    button.click()
+                    button.click?.()
                 }
             }
         }, TEST_INTERVAL)
@@ -65,7 +65,7 @@ const TestEventClickRemoval = (): JSX.Element => {
 TestEventClickRemoval.test = {
     static: false,
     expect: () => {
-        const value = testObservables['TestEventClickRemoval_o']?.() ?? 0
+        const value = $$(testObservables['TestEventClickRemoval_o']) ?? 0
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Event - Click Removal</h3><p><button>${value}</button></p>`  // For SSR comparison
