@@ -144,7 +144,9 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
 
     if (type === 'string' || type === 'number' || type === 'bigint') {
 
-        setChildReplacementText(String(child), childPrev)
+        // For BigInt, preserve the 'n' suffix in the string representation
+        const textValue = typeof child === 'bigint' ? `${child}n` : String(child)
+        setChildReplacementText(textValue, childPrev)
 
     } else {
 
@@ -230,7 +232,9 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 
-            const textNode = createText(child as any)
+            // For BigInt, preserve the 'n' suffix in the string representation
+            const textValue = typeof child === 'bigint' ? `${child}n` : String(child)
+            const textNode = createText(textValue as any)
 
             if (!fragmentOnly) {
 
@@ -318,7 +322,9 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 
-            FragmentUtils.pushNode(fragmentNext, createText(child as any))
+            // For BigInt, preserve the 'n' suffix in the string representation
+            const textValue = typeof child === 'bigint' ? `${child}n` : String(child)
+            FragmentUtils.pushNode(fragmentNext, createText(textValue as any))
             console.log('[setChildStatic] After pushNode, fragmentNext.length:', fragmentNext.length)
 
         } else if (type === 'object' && child !== null && typeof child.nodeType === 'number') {

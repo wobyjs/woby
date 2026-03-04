@@ -51,5 +51,5 @@ TestForFallbackObservable.test = {
 
 export default () => <TestSnapshots Component={TestForFallbackObservable} />
 
-console.log('TestForFallbackObservable:')
-console.log(renderToString(<TestForFallbackObservable />))
+// console.log('TestForFallbackObservable:')
+// console.log(renderToString(<TestForFallbackObservable />))

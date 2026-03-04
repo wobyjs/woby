@@ -61,7 +61,11 @@ import {useEnvironment,showEnvLog}from '../components/environment_context'
 export const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]) => {
 
     console.log('[createElement] START - component:', component)
-    console.log('[createElement] _props:', JSON.stringify(_props, (key, value) => typeof value === 'symbol' ? value.toString() : value, 2))
+    console.log('[createElement] _props:', JSON.stringify(_props, (key, value) => {
+        if (typeof value === 'symbol') return value.toString()
+        if (typeof value === 'bigint') return value.toString()
+        return value
+    }, 2))
     console.log('[createElement] _children:', _children)
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)

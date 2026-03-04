@@ -18,7 +18,7 @@ const TestBigIntStatic = (): JSX.Element => {
 TestBigIntStatic.test = {
     static: true,
     expect: () => {
-        const expected = '<p>123123</p>'
+        const expected = '<p>123123n</p>'
 
         const ssrComponent = testObservables['TestBigIntStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
