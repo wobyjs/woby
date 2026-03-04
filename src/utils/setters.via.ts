@@ -687,7 +687,7 @@ export const setStylesStatic = (element: HTMLElement, object: null | undefined |
 
                 objectPrev = store.unwrap(objectPrev)
 
-                for (const key in objectPrev) {
+                for (const key in objectPrev as object) {
 
                     if (object && key in object) continue
 

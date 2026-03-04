@@ -12,7 +12,7 @@ const TestForRandomOnlyChild = (): JSX.Element => {
             <h3>For - Random</h3>
             <For values={values}>
                 {(value: number) => {
-                    return <p>{value}</p>
+                    return <p>Value: {value}</p>
                 }}
             </For>
         </>
@@ -45,4 +45,4 @@ TestForRandomOnlyChild.test = {
 }
 
 
-export default () => <TestSnapshots Component={TestForRandomOnlyChild} />
+export default () => <TestSnapshots Component={TestForRandomOnlyChild} /> // HMR trigger

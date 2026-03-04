@@ -200,8 +200,16 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
  * ```
  */
 export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, childComp: Function, stack: Stack): void => {
-
-    if (!dynamic && isVoidChild(child)) return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
+    console.log('[setChildStatic] START - child:', child, 'dynamic:', dynamic, 'fragmentOnly:', fragmentOnly)
+    console.log('[setChildStatic] parent:', parent, 'fragment:', fragment)
+    if (Array.isArray(child)) {
+        console.log('[setChildStatic] CHILD IS ARRAY with length:', child.length)
+        child.forEach((c, i) => console.log(`[setChildStatic]   child[${i}]:`, c))
+    }
+    if (!dynamic && isVoidChild(child)) {
+        console.log('[setChildStatic] VOID CHILD - returning early')
+        return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
+    }
 
     const prev = FragmentUtils.getChildren(fragment)
     const prevIsArray = (prev instanceof Array)
@@ -252,49 +260,85 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
     }
 
-    if (prevLength === 1) { // Fast path for single text child
-
-        const type = typeof child
-
-        if (type === 'string' || type === 'number' || type === 'bigint') {
-
-            const node = setChildReplacementText(String(child), prevFirst) //TODO: maybe "fragmentOnly" should be passed on here, but it seems unnecessary
-
-            FragmentUtils.replaceWithNode(fragment, node)
-
-            return
-
-        }
-
-    }
+    // DISABLED FAST PATH - causes issues with multiple children where later children replace earlier ones
+    // if (prevLength === 1 && !Array.isArray(child)) { // Fast path for single text child - ONLY if we're setting a single child (not an array)
+    // 
+    //     const type = typeof child
+    // 
+    //     if (type === 'string' || type === 'number' || type === 'bigint') {
+    // 
+    //         const node = setChildReplacementText(String(child), prevFirst) //TODO: maybe "fragmentOnly" should be passed on here, but it seems unnecessary
+    // 
+    //         FragmentUtils.replaceWithNode(fragment, node)
+    // 
+    //         return
+    // 
+    //     }
+    // 
+    // }
 
     const fragmentNext = FragmentUtils.make()
 
     const children = (isArray(child) ? child : [child]) as Node[] //TSC
 
-    for (let i = 0, l = children.length; i < l; i++) {
+    // For SSR mode with arrays containing functions mixed with other content, pre-resolve functions to avoid nested fragment issues
+    // In DOM mode, functions may be reactive getters that trigger DOM operations, so we don't pre-resolve them
+    let resolvedChildren = children
+    if (isSSR && Array.isArray(child) && children.some(c => typeof c === 'function')) {
+        console.log('[setChildStatic] Pre-resolving functions for SSR')
+        resolvedChildren = children.map((c, i) => {
+            if (typeof c === 'function') {
+                try {
+                    let resolved = (c as Function)()
+                    console.log(`[setChildStatic] Resolved child[${i}] function to:`, resolved)
+                    
+                    // If the result is also a function (e.g., JSX.Element), resolve it too
+                    while (typeof resolved === 'function') {
+                        console.log(`[setChildStatic] Result is still a function, resolving again...`)
+                        resolved = (resolved as Function)()
+                        console.log(`[setChildStatic] Re-resolved to:`, resolved)
+                    }
+                    
+                    return resolved
+                } catch (e) {
+                    console.error('[setChildStatic] Failed to resolve function:', e)
+                    return c
+                }
+            }
+            return c
+        })
+    }
 
-        const child = children[i]
+    console.log('[setChildStatic] Processing children array with length:', resolvedChildren.length)
+    for (let i = 0, l = resolvedChildren.length; i < l; i++) {
+
+        const child = resolvedChildren[i]
         const type = typeof child
+        console.log(`[setChildStatic] Processing child[${i}] type:`, type, 'value:', child)
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 
             FragmentUtils.pushNode(fragmentNext, createText(child as any))
+            console.log('[setChildStatic] After pushNode, fragmentNext.length:', fragmentNext.length)
 
         } else if (type === 'object' && child !== null && typeof child.nodeType === 'number') {
 
             FragmentUtils.pushNode(fragmentNext, child)
+            console.log('[setChildStatic] After pushNode (object), fragmentNext.length:', fragmentNext.length)
 
         } else if (type === 'function') {
 
+            console.log('[setChildStatic] FUNCTION CHILD detected')
             const fragment = FragmentUtils.make()
 
             // let childFragmentOnly = !fragmentOnly // Avoiding mutating the DOM immediately, letting the parent handle it
 
             FragmentUtils.pushFragment(fragmentNext, fragment)
+            console.log('[setChildStatic] After pushFragment, fragmentNext.length:', fragmentNext.length)
 
             resolveChild(child, (child, dynamic, stack) => {
 
+                console.log('[setChildStatic] resolveChild callback - child:', child, 'dynamic:', dynamic)
                 // const fragmentOnly = childFragmentOnly
 
                 // childFragmentOnly = false
@@ -306,6 +350,8 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
         }
 
     }
+    
+    console.log('[setChildStatic] FINAL fragmentNext.length:', fragmentNext.length)
 
     let next = FragmentUtils.getChildren(fragmentNext)
     let nextLength = fragmentNext.length
@@ -395,14 +441,48 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
     FragmentUtils.replaceWithFragment(fragment, fragmentNext)
 
+    if ((parent as HTMLElement).tagName === 'P')
+        console.log('setChildStatic - fragment: ', fragment)
+    
+    // Log parent's childNodes after completion
+    if ((parent as HTMLElement).tagName === 'P') {
+        const childNodesArray = Array.from((parent as any).childNodes || [])
+        console.log('[setChildStatic] PARENT childNodes after replacement:', childNodesArray.length, childNodesArray.map((n: any) => ({ nodeType: n.nodeType, textContent: n.textContent })))
+        // DEBUG: Manually merge adjacent text nodes for P elements
+        const pChildNodes = (parent as any).childNodes
+        if (pChildNodes && pChildNodes.length > 1) {
+            let mergedText = ''
+            let hasOnlyTextNodes = true
+            for (let i = 0; i < pChildNodes.length; i++) {
+                if (pChildNodes[i].nodeType === 3) {
+                    mergedText += pChildNodes[i].textContent || ''
+                } else {
+                    hasOnlyTextNodes = false
+                    break
+                }
+            }
+            if (hasOnlyTextNodes) {
+                console.log('[setChildStatic] MERGING text nodes to:', mergedText)
+                parent.textContent = mergedText
+            }
+        }
+    }
+
+
 }
 
 export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
+    console.log('[setChild] START - parent:', parent, 'child:', child, 'fragment:', fragment)
     const cd = child
 
     if (showEnvLog)
         console.log('ENV setChild: ', useEnvironment())
-    resolveChild(cd, (child, dynamic, stack) => setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack), false, stack)
+    console.log('[setChild] calling resolveChild')
+    resolveChild(cd, (child, dynamic, stack) => {
+        console.log('[setChild] resolveChild callback - child:', child, 'dynamic:', dynamic)
+        return setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack)
+    }, false, stack)
+    console.log('[setChild] END')
 }
 
 export const setClassStatic = classesToggle

@@ -29,8 +29,6 @@ import { useEnvironment, EnvironmentContext, showEnvLog } from '../components/en
 
 export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | T[], dynamic: boolean, stack: Stack) => void), _dynamic: boolean = false, stack: Stack): void => {
   const env = useEnvironment()
-  if (showEnvLog)
-    console.log('ENV resolveChild: ', env)
   const isSSR = env === 'ssr'
 
   if (isArray(value)) {
@@ -70,8 +68,6 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
     }
 
   } else {
-    if (showEnvLog)
-      console.log('ENV resolveChild: ', useEnvironment())
 
     setter(value, _dynamic, stack)
 
@@ -167,6 +163,7 @@ export const resolveArraysAndStatics = (() => {
     const isSSR = useEnvironment() === 'ssr'
     if (showEnvLog)
       console.log('ENV resolveArraysAndStaticsInner', useEnvironment())
+
 
     const createText = isSSR ? createTextSSR : createTextDOM
 

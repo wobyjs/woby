@@ -57,10 +57,12 @@ export function jsx<P extends {} = {}>(component: Component<P>, props?: P, ...ch
 //React 17
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, key?: string): Element
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, ...children: (string | Child)[]): Element {
+  console.log('[jsx] START - component:', component, 'props:', props, 'children:', children)
   if (typeof children === 'string') // React 16, key
     return wrapCloneElement(createElement<P>(component as any, props ?? {} as P, children as string), component, props)
 
   props = getProps<P>(component, props)
+  console.log('[jsx] After getProps - props.children:', (props as any)?.children)
 
   if (typeof children === 'string') // React 16, key
     Object.assign(props as any, { children })

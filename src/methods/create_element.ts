@@ -60,6 +60,9 @@ import {useEnvironment,showEnvLog}from '../components/environment_context'
  */
 export const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]) => {
 
+    console.log('[createElement] START - component:', component)
+    console.log('[createElement] _props:', JSON.stringify(_props, (key, value) => typeof value === 'symbol' ? value.toString() : value, 2))
+    console.log('[createElement] _children:', _children)
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)
     const { ...rest } = _props ?? {}
@@ -212,17 +215,22 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
                 untrack(() => {
 
+                    console.log('[createElement] Setting props and children for', component, 'hasChildren:', hasChildren, 'children:', children)
+                    console.log('[createElement] _children array:', _children, 'length:', _children.length)
+                    console.log('[createElement] props.children:', (props as any)?.children)
                     if (props) {
                         if (!!ce) {
                             const { children, ...np } = props as any //children already initialized in new ce(props)
                             setProps(child, np, stack)
                         }
                         else
-                            setProps(child, props as any, stack)
+                            setProps(child, props as any, stack)  // This will handle props.children automatically via setProp
                     }
 
-                    //already in prop
-                    if (hasChildren) {
+                    // Only set children from _arguments_ if they weren't already in props
+                    // setProps already handles props.children via setProp, so we only need to handle separate _children
+                    if (hasChildren && !(props && 'children' in props)) {
+                        console.log('[createElement] Setting children from _arguments:', children)
                         setChild(child, children, FragmentUtils.make(), stack)
                     }
 

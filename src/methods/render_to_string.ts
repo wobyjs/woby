@@ -17,12 +17,19 @@ export const renderToString = (child: Child): string => {
         const container = createHTMLNode('div')
         const stack = new Error()
 
+        console.log('renderToString START')
+        console.log('renderToString child:', child)
         // Use a fragment for the root
         const fragment = FragmentUtils.make()
 
+        console.log('renderToString calling setChild with container:', container, 'fragment:', fragment)
         // Set the child content
         setChild(container, child, fragment, stack)
 
+        console.log('renderToString after setChild - container.childNodes:', container.childNodes)
+        console.log('renderToString container.childNodes.length:', container.childNodes?.length)
+        const details = Array.from(container.childNodes || []).map((c: any) => ({ tagName: c.tagName, nodeType: c.nodeType, textContent: c.textContent, childNodesLength: c.childNodes?.length }))
+        console.log('renderToString details count:', details.length)
         // Get the rendered content from the container's children
         const children = Array.from(container.childNodes || [])
         const childrenContent = children.map((child: any) => {
@@ -35,9 +42,7 @@ export const renderToString = (child: Child): string => {
 
 // Helper function to get content from node objects
 function getNodeContent(node: any): string {
-    if (node && typeof node === 'object') {
-        // Handle object node properties
-    }
+    console.log('[getNodeContent] node:', (node as any)?.tagName || node?.nodeType, 'childNodes:', node?.childNodes?.length)
     // Handle null/undefined
     if (node === null || node === undefined) {
         return ''
@@ -50,12 +55,15 @@ function getNodeContent(node: any): string {
 
     // Handle functions (component functions or observables)
     if (isFunction(node)) {
+        console.log('[getNodeContent] FUNCTION detected:', node.name || 'anonymous')
         // Handle component functions with SYMBOL_CLONE
         if (SYMBOL_CLONE in node) {
+            console.log('[getNodeContent] SYMBOL_CLONE found - executing component')
             // Check if props have SYMBOL_JSX
 
             // Execute the component function and resolve the result
             const result = resolve(node)
+            console.log('[getNodeContent] resolve result:', result)
             return getNodeContent(result)
         }
 
@@ -93,8 +101,6 @@ function getNodeContent(node: any): string {
 
 // Helper function to construct HTML from BaseNode
 function constructNodeHTML(node: BaseNode): string {
-
-
     // Handle different node types
     if (node.nodeType === 3) {
         // Text node - check if it has textContent property
@@ -128,43 +134,26 @@ function constructNodeHTML(node: BaseNode): string {
             return `<${(node as any).tagName.toLowerCase()}${attrStr}>`
         }
 
-        // Build children string
-
         // Special handling for P elements to ensure proper text content concatenation
+        console.log('[render_to_string] Processing element:', tagName, 'childNodes:', node.childNodes?.length)
         if (tagName.toLowerCase() === 'p' && node.childNodes && node.childNodes.length > 0) {
-            // For P elements, we need to reconstruct the proper text content
-
-            // The issue is that static text and observables are processed as separate nodes
-            // but we need to concatenate them properly for SSR
-
-            // Check if we have a simple case with just one text node (observable value only)
-            if (node.childNodes.length === 1 && node.childNodes[0].nodeType === 3) {
-                // This is the case where we only have the observable value
-                // We need to reconstruct the full text "Value: {value}"
-                const observableValue = node.childNodes[0].textContent || ''
-
-                // For now, let's assume the static text should be "Value: " 
-                // In a real implementation, we'd need to track the original static text
-                const staticText = 'Value: '
-                const combinedText = staticText + observableValue
-                return `<${tagName.toLowerCase()}${attrStr}>${combinedText}</${tagName.toLowerCase()}>`
-            }
-
-            // Fallback to default processing for other cases
+            console.log('[P element in render_to_string] childNodes:', node.childNodes.length)
+            node.childNodes.forEach((child: any, i: number) => {
+                console.log(`[P element] child ${i}:`, { nodeType: child.nodeType, textContent: child.textContent, value: child.valueOf?.() })
+            })
+            // Simply concatenate all child text content
             const textContent = node.childNodes
                 .map((child: any) => {
+                    console.log('[P element] Processing child:', { nodeType: child.nodeType, tagName: child.tagName, textContent: child.textContent, isFragment: child.values !== undefined })
                     if (child.nodeType === 3) {
                         // Text node
-                        const text = child.textContent || String(child)
-                        return text
+                        return child.textContent || String(child)
                     } else if (typeof child === 'object' && 'textContent' in child) {
                         // Object with textContent
-                        const text = child.textContent || ''
-                        return text
+                        return child.textContent || ''
                     } else {
                         // Other content
-                        const result = getNodeContent(child)
-                        return result
+                        return getNodeContent(child)
                     }
                 })
                 .join('')
@@ -175,6 +164,7 @@ function constructNodeHTML(node: BaseNode): string {
         // Default handling for other elements
         const childrenContent = (node.childNodes || []).map((child: any) => {
             const result = getNodeContent(child)
+            console.log('Child result:', result)
             return result
         }).join('')
 
