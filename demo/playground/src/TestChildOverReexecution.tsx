@@ -3,8 +3,10 @@ import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testO
 
 const TestChildOverReexecution = (): JSX.Element => {
     const count = $(0)
-    let executions = 0
+    const executions = $(0)
+    let executionsLocal = 0
     registerTestObservable('TestChildOverReexecution', count)
+    registerTestObservable('TestChildOverReexecution_executions', executions)
 
     const increment = () => count(prev => Math.min(3, prev + 1))
 
@@ -30,7 +32,7 @@ const TestChildOverReexecution = (): JSX.Element => {
         <>
             <h3>Child - OverReexecution</h3>
             <div>
-                {() => executions += 1}
+                {() => { executionsLocal += 1; executions(executionsLocal); return executionsLocal }}
             </div>
             {count}
         </>
@@ -45,14 +47,11 @@ const TestChildOverReexecution = (): JSX.Element => {
 TestChildOverReexecution.test = {
     static: false,
     expect: () => {
-        const observable = testObservables['TestChildOverReexecution']
-        let expected: string
-        if (observable) {
-            const currentValue = $$(observable)
-            expected = `<div>1</div>${currentValue}`
-        } else {
-            expected = `<div>1</div>0`
-        }
+        const countObservable = testObservables['TestChildOverReexecution']
+        const executionsObservable = testObservables['TestChildOverReexecution_executions']
+        const currentValue = countObservable ? $$(countObservable) : 0
+        const currentExecutions = executionsObservable ? $$(executionsObservable) : 0
+        const expected = `<div>${currentExecutions}</div>${currentValue}`
 
         const ssrComponent = testObservables['TestChildOverReexecution_ssr']
         const ssrResult = renderToString(ssrComponent)

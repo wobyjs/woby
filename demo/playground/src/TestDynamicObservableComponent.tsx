@@ -31,7 +31,7 @@ TestDynamicObservableComponent.test = {
         const level = $$(testObservables['TestDynamicObservableComponent'])
 
         // Define expected values for both main test and SSR test
-        const expectedFull = `<h3>Dynamic - Observable Component</h3><h${level}>${$$(level)}</h${level}>`  // For SSR comparison
+        const expectedFull = `<h3>Dynamic - Observable Component</h3><h${level}>Level: ${$$(level)}</h${level}>`  // For SSR comparison
         const expected = `<h${level}>Level: ${$$(level)}</h${level}>`   // For main test comparison
 
         const ssrComponent = testObservables['TestDynamicObservableComponent_ssr']

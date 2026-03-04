@@ -35,7 +35,7 @@ TestDynamicHeading.test = {
         const level = $$(testObservables['TestDynamicHeading'])
 
         // Define expected values for both main test and SSR test
-        const expectedFull = `<h3>Dynamic - Heading</h3><h${level}>${level}</h${level}>`  // For SSR comparison
+        const expectedFull = `<h3>Dynamic - Heading</h3><h${level}>Level: ${level}</h${level}>`  // For SSR comparison
         const expected = `<h${level}>Level: ${level}</h${level}>`   // For main test comparison
 
         const ssrComponent = testObservables['TestDynamicHeading_ssr']

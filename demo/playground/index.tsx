@@ -349,7 +349,7 @@ const tests = [
     // TestBigIntObservable,
 
     // TestBigIntRemoval,
-    TestBigIntStatic,
+    // TestBigIntStatic,
     // TestBooleanFunction,
     // TestBooleanObservable,
     // TestBooleanRemoval,
@@ -450,7 +450,6 @@ const tests = [
     // TestForFallbackFunction,
 
     // TestForFallbackObservable,
-
     // TestForFallbackObservableStatic,
     // TestForFallbackStatic,
     // TestForFunctionObservables,
@@ -472,16 +471,16 @@ const tests = [
     // TestForUnkeyedRandom,
     // TestForUnkeyedRandomOnlyChild,
 
-    // TestForUnkeyedStatic,
-    // TestFragmentStatic,
-    // TestFragmentStaticComponent,
-    // TestFragmentStaticDeep,
-    // TestHTMLDangerouslySetInnerHTMLFunction,
-    // TestHTMLDangerouslySetInnerHTMLFunctionString,
-    // TestHTMLDangerouslySetInnerHTMLObservable,
-    // TestHTMLDangerouslySetInnerHTMLObservableString,
-    // TestHTMLDangerouslySetInnerHTMLStatic,
-    // TestHTMLFunctionStatic,
+    TestForUnkeyedStatic,
+    TestFragmentStatic,
+    TestFragmentStaticComponent,
+    TestFragmentStaticDeep,
+    TestHTMLDangerouslySetInnerHTMLFunction,
+    TestHTMLDangerouslySetInnerHTMLFunctionString,
+    TestHTMLDangerouslySetInnerHTMLObservable,
+    TestHTMLDangerouslySetInnerHTMLObservableString,
+    TestHTMLDangerouslySetInnerHTMLStatic,
+    TestHTMLFunctionStatic,
 
     // TestHTMLFunctionStaticRegistry,
     // TestHTMLInnerHTMLFunction,

@@ -46,11 +46,8 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
       if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
         (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
-      // EnvironmentContext.Provider(env, () => {
       const newValue = value()
-      // if (!replaceSelf(value as any, newValue as any))
       resolveChild(newValue, setter, _dynamic, stack)
-      // })
 
     } else {
 

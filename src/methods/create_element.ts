@@ -21,7 +21,7 @@ import { customElement } from './custom_element'
 import { Stack } from 'soby'
 import { customElements as ces } from '../ssr/custom_elements'
 // import { isSSR } from '../constants'
-import {useEnvironment,showEnvLog}from '../components/environment_context'
+import { useEnvironment, showEnvLog } from '../components/environment_context'
 
 // if (isSSR) globalThis.customElements = ces as any
 
@@ -60,13 +60,6 @@ import {useEnvironment,showEnvLog}from '../components/environment_context'
  */
 export const createElement = <P = { children?: Child }>(component: Component<P>, _props?: P | null, ..._children: Child[]) => {
 
-    console.log('[createElement] START - component:', component)
-    console.log('[createElement] _props:', JSON.stringify(_props, (key, value) => {
-        if (typeof value === 'symbol') return value.toString()
-        if (typeof value === 'bigint') return value.toString()
-        return value
-    }, 2))
-    console.log('[createElement] _children:', _children)
     const children = _children.length > 1 ? _children : (_children.length > 0 ? _children[0] : undefined)
     const hasChildren = !isVoidChild(children)
     const { ...rest } = _props ?? {}
@@ -179,79 +172,75 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
     //     }
     // } else {
-        // Client-side logic
-        const props = _props ?? {}
+    // Client-side logic
+    const props = _props ?? {}
 
-        if (isFunction(component)) {
-            return wrapElement(() => {
+    if (isFunction(component)) {
+        return wrapElement(() => {
 
-                return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
+            return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
+
+        })
+
+    } else if (isString(component)) {
+
+        const isSVG = isSVGElement(component)
+        const isComment = component === 'comment'
+        const isText = component === 'text'
+
+        const createNode = isSVG ? (isSSR ? createSVGNodeSSR : createSVGNodeDOM) : (isSSR ? createHTMLNodeSSR : createHTMLNodeDOM)
+        const createComment = isSSR ? createCommentDOM : createCommentSSR
+        const createText = isSSR ? createTextDOM : createTextSSR
+        const create = isComment ? () => createComment((props as any).data ?? '') : isText ? () => createText((props as any).data ?? '') : createNode
+
+        return wrapElement((): Child => {
+            const isSSR = useEnvironment() === 'ssr'
+            if (showEnvLog)
+                console.log('ENV createElement wrapElement: ', useEnvironment())
+
+            // Check if this is a custom element
+            const ce = isSSR ? ces.get(component) : customElements.get(component) as ReturnType<typeof customElement>
+
+            const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
+
+            // if (!!ce)
+            //     (child as InstanceType<ReturnType<typeof customElement>>).props = { ...props }
+
+            if (isSVG) child['isSVG'] = true
+
+            const stack = new Stack()
+
+            untrack(() => {
+
+                if (props) {
+                    if (!!ce) {
+                        const { children, ...np } = props as any //children already initialized in new ce(props)
+                        setProps(child, np, stack)
+                    }
+                    else
+                        setProps(child, props as any, stack)  // This will handle props.children automatically via setProp
+                }
+
+                // Only set children from _arguments_ if they weren't already in props
+                // setProps already handles props.children via setProp, so we only need to handle separate _children
+                if (hasChildren && !(props && 'children' in props)) {
+                    setChild(child, children, FragmentUtils.make(), stack)
+                }
 
             })
 
-        } else if (isString(component)) {
+            return child as any
 
-            const isSVG = isSVGElement(component)
-            const isComment = component === 'comment'
-            const isText = component === 'text'
+        })
 
-            const createNode = isSVG ? (isSSR?createSVGNodeSSR : createSVGNodeDOM) : (isSSR?createHTMLNodeSSR : createHTMLNodeDOM)
-            const createComment= isSSR?createCommentDOM : createCommentSSR
-            const createText = isSSR ? createTextDOM : createTextSSR
-            const create = isComment ? () => createComment((props as any).data ?? '') : isText ? () => createText((props as any).data ?? '') : createNode
+    } else if (isNode(component)) {
 
-            return wrapElement((): Child => {
-                const isSSR = useEnvironment() === 'ssr'
-                if(showEnvLog)
-                    console.log('ENV createElement wrapElement: ', useEnvironment())
+        return wrapElement(() => component)
 
-                // Check if this is a custom element
-                const ce = isSSR ? ces.get(component) : customElements.get(component) as ReturnType<typeof customElement>
+    } else {
 
-                const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
+        throw new Error('Invalid component')
 
-                // if (!!ce)
-                //     (child as InstanceType<ReturnType<typeof customElement>>).props = { ...props }
-
-                if (isSVG) child['isSVG'] = true
-
-                const stack = new Stack()
-
-                untrack(() => {
-
-                    console.log('[createElement] Setting props and children for', component, 'hasChildren:', hasChildren, 'children:', children)
-                    console.log('[createElement] _children array:', _children, 'length:', _children.length)
-                    console.log('[createElement] props.children:', (props as any)?.children)
-                    if (props) {
-                        if (!!ce) {
-                            const { children, ...np } = props as any //children already initialized in new ce(props)
-                            setProps(child, np, stack)
-                        }
-                        else
-                            setProps(child, props as any, stack)  // This will handle props.children automatically via setProp
-                    }
-
-                    // Only set children from _arguments_ if they weren't already in props
-                    // setProps already handles props.children via setProp, so we only need to handle separate _children
-                    if (hasChildren && !(props && 'children' in props)) {
-                        console.log('[createElement] Setting children from _arguments:', children)
-                        setChild(child, children, FragmentUtils.make(), stack)
-                    }
-
-                })
-
-                return child as any
-
-            })
-
-        } else if (isNode(component)) {
-
-            return wrapElement(() => component)
-
-        } else {
-
-            throw new Error('Invalid component')
-
-        }
+    }
     // }
 }

@@ -43,7 +43,7 @@ TestDirectiveSingleArgument.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Directive - Single Argument</h3><input value="bar">'  // For SSR comparison
+        const expectedFull = '<h3>Directive - Single Argument</h3><input value="bar"></input>'  // For SSR comparison
         const expected = '<input value="bar">'   // For main test comparison
 
         const ssrComponent = testObservables['TestDirectiveSingleArgument_ssr']

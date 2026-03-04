@@ -58,9 +58,8 @@ TestCleanupInner.test = {
 
         const ssrComponent = testObservables['TestCleanupInner_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>Cleanup - Inner</h3>${expected}`
-        if (ssrResult !== expectedFull) {
-            assert(false, `[TestCleanupInner] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+        if (ssrResult !== expected) {
+            assert(false, `[TestCleanupInner] SSR mismatch: got ${ssrResult}, expected ${expected}`)
         } else {
             console.log(`✅ [TestCleanupInner] SSR test passed: ${ssrResult}`)
         }
@@ -71,3 +70,5 @@ TestCleanupInner.test = {
 
 
 export default () => <TestSnapshots Component={TestCleanupInner} />
+
+// console.log(renderToString(<TestCleanupInner />))

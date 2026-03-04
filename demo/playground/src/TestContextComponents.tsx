@@ -45,7 +45,7 @@ TestContextComponents.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Context - Components</h3><context-provider value="outer" symbol="Symbol()"><p>outer</p><p>outer</p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="component-function-value" symbol="Symbol()"><p>Component function provider: component-function-value</p></context-provider>'  // For SSR comparison
+        const expectedFull = '<h3>Context - Components</h3><context-provider value="outer" symbol="Symbol()"><p>outer</p><context-provider value="inner" symbol="Symbol()"><p>inner</p></context-provider><p>outer</p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="component-function-value" symbol="Symbol()"><p>Component function provider: component-function-value</p></context-provider>'  // For SSR comparison
         const expected = '<context-provider value="outer"><p>outer</p><context-provider value="inner"><p>inner</p></context-provider><p>outer</p></context-provider><h3>Context.Provider(value, () =&gt; ) Test</h3><context-provider value="component-function-value"><p>Component function provider: component-function-value</p></context-provider>'   // For main test comparison
 
         const ssrComponent = testObservables['TestContextComponents_ssr']

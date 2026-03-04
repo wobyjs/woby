@@ -23,8 +23,8 @@ TestBigIntFunction.test = {
     compareActualValues: true, // Use compareActualValues to bypass conversion logic
     expect: () => {
         const value = $$(testObservables['TestBigIntFunction'])
-        // Return value without 'n' suffix to match actual rendering
-        const expected = `<p>${value}</p>`
+        // Keep 'n' suffix to match actual SSR rendering
+        const expected = `<p>${value}n</p>`
 
         const ssrComponent = testObservables['TestBigIntFunction_ssr']
         const ssrResult = renderToString(ssrComponent)

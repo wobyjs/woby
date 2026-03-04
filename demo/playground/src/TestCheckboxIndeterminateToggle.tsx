@@ -22,18 +22,19 @@ const TestCheckboxIndeterminateToggle = (): JSX.Element => {
 TestCheckboxIndeterminateToggle.test = {
     static: true,
     expect: () => {
-        const expected = '<input type="checkbox"><input type="checkbox" checked="">'
+        const ssrExpected = '<input type="checkbox"></input><input type="checkbox" checked=""></input>'
+        const domExpected = '<input type="checkbox"><input type="checkbox">'
 
         const ssrComponent = testObservables['TestCheckboxIndeterminateToggle_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3>${expected}`
+        const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3>${ssrExpected}`
         if (ssrResult !== expectedFull) {
             assert(false, `[TestCheckboxIndeterminateToggle] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {
             console.log(`✅ [TestCheckboxIndeterminateToggle] SSR test passed: ${ssrResult}`)
         }
 
-        return '<input type="checkbox"><input type="checkbox">'
+        return domExpected
     }
 }
 

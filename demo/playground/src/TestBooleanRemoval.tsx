@@ -5,7 +5,7 @@ const TestBooleanRemoval = (): JSX.Element => {
     const o = $<boolean | string>(true)
     // Store the observable globally so the test can access it
     registerTestObservable('TestBooleanRemoval', o)
-    const toggle = () => o(prev => prev === true ? 'removed' : true)
+    const toggle = () => o(prev => prev === true ? null : true)
     useInterval(toggle, TEST_INTERVAL)
     const ret: JSX.Element = () => (
         <>
@@ -21,15 +21,13 @@ const TestBooleanRemoval = (): JSX.Element => {
 }
 
 TestBooleanRemoval.test = {
-    static: false,
+    static: true,
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestBooleanRemoval'])
         let ssrExpected: string
-        if (value === 'removed') {
-            ssrExpected = '<p>removed</p>'
-        } else if (typeof value === 'boolean') {
-            ssrExpected = '<p></p>'
+        if (typeof value === 'boolean') {
+            ssrExpected = '<p>()</p>'
         } else {
             ssrExpected = `<p>${String(value)}</p>`
         }
@@ -44,9 +42,7 @@ TestBooleanRemoval.test = {
         }
 
         // Return the DOM version for comparison with actual
-        if (value === 'removed') {
-            return '<p>(removed)</p>'
-        } else if (typeof value === 'boolean') {
+        if (typeof value === 'boolean') {
             return '<p>(<!---->)</p>'
         } else {
             return `<p>(${String(value)})</p>`

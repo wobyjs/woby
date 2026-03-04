@@ -17,19 +17,12 @@ export const renderToString = (child: Child): string => {
         const container = createHTMLNode('div')
         const stack = new Error()
 
-        console.log('renderToString START')
-        console.log('renderToString child:', child)
         // Use a fragment for the root
         const fragment = FragmentUtils.make()
 
-        console.log('renderToString calling setChild with container:', container, 'fragment:', fragment)
         // Set the child content
         setChild(container, child, fragment, stack)
 
-        console.log('renderToString after setChild - container.childNodes:', container.childNodes)
-        console.log('renderToString container.childNodes.length:', container.childNodes?.length)
-        const details = Array.from(container.childNodes || []).map((c: any) => ({ tagName: c.tagName, nodeType: c.nodeType, textContent: c.textContent, childNodesLength: c.childNodes?.length }))
-        console.log('renderToString details count:', details.length)
         // Get the rendered content from the container's children
         const children = Array.from(container.childNodes || [])
         const childrenContent = children.map((child: any) => {
@@ -42,7 +35,6 @@ export const renderToString = (child: Child): string => {
 
 // Helper function to get content from node objects
 function getNodeContent(node: any): string {
-    console.log('[getNodeContent] node:', (node as any)?.tagName || node?.nodeType, 'childNodes:', node?.childNodes?.length)
     // Handle null/undefined
     if (node === null || node === undefined) {
         return ''
@@ -55,15 +47,10 @@ function getNodeContent(node: any): string {
 
     // Handle functions (component functions or observables)
     if (isFunction(node)) {
-        console.log('[getNodeContent] FUNCTION detected:', node.name || 'anonymous')
         // Handle component functions with SYMBOL_CLONE
         if (SYMBOL_CLONE in node) {
-            console.log('[getNodeContent] SYMBOL_CLONE found - executing component')
-            // Check if props have SYMBOL_JSX
-
             // Execute the component function and resolve the result
             const result = resolve(node)
-            console.log('[getNodeContent] resolve result:', result)
             return getNodeContent(result)
         }
 
@@ -135,16 +122,10 @@ function constructNodeHTML(node: BaseNode): string {
         }
 
         // Special handling for P elements to ensure proper text content concatenation
-        console.log('[render_to_string] Processing element:', tagName, 'childNodes:', node.childNodes?.length)
         if (tagName.toLowerCase() === 'p' && node.childNodes && node.childNodes.length > 0) {
-            console.log('[P element in render_to_string] childNodes:', node.childNodes.length)
-            node.childNodes.forEach((child: any, i: number) => {
-                console.log(`[P element] child ${i}:`, { nodeType: child.nodeType, textContent: child.textContent, value: child.valueOf?.() })
-            })
             // Simply concatenate all child text content
             const textContent = node.childNodes
                 .map((child: any) => {
-                    console.log('[P element] Processing child:', { nodeType: child.nodeType, tagName: child.tagName, textContent: child.textContent, isFragment: child.values !== undefined })
                     if (child.nodeType === 3) {
                         // Text node
                         return child.textContent || String(child)
@@ -163,9 +144,7 @@ function constructNodeHTML(node: BaseNode): string {
 
         // Default handling for other elements
         const childrenContent = (node.childNodes || []).map((child: any) => {
-            const result = getNodeContent(child)
-            console.log('Child result:', result)
-            return result
+            return getNodeContent(child)
         }).join('')
 
         return `<${tagName.toLowerCase()}${attrStr}>${childrenContent}</${tagName.toLowerCase()}>`
