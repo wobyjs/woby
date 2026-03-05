@@ -3,34 +3,81 @@ import type { Child } from '../types'
 import { setChild } from '../utils/setters'
 // import { isArray } from '../utils/lang'
 import { BaseNode } from '../ssr/base_node'
-import { createHTMLNode } from '../utils/creators.ssr'
+import { createHTMLNode as createHTMLNodeSSR } from '../utils/creators.ssr'
 import { $$, context, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'
 import { isFunction } from '../utils/lang'
 import { EnvironmentContext, useEnvironment, showEnvLog } from '../components/environment_context'
+import type { SSRDocument } from '../ssr/document'
+import { createDocument } from '../ssr/document'
 
-export const renderToString = (child: Child): string => {
+/**
+ * Options for renderToString
+ */
+export interface RenderToStringOptions {
+    /**
+     * Custom SSR document instance for isolated context
+     * If not provided, a new document instance will be created internally
+     */
+    document?: SSRDocument
+    /**
+     * If true, returns both HTML string and document instance
+     * Useful for inspecting what was rendered to document.body (e.g., portals)
+     */
+    returnDocument?: boolean
+}
+
+export const renderToString = (
+    child: Child,
+    options?: RenderToStringOptions
+): string | { html: string; document: SSRDocument } => {
+    console.log('[renderToString] Called with:', {
+        childType: typeof child,
+        hasOptions: !!options,
+        options: options ? {
+            hasDocument: !!options.document,
+            returnDocument: options.returnDocument
+        } : undefined
+    })
+
     return EnvironmentContext.Provider('ssr', () => {
+        // Create or use provided document instance for isolated context
+        const ssrDoc = options?.document ?? createDocument()
+        console.log('[renderToString] Using document:', ssrDoc ? 'custom/provided' : 'new instance')
+
         if (showEnvLog)
             console.log('ENV renderToString:', useEnvironment())
-        // Create a container for SSR using HTMLNode
-        const container = createHTMLNode('div')
+
+        // Use document's createElement for container creation
+        const container = ssrDoc.createElement('div')
+        console.log('[renderToString] Created container:', container.tagName || 'div')
         const stack = new Error()
 
         // Use a fragment for the root
         const fragment = FragmentUtils.make()
+        console.log('[renderToString] Created fragment')
 
         // Set the child content
+        console.log('[renderToString] About to setChild with child type:', typeof child)
         setChild(container, child, fragment, stack)
+        console.log('[renderToString] setChild completed, childNodes count:', container.childNodes?.length || 0)
 
         // Get the rendered content from the container's children
         const children = Array.from(container.childNodes || [])
         const childrenContent = children.map((child: any) => {
             return getNodeContent(child)
         }).join('')
+        console.log('[renderToString] Generated HTML content length:', childrenContent.length)
 
+        // Return both html and document if requested
+        if (options?.returnDocument) {
+            console.log('[renderToString] Returning object with html and document')
+            return { html: childrenContent, document: ssrDoc }
+        }
+
+        console.log('[renderToString] Returning HTML string')
         return childrenContent
-    }) as string
+    }) as any
 }
 
 // Helper function to get content from node objects

@@ -45,7 +45,6 @@ TestPortalObservable.test = {
         const expectedFull = '<h3>Portal - Observable</h3><!---->'  // For SSR comparison (portal renders as comment)
         const expected = '<!---->'   // For main DOM test comparison
 
-        // Test the SSR value synchronously
         const ssrComponent = testObservables['TestPortalObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {

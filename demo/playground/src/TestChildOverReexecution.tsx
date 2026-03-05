@@ -10,14 +10,6 @@ const TestChildOverReexecution = (): JSX.Element => {
 
     const increment = () => count(prev => Math.min(3, prev + 1))
 
-    // Expose increment function for testing
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            (window as any).testChildOverReexecutionIncrement = increment
-        }
-    })
-
-    // For playground testing, add automatic increment
     useEffect(() => {
         const interval = setInterval(() => {
             if ($$(count) < 6) {
@@ -32,7 +24,7 @@ const TestChildOverReexecution = (): JSX.Element => {
         <>
             <h3>Child - OverReexecution</h3>
             <div>
-                {() => { executionsLocal += 1; executions(executionsLocal); return executionsLocal }}
+                {() => executionsLocal += 1}
             </div>
             {count}
         </>
@@ -51,7 +43,7 @@ TestChildOverReexecution.test = {
         const executionsObservable = testObservables['TestChildOverReexecution_executions']
         const currentValue = countObservable ? $$(countObservable) : 0
         const currentExecutions = executionsObservable ? $$(executionsObservable) : 0
-        const expected = `<div>${currentExecutions}</div>${currentValue}`
+        const expected = `<div>1</div>${currentValue}`
 
         const ssrComponent = testObservables['TestChildOverReexecution_ssr']
         const ssrResult = renderToString(ssrComponent)

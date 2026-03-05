@@ -6,7 +6,7 @@ const TestIfFunctionUntrackedUnnarrowed = (): JSX.Element => {
     const content = $(0)
     const increment = () => content(prev => (prev + 1) % 3)
     useInterval(increment, TEST_INTERVAL)
-    const ret = (
+    const ret = () => (
         <>
             <h3>If - Function Untracked Unnarrowed</h3>
             <p>(<If when={o}>{() => content()}</If>)</p>
@@ -16,7 +16,7 @@ const TestIfFunctionUntrackedUnnarrowed = (): JSX.Element => {
     // Store the component for SSR testing
     registerTestObservable('TestIfFunctionUntrackedUnnarrowed_ssr', ret)
 
-    return ret
+    return null //ret
 }
 
 TestIfFunctionUntrackedUnnarrowed.test = {

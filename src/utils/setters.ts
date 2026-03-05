@@ -1,4 +1,4 @@
-import { DIRECTIVES, SYMBOLS_DIRECTIVES, /* SYMBOL_DOM, */ SYMBOL_UNCACHED, isSSR } from '../constants'
+import { DIRECTIVES, SYMBOLS_DIRECTIVES, /* SYMBOL_DOM, */ SYMBOL_UNCACHED } from '../constants'
 import { useMicrotask } from '../hooks/use_microtask'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { isStore } from '../methods/soby'
@@ -314,7 +314,6 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
         }
     }
 
-    console.log('[setChildStatic] Processing children array with length:', resolvedChildren.length)
     for (let i = 0, l = resolvedChildren.length; i < l; i++) {
 
         const child = resolvedChildren[i]
@@ -829,7 +828,6 @@ export const setEventStatic = (() => {
 })()
 
 export const setEvent = (element: HTMLElement, event: string, value: ObservableMaybe<null | undefined | EventListener>, stack: Stack): void => {
-    const isSSR = useEnvironment() === 'ssr'
 
     // if (isFunction(value) && isFunctionReactive(value) /* && !isSSR */) {
     if (isObservable(value))
@@ -848,12 +846,16 @@ export const setHTMLStatic = (element: HTMLElement, value: null | undefined | nu
 }
 
 export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
 
-    useRenderEffect(() => {
-
+    if (isSSR)
         setHTMLStatic(element, $$($$(value).__html))
+    else
+        useRenderEffect(() => {
 
-    }, stack)
+            setHTMLStatic(element, $$($$(value).__html))
+
+        }, stack)
 
 }
 
@@ -1132,9 +1134,12 @@ export const setTemplateAccessor = (element: HTMLElement, key: string, value: Te
 
 }
 
-if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
+// if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
 
 export const setProp = (element: HTMLElement | Comment, key: string, value: any, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
+    if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
+
     if (element instanceof Comment || element instanceof Text) {
         if (key === 'ref')
             setRef(element, value)

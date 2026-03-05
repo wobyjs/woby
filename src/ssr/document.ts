@@ -17,6 +17,10 @@ type AddEventListenerOptions = boolean | {
     passive?: boolean
 }
 
+type EventListenerOptions = {
+    capture?: boolean
+}
+
 // Enhanced mock implementations for SSR without happy-dom
 // These implementations better support the html`` template pattern from index.tsx
 
@@ -37,6 +41,7 @@ const createHTMLNode = ((tagName: string) => {
             this.tagName = tagName.toUpperCase()
             this.style = {}
             this.#className = ''
+            this.id = ''
         }
 
         set className(value: string) {
@@ -48,6 +53,15 @@ const createHTMLNode = ((tagName: string) => {
 
         get className(): string {
             return this.#className
+        }
+
+        set id(value: string) {
+            // Update both the property and attributes for consistency
+            this.setAttribute('id', value)
+        }
+
+        get id(): string {
+            return this.attributes['id'] || ''
         }
 
         // Override setAttribute for special HTML handling
@@ -259,52 +273,96 @@ const createDocumentFragment = (() => {
     return new DocumentFragmentNode()
 }) as any as FN<[], DocumentFragment>
 
-// Mock body element for SSR
-const body = createHTMLNode('body')
-
-export const document = {
-    // Map to store event listeners for better tracking
-    _eventListeners: new Map<string, Array<{
+/**
+ * Type definition for SSR Document interface
+ */
+export interface SSRDocument {
+    _eventListeners: Map<string, Array<{
         listener: EventListenerOrEventListenerObject
         options?: boolean | AddEventListenerOptions
-    }>>(),
-
-    addEventListener: function (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
-        // Mock implementation for SSR - store listeners in map
-        if (!this._eventListeners.has(type)) {
-            this._eventListeners.set(type, [])
-        }
-        this._eventListeners.get(type)!.push({ listener, options })
-    },
-
-    removeEventListener: function (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
-        // Mock implementation for SSR - remove listeners from map
-        if (this._eventListeners.has(type)) {
-            const listeners = this._eventListeners.get(type)!
-            const index = listeners.findIndex(item => item.listener === listener)
-            if (index !== -1) {
-                listeners.splice(index, 1)
-            }
-        }
-    },
-
-    // Helper method to get listeners for testing/debugging
-    _getEventListeners: function (type: string) {
-        return this._eventListeners.get(type) || []
-    },
-
-    createComment,
-    createElement: createHTMLNode,
-    createElementNS: ((namespaceURI: string, qualifiedName: string) => {
-        if (namespaceURI === 'http://www.w3.org/2000/svg') {
-            return createSVGNode(qualifiedName)
-        }
-        return createHTMLNode(qualifiedName)
-    }) as any as FN<[string, string], Element>,
-    createTextNode: createText,
-    createDocumentFragment,
-
-    // Body property for portal component
-    body
+    }>>
+    body: HTMLElement
+    createComment: typeof createComment
+    createElement: typeof createHTMLNode
+    createElementNS: FN<[string, string], Element>
+    createTextNode: typeof createText
+    createDocumentFragment: typeof createDocumentFragment
+    addEventListener: (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => void
+    removeEventListener: (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) => void
+    _getEventListeners: (type: string) => Array<{
+        listener: EventListenerOrEventListenerObject
+        options?: boolean | AddEventListenerOptions
+    }>
 }
+
+/**
+ * Factory function to create isolated SSR document instances
+ * Use this when you need separate document contexts (e.g., parallel tests, multiple renders)
+ */
+export const createDocument = (): SSRDocument => {
+    console.log('[createDocument] Creating new isolated document instance')
+    // Mock body element for SSR - fresh instance per document
+    const body = createHTMLNode('body')
+    console.log('[createDocument] Created body element:', body.tagName)
+
+    return {
+        // Map to store event listeners - isolated per document instance
+        _eventListeners: new Map<string, Array<{
+            listener: EventListenerOrEventListenerObject
+            options?: boolean | AddEventListenerOptions
+        }>>(),
+
+        addEventListener: function (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
+            console.log('[document.addEventListener] Adding listener for type:', type)
+            if (!this._eventListeners.has(type)) {
+                this._eventListeners.set(type, [])
+            }
+            this._eventListeners.get(type)!.push({ listener, options })
+        },
+
+        removeEventListener: function (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
+            console.log('[document.removeEventListener] Removing listener for type:', type)
+            if (this._eventListeners.has(type)) {
+                const listeners = this._eventListeners.get(type)!
+                const index = listeners.findIndex(item => item.listener === listener)
+                if (index !== -1) {
+                    listeners.splice(index, 1)
+                }
+            }
+        },
+
+        // Helper method to get listeners for testing/debugging
+        _getEventListeners: function (type: string) {
+            const listeners = this._eventListeners.get(type) || []
+            console.log('[document._getEventListeners] Getting listeners for type:', type, 'count:', listeners.length)
+            return listeners
+        },
+
+        createComment,
+        createElement: ((tagName: string) => {
+            console.log('[document.createElement] Creating element:', tagName)
+            const element = createHTMLNode(tagName)
+            console.log('[document.createElement] Created element with tag:', element.tagName, 'objectId:', (element as any).objectId)
+            return element
+        }) as typeof createHTMLNode,
+        createElementNS: ((namespaceURI: string, qualifiedName: string) => {
+            console.log('[document.createElementNS] Creating element with namespace:', namespaceURI, 'qualifiedName:', qualifiedName)
+            if (namespaceURI === 'http://www.w3.org/2000/svg') {
+                return createSVGNode(qualifiedName)
+            }
+            return createHTMLNode(qualifiedName)
+        }) as any as FN<[string, string], Element>,
+        createTextNode: createText,
+        createDocumentFragment,
+
+        // Body property for portal component - isolated per instance
+        body
+    }
+}
+
+/**
+ * Default singleton document instance for simple use cases
+ * Maintains backward compatibility with existing code
+ */
+export const document = createDocument()
 

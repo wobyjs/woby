@@ -8,7 +8,7 @@ export { Fragment } from '../components/fragment'
 // import { wrapCloneElement } from '../methods/wrap_clone_element';
 import type { Child, Component, ComponentFunction, Element } from '../types'
 import { wrapCloneElement, CloneableType } from '../methods/wrap_clone_element'
-import { createElement } from '../index'
+import { createElement } from '../methods/create_element'
 import { isObject, isString } from '../utils/lang'
 import { isSSR, SYMBOL_CLONE, SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
 import { customElements as ces } from '../ssr/custom_elements'

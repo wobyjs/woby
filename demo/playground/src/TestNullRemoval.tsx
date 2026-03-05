@@ -24,20 +24,22 @@ TestNullRemoval.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
+        // SSR renders null as empty (), DOM renders as (<!---->)
         const value = $$(testObservables['TestNullRemoval'])
-        const expected = value !== null ? `<p>(${value})</p>` : '<p>(<!---->)</p>'
+        const expectedForDOM = value !== null ? `<p>(${value})</p>` : '<p>(<!---->)</p>'  // DOM renders <!----> for null
+        const expectedForSSR = value !== null ? `<p>(${value})</p>` : '<p>()</p>'  // SSR renders empty () for null
 
         // Test the SSR value synchronously
         const ssrComponent = testObservables['TestNullRemoval_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Null - Removal</h3>' + expected
+        const expectedFull = '<h3>Null - Removal</h3>' + expectedForSSR
         if (ssrResult !== expectedFull) {
             assert(false, `[TestNullRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {
             console.log(`✅ [TestNullRemoval] SSR test passed: ${ssrResult}`)
         }
 
-        return expected
+        return expectedForDOM
     }
 }
 

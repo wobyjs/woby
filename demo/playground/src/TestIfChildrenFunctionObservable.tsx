@@ -2,10 +2,11 @@ import { $, $$, If, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestIfChildrenFunctionObservable = (): JSX.Element => {
-    const o = $<number | false>(Math.random())
+    const o = $<number | false>(987654321)
     registerTestObservable('TestIfChildrenFunctionObservable', o)
-    const toggle = () => o(prev => prev ? false : Math.random())
+    const toggle = () => o(prev => prev ? false : 1234567890)
     useInterval(toggle, TEST_INTERVAL)
+    // toggle()
     const Content = ({ value }): JSX.Element => {
         return <p>Value: {value}</p>
     }
@@ -48,3 +49,5 @@ TestIfChildrenFunctionObservable.test = {
 
 
 export default () => <TestSnapshots Component={TestIfChildrenFunctionObservable} />
+
+console.log(renderToString(<TestIfChildrenFunctionObservable />))

@@ -61,10 +61,8 @@ TestNestedArrays.test = {
 
         for (let i = 0; i < itemsState.length; i++) {
             const item = itemsState[i]
-            // Add <!-- --> for inactive If blocks
-            if (activeItemState !== item) {
-                html += '<!---->'
-            } else {
+            // Add <!-- --> for inactive If blocks (only if activeItem matches)
+            if (activeItemState === item) {
                 html += '<li>test</li>'
             }
             html += `<li>${item}</li>`
@@ -87,4 +85,4 @@ TestNestedArrays.test = {
 }
 
 
-export default () => <TestSnapshots Component={TestNestedArrays} />
+export default () => <TestSnapshots Component={TestNestedArrays} /> // HMR

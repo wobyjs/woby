@@ -110,3 +110,7 @@ export * as JSX from './types'
 
 // Add HtmlBoolean export
 export * from './html'
+export * as ssr from './ssr/index'
+
+// Export SSR document factory for isolated contexts
+export { createDocument, type SSRDocument } from './ssr/document'
