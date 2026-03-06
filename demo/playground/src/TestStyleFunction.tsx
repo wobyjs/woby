@@ -29,7 +29,8 @@ TestStyleFunction.test = {
         const color = $$(testObservables['TestStyleFunction']) ?? 'green'
         const expected = `<p style="color: ${color};">content</p>`
 
-        // Test the SSR value
+        //<h3>Style - Function</h3><p>content</p>
+        //<h3>Style - Function</h3><p style="color: green;">content</p>
         const ssrComponent = testObservables['TestStyleFunction_ssr']
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Style - Function</h3><p style="color: ${color};">content</p>`

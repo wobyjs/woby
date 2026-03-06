@@ -3,6 +3,7 @@
 
 import { isSSR } from '../constants'
 import type { FragmentNode, FragmentFragment, Fragment } from '../types'
+import type { Comment as CommentSSR } from '../ssr/comment'
 
 /* HELPERS */
 
@@ -41,7 +42,7 @@ export const FragmentUtils = {
 
   },
 
-  getChildrenFragmented: (thiz: Fragment, children: Node[] = []): Node[] => {
+  getChildrenFragmented: (thiz: Fragment, children: (Node | Comment | CommentSSR)[] = []): (Node | Comment | CommentSSR)[] => {
 
     const { values, length } = thiz
 
@@ -83,7 +84,7 @@ export const FragmentUtils = {
 
   },
 
-  getChildren: (thiz: Fragment): Node | Node[] => {
+  getChildren: (thiz: Fragment): (Node | Node | Comment | CommentSSR | Comment)[] => {
 
     if (!thiz.length) return NOOP_CHILDREN
 
@@ -103,13 +104,13 @@ export const FragmentUtils = {
 
   },
 
-  pushNode: (thiz: Fragment, node: Node): void => {
+  pushNode: (thiz: Fragment, node: Node | Comment | CommentSSR): void => {
 
     FragmentUtils.pushValue(thiz, node)
 
   },
 
-  pushValue: (thiz: Fragment, value: Node | Fragment): void => {
+  pushValue: (thiz: Fragment, value: Node | Fragment | Comment | CommentSSR): void => {
 
     const { values, length } = thiz as any //TSC
 

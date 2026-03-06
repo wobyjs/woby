@@ -2,10 +2,11 @@
 
 import '../types'
 import { Fragment } from '../components/fragment'
-// import createElement from '../methods/create_element.ssr';
-// import { wrapCloneElement } from '../methods/wrap_clone_element';
+import { createElement } from '../methods/create_element'
+import { wrapCloneElement } from '../methods/wrap_clone_element'
 import type { Child, Component, Element } from '../types'
-import { SYMBOL_CLONE, createElement, wrapCloneElement } from '../ssr'
+import { SYMBOL_CLONE } from '../constants'
+// import { SYMBOL_CLONE, createElement, wrapCloneElement } from '../ssr'
 // import $ from 'soby'
 
 /* MAIN */

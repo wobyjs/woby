@@ -35,6 +35,8 @@
  */
 
 import { createComment } from "./creators"
+import { Comment as CommentSSR } from "../ssr"
+
 
 // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
 
@@ -69,7 +71,7 @@ const afterDummyWrapper: [Node] = [dummyNode]
  * // This will efficiently insert nodeC before nodeA, and append nodeD
  * ```
  */
-export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null): void => {
+export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[], after: (Node | Node | Comment | CommentSSR)[], nextSibling: Node | null): void => {
   if (before === after) return
   if (before instanceof Node) {
     if (after instanceof Node) {
@@ -93,7 +95,7 @@ export const diff = (parent: Node, before: Node | Node[], after: Node | Node[], 
   let aStart = 0
   let bStart = 0
   let map: Map<any, any> | null = null
-  let removable: Node | undefined
+  let removable: Node | Comment | CommentSSR | undefined
   while (aStart < aEnd || bStart < bEnd) {
     // append head, tail, or nodes in between: fast path
     if (aEnd === aStart) {

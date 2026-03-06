@@ -4,6 +4,7 @@
 
 import { BaseNode } from "./base_node"
 import { Comment } from "./comment"
+import { createHTMLNode } from "./html_node"
 import type { FN } from "../types"
 
 type EventListener = (evt: Event) => void
@@ -24,132 +25,20 @@ type EventListenerOptions = {
 // Enhanced mock implementations for SSR without happy-dom
 // These implementations better support the html`` template pattern from index.tsx
 
-const createComment = ((content: string) => {
-    // Create a proper Comment instance that extends BaseNode
-    const comment = new Comment(content)
-    return comment
+
+export const createComment = ((content: string) => {
+    const node = {
+        nodeType: 8,
+        textContent: content,
+        parentNode: null as any,
+        toString: () => `<!--${content}-->`
+    }
+    return node
 }) as any as FN<[string], Comment>
 
-const createHTMLNode = ((tagName: string) => {
-    class HTMLNode extends BaseNode {
-        tagName: string
-        style: any
-        #className: string
+// Re-export createHTMLNode from html_node.ts
 
-        constructor() {
-            super(1)
-            this.tagName = tagName.toUpperCase()
-            this.style = {}
-            this.#className = ''
-            this.id = ''
-        }
-
-        set className(value: string) {
-            this.#className = value
-            // Also update the attributes object to keep them in sync
-            // Directly update the attributes to avoid circular calls
-            this.attributes['class'] = value
-        }
-
-        get className(): string {
-            return this.#className
-        }
-
-        set id(value: string) {
-            // Update both the property and attributes for consistency
-            this.setAttribute('id', value)
-        }
-
-        get id(): string {
-            return this.attributes['id'] || ''
-        }
-
-        // Override setAttribute for special HTML handling
-        setAttribute(name: string, value: any) {
-            // Handle special cases for style and class
-            if (name === 'style') {
-                this.style = value
-            } else if (name === 'class' || name === 'className') {
-                // Use the setter to ensure synchronization
-                this.className = value
-            }
-            super.setAttribute(name, value)
-        }
-
-        // Method to set innerHTML (simplified)
-        set innerHTML(content: string) {
-            // Clear existing children
-            this.childNodes = []
-            // Add as text node
-            this.appendChild(createText(content))
-        }
-
-        // Add append method for compatibility with diff algorithm
-        append(...nodes: any[]) {
-            nodes.forEach(node => {
-                this.appendChild(node)
-            })
-        }
-
-        // Add before method for compatibility with diff algorithm
-        before(...nodes: any[]) {
-            // This is a simplified implementation
-            // In a real DOM, this would insert nodes before this node
-            // But for our purposes, we'll just append to the parent
-            if (this.parentNode) {
-                nodes.forEach(node => {
-                    this.parentNode.insertBefore(node, this)
-                })
-            }
-        }
-
-        // Getter for outerHTML
-        get outerHTML() {
-            // Build attributes string
-            const attrs = Object.entries(this.attributes)
-                .map(([name, value]) => `${name}="${value}"`)
-                .join(' ')
-            const attrStr = attrs ? ` ${attrs}` : ''
-
-            // Handle self-closing tags
-            if (['br', 'hr', 'img', 'input', 'meta', 'link'].includes(this.tagName.toLowerCase())) {
-                return `<${this.tagName.toLowerCase()}${attrStr} />`
-            }
-
-            // Build children string
-            const children = this.childNodes.map((child: any) => {
-                if (typeof child === 'object' && child !== null) {
-                    if ('outerHTML' in child) {
-                        return child.outerHTML
-                    } else if ('textContent' in child) {
-                        return child.textContent
-                    }
-                }
-                return String(child)
-            }).join('')
-
-            return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
-        }
-
-        // Getter for innerHTML
-        get innerHTML() {
-            return this.childNodes.map((child: any) => {
-                if (typeof child === 'object' && child !== null) {
-                    if ('outerHTML' in child) {
-                        return child.outerHTML
-                    } else if ('textContent' in child) {
-                        return child.textContent
-                    }
-                }
-                return String(child)
-            }).join('')
-        }
-    }
-
-    return new HTMLNode()
-}) as any as FN<[string], HTMLElement>
-
-const createSVGNode = ((tagName: string) => {
+export const createSVGNode = ((tagName: string) => {
     class SVGNode extends BaseNode {
         tagName: string
         isSVG: boolean
@@ -216,7 +105,7 @@ const createSVGNode = ((tagName: string) => {
     return new SVGNode()
 }) as any as FN<[string], SVGElement>
 
-const createText = ((text: string) => {
+export const createText = ((text: string) => {
     // Define TextNode that extends BaseNode for SSR compatibility
     const TextNode = class extends BaseNode {
         textContent: string
@@ -262,6 +151,18 @@ const createText = ((text: string) => {
 
     return new TextNode(text) as any
 }) as any as FN<[string], Text>
+
+
+// export const createText = ((text: string) => {
+//     const node = {
+//         nodeType: 3,
+//         textContent: String(text),
+//         parentNode: null as any,
+//         toString: () => String(text)
+//     }
+//     return node
+// }) as any as FN<[string], Text>
+
 
 const createDocumentFragment = (() => {
     class DocumentFragmentNode extends BaseNode {

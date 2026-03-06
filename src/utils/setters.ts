@@ -9,7 +9,7 @@ import { context, with as _with, batch, Observable, SYMBOL_OBSERVABLE_WRITABLE }
 import { SYMBOL_STORE_OBSERVABLE } from '../soby'
 import { classesToggle } from '../utils/classlist'
 import { createText as createTextDOM, createComment as createCommentDOM } from '../utils/creators'
-import { createText as createTextSSR, createComment as createCommentSSR } from '../utils/creators.ssr'
+import { createText as createTextSSR, createComment as createCommentSSR } from '../ssr/document'
 import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isObject, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
@@ -425,7 +425,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
                 if (next instanceof Array) {
 
                     // parent.append.apply(parent, next)
-                    for (const node of next) parent.appendChild(node)
+                    for (const node of next) parent.appendChild(node as any)
 
                 } else {
                     parent.appendChild(next)
@@ -449,7 +449,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
         if (next !== fragmentNext.values) {
 
-            next = placeholder
+            next = placeholder as any
             nextLength += 1
 
         }
@@ -991,6 +991,7 @@ export const setStyle = (element: HTMLElement, key: string, value: FunctionMaybe
 }
 
 export const setStylesStatic = (element: HTMLElement, object: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, objectPrev: null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>, stack: Stack): void => {
+    const isSSR = useEnvironment() === 'ssr'
 
     if (isString(object)) {
 
@@ -1035,13 +1036,23 @@ export const setStylesStatic = (element: HTMLElement, object: null | undefined |
             }
 
         } else {
-            //@ts-ignore
+
             for (const key in object) {
 
                 setStyle(element, key, object[key], stack)
 
             }
 
+            // In SSR mode, after setting all styles, serialize them to the style attribute
+            if (isSSR && object && !isString(object)) {
+                const styleString = Array.from(Object.entries(object))
+                    .filter(([_, value]) => !isNil(value))
+                    .map(([key, value]) => `${key}: ${value};`)
+                    .join(' ')
+                if (styleString) {
+                    element.setAttribute('style', styleString)
+                }
+            }
         }
 
     }
@@ -1067,7 +1078,9 @@ export const setStyles = (element: HTMLElement, object: FunctionMaybe<null | und
 
     } else {
 
-        setStylesStatic(element, $$(object), null, stack)
+        // In SSR, we still need to resolve nested functions in the style object
+        const resolvedObject = isSSR ? resolveStyle(object) : $$(object)
+        setStylesStatic(element, resolvedObject, null, stack)
 
     }
 

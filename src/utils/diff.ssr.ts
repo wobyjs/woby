@@ -16,15 +16,15 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-import { createComment } from "./creators.ssr"
+import { createComment } from "../ssr"
 
 /* MAIN */
 
 // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
 
 const dummyNode = createComment('')
-const beforeDummyWrapper: [Node] = [dummyNode]
-const afterDummyWrapper: [Node] = [dummyNode]
+const beforeDummyWrapper: [Node] = [dummyNode as any]
+const afterDummyWrapper: [Node] = [dummyNode as any]
 
 const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSibling: Node | null): void => {
   if (before === after) return
@@ -194,8 +194,8 @@ const diff = (parent: Node, before: Node | Node[], after: Node | Node[], nextSib
       }
     }
   }
-  beforeDummyWrapper[0] = dummyNode
-  afterDummyWrapper[0] = dummyNode
+  beforeDummyWrapper[0] = dummyNode as any
+  afterDummyWrapper[0] = dummyNode as any
 }
 
 /* EXPORT */

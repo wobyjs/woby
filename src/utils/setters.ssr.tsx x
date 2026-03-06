@@ -919,27 +919,40 @@ export const setStylesStatic = (element: HTMLElement, object: null | undefined |
 }
 
 export const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Stack): void => {
+    console.log('[DEBUG setStyles] Called with object:', object)
 
     if (isFunction(object) || isArray(object)) {
+        console.log('[DEBUG setStyles] Is function or array')
 
         let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
-
-        useRenderEffect(() => {
-
+        const isSSR = useEnvironment() === 'ssr'
+        
+        // During SSR, resolve styles immediately instead of in useRenderEffect
+        if (isSSR) {
+            console.log('[DEBUG setStyles] SSR mode - resolving styles immediately')
             const objectNext = resolveStyle(object)
+            console.log('[DEBUG setStyles] SSR resolved objectNext:', objectNext)
+            setStylesStatic(element, objectNext, null, stack)
+        } else {
+            useRenderEffect(() => {
+                console.log('[DEBUG setStyles] useRenderEffect callback executing')
 
-            setStylesStatic(element, objectNext, objectPrev, stack)
+                const objectNext = resolveStyle(object)
+                console.log('[DEBUG setStyles] Resolved objectNext:', objectNext)
 
-            objectPrev = objectNext
+                setStylesStatic(element, objectNext, objectPrev, stack)
 
-        }, stack)
+                objectPrev = objectNext
+
+            }, stack)
+        }
 
     } else {
+        console.log('[DEBUG setStyles] Is plain value')
 
         setStylesStatic(element, $$(object), null, stack)
 
     }
-
 }
 
 export const setTemplateAccessor = (element: HTMLElement, key: string, value: TemplateActionProxy): void => {

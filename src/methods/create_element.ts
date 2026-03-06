@@ -11,7 +11,7 @@
 import { untrack } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
 import { createComment as createCommentDOM, createHTMLNode as createHTMLNodeDOM, createSVGNode as createSVGNodeDOM, createText as createTextDOM } from '../utils/creators'
-import { createHTMLNode as createHTMLNodeSSR, createSVGNode as createSVGNodeSSR, createComment as createCommentSSR, createText as createTextSSR } from '../utils/creators.ssr'
+import { createHTMLNode as createHTMLNodeSSR, createSVGNode as createSVGNodeSSR, createComment as createCommentSSR, createText as createTextSSR } from '../ssr'
 import { isClass, isFunction, isNode, isObject, isString, isSVGElement, isVoidChild } from '../utils/lang'
 import { setChild, setProps } from '../utils/setters'
 import { setChild as setChildSSR, setProps as setPropsSSR } from '../utils/setters'

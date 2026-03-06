@@ -1,12 +1,13 @@
 
 /* IMPORT */
 import type * as CSS from 'csstype'
-
+import type { Comment as CommentSSR } from './ssr/comment'
 // import './jsx/types' //import once to make entire project compilable.
 
 /* EXPORT */
 
 declare const ContextWithDefaultSymbol: unique symbol
+
 
 
 export type ArrayMaybe<T = unknown> = T[] | T
@@ -83,7 +84,7 @@ export type FragmentNodes = { values: Node[], fragmented?: false, length: 2 | 3 
 
 export type FragmentFragments = { values: Fragment[], fragmented: true, length: 2 | 3 | 4 | 5 }
 
-export type FragmentMixed = { values: (Node | Fragment)[], fragmented: true, length: 2 | 3 | 4 | 5 }
+export type FragmentMixed = { values: (Node | Fragment | Comment | CommentSSR)[], fragmented: true, length: 2 | 3 | 4 | 5 }
 
 export type Fragment = FragmentUndefined | FragmentNode | FragmentFragment | FragmentNodes | FragmentFragments | FragmentMixed
 

@@ -9,6 +9,7 @@ import { $ } from '../methods/soby'
 import { $$ } from '../methods/soby'
 import { assign, castError, isPromise } from '../utils/lang'
 import type { ObservableMaybe, PromiseMaybe, ResourceStaticPending, ResourceStaticRejected, ResourceStaticResolved, ResourceStatic, ResourceFunction, Resource } from '../types'
+import { useEnvironment } from '../components/environment_context'
 
 /* MAIN */
 
@@ -33,7 +34,10 @@ export const useResource = <T>(fetcher: (() => ObservableMaybe<PromiseMaybe<T>>)
 
   const stack = new Error()
 
-  useRenderEffect(() => {
+  const isSSR = useEnvironment() === 'ssr'
+  const useREffect = isSSR ? (fn: () => void) => fn() : useRenderEffect
+
+  useREffect(() => {
 
     const disposed = useCheapDisposed()
 

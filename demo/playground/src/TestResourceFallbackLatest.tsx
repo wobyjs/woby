@@ -1,23 +1,25 @@
-import { $, $$, ErrorBoundary, If, useResource, renderToString } from 'woby'
+import { $, $$, ErrorBoundary, If, useResource, renderToString, renderT } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestResourceFallbackLatest = (): JSX.Element => {
-    const resource = useResource(() => { throw new Error('Some error') })
-    const ret: JSX.Element = () => (
-        <>
-            <h3>Resource - Fallback Latest</h3>
-            <ErrorBoundary fallback={<p>Error!</p>}>
-                <If when={() => resource().latest} fallback={<p>Loading!</p>}>
-                    <p>Loaded!</p>
-                </If>
-            </ErrorBoundary>
-            <ErrorBoundary fallback={<p>Error!</p>}>
-                <If when={resource.latest} fallback={<p>Loading!</p>}>
-                    <p>Loaded!</p>
-                </If>
-            </ErrorBoundary>
-        </>
-    )
+    const ret: JSX.Element = () => {
+        const resource = useResource(() => { throw new Error('Some error') })
+        return (
+            <>
+                <h3>Resource - Fallback Latest</h3>
+                <ErrorBoundary fallback={<p>Error!</p>}>
+                    <If when={() => resource().latest} fallback={<p>Loading!</p>}>
+                        <p>Loaded!</p>
+                    </If>
+                </ErrorBoundary>
+                <ErrorBoundary fallback={<p>Error!</p>}>
+                    <If when={resource.latest} fallback={<p>Loading!</p>}>
+                        <p>Loaded!</p>
+                    </If>
+                </ErrorBoundary>
+            </>
+        )
+    }
 
     // Store the component for SSR testing
     registerTestObservable('TestResourceFallbackLatest_ssr', ret)
@@ -29,6 +31,8 @@ TestResourceFallbackLatest.test = {
     static: true,
     expect: () => {
         const expected = '<p>Error!</p><p>Error!</p>'
+        //<h3>Resource - Fallback Latest</h3><p>Loading!</p><p>Loading!</p>
+        //<h3>Resource - Fallback Latest</h3><p>Error!</p><p>Error!</p>
 
         const ssrComponent = testObservables['TestResourceFallbackLatest_ssr']
         const ssrResult = renderToString(ssrComponent)
@@ -45,3 +49,5 @@ TestResourceFallbackLatest.test = {
 
 
 export default () => <TestSnapshots Component={TestResourceFallbackLatest} />
+
+// console.log(renderToString(<TestResourceFallbackLatest />))

@@ -3,7 +3,7 @@ import type { Child } from '../types'
 import { setChild } from '../utils/setters'
 // import { isArray } from '../utils/lang'
 import { BaseNode } from '../ssr/base_node'
-import { createHTMLNode as createHTMLNodeSSR } from '../utils/creators.ssr'
+// import { createHTMLNode as createHTMLNodeSSR } from '../ssr/document'
 import { $$, context, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'
 import { isFunction } from '../utils/lang'
@@ -143,25 +143,7 @@ function constructNodeHTML(node: BaseNode): string {
         const attrs = Object.entries(node.attributes || {})
             .map(([name, value]) => `${name}="${value}"`)
             .join(' ')
-
-        // Handle style property - convert style object to CSS string
-        let styleAttr = ''
-        if ((node as any).style && typeof (node as any).style === 'object' && Object.keys((node as any).style).length > 0) {
-            const styleParts: string[] = []
-            for (const [key, value] of Object.entries((node as any).style)) {
-                if (value !== null && value !== undefined && value !== '') {
-                    // Convert camelCase to kebab-case for CSS properties
-                    const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase()
-                    styleParts.push(`${cssKey}: ${value};`)
-                }
-            }
-            if (styleParts.length > 0) {
-                styleAttr = ` style="${styleParts.join(' ')}"`
-            }
-        }
-
         const attrStr = attrs ? ` ${attrs}` : ''
-        const finalAttrStr = attrStr + styleAttr
 
         // Handle self-closing tags
         const selfClosingTags = ['BR', 'HR', 'IMG', 'INPUT', 'META', 'LINK']
@@ -187,7 +169,7 @@ function constructNodeHTML(node: BaseNode): string {
                 })
                 .join('')
 
-            return `<${tagName.toLowerCase()}${finalAttrStr}>${textContent}</${tagName.toLowerCase()}>`
+            return `<${tagName.toLowerCase()}${attrStr}>${textContent}</${tagName.toLowerCase()}>`
         }
 
         // Default handling for other elements
@@ -195,7 +177,7 @@ function constructNodeHTML(node: BaseNode): string {
             return getNodeContent(child)
         }).join('')
 
-        return `<${tagName.toLowerCase()}${finalAttrStr}>${childrenContent}</${tagName.toLowerCase()}>`
+        return `<${tagName.toLowerCase()}${attrStr}>${childrenContent}</${tagName.toLowerCase()}>`
     }
 
     // Default case

@@ -1,18 +1,74 @@
-import type { FN } from '../types'
-import { BaseNode } from '../ssr/base_node'
+/**
+ * HTMLNode class for SSR document mock
+ */
 
-// Enhanced mock implementations for SSR without happy-dom
-// These implementations better support the html`` template pattern from index.tsx
+import { BaseNode } from "./base_node"
+import type { FN } from "../types"
 
-export const createComment = ((content: string) => {
-    const node = {
-        nodeType: 8,
-        textContent: content,
-        parentNode: null as any,
-        toString: () => `<!--${content}-->`
+/**
+ * Style class for handling CSS properties in SSR
+ */
+class Style {
+    [key: string]: any
+
+    constructor() {
+        // Add setProperty method for CSS custom properties
+        this.setProperty = (name: string, value: string) => {
+            this[name] = value
+        }
     }
-    return node
-}) as any as FN<[string], Comment>
+
+    setProperty(name: string, value: string): void {
+        this[name] = value
+    }
+}
+
+const createText = ((text: string) => {
+    // Define TextNode that extends BaseNode for SSR compatibility
+    const TextNode = class extends BaseNode {
+        textContent: string
+        objectId: string
+
+        constructor(text: string) {
+            super(3) // nodeType 3 for text
+            this.objectId = Math.random().toString(36).substr(2, 9) // Unique ID for tracking
+            this.textContent = String(text)
+        }
+
+        // Getter for text representation
+        toString() {
+            return this.textContent
+        }
+
+        // Property to get text as string for rendering
+        get nodeValue() {
+            return this.textContent
+        }
+
+        set nodeValue(value: string) {
+            this.textContent = value
+        }
+
+        // DOM-like properties that may be needed by diff algorithm
+        get nextSibling() {
+            if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
+                const index = this.parentNode.childNodes.indexOf(this)
+                return index !== -1 ? this.parentNode.childNodes[index + 1] : null
+            }
+            return null
+        }
+
+        get previousSibling() {
+            if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
+                const index = this.parentNode.childNodes.indexOf(this)
+                return index > 0 ? this.parentNode.childNodes[index - 1] : null
+            }
+            return null
+        }
+    }
+
+    return new TextNode(text) as any
+}) as any as FN<[string], Text>
 
 export const createHTMLNode = ((tagName: string) => {
     class HTMLNode extends BaseNode {
@@ -23,7 +79,7 @@ export const createHTMLNode = ((tagName: string) => {
         constructor() {
             super(1)
             this.tagName = tagName.toUpperCase()
-            this.style = {}
+            this.style = new Style()
             this.#className = ''
         }
 
@@ -38,6 +94,15 @@ export const createHTMLNode = ((tagName: string) => {
             return this.#className
         }
 
+        set id(value: string) {
+            // Update both the property and attributes for consistency
+            this.setAttribute('id', value)
+        }
+
+        get id(): string {
+            return this.attributes['id'] || null
+        }
+
         // Override setAttribute for special HTML handling
         setAttribute(name: string, value: any) {
             // Handle special cases for style and class
@@ -47,7 +112,6 @@ export const createHTMLNode = ((tagName: string) => {
                 // Use the setter to ensure synchronization
                 this.className = value
             }
-            // Always call the parent setAttribute to ensure the attribute is stored in this.attributes
             super.setAttribute(name, value)
         }
 
@@ -88,7 +152,7 @@ export const createHTMLNode = ((tagName: string) => {
 
             // Handle self-closing tags
             if (['br', 'hr', 'img', 'input', 'meta', 'link'].includes(this.tagName.toLowerCase())) {
-                return `<${this.tagName.toLowerCase()}${attrStr}>`
+                return `<${this.tagName.toLowerCase()}${attrStr} />`
             }
 
             // Build children string
@@ -105,47 +169,10 @@ export const createHTMLNode = ((tagName: string) => {
 
             return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
         }
-    }
 
-    return new HTMLNode()
-}) as any as FN<[string], HTMLElement>
-
-export const createSVGNode = ((tagName: string) => {
-    class SVGNode extends BaseNode {
-        tagName: string
-        isSVG: boolean
-        style: any
-        #className: string
-
-        constructor() {
-            super(1)
-            this.tagName = tagName.toUpperCase()
-            this.isSVG = true
-            this.style = {}
-            this.#className = ''
-        }
-
-        set className(value: string) {
-            this.#className = value
-            // Also update the attributes object to keep them in sync
-            // Directly update the attributes to avoid circular calls
-            this.attributes['class'] = value
-        }
-
-        get className(): string {
-            return this.#className
-        }
-
-        // Getter for outerHTML
-        get outerHTML() {
-            // Build attributes string
-            const attrs = Object.entries(this.attributes)
-                .map(([name, value]) => `${name}="${value}"`)
-                .join(' ')
-            const attrStr = attrs ? ` ${attrs}` : ''
-
-            // Build children string
-            const children = this.childNodes.map((child: any) => {
+        // Getter for innerHTML
+        get innerHTML() {
+            return this.childNodes.map((child: any) => {
                 if (typeof child === 'object' && child !== null) {
                     if ('outerHTML' in child) {
                         return child.outerHTML
@@ -155,30 +182,8 @@ export const createSVGNode = ((tagName: string) => {
                 }
                 return String(child)
             }).join('')
-
-            return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
         }
     }
 
-    return new SVGNode()
-}) as any as FN<[string], SVGElement>
-
-export const createText = ((text: string) => {
-    const node = {
-        nodeType: 3,
-        textContent: String(text),
-        parentNode: null as any,
-        toString: () => String(text)
-    }
-    return node
-}) as any as FN<[string], Text>
-
-export const createDocumentFragment = (() => {
-    class DocumentFragmentNode extends BaseNode {
-        constructor() {
-            super(11)
-        }
-    }
-
-    return new DocumentFragmentNode()
-}) as any as FN<[], DocumentFragment>
+    return new HTMLNode()
+}) as any as FN<[string], HTMLElement>

@@ -27,6 +27,7 @@ TestStringRemoval.test = {
     compareActualValues: true,
     expect: () => {
         const val = $$(testObservables['TestStringRemoval'])
+        // DOM renders <!----> comment for null, SSR renders empty string
         const expected = val !== null ? `<p>(${val})</p>` : '<p>(<!---->)</p>'
 
         // Test the SSR value
@@ -34,7 +35,7 @@ TestStringRemoval.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = val !== null ?
             `<h3>String - Removal</h3><p>(${val})</p>` :
-            '<h3>String - Removal</h3><p>(<!---->)</p>'
+            '<h3>String - Removal</h3><p>()</p>'
         if (ssrResult !== expectedFull) {
             assert(false, `[TestStringRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {
