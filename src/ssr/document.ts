@@ -300,10 +300,8 @@ export interface SSRDocument {
  * Use this when you need separate document contexts (e.g., parallel tests, multiple renders)
  */
 export const createDocument = (): SSRDocument => {
-    console.log('[createDocument] Creating new isolated document instance')
     // Mock body element for SSR - fresh instance per document
     const body = createHTMLNode('body')
-    console.log('[createDocument] Created body element:', body.tagName)
 
     return {
         // Map to store event listeners - isolated per document instance
@@ -313,7 +311,6 @@ export const createDocument = (): SSRDocument => {
         }>>(),
 
         addEventListener: function (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
-            console.log('[document.addEventListener] Adding listener for type:', type)
             if (!this._eventListeners.has(type)) {
                 this._eventListeners.set(type, [])
             }
@@ -321,7 +318,6 @@ export const createDocument = (): SSRDocument => {
         },
 
         removeEventListener: function (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
-            console.log('[document.removeEventListener] Removing listener for type:', type)
             if (this._eventListeners.has(type)) {
                 const listeners = this._eventListeners.get(type)!
                 const index = listeners.findIndex(item => item.listener === listener)
@@ -333,20 +329,14 @@ export const createDocument = (): SSRDocument => {
 
         // Helper method to get listeners for testing/debugging
         _getEventListeners: function (type: string) {
-            const listeners = this._eventListeners.get(type) || []
-            console.log('[document._getEventListeners] Getting listeners for type:', type, 'count:', listeners.length)
-            return listeners
+            return this._eventListeners.get(type) || []
         },
 
         createComment,
         createElement: ((tagName: string) => {
-            console.log('[document.createElement] Creating element:', tagName)
-            const element = createHTMLNode(tagName)
-            console.log('[document.createElement] Created element with tag:', element.tagName, 'objectId:', (element as any).objectId)
-            return element
+            return createHTMLNode(tagName)
         }) as typeof createHTMLNode,
         createElementNS: ((namespaceURI: string, qualifiedName: string) => {
-            console.log('[document.createElementNS] Creating element with namespace:', namespaceURI, 'qualifiedName:', qualifiedName)
             if (namespaceURI === 'http://www.w3.org/2000/svg') {
                 return createSVGNode(qualifiedName)
             }

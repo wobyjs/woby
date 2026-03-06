@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, render, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestStyleFunction = (): JSX.Element => {
@@ -45,3 +45,5 @@ TestStyleFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestStyleFunction} />
+
+console.log(renderToString(<TestStyleFunction />))

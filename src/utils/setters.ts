@@ -246,7 +246,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
             if (!fragmentOnly) {
                 try {
                     parent.insertBefore(node, null)
-                } catch { debugger }
+                } catch { /* debugger */ }
             }
 
             FragmentUtils.replaceWithNode(fragment, node)

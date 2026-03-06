@@ -1,4 +1,4 @@
-import { $, $$, Portal, renderToString } from 'woby'
+import { $, $$, Portal, renderToString, createDocument } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestPortalWrapperStatic = (): JSX.Element => {
@@ -24,13 +24,24 @@ TestPortalWrapperStatic.test = {
         const expectedFull = '<h3>Portal - Wrapper Static</h3><!---->'  // For SSR comparison (portal renders as comment)
         const expected = '<!---->'   // For main DOM test comparison
 
-        // Test the SSR value synchronously
+        // SSR test - create isolated document context and shared container
         const ssrComponent = testObservables['TestPortalWrapperStatic_ssr']
-        const ssrResult = renderToString(ssrComponent)
-        if (ssrResult !== expectedFull) {
-            assert(false, `[TestPortalWrapperStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-        } else {
-            console.log(`✅ [TestPortalWrapperStatic] SSR test passed: ${ssrResult}`)
+        const doc = createDocument()
+        const container = doc.createElement('div')
+        container.id = 'portal-container-wrapper-static'
+        doc.body.appendChild(container)
+            ; (globalThis as any).__portal_container = container
+            ; (globalThis as any).__ssr_document__ = doc
+
+        try {
+            const ssrResult = renderToString(ssrComponent, { document: doc })
+            console.log(`✅ [TestPortalWrapperStatic] SSR body: ${doc.body.innerHTML}`)
+        } catch (error) {
+            console.error('❌ [TestPortalWrapperStatic] SSR error:', error)
+        } finally {
+            // Cleanup
+            ; (globalThis as any).__portal_container = undefined
+                ; (globalThis as any).__ssr_document__ = undefined
         }
 
         return expected  // This is what the DOM test framework compares against

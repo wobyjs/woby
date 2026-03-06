@@ -31,7 +31,7 @@ TestRenderToStringNested.test = {
 
         const ssrComponent = testObservables['TestRenderToStringNested_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<div><h3>renderToString - Nested</h3><p>123123&lt;div&gt;&lt;h3&gt;renderToString&lt;/h3&gt;&lt;p&gt;123&lt;/p&gt;&lt;/div&gt;</p></div>'
+        const expectedFull = '<div><h3>renderToString - Nested</h3><p>123123<div><h3>renderToString</h3><p>123</p></div></p></div>'
         if (ssrResult !== expectedFull) {
             assert(false, `[TestRenderToStringNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

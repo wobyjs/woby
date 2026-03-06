@@ -27,18 +27,21 @@ const TestRefUntrack = (): JSX.Element => {
 TestRefUntrack.test = {
     static: true,
     expect: () => {
-        const expected = '<p>0</p>'
+        // SSR renders initial state before interval updates
+        const expectedForSSR = '<p>content</p>'
+        // DOM shows dynamic value from observable (0 initially)
+        const expectedForDOM = '<p>0</p>'
 
         const ssrComponent = testObservables['TestRefUntrack_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Ref - Untrack</h3><p>0</p>'
+        const expectedFull = '<h3>Ref - Untrack</h3>' + expectedForSSR
         if (ssrResult !== expectedFull) {
             assert(false, `[TestRefUntrack] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {
             console.log(`✅ [TestRefUntrack] SSR test passed: ${ssrResult}`)
         }
 
-        return expected
+        return expectedForDOM
     }
 }
 

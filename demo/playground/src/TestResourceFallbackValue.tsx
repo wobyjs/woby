@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, ErrorBoundary, If, useResource, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestResourceFallbackValue = (): JSX.Element => {

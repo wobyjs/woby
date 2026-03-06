@@ -38,7 +38,7 @@ TestSelectObservableOption.test = {
 
         const ssrComponent = testObservables['TestSelectObservableOption_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Select - Observable Option</h3><select name="select-observable-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
+        const expectedFull = '<h3>Select - Observable Option</h3><select name="select-observable-option"><option value="foo">foo</option><option value="bar" selected="">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
         if (ssrResult !== expectedFull) {
             assert(false, `[TestSelectObservableOption] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {

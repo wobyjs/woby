@@ -31,51 +31,34 @@ export const renderToString = (
     child: Child,
     options?: RenderToStringOptions
 ): string | { html: string; document: SSRDocument } => {
-    console.log('[renderToString] Called with:', {
-        childType: typeof child,
-        hasOptions: !!options,
-        options: options ? {
-            hasDocument: !!options.document,
-            returnDocument: options.returnDocument
-        } : undefined
-    })
-
     return EnvironmentContext.Provider('ssr', () => {
         // Create or use provided document instance for isolated context
         const ssrDoc = options?.document ?? createDocument()
-        console.log('[renderToString] Using document:', ssrDoc ? 'custom/provided' : 'new instance')
 
         if (showEnvLog)
             console.log('ENV renderToString:', useEnvironment())
 
         // Use document's createElement for container creation
         const container = ssrDoc.createElement('div')
-        console.log('[renderToString] Created container:', container.tagName || 'div')
         const stack = new Error()
 
         // Use a fragment for the root
         const fragment = FragmentUtils.make()
-        console.log('[renderToString] Created fragment')
 
         // Set the child content
-        console.log('[renderToString] About to setChild with child type:', typeof child)
         setChild(container, child, fragment, stack)
-        console.log('[renderToString] setChild completed, childNodes count:', container.childNodes?.length || 0)
 
         // Get the rendered content from the container's children
         const children = Array.from(container.childNodes || [])
         const childrenContent = children.map((child: any) => {
             return getNodeContent(child)
         }).join('')
-        console.log('[renderToString] Generated HTML content length:', childrenContent.length)
 
         // Return both html and document if requested
         if (options?.returnDocument) {
-            console.log('[renderToString] Returning object with html and document')
             return { html: childrenContent, document: ssrDoc }
         }
 
-        console.log('[renderToString] Returning HTML string')
         return childrenContent
     }) as any
 }
@@ -160,7 +143,25 @@ function constructNodeHTML(node: BaseNode): string {
         const attrs = Object.entries(node.attributes || {})
             .map(([name, value]) => `${name}="${value}"`)
             .join(' ')
+
+        // Handle style property - convert style object to CSS string
+        let styleAttr = ''
+        if ((node as any).style && typeof (node as any).style === 'object' && Object.keys((node as any).style).length > 0) {
+            const styleParts: string[] = []
+            for (const [key, value] of Object.entries((node as any).style)) {
+                if (value !== null && value !== undefined && value !== '') {
+                    // Convert camelCase to kebab-case for CSS properties
+                    const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase()
+                    styleParts.push(`${cssKey}: ${value};`)
+                }
+            }
+            if (styleParts.length > 0) {
+                styleAttr = ` style="${styleParts.join(' ')}"`
+            }
+        }
+
         const attrStr = attrs ? ` ${attrs}` : ''
+        const finalAttrStr = attrStr + styleAttr
 
         // Handle self-closing tags
         const selfClosingTags = ['BR', 'HR', 'IMG', 'INPUT', 'META', 'LINK']
@@ -186,7 +187,7 @@ function constructNodeHTML(node: BaseNode): string {
                 })
                 .join('')
 
-            return `<${tagName.toLowerCase()}${attrStr}>${textContent}</${tagName.toLowerCase()}>`
+            return `<${tagName.toLowerCase()}${finalAttrStr}>${textContent}</${tagName.toLowerCase()}>`
         }
 
         // Default handling for other elements
@@ -194,7 +195,7 @@ function constructNodeHTML(node: BaseNode): string {
             return getNodeContent(child)
         }).join('')
 
-        return `<${tagName.toLowerCase()}${attrStr}>${childrenContent}</${tagName.toLowerCase()}>`
+        return `<${tagName.toLowerCase()}${finalAttrStr}>${childrenContent}</${tagName.toLowerCase()}>`
     }
 
     // Default case

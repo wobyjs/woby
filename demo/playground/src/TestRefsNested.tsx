@@ -29,18 +29,21 @@ const TestRefsNested = (): JSX.Element => {
 TestRefsNested.test = {
     static: true,
     expect: () => {
-        const expected = '<p>Got ref1 - Has parent: true - Is connected: true / Got ref2 - Has parent: true - Is connected: true</p>'
+        // SSR doesn't execute useEffect, so just shows 'content'
+        // DOM executes useEffect with sync:true, so shows ref status
+        const expectedForSSR = '<p>content</p>'
+        const expectedForDOM = '<p>Got ref1 - Has parent: true - Is connected: true / Got ref2 - Has parent: true - Is connected: true</p>'
 
         const ssrComponent = testObservables['TestRefsNested_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Refs - Nested</h3><p>Got ref1 - Has parent: true - Is connected: true / Got ref2 - Has parent: true - Is connected: true</p>'
+        const expectedFull = '<h3>Refs - Nested</h3>' + expectedForSSR
         if (ssrResult !== expectedFull) {
             assert(false, `[TestRefsNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
         } else {
             console.log(`✅ [TestRefsNested] SSR test passed: ${ssrResult}`)
         }
 
-        return expected
+        return expectedForDOM
     }
 }
 

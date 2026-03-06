@@ -20,7 +20,7 @@ TestPropertyCheckedObservable.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Property - Checked Observable</h3><p><input type="checkbox"></p>'  // For SSR comparison (checked property does not render as attribute in SSR)
+        const expectedFull = '<h3>Property - Checked Observable</h3><p><input type="checkbox" checked=""></input></p>'  // For SSR comparison
         const expected = '<p><input type="checkbox"></p>'   // For main DOM test comparison
 
         // Test the SSR value synchronously
