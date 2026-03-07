@@ -24,18 +24,19 @@ TestUndefinedObservable.test = {
     static: false,
     expect: () => {
         const value = $$(testObservables['TestUndefinedObservable'])
-        const expected = value !== undefined ? `<p>${value}</p>` : '<p><!----></p>'
+        const expectedForDOM = value !== undefined ? `<p>${value}</p>` : '<p><!----></p>'
+        const expectedForSSR = value !== undefined ? `<p>${value}</p>` : '<p></p>'
 
         const ssrComponent = testObservables['TestUndefinedObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = value !== undefined ? `<h3>Undefined - Observable</h3><p>${value}</p>` : '<h3>Undefined - Observable</h3><p><!----></p>'
-        if (ssrResult !== expectedFull) {
-            assert(false, `[TestUndefinedObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        const expectedFullForSSR = value !== undefined ? `<h3>Undefined - Observable</h3><p>${value}</p>` : '<h3>Undefined - Observable</h3><p></p>'
+        if (ssrResult !== expectedFullForSSR) {
+            assert(false, `[TestUndefinedObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFullForSSR}`)
         } else {
             console.log(`✅ [TestUndefinedObservable] SSR test passed: ${ssrResult}`)
         }
 
-        return expected
+        return expectedForDOM
     }
 }
 

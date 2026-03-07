@@ -1,6 +1,5 @@
 import type { ComponentIntrinsicElement, FN } from '../types'
-import { createComment as createCommentSSR, createText as createTextSSR, createDocumentFragment as createDocumentFragmentSSR } from '../ssr/document'
-import { createHTMLNode as createHTMLNodeSSR } from '../ssr/html_node'
+import { createComment as createCommentSSR, createText as createTextSSR, createDocumentFragment as createDocumentFragmentSSR, createElement as createHTMLNodeSSR } from '../ssr/document'
 import { createSVGNode as createSVGNodeSSR } from '../ssr/document'
 
 // Enhanced mock implementations for SSR without happy-dom

@@ -25,7 +25,7 @@ TestSymbolFunction.test = {
 
         const ssrComponent = testObservables['TestSymbolFunction_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Symbol - Function</h3><p><!----></p>'
+        const expectedFull = '<h3>Symbol - Function</h3><p></p>'
         if (ssrResult !== expectedFull) {
             assert(false, `[TestSymbolFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {

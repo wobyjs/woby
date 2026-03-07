@@ -17,12 +17,8 @@ export * from './base_node'
 export * from './mutation_observer'
 export * from './custom_elements'
 export * from './document'
-export * from './html_node'
 export * from './comment'
+export * from './element'
 
-// Export methods required for JSX runtime
-// export { wrapCloneElement } from '../methods/wrap_clone_element'
-// export { createElement } from '../methods/create_element'
-// export { SYMBOL_CLONE } from '../constants'
 
 

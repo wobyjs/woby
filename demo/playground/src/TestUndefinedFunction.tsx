@@ -24,18 +24,19 @@ TestUndefinedFunction.test = {
     static: false,
     expect: () => {
         const value = $$(testObservables['TestUndefinedFunction'])
-        const expected = value !== undefined ? `<p>${value}</p>` : '<p><!----></p>'
+        const expectedForDOM = value !== undefined ? `<p>${value}</p>` : '<p><!----></p>'
+        const expectedForSSR = value !== undefined ? `<p>${value}</p>` : '<p></p>'
 
         const ssrComponent = testObservables['TestUndefinedFunction_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = value !== undefined ? `<h3>Undefined - Function</h3><p>${value}</p>` : '<h3>Undefined - Function</h3><p><!----></p>'
-        if (ssrResult !== expectedFull) {
-            assert(false, `[TestUndefinedFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        const expectedFullForSSR = value !== undefined ? `<h3>Undefined - Function</h3><p>${value}</p>` : '<h3>Undefined - Function</h3><p></p>'
+        if (ssrResult !== expectedFullForSSR) {
+            assert(false, `[TestUndefinedFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFullForSSR}`)
         } else {
             console.log(`✅ [TestUndefinedFunction] SSR test passed: ${ssrResult}`)
         }
 
-        return expected
+        return expectedForDOM
     }
 }
 

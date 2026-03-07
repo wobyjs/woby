@@ -60,9 +60,13 @@ export const setAttributeStatic = (() => {
             // e.g., tabIndex -> tabindex, className -> class
             const normalizedKey = key.toLowerCase()
 
-            if (isNil(value) || value === false || (value === true && attributesBoolean.has(normalizedKey))) {
+            if (isNil(value) || value === false) {
 
                 element.removeAttribute(normalizedKey)
+
+            } else if (value === true && attributesBoolean.has(normalizedKey)) {
+                // Boolean attribute with true value - set as empty string
+                element.setAttribute(normalizedKey, '')
 
             } else {
 

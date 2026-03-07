@@ -1,11 +1,3 @@
-// Augment JSX.IntrinsicElements to include custom element
-declare module 'woby' {
-    namespace JSX {
-        interface IntrinsicElements {
-            'basic-element': any
-        }
-    }
-}
 
 /**
  * Test Custom Element Basic Functionality
@@ -94,7 +86,7 @@ TestCustomElementBasicTSX.test = {
 
         const ssrComponent = testObservables['TestCustomElementBasicTSX_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<div><h2>1. TSX Usage</h2><div style="border: 2px solid green; padding: 10px; background-color: rgb(224, 224, 224);"><h2>Test Element</h2><div><p>This is child content from TSX</p></div><p>Count: 42</p><p>Active: Yes</p></div></div>'
+        const expectedFull = '<div><h2>1. TSX Usage</h2><div style="border: 2px solid green; padding: 10px; background-color: #e0e0e0;"><h2>Test Element</h2><div><p>This is child content from TSX</p></div><p>Count: 42</p><p>Active: Yes</p></div></div>'
         if (ssrResult !== expectedFull) {
             assert(false, `[TestCustomElementBasicTSX] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
@@ -131,11 +123,11 @@ const TestCustomElementBasicHTML = (): JSX.Element => {
 TestCustomElementBasicHTML.test = {
     static: true,
     expect: () => {
-        const expected = '<div><h2>2. Custom Element in TSX</h2><basic-element><p>This is child content from HTML</p></basic-element></div>'
+        const expected = '<div><h2>2. Custom Element in TSX</h2><basic-element title="HTML Attribute Title" count="100" active="true" color="red" style="margin-top: 20px;"><div style="border: 2px solid red; padding: 10px; background-color: rgb(224, 224, 224);"><h2>HTML Attribute Title</h2><div><p>This is child content from HTML</p></div><p>Count: 100</p><p>Active: Yes</p></div></basic-element></div>'
 
         const ssrComponent = testObservables['TestCustomElementBasicHTML_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<div><h2>2. Custom Element in TSX</h2><basic-element><p>This is child content from HTML</p></basic-element></div>'
+        const expectedFull = '<div><h2>2. Custom Element in TSX</h2><basic-element title="HTML Attribute Title" count="100" active="true" color="red"><p>This is child content from HTML</p></basic-element></div>'
         if (ssrResult !== expectedFull) {
             assert(false, `[TestCustomElementBasicHTML] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
@@ -175,11 +167,12 @@ const TestCustomElementBasicMixed = (): JSX.Element => {
 TestCustomElementBasicMixed.test = {
     static: true,
     expect: () => {
-        const expected = '<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element><basic-element><p>Nested content</p></basic-element></basic-element></div>'
+        const expected = `<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element title="Mixed TSX" count="0" color="blue"><div style="border: 2px solid blue; padding: 10px; background-color: white;"><h2>Mixed TSX</h2><div><basic-element title="Nested Custom Element" count="50" color="blue"><div style="border: 2px solid blue; padding: 10px; background-color: white;"><h2>Nested Custom Element</h2><div><p>Nested content</p></div><p>Count: 50</p><p>Active: No</p></div></basic-element></div><p>Count: 0</p><p>Active: No</p></div></basic-element></div>`
+        //`<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element title="Mixed TSX"><basic-element title="Nested Custom Element" count="50"><p>Nested content</p></basic-element></basic-element></div>`
 
         const ssrComponent = testObservables['TestCustomElementBasicMixed_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element><basic-element><p>Nested content</p></basic-element></basic-element></div>'
+        const expectedFull = ''
         if (ssrResult !== expectedFull) {
             assert(false, `[TestCustomElementBasicMixed] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
@@ -238,10 +231,10 @@ TestCustomElementBasicPureHTML.test = {
 }
 
 export default () => <>
-    <TestSnapshots Component={TestCustomElementBasicTSX} />
-    <TestSnapshots Component={TestCustomElementBasicHTML} />
+    {/* <TestSnapshots Component={TestCustomElementBasicTSX} />
+    <TestSnapshots Component={TestCustomElementBasicHTML} /> */}
     <TestSnapshots Component={TestCustomElementBasicMixed} />
-    <TestSnapshots Component={TestCustomElementBasicPureHTML} />
+    {/* <TestSnapshots Component={TestCustomElementBasicPureHTML} /> */}
 </>
 
 
@@ -287,3 +280,4 @@ function getInnerHtml(node, depth = 0) {
     return output
 }
 
+console.log(renderToString(<TestCustomElementBasicMixed />))

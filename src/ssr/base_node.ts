@@ -23,32 +23,32 @@ export class BaseNode {
     }
     // Event listener implementation
     _eventListeners: Map<string, Array<(event: any) => void>>
-    // Node type constants
-    static readonly ELEMENT_NODE = 1
-    static readonly ATTRIBUTE_NODE = 2
-    static readonly TEXT_NODE = 3
-    static readonly CDATA_SECTION_NODE = 4
-    static readonly ENTITY_REFERENCE_NODE = 5
-    static readonly ENTITY_NODE = 6
-    static readonly PROCESSING_INSTRUCTION_NODE = 7
-    static readonly COMMENT_NODE = 8
-    static readonly DOCUMENT_NODE = 9
-    static readonly DOCUMENT_TYPE_NODE = 10
-    static readonly DOCUMENT_FRAGMENT_NODE = 11
-    static readonly NOTATION_NODE = 12
-    // Instance properties for Node type access
-    readonly ELEMENT_NODE = 1
-    readonly ATTRIBUTE_NODE = 2
-    readonly TEXT_NODE = 3
-    readonly CDATA_SECTION_NODE = 4
-    readonly ENTITY_REFERENCE_NODE = 5
-    readonly ENTITY_NODE = 6
-    readonly PROCESSING_INSTRUCTION_NODE = 7
-    readonly COMMENT_NODE = 8
-    readonly DOCUMENT_NODE = 9
-    readonly DOCUMENT_TYPE_NODE = 10
-    readonly DOCUMENT_FRAGMENT_NODE = 11
-    readonly NOTATION_NODE = 12
+    // // Node type constants
+    // static readonly ELEMENT_NODE = 1
+    // static readonly ATTRIBUTE_NODE = 2
+    // static readonly TEXT_NODE = 3
+    // static readonly CDATA_SECTION_NODE = 4
+    // static readonly ENTITY_REFERENCE_NODE = 5
+    // static readonly ENTITY_NODE = 6
+    // static readonly PROCESSING_INSTRUCTION_NODE = 7
+    // static readonly COMMENT_NODE = 8
+    // static readonly DOCUMENT_NODE = 9
+    // static readonly DOCUMENT_TYPE_NODE = 10
+    // static readonly DOCUMENT_FRAGMENT_NODE = 11
+    // static readonly NOTATION_NODE = 12
+    // // Instance properties for Node type access
+    // readonly ELEMENT_NODE = 1
+    // readonly ATTRIBUTE_NODE = 2
+    // readonly TEXT_NODE = 3
+    // readonly CDATA_SECTION_NODE = 4
+    // readonly ENTITY_REFERENCE_NODE = 5
+    // readonly ENTITY_NODE = 6
+    // readonly PROCESSING_INSTRUCTION_NODE = 7
+    // readonly COMMENT_NODE = 8
+    // readonly DOCUMENT_NODE = 9
+    // readonly DOCUMENT_TYPE_NODE = 10
+    // readonly DOCUMENT_FRAGMENT_NODE = 11
+    // readonly NOTATION_NODE = 12
 
     constructor(nodeType: number) {
         this.nodeType = nodeType
@@ -448,17 +448,17 @@ export class BaseNode {
         return this.parentNode
     }
 
-    // Basic cloneNode implementation
-    cloneNode(deep: boolean = false): any {
-        // This is a basic implementation - subclasses should override
-        const cloned = new (this.constructor as any)()
-        cloned.nodeType = this.nodeType
-        cloned.attributes = { ...this.attributes }
-        if (deep && this.childNodes.length > 0) {
-            cloned.childNodes = this.childNodes.map((child: any) => child.cloneNode?.(deep) || child)
-        }
-        return cloned
-    }
+    // // Basic cloneNode implementation
+    // cloneNode(deep: boolean = false): any {
+    //     // This is a basic implementation - subclasses should override
+    //     const cloned = new (this.constructor as any)(this.tagName)
+    //     cloned.nodeType = this.nodeType
+    //     cloned.attributes = { ...this.attributes }
+    //     if (deep && this.childNodes.length > 0) {
+    //         cloned.childNodes = this.childNodes.map((child: any) => child.cloneNode?.(deep) || child)
+    //     }
+    //     return cloned
+    // }
 
     // Stub implementations for remaining Node interface methods
     compareDocumentPosition(other: any): number {
@@ -502,7 +502,7 @@ export class BaseNode {
         // No-op
     }
 
-    cloneRange?(): any {
-        return this.cloneNode(true)
-    }
+    // cloneRange?(): any {
+    //     return this.cloneNode(true)
+    // }
 }

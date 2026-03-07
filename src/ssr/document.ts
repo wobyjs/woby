@@ -4,7 +4,7 @@
 
 import { BaseNode } from "./base_node"
 import { Comment } from "./comment"
-import { createHTMLNode } from "./html_node"
+import { Element } from "./element"
 import type { FN } from "../types"
 import { Style } from "./style"
 
@@ -31,71 +31,64 @@ export const createComment = ((content: string) => {
 }) as any as FN<[string], Comment>
 
 
-export const createSVGNode = ((tagName: string) => {
-    class SVGNode extends BaseNode {
-        tagName: string
-        isSVG: boolean
-        style: any
-        #className: string
+export const createElement = ((tagName: string) => {
+    return new Element(tagName)
+}) as any as FN<[string], HTMLElement>
 
-        constructor() {
-            super(1)
-            this.tagName = tagName.toUpperCase()
-            this.isSVG = true
-            this.style = new Style()
-            this.#className = ''
-        }
+// Alias for backward compatibility
+export const createHTMLNode = createElement
 
-        set className(value: string) {
-            this.#className = value
-            // Also update the attributes object to keep them in sync
-            // Directly update the attributes to avoid circular calls
-            this.attributes['class'] = value
-        }
+class SVGNode extends Element {
+    tagName: string
+    isSVG: boolean
+    style: Style
+    #className: string
 
-        get className(): string {
-            return this.#className
-        }
-
-        // Getter for outerHTML
-        get outerHTML() {
-            // Build attributes string
-            const attrs = Object.entries(this.attributes)
-                .map(([name, value]) => `${name}="${value}"`)
-                .join(' ')
-            const attrStr = attrs ? ` ${attrs}` : ''
-
-            // Build children string
-            const children = this.childNodes.map((child: any) => {
-                if (typeof child === 'object' && child !== null) {
-                    if ('outerHTML' in child) {
-                        return child.outerHTML
-                    } else if ('textContent' in child) {
-                        return child.textContent
-                    }
-                }
-                return String(child)
-            }).join('')
-
-            return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
-        }
-
-        // Getter for innerHTML
-        get innerHTML() {
-            return this.childNodes.map((child: any) => {
-                if (typeof child === 'object' && child !== null) {
-                    if ('outerHTML' in child) {
-                        return child.outerHTML
-                    } else if ('textContent' in child) {
-                        return child.textContent
-                    }
-                }
-                return String(child)
-            }).join('')
-        }
+    constructor(tagName: string) {
+        super(tagName)
+        this.isSVG = true
     }
 
-    return new SVGNode()
+    // Getter for outerHTML
+    get outerHTML() {
+        // Build attributes string
+        const attrs = Object.entries(this.attributes)
+            .map(([name, value]) => `${name}="${value}"`)
+            .join(' ')
+        const attrStr = attrs ? ` ${attrs}` : ''
+
+        // Build children string
+        const children = this.childNodes.map((child: any) => {
+            if (typeof child === 'object' && child !== null) {
+                if ('outerHTML' in child) {
+                    return child.outerHTML
+                } else if ('textContent' in child) {
+                    return child.textContent
+                }
+            }
+            return String(child)
+        }).join('')
+
+        return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
+    }
+
+    // Getter for innerHTML
+    get innerHTML() {
+        return this.childNodes.map((child: any) => {
+            if (typeof child === 'object' && child !== null) {
+                if ('outerHTML' in child) {
+                    return child.outerHTML
+                } else if ('textContent' in child) {
+                    return child.textContent
+                }
+            }
+            return String(child)
+        }).join('')
+    }
+}
+
+export const createSVGNode = ((tagName: string) => {
+    return new SVGNode(tagName)
 }) as any as FN<[string], SVGElement>
 
 export const createText = ((text: string) => {
@@ -160,7 +153,7 @@ export interface SSRDocument {
     }>>
     body: HTMLElement
     createComment: typeof createComment
-    createElement: typeof createHTMLNode
+    createElement: typeof createElement
     createElementNS: FN<[string, string], Element>
     createTextNode: typeof createText
     createDocumentFragment: typeof createDocumentFragment
@@ -178,7 +171,7 @@ export interface SSRDocument {
  */
 export const createDocument = (): SSRDocument => {
     // Mock body element for SSR - fresh instance per document
-    const body = createHTMLNode('body')
+    const body = createElement('body')
 
     return {
         // Map to store event listeners - isolated per document instance
@@ -211,13 +204,13 @@ export const createDocument = (): SSRDocument => {
 
         createComment,
         createElement: ((tagName: string) => {
-            return createHTMLNode(tagName)
-        }) as typeof createHTMLNode,
+            return createElement(tagName)
+        }) as typeof createElement,
         createElementNS: ((namespaceURI: string, qualifiedName: string) => {
             if (namespaceURI === 'http://www.w3.org/2000/svg') {
                 return createSVGNode(qualifiedName)
             }
-            return createHTMLNode(qualifiedName)
+            return createElement(qualifiedName)
         }) as any as FN<[string, string], Element>,
         createTextNode: createText,
         createDocumentFragment,

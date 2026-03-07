@@ -6,19 +6,22 @@ const TestTemplateSVG = (): JSX.Element => {
     registerTestObservable('TestTemplateSVG', color)
     const update = () => color(randomColor())
     useInterval(update, TEST_INTERVAL / 2)
-    const Templated = template<{ color }>(props => {
+
+    const ret: JSX.Element = () => {
+        const Templated = template<{ color }>(props => {
+            return (
+                <svg viewBox="0 0 50 50" width="50px" stroke={props.color} stroke-width="3" fill="white">
+                    <circle cx="25" cy="25" r="20" />
+                </svg>
+            )
+        })
         return (
-            <svg viewBox="0 0 50 50" width="50px" stroke={props.color} stroke-width="3" fill="white">
-                <circle cx="25" cy="25" r="20" />
-            </svg>
+            <>
+                <h3>Template - SVG</h3>
+                <Templated color={color} />
+            </>
         )
-    })
-    const ret: JSX.Element = () => (
-        <>
-            <h3>Template - SVG</h3>
-            <Templated color={color} />
-        </>
-    )
+    }
 
     // Store the component for SSR testing
     registerTestObservable('TestTemplateSVG_ssr', ret)

@@ -1,14 +1,12 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-const TestSymbolStatic = (): JSX.Element => {
-    return (
-        <>
-            <h3>Symbol - Static</h3>
-            <p>{Symbol()}</p>
-        </>
-    )
-}
+const TestSymbolStatic = (): JSX.Element => (
+    <>
+        <h3>Symbol - Static</h3>
+        <p>{Symbol()}</p>
+    </>
+)
 
 TestSymbolStatic.test = {
     static: true,
@@ -16,7 +14,7 @@ TestSymbolStatic.test = {
         const expected = '<p></p>'
 
         const ssrComponent = testObservables['TestSymbolStatic_ssr']
-        const ssrResult = renderToString(ssrComponent)
+        const ssrResult = renderToString(<TestSymbolStatic />)
         const expectedFull = '<h3>Symbol - Static</h3><p></p>'
         if (ssrResult !== expectedFull) {
             assert(false, `[TestSymbolStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
@@ -30,3 +28,5 @@ TestSymbolStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestSymbolStatic} />
+
+// console.log(renderToString(<TestSymbolStatic />))

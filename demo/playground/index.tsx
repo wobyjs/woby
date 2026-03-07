@@ -338,7 +338,7 @@ globalThis.Woby = Woby
 
 const tests = [
     // TestABCD,
-    // TestAttributeBooleanStatic,
+    TestAttributeBooleanStatic,
     // TestAttributeFunction,
     // TestAttributeFunctionBoolean,
     // TestAttributeObservable,
@@ -640,7 +640,7 @@ const tests = [
     // TestSymbolStatic,
     // TestTabIndexBooleanFunction,
     // TestTabIndexBooleanObservable,
-    TestTabIndexBooleanStatic,
+    // TestTabIndexBooleanStatic,
     // TestTemplateExternal,
     // TestTemplateSVG,
 

@@ -1,28 +1,27 @@
-import { isSSR } from '../constants'
 import { useMemo } from '../hooks/soby'
 import { createElement } from '../methods/create_element'
 import { resolve } from '../methods/soby'
 import { $$ } from '../methods/soby'
 import { isFunction } from '../utils/lang'
 import type { Child, Component, FunctionMaybe } from '../types'
+import { useEnvironment } from '../components/environment_context'
 
 
-export const Dynamic = <P = {}>({ component, props, children }: { component: Component<P>, props?: FunctionMaybe<P | null>, children?: Child }): Child => {
+export const Dynamic = <P = {}>(props: { component: Component<P> } & P): Child => {
+    // const isSSR = useEnvironment() === 'ssr'
+    const { component, ...rest } = props
 
-    // In SSR mode, we don't pass children to avoid duplication issues
-    const resolvedChildren = isSSR ? undefined : children
-
-    if (isFunction(component) || isFunction(props)) {
+    if (isFunction(component) || isFunction(props) /* && !isSSR */) {
 
         return useMemo(() => {
 
-            return resolve(createElement<P>($$(component, false), $$(props), resolvedChildren))
+            return resolve(createElement<P>($$(component, false), $$(rest as any))/* , children */)
 
         })
 
     } else {
 
-        return createElement<P>(component, props, resolvedChildren)
+        return createElement<P>(component, $$(rest as any))/* , children */
 
     }
 

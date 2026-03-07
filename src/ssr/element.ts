@@ -4,15 +4,41 @@
  */
 
 import { BaseNode } from './base_node'
+import { Style } from './style'
+import { Comment } from './comment'
 
 export class Element extends BaseNode {
     tagName: string
+    style: Style
+    #className: string
     attributes: Record<string, string>
 
     constructor(tagName: string) {
         super(1) // ELEMENT_NODE
         this.tagName = tagName.toUpperCase()
+        this.style = new Style()
+        this.#className = ''
         this.attributes = {}
+    }
+
+    set className(value: string) {
+        this.#className = value
+        // Also update the attributes object to keep them in sync
+        // Directly update the attributes to avoid circular calls
+        this.attributes['class'] = value
+    }
+
+    get className(): string {
+        return this.#className
+    }
+
+    set id(value: string) {
+        // Update both the property and attributes for consistency
+        this.setAttribute('id', value)
+    }
+
+    get id(): string {
+        return this.attributes['id'] || null
     }
 
     // Getter for innerHTML
@@ -46,8 +72,19 @@ export class Element extends BaseNode {
         return this.attributes[name] ?? null
     }
 
+    // Override setAttribute for special HTML handling
     setAttribute(name: string, value: any) {
-        this.attributes[name] = String(value)
+        // Handle special cases for style and class
+        if (name === 'style') {
+            // Store the string value in attributes but keep style as object
+            this.attributes['style'] = value
+            // Don't overwrite this.style - keep it as Style object
+        } else if (name === 'class' || name === 'className') {
+            // Use the setter to ensure synchronization
+            this.className = value
+        } else {
+            this.attributes[name] = String(value)
+        }
         super.setAttribute(name, value)
     }
 
@@ -58,6 +95,53 @@ export class Element extends BaseNode {
 
     hasAttribute(name: string): boolean {
         return name in this.attributes
+    }
+
+    // Add append method for compatibility with diff algorithm
+    append(...nodes: any[]) {
+        nodes.forEach(node => {
+            this.appendChild(node)
+        })
+    }
+
+    // Add before method for compatibility with diff algorithm
+    before(...nodes: any[]) {
+        // This is a simplified implementation
+        // In a real DOM, this would insert nodes before this node
+        // But for our purposes, we'll just append to the parent
+        if (this.parentNode) {
+            nodes.forEach(node => {
+                this.parentNode.insertBefore(node, this)
+            })
+        }
+    }
+
+    // Getter for outerHTML
+    get outerHTML() {
+        // Build attributes string - normalize attribute names to lowercase for HTML compliance
+        const attrs = Object.entries(this.attributes)
+            .map(([name, value]) => `${name.toLowerCase()}="${value}"`)
+            .join(' ')
+        const attrStr = attrs ? ` ${attrs}` : ''
+
+        // Handle self-closing tags
+        if (['br', 'hr', 'img', 'input', 'meta', 'link'].includes(this.tagName.toLowerCase())) {
+            return `<${this.tagName.toLowerCase()}${attrStr} />`
+        }
+
+        // Build children string
+        const children = this.childNodes.map((child: any) => {
+            if (typeof child === 'object' && child !== null) {
+                if ('outerHTML' in child) {
+                    return child.outerHTML
+                } else if ('textContent' in child) {
+                    return child.textContent
+                }
+            }
+            return String(child)
+        }).join('')
+
+        return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
     }
 
     // // Add textContent property
@@ -71,20 +155,79 @@ export class Element extends BaseNode {
 
     // Add cloneNode method
     cloneNode(deep?: boolean): globalThis.Node {
-        // This is a simplified implementation
+        // Create new instance of the same class to preserve prototype chain
         const cloned = new Element(this.tagName)
+
+        // Clone all attributes
         cloned.attributes = { ...this.attributes }
 
+        // Clone className (also kept in sync via attributes)
+        cloned.#className = this.#className
+
+        // Clone style object properly (not just reference)
+        if (this.style && typeof this.style === 'object') {
+            // Style is a class instance, need to preserve it
+            cloned.style = new Style()
+            // Copy all style properties
+            Object.assign(cloned.style, this.style)
+        }
+
+        // Clone other BaseNode properties
+        cloned.nodeType = this.nodeType
+        cloned.parentNode = null // Don't clone parent reference
+
         if (deep) {
+            // Deep clone child nodes
             cloned.childNodes = this.childNodes.map(child => {
                 if (child.cloneNode) {
+                    // If child has cloneNode, use it
                     return child.cloneNode(true)
                 }
-                // For simple nodes, create a basic clone
-                const simpleClone = new BaseNode(child.nodeType)
-                simpleClone.attributes = { ...child.attributes }
+
+                // For text nodes and other simple nodes
+                if (child.nodeType === 3) { // TEXT_NODE
+                    // Preserve text content and nodeValue
+                    const textClone = new (child.constructor as any)(String((child as any).textContent || (child as any).nodeValue || ''))
+                    // Copy all properties
+                    Object.keys(child).forEach(key => {
+                        if (!(key in textClone)) {
+                            textClone[key] = (child as any)[key]
+                        }
+                    })
+                    return textClone
+                }
+
+                if (child.nodeType === 8) { // COMMENT_NODE
+                    const commentContent = (child as any).textContent || (child as any).data || ''
+                    const commentClone = new Comment(String(commentContent))
+                    return commentClone
+                }
+
+                // For other nodes, create a basic clone preserving constructor
+                const SimpleClone = function () { }
+                SimpleClone.prototype = Object.create(Object.getPrototypeOf(child))
+                const simpleClone = new (SimpleClone as any)()
+
+                // Copy all enumerable properties
+                Object.keys(child).forEach(key => {
+                    const value = (child as any)[key]
+                    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+                        // Deep clone nested objects
+                        try {
+                            simpleClone[key] = JSON.parse(JSON.stringify(value))
+                        } catch {
+                            // For non-serializable objects, shallow copy
+                            simpleClone[key] = value
+                        }
+                    } else {
+                        simpleClone[key] = value
+                    }
+                })
+
                 return simpleClone
             }) as any as BaseNode[]
+
+            // Set parent references for cloned children
             cloned.childNodes.forEach(child => {
                 (child as any).parentNode = cloned
             })
