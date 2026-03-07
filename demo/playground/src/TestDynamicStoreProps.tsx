@@ -1,4 +1,4 @@
-import { $, $$, Dynamic, store, useEffect, isStore, renderToString } from 'woby'
+import { $, $$, Dynamic, store, useEffect, isStore, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let timing = Math.random()
@@ -90,7 +90,7 @@ TestDynamicStoreProps.test = {
 
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestDynamicStoreProps] ❌ SSR ASSERTION FAILED')
-            assert(false, `[TestDynamicStoreProps] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+            assert(false, `[TestDynamicStoreProps] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ [TestDynamicStoreProps] SSR test passed: ${ssrResult}`)
         }

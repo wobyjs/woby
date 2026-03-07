@@ -1,4 +1,4 @@
-import { $, $$, If, renderToString } from 'woby'
+import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
 const TestIfFunctionUntracked = (): JSX.Element => {
@@ -33,7 +33,7 @@ TestIfFunctionUntracked.test = {
         const ssrComponent = testObservables['TestIfFunctionUntracked_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIfFunctionUntracked] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestIfFunctionUntracked] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestIfFunctionUntracked] SSR test passed: ${ssrResult}`)
         }

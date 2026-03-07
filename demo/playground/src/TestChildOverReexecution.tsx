@@ -1,4 +1,4 @@
-import { $, $$, useEffect, renderToString } from 'woby'
+import { $, $$, useEffect, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestChildOverReexecution = (): JSX.Element => {
@@ -56,7 +56,7 @@ TestChildOverReexecution.test = {
             if (ssrResult === expectedFull) {
                 console.log(`✅ [TestChildOverReexecution] SSR test passed: ${ssrResult}`)
             } else {
-                assert(false, `[TestChildOverReexecution] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                assert(false, `[TestChildOverReexecution] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
             }
         } else {
             assert(false, `SSR result format unexpected: ${ssrResult}`)

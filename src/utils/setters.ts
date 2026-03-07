@@ -56,16 +56,18 @@ export const setAttributeStatic = (() => {
             }
 
         } else {
+            // Normalize camelCase attribute names to lowercase for HTML
+            // e.g., tabIndex -> tabindex, className -> class
+            const normalizedKey = key.toLowerCase()
 
-            if (isNil(value) || (value === false && attributesBoolean.has(key))) {
+            if (isNil(value) || (value === false && attributesBoolean.has(normalizedKey))) {
 
-                element.removeAttribute(key)
+                element.removeAttribute(normalizedKey)
 
             } else {
 
                 value = (value === true) ? '' : String(value)
-
-                element.setAttribute(key, value)
+                element.setAttribute(normalizedKey, value)
 
             }
 
@@ -401,7 +403,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
                 if (next !== fragmentNext.values) {
 
-                    next = placeholder
+                    next = placeholder as any
                     nextLength += 1
 
                 }
@@ -894,7 +896,7 @@ export const setPropertyStatic = (element: HTMLElement | Comment, key: string, v
 
         }
 
-    } catch { // If it fails, maybe because like HTMLInputElement.form there's only a getter, we try as an attribute instead //TODO: Figure out something better than this
+    } catch (e) { // If it fails, maybe because like HTMLInputElement.form there's only a getter, we try as an attribute instead //TODO: Figure out something better than this
 
         if (!isComment)
             setAttributeStatic(element, key, value)
@@ -935,17 +937,18 @@ export const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null |
 
 }
 
+// From Preact: https://github.com/preactjs/preact/blob/e703a62b77c9de45e886d8a7f59bd0db658318f9/src/constants.js#L3
+// const propertyNonDimensionalRe = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
+// From this Preact issue: https://github.com/preactjs/preact/issues/2607
+const propertyNonDimensionalRe = /^(-|f[lo].*[^se]$|g.{5,}[^ps]$|z|o[pr]|(W.{5})?[lL]i.*(t|mp)$|an|(bo|s).{4}Im|sca|m.{6}[ds]|ta|c.*[st]$|wido|ini)/i
+
 export const setStyleStatic = (() => {
 
-    // From Preact: https://github.com/preactjs/preact/blob/e703a62b77c9de45e886d8a7f59bd0db658318f9/src/constants.js#L3
-    // const propertyNonDimensionalRe = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
-    // From this Preact issue: https://github.com/preactjs/preact/issues/2607
-    const propertyNonDimensionalRe = /^(-|f[lo].*[^se]$|g.{5,}[^ps]$|z|o[pr]|(W.{5})?[lL]i.*(t|mp)$|an|(bo|s).{4}Im|sca|m.{6}[ds]|ta|c.*[st]$|wido|ini)/i
     const propertyNonDimensionalCache: Partial<Record<string, boolean>> = {}
 
     return (element: HTMLElement, key: string, value: null | undefined | number | string): void => {
 
-        if (key.charCodeAt(0) === 45) { // /^-/
+        if (key.charCodeAt(0) === 45) { // /^-
 
             if (isNil(value)) {
 
@@ -1047,7 +1050,13 @@ export const setStylesStatic = (element: HTMLElement, object: null | undefined |
             if (isSSR && object && !isString(object)) {
                 const styleString = Array.from(Object.entries(object))
                     .filter(([_, value]) => !isNil(value))
-                    .map(([key, value]) => `${key}: ${value};`)
+                    .map(([key, value]) => {
+                        // Convert camelCase to kebab-case
+                        const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase()
+                        // Add px suffix for numeric values (except for non-dimensional properties)
+                        const cssValue = typeof value === 'number' && !propertyNonDimensionalRe.test(key) ? `${value}px` : String(value)
+                        return `${cssKey}: ${cssValue};`
+                    })
                     .join(' ')
                 if (styleString) {
                     element.setAttribute('style', styleString)
@@ -1062,7 +1071,7 @@ export const setStylesStatic = (element: HTMLElement, object: null | undefined |
 export const setStyles = (element: HTMLElement, object: FunctionMaybe<null | undefined | string | Record<string, FunctionMaybe<null | undefined | number | string>>>, stack: Stack): void => {
     const isSSR = useEnvironment() === 'ssr'
 
-    if (isFunction(object) || isArray(object) && !isSSR) {
+    if ((isFunction(object) || isArray(object)) && !isSSR) {
 
         let objectPrev: null | undefined | string | Record<string, null | undefined | number | string>
 

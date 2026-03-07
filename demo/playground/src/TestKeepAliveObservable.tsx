@@ -1,4 +1,4 @@
-import { $, $$, If, KeepAlive, renderToString } from 'woby'
+import { $, $$, If, KeepAlive, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
@@ -59,7 +59,7 @@ TestKeepAliveObservable.test = {
         const ssrComponent = testObservables['TestKeepAliveObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestKeepAliveObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestKeepAliveObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestKeepAliveObservable] SSR test passed: ${ssrResult}`)
         }

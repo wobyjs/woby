@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
@@ -70,7 +70,7 @@ TestNullFunction.test = {
 
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestNullFunction] ❌ SSR ASSERTION FAILED')
-            assert(false, `[TestNullFunction] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+            assert(false, `[TestNullFunction] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ [TestNullFunction] SSR test passed: ${ssrResult}`)
         }

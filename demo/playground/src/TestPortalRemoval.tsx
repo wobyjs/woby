@@ -1,4 +1,4 @@
-import { $, $$, Portal, If, renderToString, createDocument } from 'woby'
+import { $, $$, Portal, If, renderToString, createDocument, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestPortalRemoval = (): JSX.Element => {

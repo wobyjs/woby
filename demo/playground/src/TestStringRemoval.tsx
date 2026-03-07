@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestStringRemoval = (): JSX.Element => {
@@ -37,7 +37,7 @@ TestStringRemoval.test = {
             `<h3>String - Removal</h3><p>(${val})</p>` :
             '<h3>String - Removal</h3><p>()</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestStringRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestStringRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestStringRemoval] SSR test passed: ${ssrResult}`)
         }

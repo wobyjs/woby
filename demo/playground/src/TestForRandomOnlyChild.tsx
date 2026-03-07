@@ -1,4 +1,4 @@
-import { $, $$, For, renderToString } from 'woby'
+import { $, $$, For, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestForRandomOnlyChild = (): JSX.Element => {
@@ -35,7 +35,7 @@ TestForRandomOnlyChild.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>For - Random</h3><p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForRandomOnlyChild] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestForRandomOnlyChild] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestForRandomOnlyChild] SSR test passed: ${ssrResult}`)
         }

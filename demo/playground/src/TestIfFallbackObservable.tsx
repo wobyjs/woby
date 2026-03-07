@@ -1,4 +1,4 @@
-import { $, $$, If, renderToString } from 'woby'
+import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 let timing = 0
@@ -73,7 +73,7 @@ TestIfFallbackObservable.test = {
 
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestIfFallbackObservable] ❌ SSR ASSERTION FAILED')
-            assert(false, `[TestIfFallbackObservable] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+            assert(false, `[TestIfFallbackObservable] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ [TestIfFallbackObservable] SSR test passed: ${ssrResult}`)
         }

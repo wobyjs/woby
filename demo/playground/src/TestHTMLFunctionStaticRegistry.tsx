@@ -1,4 +1,4 @@
-import { $, $$, html, If, renderToString } from 'woby'
+import { $, $$, html, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestHTMLFunctionStaticRegistry = (): JSX.Element => {
@@ -32,7 +32,7 @@ TestHTMLFunctionStaticRegistry.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>HTML - Function - Static Registry</h3><p>content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestHTMLFunctionStaticRegistry] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestHTMLFunctionStaticRegistry] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestHTMLFunctionStaticRegistry] SSR test passed: ${ssrResult}`)
         }

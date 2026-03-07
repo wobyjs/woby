@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestEventClickStopImmediatePropagation = (): JSX.Element => {
@@ -72,7 +72,7 @@ TestEventClickStopImmediatePropagation.test = {
         const ssrComponent = testObservables['TestEventClickStopImmediatePropagation_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventClickStopImmediatePropagation] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestEventClickStopImmediatePropagation] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestEventClickStopImmediatePropagation] SSR test passed: ${ssrResult}`)
         }

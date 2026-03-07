@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
 
 const TestPropertyValueObservable = (): JSX.Element => {
@@ -27,7 +27,7 @@ TestPropertyValueObservable.test = {
         const ssrComponent = testObservables['TestPropertyValueObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestPropertyValueObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestPropertyValueObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestPropertyValueObservable] SSR test passed: ${ssrResult}`)
         }

@@ -1,6 +1,6 @@
-import { $, $$, If, renderToString } from 'woby'
+import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, random, registerTestObservable, testObservables, useInterval, TEST_INTERVAL, assert } from './util'
-import { useEffect } from 'woby'
+import { useEffect, type JSX } from 'woby'
 
 const TestIfChildrenFunction = (): JSX.Element => {
     const initialValue = String(random())
@@ -37,7 +37,7 @@ TestIfChildrenFunction.test = {
         const ssrComponent = testObservables['TestIfChildrenFunction_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIfChildrenFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestIfChildrenFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestIfChildrenFunction] SSR test passed: ${ssrResult}`)
         }

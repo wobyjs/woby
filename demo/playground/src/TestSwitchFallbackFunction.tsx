@@ -1,4 +1,4 @@
-import { $, $$, Switch, renderToString } from 'woby'
+import { $, $$, Switch, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSwitchFallbackFunction = (): JSX.Element => {
@@ -32,7 +32,7 @@ TestSwitchFallbackFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Switch - Fallback Function</h3><p>Fallback: 0.123456</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSwitchFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestSwitchFallbackFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestSwitchFallbackFunction] SSR test passed: ${ssrResult}`)
         }

@@ -1,4 +1,4 @@
-import { $, $$, createDirective, useEffect, renderToString } from 'woby'
+import { $, $$, createDirective, useEffect, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 // Declare the modelLocal directive in JSX namespace
@@ -48,7 +48,7 @@ TestDirectiveRegisterLocal.test = {
         const ssrComponent = testObservables['TestDirectiveRegisterLocal_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestDirectiveRegisterLocal] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestDirectiveRegisterLocal] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestDirectiveRegisterLocal] SSR test passed: ${ssrResult}`)
         }

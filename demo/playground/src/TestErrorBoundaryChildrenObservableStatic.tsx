@@ -1,4 +1,4 @@
-import { $, $$, ErrorBoundary, renderToString } from 'woby'
+import { $, $$, ErrorBoundary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
@@ -43,7 +43,7 @@ TestErrorBoundaryChildrenObservableStatic.test = {
         const ssrComponent = testObservables['TestErrorBoundaryChildrenObservableStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestErrorBoundaryChildrenObservableStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestErrorBoundaryChildrenObservableStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestErrorBoundaryChildrenObservableStatic] SSR test passed: ${ssrResult}`)
         }

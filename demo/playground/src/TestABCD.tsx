@@ -1,4 +1,4 @@
-import { $, $$, renderToString, useEnvironment } from 'woby'
+import { $, $$, renderToString, useEnvironment, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestABCD = (): JSX.Element => {
@@ -14,12 +14,12 @@ const TestABCD = (): JSX.Element => {
     const increment = () => index(prev => (prev + 1) % states.length)
     useInterval(increment, TEST_INTERVAL)
 
-    const getCurrentElement =  ()=>states[index()]
+    const getCurrentElement = () => states[index()]
 
-     //why must fn component ?
-     //ret is shared with browser & ssr
-     //return component directly pin jsx to use browser env
-     //same for states
+    //why must fn component ?
+    //ret is shared with browser & ssr
+    //return component directly pin jsx to use browser env
+    //same for states
     const ret: JSX.Element = () => (
         <>
             <h3>Children - ABCD</h3>
@@ -59,7 +59,7 @@ TestABCD.test = {
         ]
         const expectedFull = actualElements[idx]
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestABCD] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestABCD] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestABCD] SSR test passed: ${ssrResult}`)
         }

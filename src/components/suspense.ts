@@ -12,7 +12,7 @@ import type { Child, FunctionMaybe, ObservableReadonly } from '../types'
 const SYMBOL_CLONE = Symbol.for('CloneElement')
 
 
-export const Suspense = ({ when, fallback, children }: { when?: FunctionMaybe<unknown>, fallback?: Child, children?: Child }): ObservableReadonly<Child> => {
+export const Suspense = ({ when, fallback, children }: { when?: FunctionMaybe<unknown>, fallback?: Child, children?: Child }): ObservableReadonly<Child> | Child => {
   const isSSR = useEnvironment() === 'ssr'
 
   return SuspenseContext.wrap(suspense => {

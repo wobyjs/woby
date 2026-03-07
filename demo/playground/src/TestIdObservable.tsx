@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestIdObservable = (): JSX.Element => {
@@ -25,14 +25,14 @@ TestIdObservable.test = {
         const value = $$(testObservables['TestIdObservable'])
         const expected = `<p id="${value}">content</p>`
 
-            const ssrComponent = testObservables['TestIdObservable_ssr']
-            const ssrResult = renderToString(ssrComponent)
-            const expectedFull = `<h3>ID - Observable</h3><p id="${value}">content</p>`
-            if (ssrResult !== expectedFull) {
-                assert(false, `[TestIdObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-            } else {
-                console.log(`✅ [TestIdObservable] SSR test passed: ${ssrResult}`)
-            }
+        const ssrComponent = testObservables['TestIdObservable_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>ID - Observable</h3><p id="${value}">content</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestIdObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [TestIdObservable] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

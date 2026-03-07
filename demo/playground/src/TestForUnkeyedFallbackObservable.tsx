@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestForUnkeyedFallbackObservable = (): JSX.Element => {
@@ -45,7 +45,7 @@ TestForUnkeyedFallbackObservable.test = {
         const ssrComponent = testObservables['TestForUnkeyedFallbackObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForUnkeyedFallbackObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestForUnkeyedFallbackObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestForUnkeyedFallbackObservable] SSR test passed: ${ssrResult}`)
         }

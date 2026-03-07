@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestStyleFunctionNumeric = (): JSX.Element => {
@@ -24,13 +24,15 @@ TestStyleFunctionNumeric.test = {
     expect: () => {
         const value = $$(testObservables['TestStyleFunctionNumeric'])
         const expected = `<p style="flex-grow: ${value.flexGrow}; width: ${value.width}px;">content</p>`
+        //<h3>Style - Function Numeric</h3><p style="flexGrow: 1; width: 50;">content</p>
+        //<h3>Style - Function Numeric</h3><p style="flex-grow: 1; width: 50px;">content</p>
 
         // Test the SSR value
         const ssrComponent = testObservables['TestStyleFunctionNumeric_ssr']
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Style - Function Numeric</h3><p style="flex-grow: ${value.flexGrow}; width: ${value.width}px;">content</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestStyleFunctionNumeric] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestStyleFunctionNumeric] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestStyleFunctionNumeric] SSR test passed: ${ssrResult}`)
         }
@@ -41,3 +43,5 @@ TestStyleFunctionNumeric.test = {
 
 
 export default () => <TestSnapshots Component={TestStyleFunctionNumeric} />
+
+// console.log(renderToString(<TestStyleFunctionNumeric />))

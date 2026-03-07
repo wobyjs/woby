@@ -1,4 +1,4 @@
-import { $, $$, createDirective, useEffect, renderToString } from 'woby'
+import { $, $$, createDirective, useEffect, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 // Declare the model directive in JSX namespace
@@ -47,7 +47,7 @@ TestDirectiveRef.test = {
         const ssrComponent = testObservables['TestDirectiveRef_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestDirectiveRef] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestDirectiveRef] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestDirectiveRef] SSR test passed: ${ssrResult}`)
         }

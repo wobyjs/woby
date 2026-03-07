@@ -1,4 +1,4 @@
-import { $, renderToString } from 'woby'
+import { $, renderToString, type JSX } from 'woby'
 
 const DebugPElement = (): JSX.Element => {
     const value = $(42)

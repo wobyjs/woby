@@ -2,8 +2,7 @@
 
 import * as Woby from 'woby'
 import type { JSX, Observable } from 'woby'
-import { useEffect } from 'woby'
-import { $, } from 'woby'
+import { useEffect, $, } from 'woby'
 
 globalThis.Woby = Woby
 

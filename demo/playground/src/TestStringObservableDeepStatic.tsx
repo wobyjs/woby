@@ -1,5 +1,5 @@
-import { $, $$, renderToString } from 'woby'
-import { useMemo } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
+import { useMemo, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestStringObservableDeepStatic = (): JSX.Element => {
@@ -34,7 +34,7 @@ TestStringObservableDeepStatic.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>String - Observable Deep Static</h3><p>0.123456</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestStringObservableDeepStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestStringObservableDeepStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestStringObservableDeepStatic] SSR test passed: ${ssrResult}`)
         }

@@ -1,4 +1,4 @@
-import { $, $$, If, renderToString } from 'woby'
+import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestIfFunctionUntrackedUnnarrowed = (): JSX.Element => {
@@ -28,7 +28,7 @@ TestIfFunctionUntrackedUnnarrowed.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>If - Function Untracked Unnarrowed</h3><p>(0)</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIfFunctionUntrackedUnnarrowed] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestIfFunctionUntrackedUnnarrowed] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestIfFunctionUntrackedUnnarrowed] SSR test passed: ${ssrResult}`)
         }

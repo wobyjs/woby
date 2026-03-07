@@ -1,4 +1,4 @@
-import { $, $$, Portal, renderToString, useEnvironment, ssr, createDocument } from 'woby'
+import { $, $$, Portal, renderToString, useEnvironment, ssr, createDocument, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestPortalMountObservable = (): JSX.Element => {

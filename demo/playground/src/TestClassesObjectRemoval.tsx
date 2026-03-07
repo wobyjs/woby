@@ -1,4 +1,4 @@
-import { $, $$, renderToString, useEffect } from 'woby'
+import { $, $$, renderToString, useEffect, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestClassesObjectRemoval = (): JSX.Element => {
@@ -75,7 +75,7 @@ TestClassesObjectRemoval.test = {
             console.error(`❌ SSR test failed:`)
             console.error(`  Got: ${ssrResult}`)
             console.error(`  Expected: ${expectedFull}`)
-            assert(false, `[TestClassesObjectRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestClassesObjectRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         }
 
         return expected

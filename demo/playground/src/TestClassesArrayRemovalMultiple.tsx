@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestClassesArrayRemovalMultiple = (): JSX.Element => {
@@ -32,14 +32,14 @@ TestClassesArrayRemovalMultiple.test = {
             expected = `<p class="${classes}">content</p>`
         }
 
-            const ssrComponent = testObservables['TestClassesArrayRemovalMultiple_ssr']
-            const ssrResult = renderToString(ssrComponent)
-            const expectedFull = value ? `<h3>Classes - Array Removal Multiple</h3>${expected}` : '<h3>Classes - Array Removal Multiple</h3><p>content</p>'
-            if (ssrResult !== expectedFull) {
-                assert(false, `[TestClassesArrayRemovalMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-            } else {
-                console.log(`✅ [TestClassesArrayRemovalMultiple] SSR test passed: ${ssrResult}`)
-            }
+        const ssrComponent = testObservables['TestClassesArrayRemovalMultiple_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = value ? `<h3>Classes - Array Removal Multiple</h3>${expected}` : '<h3>Classes - Array Removal Multiple</h3><p>content</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassesArrayRemovalMultiple] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassesArrayRemovalMultiple] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

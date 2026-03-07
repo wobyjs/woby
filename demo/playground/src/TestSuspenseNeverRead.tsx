@@ -1,4 +1,4 @@
-import { $, $$, Suspense, useResource, renderToString } from 'woby'
+import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSuspenseNeverRead = (): JSX.Element => {
@@ -36,7 +36,7 @@ TestSuspenseNeverRead.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Suspense - Never Read</h3><p>Content!</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSuspenseNeverRead] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestSuspenseNeverRead] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestSuspenseNeverRead] SSR test passed: ${ssrResult}`)
         }

@@ -1,4 +1,4 @@
-import { $, $$, ErrorBoundary, If, useResource, renderToString } from 'woby'
+import { $, $$, ErrorBoundary, If, useResource, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestResourceFallbackValue = (): JSX.Element => {
@@ -34,7 +34,7 @@ TestResourceFallbackValue.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Resource - Fallback Value</h3><p>Error!</p><p>Error!</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestResourceFallbackValue] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestResourceFallbackValue] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestResourceFallbackValue] SSR test passed: ${ssrResult}`)
         }

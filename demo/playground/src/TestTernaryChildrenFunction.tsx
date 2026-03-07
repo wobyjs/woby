@@ -1,4 +1,4 @@
-import { $, $$, Ternary, useTimeout, renderToString } from 'woby'
+import { $, $$, Ternary, useTimeout, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestTernaryChildrenFunction = (): JSX.Element => {
@@ -64,7 +64,7 @@ TestTernaryChildrenFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Ternary - Children Function</h3><p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestTernaryChildrenFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestTernaryChildrenFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestTernaryChildrenFunction] SSR test passed: ${ssrResult}`)
         }

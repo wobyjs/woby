@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, randomBigInt, assert } from './util'
 
 const TestBigIntFunction = (): JSX.Element => {
@@ -30,7 +30,7 @@ TestBigIntFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>BigInt - Function</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestBigIntFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestBigIntFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestBigIntFunction] SSR test passed: ${ssrResult}`)
         }

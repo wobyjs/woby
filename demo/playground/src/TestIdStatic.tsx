@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestIdStatic = (): JSX.Element => {
@@ -24,7 +24,7 @@ TestIdStatic.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>ID - Static</h3><p id="foo">content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIdStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestIdStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestIdStatic] SSR test passed: ${ssrResult}`)
         }

@@ -10,7 +10,7 @@
  * - Type conversion and serialization
  * - Style and attribute handling
  */
-import { $, $$, customElement, defaults, createContext, useMountedContext, HtmlString, HtmlNumber, HtmlBoolean, HtmlDate } from 'woby'
+import { $, $$, customElement, defaults, createContext, useMountedContext, HtmlString, HtmlNumber, HtmlBoolean, HtmlDate, type JSX } from 'woby'
 
 // Contexts for testing
 const AppContext = createContext('default-app')

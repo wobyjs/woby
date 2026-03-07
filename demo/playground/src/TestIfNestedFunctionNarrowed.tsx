@@ -1,4 +1,4 @@
-import { $, $$, If, renderToString } from 'woby'
+import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestIfNestedFunctionNarrowed = (): JSX.Element => {
@@ -27,7 +27,7 @@ TestIfNestedFunctionNarrowed.test = {
         const ssrComponent = testObservables['TestIfNestedFunctionNarrowed_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIfNestedFunctionNarrowed] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestIfNestedFunctionNarrowed] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestIfNestedFunctionNarrowed] SSR test passed: ${ssrResult}`)
         }

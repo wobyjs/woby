@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestEventTargetCurrentTarget = (): JSX.Element => {
@@ -100,7 +100,7 @@ TestEventTargetCurrentTarget.test = {
         const ssrContent = match ? match[1] : '<p>paragraph</p><ul><li>one</li><li>two</li><li>three</li></ul>'
         const expectedFull = `<h3>Event - Target - Current Target</h3><div>${ssrContent}</div>`  // For SSR comparison
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventTargetCurrentTarget] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestEventTargetCurrentTarget] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             assert(true, `[TestEventTargetCurrentTarget] SSR test passed: ${ssrResult}`)
         }

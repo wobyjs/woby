@@ -1,4 +1,4 @@
-import { $, $$, createContext, useContext, renderToString, jsx } from 'woby'
+import { $, $$, createContext, useContext, renderToString, jsx, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestContextComponents = (): JSX.Element => {
@@ -51,7 +51,7 @@ TestContextComponents.test = {
         const ssrComponent = testObservables['TestContextComponents_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestContextComponents] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestContextComponents] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestContextComponents] SSR test passed: ${ssrResult}`)
         }

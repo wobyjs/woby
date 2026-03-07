@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
 const TestHTMLDangerouslySetInnerHTMLObservable = (): JSX.Element => {
@@ -27,7 +27,7 @@ TestHTMLDangerouslySetInnerHTMLObservable.test = {
         const ssrComponent = testObservables['TestHTMLDangerouslySetInnerHTMLObservable_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestHTMLDangerouslySetInnerHTMLObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestHTMLDangerouslySetInnerHTMLObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestHTMLDangerouslySetInnerHTMLObservable] SSR test passed: ${ssrResult}`)
         }

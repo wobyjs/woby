@@ -1,4 +1,4 @@
-import { $, $$, Ternary, renderToString } from 'woby'
+import { $, $$, Ternary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestTernaryStatic = (): JSX.Element => {
@@ -31,7 +31,7 @@ TestTernaryStatic.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Ternary - Static</h3><p>true (1)</p><p>false (2)</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestTernaryStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestTernaryStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestTernaryStatic] SSR test passed: ${ssrResult}`)
         }

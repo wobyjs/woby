@@ -1,4 +1,4 @@
-import { $, $$, ErrorBoundary, renderToString } from 'woby'
+import { $, $$, ErrorBoundary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestErrorBoundaryFallbackFunction = (): JSX.Element => {
@@ -43,7 +43,7 @@ TestErrorBoundaryFallbackFunction.test = {
         const ssrComponent = testObservables['TestErrorBoundaryFallbackFunction_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestErrorBoundaryFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestErrorBoundaryFallbackFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestErrorBoundaryFallbackFunction] SSR test passed: ${ssrResult}`)
         }

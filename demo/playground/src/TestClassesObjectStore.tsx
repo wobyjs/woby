@@ -1,4 +1,4 @@
-import { $, $$, store, renderToString } from 'woby'
+import { $, $$, store, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let testit = true
@@ -50,7 +50,7 @@ TestClassesObjectStore.test = {
         const dynamicExpectedFull = `<h3>Classes - Object Store</h3><p class="${actualClass}">content</p>`
 
         if (ssrResult !== dynamicExpectedFull) {
-            assert(false, `[TestClassesObjectStore] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+            assert(false, `[TestClassesObjectStore] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ [TestClassesObjectStore] SSR test passed: ${ssrResult}`)
         }

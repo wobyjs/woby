@@ -8,7 +8,7 @@
  * - Host element interactions
  * - Property passing through nested structures
  */
-import { $, $$, customElement, defaults, HtmlString, HtmlNumber, HtmlBoolean } from 'woby'
+import { $, $$, customElement, defaults, HtmlString, HtmlNumber, HtmlBoolean, type JSX } from 'woby'
 
 // Leaf component - simplest custom element
 const LeafElement = defaults(() => ({

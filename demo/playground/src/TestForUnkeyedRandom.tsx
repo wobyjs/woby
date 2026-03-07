@@ -1,6 +1,6 @@
-import { $, $$, For, ObservableReadonly, renderToString } from 'woby'
+import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
-import { useEffect } from 'woby'
+import { useEffect, type JSX } from 'woby'
 
 const TestForUnkeyedRandom = (): JSX.Element => {
     const values = $([random(), random(), random()])
@@ -46,7 +46,7 @@ TestForUnkeyedRandom.test = {
         const ssrComponent = testObservables['TestForUnkeyedRandom_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForUnkeyedRandom] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestForUnkeyedRandom] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestForUnkeyedRandom] SSR test passed: ${ssrResult}`)
         }

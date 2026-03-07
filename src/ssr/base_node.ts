@@ -23,6 +23,32 @@ export class BaseNode {
     }
     // Event listener implementation
     _eventListeners: Map<string, Array<(event: any) => void>>
+    // Node type constants
+    static readonly ELEMENT_NODE = 1
+    static readonly ATTRIBUTE_NODE = 2
+    static readonly TEXT_NODE = 3
+    static readonly CDATA_SECTION_NODE = 4
+    static readonly ENTITY_REFERENCE_NODE = 5
+    static readonly ENTITY_NODE = 6
+    static readonly PROCESSING_INSTRUCTION_NODE = 7
+    static readonly COMMENT_NODE = 8
+    static readonly DOCUMENT_NODE = 9
+    static readonly DOCUMENT_TYPE_NODE = 10
+    static readonly DOCUMENT_FRAGMENT_NODE = 11
+    static readonly NOTATION_NODE = 12
+    // Instance properties for Node type access
+    readonly ELEMENT_NODE = 1
+    readonly ATTRIBUTE_NODE = 2
+    readonly TEXT_NODE = 3
+    readonly CDATA_SECTION_NODE = 4
+    readonly ENTITY_REFERENCE_NODE = 5
+    readonly ENTITY_NODE = 6
+    readonly PROCESSING_INSTRUCTION_NODE = 7
+    readonly COMMENT_NODE = 8
+    readonly DOCUMENT_NODE = 9
+    readonly DOCUMENT_TYPE_NODE = 10
+    readonly DOCUMENT_FRAGMENT_NODE = 11
+    readonly NOTATION_NODE = 12
 
     constructor(nodeType: number) {
         this.nodeType = nodeType
@@ -124,6 +150,12 @@ export class BaseNode {
         })
 
         return child
+    }
+
+    append(...nodes: any[]) {
+        nodes.forEach(node => {
+            this.appendChild(node)
+        })
     }
 
     insertBefore(newNode: any, referenceNode: any) {
@@ -352,5 +384,125 @@ export class BaseNode {
         if (index !== -1) {
             this._observers.splice(index, 1)
         }
+    }
+
+    // Getter for nextSibling - finds this node's position in parent's childNodes
+    get nextSibling(): any | null {
+        if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
+            const index = this.parentNode.childNodes.indexOf(this)
+            return index !== -1 && index < this.parentNode.childNodes.length - 1
+                ? this.parentNode.childNodes[index + 1]
+                : null
+        }
+        return null
+    }
+
+    // Getter for previousSibling - finds this node's position in parent's childNodes
+    get previousSibling(): any | null {
+        if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
+            const index = this.parentNode.childNodes.indexOf(this)
+            return index > 0 ? this.parentNode.childNodes[index - 1] : null
+        }
+        return null
+    }
+
+    // Getter for firstChild
+    get firstChild(): any | null {
+        return this.childNodes.length > 0 ? this.childNodes[0] : null
+    }
+
+    // Getter for lastChild
+    get lastChild(): any | null {
+        return this.childNodes.length > 0 ? this.childNodes[this.childNodes.length - 1] : null
+    }
+
+    // Getter for isConnected (checks if node is connected to a document)
+    get isConnected(): boolean {
+        let parent: any = this.parentNode
+        while (parent) {
+            if (parent.nodeType === 9) { // Document node type
+                return true
+            }
+            parent = parent.parentNode
+        }
+        return false
+    }
+
+    // Getter for baseURI (returns empty string as basic implementation)
+    get baseURI(): string {
+        return ''
+    }
+
+    // Getter for nodeName (returns empty string for nodes, tag name for elements)
+    get nodeName(): string {
+        return ''
+    }
+
+    // Getter for ownerDocument (returns null as basic implementation)
+    get ownerDocument(): any | null {
+        return null
+    }
+
+    // Getter for parentElement (returns parent if it's an element)
+    get parentElement(): any | null {
+        return this.parentNode
+    }
+
+    // Basic cloneNode implementation
+    cloneNode(deep: boolean = false): any {
+        // This is a basic implementation - subclasses should override
+        const cloned = new (this.constructor as any)()
+        cloned.nodeType = this.nodeType
+        cloned.attributes = { ...this.attributes }
+        if (deep && this.childNodes.length > 0) {
+            cloned.childNodes = this.childNodes.map((child: any) => child.cloneNode?.(deep) || child)
+        }
+        return cloned
+    }
+
+    // Stub implementations for remaining Node interface methods
+    compareDocumentPosition(other: any): number {
+        return 0
+    }
+
+    contains(other: any): boolean {
+        return false
+    }
+
+    getRootNode(): any {
+        return this.ownerDocument || this
+    }
+
+    hasChildNodes(): boolean {
+        return this.childNodes.length > 0
+    }
+
+    // Additional Node interface stubs
+    isDefaultNamespace(prefix: string): boolean {
+        return false
+    }
+
+    isEqualNode(other: any): boolean {
+        return this === other
+    }
+
+    isSameNode(other: any): boolean {
+        return this === other
+    }
+
+    lookupNamespaceURI(prefix: string): string | null {
+        return null
+    }
+
+    lookupPrefix(namespaceURI: string): string | null {
+        return null
+    }
+
+    normalize(): void {
+        // No-op
+    }
+
+    cloneRange?(): any {
+        return this.cloneNode(true)
     }
 }

@@ -1,4 +1,4 @@
-import { $, $$, If, renderToString } from 'woby'
+import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 export const TestCleanupInner = () => {
@@ -59,7 +59,7 @@ TestCleanupInner.test = {
         const ssrComponent = testObservables['TestCleanupInner_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expected) {
-            assert(false, `[TestCleanupInner] SSR mismatch: got ${ssrResult}, expected ${expected}`)
+            assert(false, `[TestCleanupInner] SSR mismatch: got \n${ssrResult}, expected \n${expected}`)
         } else {
             console.log(`✅ [TestCleanupInner] SSR test passed: ${ssrResult}`)
         }

@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSelectStaticValue = (): JSX.Element => {
@@ -32,7 +32,7 @@ TestSelectStaticValue.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Select - Static Value</h3><select name="select-static-value" value="bar"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSelectStaticValue] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestSelectStaticValue] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestSelectStaticValue] SSR test passed: ${ssrResult}`)
         }

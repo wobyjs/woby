@@ -1,4 +1,4 @@
-import { $, $$, jsx, Portal, renderToString, createDocument, useEnvironment } from 'woby'
+import { $, $$, jsx, Portal, renderToString, createDocument, useEnvironment, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 import { TestCleanupInner } from './TestCleanupInner'
 

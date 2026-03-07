@@ -60,7 +60,7 @@ export const FragmentUtils = {
 
         } else {
 
-          FragmentUtils.getChildrenFragmented(value, children)
+          FragmentUtils.getChildrenFragmented(value as any, children)
 
         }
 
@@ -90,7 +90,7 @@ export const FragmentUtils = {
 
     if (!thiz.fragmented) return thiz.values as any
 
-    if (thiz.length === 1) return FragmentUtils.getChildren(thiz.values)
+    if (thiz.length === 1) return FragmentUtils.getChildren(thiz.values as any)
 
     return FragmentUtils.getChildrenFragmented(thiz)
 
@@ -116,7 +116,7 @@ export const FragmentUtils = {
 
     if (length === 0) {
 
-      thiz.values = value
+      thiz.values = value as Fragment
 
     } else if (length === 1) {
 

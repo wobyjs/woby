@@ -1,4 +1,4 @@
-import { $, $$, lazy, Suspense, type JSX, renderToString } from 'woby'
+import { $, $$, lazy, Suspense, type JSX, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestLazy = (): JSX.Element => {
@@ -27,7 +27,7 @@ TestLazy.test = {
         const ssrComponent = testObservables['TestLazy_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestLazy] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestLazy] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestLazy] SSR test passed: ${ssrResult}`)
         }

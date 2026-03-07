@@ -1,5 +1,5 @@
-import { $, $$,  renderToString } from 'woby'
-import { TestSnapshots,useInterval,  TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { $, $$, renderToString, type JSX } from 'woby'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestAttributeFunction = (): JSX.Element => {
     const o = $('red')
@@ -31,7 +31,7 @@ TestAttributeFunction.test = {
         const currentValue = $$(testObservables['TestAttributeFunction'])
         const expectedFull = `<h3>Attribute - Function</h3><p data-color="dark${currentValue}">content</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestAttributeFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestAttributeFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestAttributeFunction] SSR test passed: ${ssrResult}`)
         }

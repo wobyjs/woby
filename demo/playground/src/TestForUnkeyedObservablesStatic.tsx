@@ -1,4 +1,4 @@
-import { $, $$, For, ObservableReadonly, renderToString } from 'woby'
+import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestForUnkeyedObservablesStatic = (): JSX.Element => {
@@ -39,7 +39,7 @@ TestForUnkeyedObservablesStatic.test = {
         const ssrComponent = testObservables['TestForUnkeyedObservablesStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForUnkeyedObservablesStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestForUnkeyedObservablesStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestForUnkeyedObservablesStatic] SSR test passed: ${ssrResult}`)
         }

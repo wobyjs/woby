@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestUndefinedFunction = (): JSX.Element => {
@@ -30,7 +30,7 @@ TestUndefinedFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = value !== undefined ? `<h3>Undefined - Function</h3><p>${value}</p>` : '<h3>Undefined - Function</h3><p><!----></p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestUndefinedFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestUndefinedFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestUndefinedFunction] SSR test passed: ${ssrResult}`)
         }

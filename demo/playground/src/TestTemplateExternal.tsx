@@ -1,4 +1,4 @@
-import { $, $$, template, renderToString } from 'woby'
+import { $, $$, template, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestTemplateExternal = (): JSX.Element => {
@@ -32,7 +32,7 @@ TestTemplateExternal.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Template - External</h3><div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestTemplateExternal] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestTemplateExternal] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestTemplateExternal] SSR test passed: ${ssrResult}`)
         }

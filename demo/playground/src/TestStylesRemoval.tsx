@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import type { FunctionUnwrap } from './util'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
@@ -53,7 +53,7 @@ TestStylesRemoval.test = {
                 expectedFull = '<h3>Styles - Removal</h3><p>content</p>'
             }
             if (ssrResult !== expectedFull) {
-                assert(false, `[TestStylesRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                assert(false, `[TestStylesRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
             } else {
                 console.log(`✅ [TestStylesRemoval] SSR test passed: ${ssrResult}`)
             }

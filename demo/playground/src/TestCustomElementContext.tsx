@@ -7,7 +7,7 @@
  * - Context value passing between TSX and custom elements
  * - Nested context providers
  */
-import { $, $$, customElement, defaults, createContext, useContext, useMountedContext, HtmlString, HtmlNumber } from 'woby'
+import { $, $$, customElement, defaults, createContext, useContext, useMountedContext, HtmlString, HtmlNumber, type JSX } from 'woby'
 
 // Create contexts
 const ThemeContext = createContext('light')

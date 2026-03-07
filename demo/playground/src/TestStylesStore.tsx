@@ -1,4 +1,4 @@
-import { $, $$, store, renderToString } from 'woby'
+import { $, $$, store, renderToString, type JSX } from 'woby'
 import { TestSnapshots, TEST_INTERVAL, useInterval, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
@@ -79,7 +79,7 @@ TestStylesStore.test = {
 
             if (ssrResult !== dynamicExpectedFull) {
                 console.error('[TestStylesStore]❌ SSR ASSERTION FAILED')
-                assert(false, `[TestStylesStore] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+                assert(false, `[TestStylesStore] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
             } else {
                 console.log(`✅ [TestStylesStore] SSR test passed: ${ssrResult}`)
             }

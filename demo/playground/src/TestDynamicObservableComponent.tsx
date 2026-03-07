@@ -1,4 +1,4 @@
-import { $, $$, Dynamic, useMemo, renderToString } from 'woby'
+import { $, $$, Dynamic, useMemo, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestDynamicObservableComponent = (): JSX.Element => {
@@ -37,7 +37,7 @@ TestDynamicObservableComponent.test = {
         const ssrComponent = testObservables['TestDynamicObservableComponent_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestDynamicObservableComponent] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestDynamicObservableComponent] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestDynamicObservableComponent] SSR test passed: ${ssrResult}`)
         }

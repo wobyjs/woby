@@ -1,4 +1,4 @@
-import { $, $$, If, renderToString } from 'woby'
+import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
@@ -101,7 +101,7 @@ TestNestedIfsLazy.test = {
         // Use dynamic matching to avoid timing mismatches
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestNestedIfsLazy] ❌ SSR ASSERTION FAILED')
-            assert(false, `[TestNestedIfsLazy] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+            assert(false, `[TestNestedIfsLazy] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ [TestNestedIfsLazy] SSR test passed: ${ssrResult}`)
         }

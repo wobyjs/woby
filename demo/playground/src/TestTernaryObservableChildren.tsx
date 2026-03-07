@@ -1,4 +1,4 @@
-import { $, $$, Ternary, renderToString } from 'woby'
+import { $, $$, Ternary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestTernaryObservableChildren = (): JSX.Element => {
@@ -102,7 +102,7 @@ TestTernaryObservableChildren.test = {
 
             if (ssrResult !== dynamicExpectedFull) {
                 console.error('[TestTernaryObservableChildren]❌ SSR ASSERTION FAILED')
-                assert(false, `[TestTernaryObservableChildren] SSR mismatch: got ${ssrResult}, expected ${dynamicExpectedFull}`)
+                assert(false, `[TestTernaryObservableChildren] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
             } else {
                 console.log(`✅ [TestTernaryObservableChildren] SSR test passed: ${ssrResult}`)
             }

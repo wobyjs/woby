@@ -1,4 +1,4 @@
-import { $, $$, Dynamic, renderToString } from 'woby'
+import { $, $$, Dynamic, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestDynamicHeading = (): JSX.Element => {
@@ -41,7 +41,7 @@ TestDynamicHeading.test = {
         const ssrComponent = testObservables['TestDynamicHeading_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestDynamicHeading] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestDynamicHeading] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestDynamicHeading] SSR test passed: ${ssrResult}`)
         }

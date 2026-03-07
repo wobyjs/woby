@@ -1,4 +1,4 @@
-import { $, $$, createContext, useContext, Dynamic, renderToString, jsx } from 'woby'
+import { $, $$, createContext, useContext, Dynamic, renderToString, jsx, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestContextDynamicContext = () => {
@@ -60,7 +60,7 @@ TestContextDynamicContext.test = {
         const ssrComponent = testObservables['TestContextDynamicContext_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestContextDynamicContext] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestContextDynamicContext] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestContextDynamicContext] SSR test passed: ${ssrResult}`)
         }

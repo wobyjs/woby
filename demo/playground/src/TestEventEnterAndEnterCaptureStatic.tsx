@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestEventEnterAndEnterCaptureStatic = (): JSX.Element => {
@@ -64,7 +64,7 @@ TestEventEnterAndEnterCaptureStatic.test = {
         const expectedFull = `<h3>Event - Enter & Enter Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
         // Handle HTML entity encoding in SSR output
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventEnterAndEnterCaptureStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestEventEnterAndEnterCaptureStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestEventEnterAndEnterCaptureStatic] SSR test passed: ${ssrResult}`)
         }

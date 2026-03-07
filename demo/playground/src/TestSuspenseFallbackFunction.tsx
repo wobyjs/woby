@@ -1,4 +1,4 @@
-import { $, $$, Suspense, useResource, renderToString } from 'woby'
+import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestSuspenseFallbackFunction = (): JSX.Element => {
@@ -40,7 +40,7 @@ TestSuspenseFallbackFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Suspense - Fallback Function</h3><p>Fallback: ${String(initialValue)}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSuspenseFallbackFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestSuspenseFallbackFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestSuspenseFallbackFunction] SSR test passed: ${ssrResult}`)
         }

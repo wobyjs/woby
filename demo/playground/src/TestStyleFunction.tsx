@@ -1,4 +1,4 @@
-import { $, $$, render, renderToString } from 'woby'
+import { $, $$, render, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestStyleFunction = (): JSX.Element => {
@@ -35,7 +35,7 @@ TestStyleFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Style - Function</h3><p style="color: ${color};">content</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestStyleFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestStyleFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestStyleFunction] SSR test passed: ${ssrResult}`)
         }

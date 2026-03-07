@@ -1,4 +1,4 @@
-import { $, $$, Suspense, renderToString } from 'woby'
+import { $, $$, Suspense, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const TestSuspenseChildrenFunction = (): JSX.Element => {
@@ -43,7 +43,7 @@ TestSuspenseChildrenFunction.test = {
         const actualValueFromSSR = match ? match[1] : 'unknown'
         const expectedFull = `<h3>Suspense - Children Function</h3><p>Children: ${actualValueFromSSR}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSuspenseChildrenFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestSuspenseChildrenFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestSuspenseChildrenFunction] SSR test passed: ${ssrResult}`)
         }

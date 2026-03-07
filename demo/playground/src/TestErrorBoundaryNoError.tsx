@@ -1,4 +1,4 @@
-import { $, $$, ErrorBoundary, renderToString } from 'woby'
+import { $, $$, ErrorBoundary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
 const TestErrorBoundaryNoError = (): JSX.Element => {
@@ -35,7 +35,7 @@ TestErrorBoundaryNoError.test = {
         const ssrComponent = testObservables['TestErrorBoundaryNoError_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestErrorBoundaryNoError] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestErrorBoundaryNoError] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestErrorBoundaryNoError] SSR test passed: ${ssrResult}`)
         }

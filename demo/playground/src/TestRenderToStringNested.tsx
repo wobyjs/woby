@@ -1,4 +1,4 @@
-import { $, $$, Suspense, useResource, renderToString } from 'woby'
+import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
 const TestRenderToStringNested = (): JSX.Element => {
@@ -33,7 +33,7 @@ TestRenderToStringNested.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<div><h3>renderToString - Nested</h3><p>123123<div><h3>renderToString</h3><p>123</p></div></p></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestRenderToStringNested] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestRenderToStringNested] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestRenderToStringNested] SSR test passed: ${ssrResult}`)
         }

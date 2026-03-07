@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestHTMLOuterHTMLObservable = (): JSX.Element => {
@@ -27,7 +27,7 @@ TestHTMLOuterHTMLObservable.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>HTML - outerHTML - Observable</h3><p></p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestHTMLOuterHTMLObservable] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestHTMLOuterHTMLObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestHTMLOuterHTMLObservable] SSR test passed: ${ssrResult}`)
         }

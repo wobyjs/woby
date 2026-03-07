@@ -19,7 +19,7 @@ export const registerTestObservable = (name: string, value: Observable<any> | JS
 Ensure the component file imports `renderToString` and `assert`:
 
 ```typescript
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 ```
 
@@ -76,7 +76,7 @@ MyComponent.test = {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {
                     if (ssrResult !== expectedFull) {
-                        assert(false, `SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+                        assert(false, `SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
                     } else {
                         console.log(`✅ SSR test passed: ${ssrResult}`)
                     }

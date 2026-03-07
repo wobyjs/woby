@@ -1,4 +1,4 @@
-import { $, $$, Switch, renderToString } from 'woby'
+import { $, $$, Switch, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSwitchCaseFunction = (): JSX.Element => {
@@ -35,7 +35,7 @@ TestSwitchCaseFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Switch - Case Function</h3><p>Case: 0.123456</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSwitchCaseFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestSwitchCaseFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestSwitchCaseFunction] SSR test passed: ${ssrResult}`)
         }

@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestClassesArrayRemoval = (): JSX.Element => {
@@ -32,14 +32,14 @@ TestClassesArrayRemoval.test = {
             expected = `<p class="${classes}">content</p>`
         }
 
-            const ssrComponent = testObservables['TestClassesArrayRemoval_ssr']
-            const ssrResult = renderToString(ssrComponent)
-            const expectedFull = value ? `<h3>Classes - Array Removal</h3>${expected}` : '<h3>Classes - Array Removal</h3><p>content</p>'
-            if (ssrResult !== expectedFull) {
-                assert(false, `[TestClassesArrayRemoval] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
-            } else {
-                console.log(`✅ [TestClassesArrayRemoval] SSR test passed: ${ssrResult}`)
-            }
+        const ssrComponent = testObservables['TestClassesArrayRemoval_ssr']
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = value ? `<h3>Classes - Array Removal</h3>${expected}` : '<h3>Classes - Array Removal</h3><p>content</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestClassesArrayRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [TestClassesArrayRemoval] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

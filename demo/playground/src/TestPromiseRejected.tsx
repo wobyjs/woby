@@ -1,4 +1,4 @@
-import { $, $$, usePromise, renderToString } from 'woby'
+import { $, $$, usePromise, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestPromiseRejected = (): JSX.Element => {
@@ -27,7 +27,7 @@ TestPromiseRejected.test = {
         const ssrComponent = testObservables['TestPromiseRejected_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestPromiseRejected] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestPromiseRejected] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestPromiseRejected] SSR test passed: ${ssrResult}`)
         }

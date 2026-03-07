@@ -1,4 +1,4 @@
-import { $, $$, KeepAlive, renderToString, useEffect } from 'woby'
+import { $, $$, KeepAlive, renderToString, useEffect, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
@@ -52,7 +52,7 @@ TestKeepAliveStatic.test = {
         const ssrComponent = testObservables['TestKeepAliveStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestKeepAliveStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestKeepAliveStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestKeepAliveStatic] SSR test passed: ${ssrResult}`)
         }

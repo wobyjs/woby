@@ -6,8 +6,8 @@ import { BaseNode } from "./base_node"
 import { Comment } from "./comment"
 import { createHTMLNode } from "./html_node"
 import type { FN } from "../types"
+import { Style } from "./style"
 
-type EventListener = (evt: Event) => void
 type EventListenerObject = {
     handleEvent(object: Event): void
 }
@@ -27,16 +27,9 @@ type EventListenerOptions = {
 
 
 export const createComment = ((content: string) => {
-    const node = {
-        nodeType: 8,
-        textContent: content,
-        parentNode: null as any,
-        toString: () => `<!--${content}-->`
-    }
-    return node
+    return new Comment(content)
 }) as any as FN<[string], Comment>
 
-// Re-export createHTMLNode from html_node.ts
 
 export const createSVGNode = ((tagName: string) => {
     class SVGNode extends BaseNode {
@@ -49,7 +42,7 @@ export const createSVGNode = ((tagName: string) => {
             super(1)
             this.tagName = tagName.toUpperCase()
             this.isSVG = true
-            this.style = {}
+            this.style = new Style()
             this.#className = ''
         }
 
@@ -130,23 +123,6 @@ export const createText = ((text: string) => {
         set nodeValue(value: string) {
             this.textContent = value
         }
-
-        // DOM-like properties that may be needed by diff algorithm
-        get nextSibling() {
-            if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
-                const index = this.parentNode.childNodes.indexOf(this)
-                return index !== -1 ? this.parentNode.childNodes[index + 1] : null
-            }
-            return null
-        }
-
-        get previousSibling() {
-            if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
-                const index = this.parentNode.childNodes.indexOf(this)
-                return index > 0 ? this.parentNode.childNodes[index - 1] : null
-            }
-            return null
-        }
     }
 
     return new TextNode(text) as any
@@ -164,7 +140,7 @@ export const createText = ((text: string) => {
 // }) as any as FN<[string], Text>
 
 
-const createDocumentFragment = (() => {
+export const createDocumentFragment = (() => {
     class DocumentFragmentNode extends BaseNode {
         constructor() {
             super(11)

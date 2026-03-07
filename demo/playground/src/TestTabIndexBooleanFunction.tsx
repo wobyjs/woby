@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestTabIndexBooleanFunction = (): JSX.Element => {
@@ -26,7 +26,7 @@ TestTabIndexBooleanFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>TabIndex - Boolean - Function</h3><p tabindex="0">content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestTabIndexBooleanFunction] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestTabIndexBooleanFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestTabIndexBooleanFunction] SSR test passed: ${ssrResult}`)
         }
@@ -37,3 +37,5 @@ TestTabIndexBooleanFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestTabIndexBooleanFunction} />
+
+console.log(renderToString(<TestTabIndexBooleanFunction />))

@@ -4,25 +4,11 @@
 
 import { BaseNode } from "./base_node"
 import type { FN } from "../types"
+import { Style } from "./style"
 
 /**
  * Style class for handling CSS properties in SSR
  */
-class Style {
-    [key: string]: any
-
-    constructor() {
-        // Add setProperty method for CSS custom properties
-        this.setProperty = (name: string, value: string) => {
-            this[name] = value
-        }
-    }
-
-    setProperty(name: string, value: string): void {
-        this[name] = value
-    }
-}
-
 const createText = ((text: string) => {
     // Define TextNode that extends BaseNode for SSR compatibility
     const TextNode = class extends BaseNode {
@@ -47,23 +33,6 @@ const createText = ((text: string) => {
 
         set nodeValue(value: string) {
             this.textContent = value
-        }
-
-        // DOM-like properties that may be needed by diff algorithm
-        get nextSibling() {
-            if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
-                const index = this.parentNode.childNodes.indexOf(this)
-                return index !== -1 ? this.parentNode.childNodes[index + 1] : null
-            }
-            return null
-        }
-
-        get previousSibling() {
-            if (this.parentNode && Array.isArray(this.parentNode.childNodes)) {
-                const index = this.parentNode.childNodes.indexOf(this)
-                return index > 0 ? this.parentNode.childNodes[index - 1] : null
-            }
-            return null
         }
     }
 
@@ -107,7 +76,9 @@ export const createHTMLNode = ((tagName: string) => {
         setAttribute(name: string, value: any) {
             // Handle special cases for style and class
             if (name === 'style') {
-                this.style = value
+                // Store the string value in attributes but keep style as object
+                this.attributes['style'] = value
+                // Don't overwrite this.style - keep it as Style object
             } else if (name === 'class' || name === 'className') {
                 // Use the setter to ensure synchronization
                 this.className = value
@@ -144,9 +115,9 @@ export const createHTMLNode = ((tagName: string) => {
 
         // Getter for outerHTML
         get outerHTML() {
-            // Build attributes string
+            // Build attributes string - normalize attribute names to lowercase for HTML compliance
             const attrs = Object.entries(this.attributes)
-                .map(([name, value]) => `${name}="${value}"`)
+                .map(([name, value]) => `${name.toLowerCase()}="${value}"`)
                 .join(' ')
             const attrStr = attrs ? ` ${attrs}` : ''
 
@@ -187,3 +158,4 @@ export const createHTMLNode = ((tagName: string) => {
 
     return new HTMLNode()
 }) as any as FN<[string], HTMLElement>
+

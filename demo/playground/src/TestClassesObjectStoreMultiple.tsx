@@ -1,4 +1,4 @@
-import { $, $$, store, renderToString } from 'woby'
+import { $, $$, store, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let testit = true  // Track assertion cycles for timing coordination
@@ -69,7 +69,7 @@ TestClassesObjectStoreMultiple.test = {
             console.error(`❌ SSR test failed:`)
             console.error(`  Got: ${ssrResult}`)
             console.error(`  Expected: ${expectedFull}`)
-            assert(false, `[TestClassesObjectStoreMultiple] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestClassesObjectStoreMultiple] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         }
 
         return expected

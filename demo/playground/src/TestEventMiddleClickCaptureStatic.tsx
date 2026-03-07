@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestEventMiddleClickCaptureStatic = (): JSX.Element => {
@@ -57,7 +57,7 @@ TestEventMiddleClickCaptureStatic.test = {
         const ssrComponent = testObservables['TestEventMiddleClickCaptureStatic_ssr']
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventMiddleClickCaptureStatic] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestEventMiddleClickCaptureStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestEventMiddleClickCaptureStatic] SSR test passed: ${ssrResult}`)
         }
@@ -76,7 +76,7 @@ TestEventMiddleClickCaptureStatic.test = {
             const buttonText = buttonElement.textContent || ''
             const currentExpected = `<p><button>${buttonText}</button></p>`
             console.assert(currentExpected === expected,
-                `TestEventMiddleClickCaptureStatic expectation failed: got ${currentExpected}, expected ${expected}`)
+                `TestEventMiddleClickCaptureStatic expectation failed: got \n${currentExpected}, expected \n${expected}`)
             if (currentExpected === expected) {
                 console.log(`✅ Expect function test passed for TestEventMiddleClickCaptureStatic  expect:  ${expected}`)
             }

@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestSVGClassObject = (): JSX.Element => {
@@ -26,7 +26,7 @@ TestSVGClassObject.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>SVG - Class Object</h3><svg class="red" viewBox="0 0 50 50" width="50px" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSVGClassObject] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestSVGClassObject] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestSVGClassObject] SSR test passed: ${ssrResult}`)
         }

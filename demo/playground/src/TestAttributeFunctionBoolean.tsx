@@ -1,4 +1,4 @@
-import { $, $$, renderToString } from 'woby'
+import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
 const TestAttributeFunctionBoolean = (): JSX.Element => {
@@ -35,7 +35,7 @@ TestAttributeFunctionBoolean.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Attribute - Function Boolean</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestAttributeFunctionBoolean] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestAttributeFunctionBoolean] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestAttributeFunctionBoolean] SSR test passed: ${ssrResult}`)
         }

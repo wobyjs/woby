@@ -17,7 +17,7 @@ declare module 'woby' {
  * - Nested properties
  * - Type conversion
  */
-import { $, $$, customElement, defaults, renderToString, Dynamic, type ElementAttributes, HtmlString, HtmlNumber, HtmlBoolean } from 'woby'
+import { $, $$, customElement, defaults, renderToString, Dynamic, type ElementAttributes, HtmlString, HtmlNumber, HtmlBoolean, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 // Define a simple custom element with basic props
@@ -96,7 +96,7 @@ TestCustomElementBasicTSX.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<div><h2>1. TSX Usage</h2><div style="border: 2px solid green; padding: 10px; background-color: rgb(224, 224, 224);"><h2>Test Element</h2><div><p>This is child content from TSX</p></div><p>Count: 42</p><p>Active: Yes</p></div></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestCustomElementBasicTSX] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestCustomElementBasicTSX] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestCustomElementBasicTSX] SSR test passed: ${ssrResult}`)
         }
@@ -137,7 +137,7 @@ TestCustomElementBasicHTML.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<div><h2>2. Custom Element in TSX</h2><basic-element><p>This is child content from HTML</p></basic-element></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestCustomElementBasicHTML] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestCustomElementBasicHTML] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestCustomElementBasicHTML] SSR test passed: ${ssrResult}`)
         }
@@ -181,7 +181,7 @@ TestCustomElementBasicMixed.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element><basic-element><p>Nested content</p></basic-element></basic-element></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestCustomElementBasicMixed] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestCustomElementBasicMixed] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestCustomElementBasicMixed] SSR test passed: ${ssrResult}`)
         }
@@ -228,7 +228,7 @@ TestCustomElementBasicPureHTML.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<div><h2>4. Pure HTML Custom Element</h2><basic-element><p>This is child content from pure HTML custom element</p></basic-element></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestCustomElementBasicPureHTML] SSR mismatch: got ${ssrResult}, expected ${expectedFull}`)
+            assert(false, `[TestCustomElementBasicPureHTML] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestCustomElementBasicPureHTML] SSR test passed: ${ssrResult}`)
         }

@@ -44,10 +44,10 @@ import { Comment as CommentSSR } from "../ssr"
 const dummyNode = createComment('')
 
 /** Wrapper array for single "before" nodes to normalize them as arrays */
-const beforeDummyWrapper: [Node] = [dummyNode]
+const beforeDummyWrapper: [Node | Comment | CommentSSR] = [dummyNode]
 
 /** Wrapper array for single "after" nodes to normalize them as arrays */
-const afterDummyWrapper: [Node] = [dummyNode]
+const afterDummyWrapper: [Node | Comment | CommentSSR] = [dummyNode]
 
 /**
  * Efficiently diffs and updates the children of a parent node.
@@ -111,9 +111,9 @@ export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[
       if (bStart < bEnd) {
         // parent.insertBefore(after[bStart++], node);
         if (node) {
-          (node as ChildNode).before.apply(node, after.slice(bStart, bEnd))
+          (node as ChildNode).before.apply(node, after.slice(bStart, bEnd) as any)
         } else {
-          (parent as ParentNode).append.apply(parent, after.slice(bStart, bEnd))
+          (parent as ParentNode).append.apply(parent, after.slice(bStart, bEnd) as any)
         }
         bStart = bEnd
       }
@@ -125,7 +125,7 @@ export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[
         if (!map || !map.has(before[aStart])) {
           removable = before[aStart]
           if (removable.parentNode === parent) { // Safety check, since setChildStatic may trigger this
-            parent.removeChild(removable)
+            parent.removeChild(removable as any)
           }
         }
         aStart++
@@ -156,10 +156,10 @@ export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[
       // [1, 2, 3, 5, 6, 4]
       const node = before[--aEnd].nextSibling
       parent.insertBefore(
-        after[bStart++],
+        after[bStart++] as any,
         before[aStart++].nextSibling
       )
-      parent.insertBefore(after[--bEnd], node)
+      parent.insertBefore(after[--bEnd] as any, node)
       // mark the future index as identical (yeah, it's dirty, but cheap 👍)
       // The main reason to do this, is that when a[aEnd] will be reached,
       // the loop will likely be on the fast path, as identical to b[bEnd].
@@ -207,9 +207,9 @@ export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[
             if (bStart < index) {
               // parent.insertBefore(after[bStart++], node);
               if (node) {
-                (node as ChildNode).before.apply(node, after.slice(bStart, index))
+                (node as ChildNode).before.apply(node, after.slice(bStart, index) as any)
               } else {
-                (parent as ParentNode).append.apply(parent, after.slice(bStart, index))
+                (parent as ParentNode).append.apply(parent, after.slice(bStart, index) as any)
               }
               bStart = index
             }
@@ -219,8 +219,8 @@ export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[
           // similar node will be found later on, to go back to the fast path
           else {
             parent.replaceChild(
-              after[bStart++],
-              before[aStart++]
+              after[bStart++] as any,
+              before[aStart++] as any
             )
           }
         }
@@ -234,7 +234,7 @@ export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[
       else {
         removable = before[aStart++]
         if (removable.parentNode === parent) { // Safety check, since setChildStatic may trigger this
-          parent.removeChild(removable)
+          parent.removeChild(removable as any)
         }
       }
     }

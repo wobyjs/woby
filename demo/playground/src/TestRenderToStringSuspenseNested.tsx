@@ -1,4 +1,4 @@
-import { $, $$, Suspense, useResource, renderToString } from 'woby'
+import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert, useTimeout } from './util'
 
 const TEST_INTERVAL = 500
@@ -90,7 +90,7 @@ const TestRenderToStringSuspenseNestedSSR = (): JSX.Element => {
 let ssrResult = renderToString(<TestRenderToStringSuspenseNestedSSR />)
 let expectedSSR = '<div><h3>renderToString - Suspense Nested</h3><p>124</p><p>125</p></div>' //final context
 if (ssrResult !== expectedSSR /* && ssrResult !== '<div></div>' */) {
-    assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got ${ssrResult}, expected ${expectedSSR}`)
+    assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
 } else {
     console.log(`✅ [TestRenderToStringSuspenseNested] SSR test passed: ${ssrResult}`)
 }
@@ -106,7 +106,7 @@ TestRenderToStringSuspenseNested.test = {
         // let ssrResult = renderToString(ssr)
         // let expectedSSR = '<div><p>456123</p><p><!----></p></div>' //final context
         // if (ssrResult !== expectedSSR /* && ssrResult !== '<div></div>' */) {
-        //     assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got ${ssrResult}, expected ${expectedSSR}`)
+        //     assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
         // } else {
         //     console.log(`✅ [TestRenderToStringSuspenseNested] SSR test passed: ${ssrResult}`)
         // }
