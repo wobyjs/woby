@@ -638,9 +638,9 @@ const tests = [
     // TestSymbolObservable,
     // TestSymbolRemoval,
     // TestSymbolStatic,
-    TestTabIndexBooleanFunction,
-    TestTabIndexBooleanObservable,
-    // TestTabIndexBooleanStatic,
+    // TestTabIndexBooleanFunction,
+    // TestTabIndexBooleanObservable,
+    TestTabIndexBooleanStatic,
     // TestTemplateExternal,
     // TestTemplateSVG,
 

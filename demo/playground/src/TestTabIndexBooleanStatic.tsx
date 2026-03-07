@@ -36,3 +36,5 @@ TestTabIndexBooleanStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestTabIndexBooleanStatic} />
+
+console.log(renderToString(<TestTabIndexBooleanStatic />))

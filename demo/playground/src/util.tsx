@@ -165,7 +165,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                             //temp hide for assertion only
                             console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                         } else {
-                            assert(false, `[${Component.name}]: Expected actual '${actualForComparison}' to be equal to function result '${expectedValue}'`)
+                            assert(false, `[${Component.name}]: Expected actual \n'${actualForComparison}' to be equal to function result \n'${expectedValue}'`)
                         }
                     } else {
                         // For dynamic components with compareActualValues, use the expect function result directly

@@ -60,13 +60,13 @@ export const setAttributeStatic = (() => {
             // e.g., tabIndex -> tabindex, className -> class
             const normalizedKey = key.toLowerCase()
 
-            if (isNil(value) || (value === false && attributesBoolean.has(normalizedKey))) {
+            if (isNil(value) || value === false || (value === true && attributesBoolean.has(normalizedKey))) {
 
                 element.removeAttribute(normalizedKey)
 
             } else {
 
-                value = (value === true) ? '' : String(value)
+                value = String(value)
                 element.setAttribute(normalizedKey, value)
 
             }
@@ -1170,6 +1170,11 @@ export const setProp = (element: HTMLElement | Comment, key: string, value: any,
     }
     else {
         if (value === undefined) return // Ignoring undefined props, for performance
+
+        // Special handling for tabIndex boolean values - convert before processing
+        if (key === 'tabIndex' && isBoolean(value)) {
+            value = value ? 0 : undefined
+        }
 
         if (isTemplateAccessor(value)) {
 
