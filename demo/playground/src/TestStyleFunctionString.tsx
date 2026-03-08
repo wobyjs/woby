@@ -42,4 +42,4 @@ TestStyleFunctionString.test = {
 
 export default () => <TestSnapshots Component={TestStyleFunctionString} />
 
-console.log(renderToString(<TestStyleFunctionString />))
+// console.log(renderToString(<TestStyleFunctionString />))

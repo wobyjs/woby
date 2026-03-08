@@ -40,4 +40,4 @@ TestHTMLFunctionStatic.test = {
 
 export default () => <TestSnapshots Component={TestHTMLFunctionStatic} />
 
-console.log(renderToString(<TestHTMLFunctionStatic />))
+// console.log(renderToString(<TestHTMLFunctionStatic />))

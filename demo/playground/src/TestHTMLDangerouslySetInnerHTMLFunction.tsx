@@ -39,4 +39,4 @@ TestHTMLDangerouslySetInnerHTMLFunction.test = {
 
 export default () => <TestSnapshots Component={TestHTMLDangerouslySetInnerHTMLFunction} />
 
-console.log(renderToString(<TestHTMLDangerouslySetInnerHTMLFunction />))
+// console.log(renderToString(<TestHTMLDangerouslySetInnerHTMLFunction />))

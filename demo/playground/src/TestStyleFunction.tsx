@@ -47,4 +47,4 @@ TestStyleFunction.test = {
 
 export default () => <TestSnapshots Component={TestStyleFunction} />
 
-console.log(renderToString(<TestStyleFunction />))
+// console.log(renderToString(<TestStyleFunction />))

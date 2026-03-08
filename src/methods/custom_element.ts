@@ -41,6 +41,8 @@ import { useLightDom } from "../hooks/use_attached"
 import { mark } from "../utils/mark"
 import { customElements as ces } from '../ssr/custom_elements'
 import { document as doc } from '../ssr/document'
+import { useEnvironment } from "../components"
+import { Element } from '../ssr/element'
 
 if (isSSR) {
     globalThis.customElements = ces as any
@@ -61,22 +63,45 @@ if (isSSR) {
 export const createSSRCustomElement = <P extends { children?: Observable<Child> }>(
     tagName: string,
     component: Component<P>
-) => {
+): void => {
     // Create a mock class for SSR that behaves like the browser version
-    class SSRCustomElement {
+    class SSRCustomElement extends Element {
         static __component__ = component
         public props: P
         public attributes: Record<string, string> = {}
         public childNodes: any[] = []
 
         constructor(props?: P) {
-            // In SSR, we just store the props
+            super(tagName) // Initialize Element with tagName
+                    
+            // Get the component function
+            const componentFn = (this.constructor as any).__component__
+                    
+            // Store provided props
             this.props = props || {} as P
-
-            // Store children if provided
-            if (props && (props as any).children) {
-                const children = (props as any).children
-                this.childNodes = Array.isArray(children) ? children : [children]
+        
+            // Execute component and render children if component exists
+            if (componentFn && typeof componentFn === 'function') {
+                try {
+                    // Call component with props to get JSX result
+                    const jsxResult = componentFn.call(null, this.props)
+                            
+                    // For SSR, we need to resolve the JSX.Element to actual nodes
+                    // The jsxResult is typically a function wrapper (JSX.Element)
+                    // We'll store it in childNodes to be resolved later by outerHTML
+                    this.childNodes = [jsxResult]
+                } catch (e) {
+                    console.error('[SSRCustomElement] Failed to execute component:', e)
+                    this.childNodes = []
+                }
+            } else {
+                // No component function, just use children from props if available
+                if (props && (props as any).children) {
+                    const children = (props as any).children
+                    this.childNodes = Array.isArray(children) ? children : [children]
+                } else {
+                    this.childNodes = []
+                }
             }
         }
 
@@ -100,19 +125,52 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
 
         // Add outerHTML getter to render the custom element with its children
         get outerHTML() {
-            // Build attributes string
-            const attrs = Object.entries(this.attributes)
-                .map(([name, value]) => `${name.toLowerCase()}="${value}"`)
+            // Build attributes string from this.attributes (already set by setProps)
+            const attrs = Object.entries(this.attributes || {})
+                .map(([name, value]) => `${name.toLowerCase()}="${value ?? ''}"`)
                 .join(' ')
             const attrStr = attrs ? ` ${attrs}` : ''
 
-            // Build children string by converting each child to HTML
+            // Build children string by resolving and converting each child to HTML
             const children = this.childNodes.map((child: any) => {
+                // Resolve function children (JSX.Element wrappers)
+                if (typeof child === 'function') {
+                    try {
+                        let resolved = child()
+                        // Keep resolving if result is also a function
+                        while (typeof resolved === 'function') {
+                            resolved = resolved()
+                        }
+
+                        // If resolved child has outerHTML, use it
+                        if (resolved && typeof resolved === 'object' && 'outerHTML' in resolved) {
+                            return resolved.outerHTML
+                        }
+
+                        // If resolved child is an Element/Node, get its content
+                        if (resolved && typeof resolved === 'object' && 'nodeType' in resolved) {
+                            if (resolved.nodeType === 1 && 'innerHTML' in resolved) {
+                                return resolved.innerHTML
+                            }
+                            if ('textContent' in resolved) {
+                                return resolved.textContent
+                            }
+                        }
+
+                        child = resolved
+                    } catch (e) {
+                        console.error('[SSRCustomElement.outerHTML] Failed to resolve child:', e)
+                        return String(child ?? '')
+                    }
+                }
                 if (typeof child === 'object' && child !== null) {
                     if ('outerHTML' in child) {
                         return child.outerHTML
                     } else if ('textContent' in child) {
                         return child.textContent
+                    } else if ('innerHTML' in child) {
+                        // For Element objects, return innerHTML for children
+                        return child.innerHTML
                     }
                 }
                 return String(child ?? '')
@@ -132,8 +190,116 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
     // Register the component in our dictionary
     ces.define(tagName, SSRCustomElement as any)
 
-    // Return the mock class for SSR
-    return SSRCustomElement as unknown as typeof HTMLElement
+    // Removed: return statement - now returns void
+}
+
+/**
+ * Creates a browser custom element with reactive properties
+ */
+export const createBrowserCustomElement = <P extends { children?: Observable<JSX.Child> }>(
+    tagName: string,
+    component: JSX.Component<P>
+): void => {
+    const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
+    if (!defaultPropsFn) {
+        console.error(`Component ${tagName} is missing default props.`)
+    }
+
+    const C = class extends HTMLElement {
+        static __component__ = component;
+        static observedAttributes: string[] = []
+        public props: P
+        public propDict: Record<string, string>
+        childs: Node[] = []
+        public slots: HTMLSlotElement
+        public placeHolder: Comment
+
+        constructor(props?: P) {
+            super()
+            this.props = !!props ? props : defaultPropsFn() || {} as P
+            C.observedAttributes = Object.keys(this.props)
+
+            if (!isJsx(this.props)) {
+                const shadowRoot = this.attachShadow({ mode: 'open', serializable: true })
+                if (!($$(this.props.children) instanceof HTMLSlotElement)) {
+                    this.slots = document.createElement('slot')
+                    this.props.children(this.slots)
+                }
+
+                const ignoreStyle = (this.props as any).ignoreStyle === true
+                if (!ignoreStyle) {
+                    const allSheets = convertAllDocumentStylesToConstructed()
+                    shadowRoot.adoptedStyleSheets = allSheets
+                }
+
+                setChild(shadowRoot, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
+            } else {
+                setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
+            }
+
+            if (!this.propDict) {
+                this.propDict = {}
+                Object.keys(this.props).forEach((k) => {
+                    const c = camelToKebabCase(k)
+                    this.propDict[c] = k
+                    this.propDict[k] = c
+                })
+            }
+        }
+
+        connectedCallback() {
+            const { observedAttributes } = C
+            const { props: p } = this
+            const aKeys = Object.keys(p).filter(k => k !== 'children' && isObservable(p[k]))
+            const rKeys = Object.keys(p).filter(k => isPureFunction(p[k]) || isObject(p[k]))
+
+            rKeys.forEach(k => this.removeAttribute(k))
+
+            for (const k of aKeys as any)
+                if (!this.attributes[this.propDict[k]] || isJsx(p))
+                    setProp(this, this.propDict[k], p[k], callStack('connectedCallback'))
+
+            for (const attr of this.attributes as any)
+                this.attributeChangedCallback1(attr.name, undefined, attr.value)
+
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(m => {
+                    if (m.type === 'attributes') {
+                        const name = m.attributeName
+                        const newValue = this.getAttribute(name)
+                        const oldValue = m.oldValue
+                        this.attributeChangedCallback1(name, oldValue, newValue)
+                    }
+                })
+            })
+
+            observer.observe(this, { attributes: true, attributeOldValue: true })
+        }
+
+        disconnectedCallback() { }
+
+        attributeChangedCallback1(name, oldValue, newValue) {
+            if (oldValue === newValue) return
+            if (newValue === '[object Object]') return
+
+            const { props } = this
+            if (name.includes('$') || name.includes('.')) {
+                const normalizedPath = normalizePropertyPath(name)
+                setNestedProperty(this, normalizedPath, newValue)
+                const propName = kebabToCamelCase(name.replace(/\$/g, '.').replace(/\./g, '.'))
+                setObservableValue(props, propName, newValue)
+            } else {
+                const propName = kebabToCamelCase(name)
+                setObservableValue(this.props, propName, newValue)
+            }
+        }
+    }
+
+    const ec = customElements.get(tagName)
+    if (!!ec)
+        console.warn(`Element ${tagName} already exists.`)
+    else
+        customElements.define(tagName, C)
 }
 
 /**
@@ -495,203 +661,8 @@ const isLightDom = (node: Node): boolean => {
  * customElement('counter-element', Counter)
  * ```
  */
-export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>) => {
-    // Check if we're in an SSR environment
-    // We need to check both window and document to ensure we're in a browser environment
-
-    // For SSR, we use the SSR-specific implementation
-    if (isSSR) {
-        // Use dynamic import for SSR version to avoid bundling it in browser builds
-        // This approach works better with TypeScript and bundlers
-        return createSSRCustomElement(tagName, component)
-    }
-    // Browser environment - use the original implementation
-    const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
-    if (!defaultPropsFn) {
-        console.error(`Component ${tagName} is missing default props. Please use the 'defaults' helper function to provide default props.`)
-    }
-
-    /**
-     * Custom Element Class
-     * 
-     * Extends HTMLElement to create a custom element with reactive properties.
-     */
-    const C = class extends HTMLElement {
-        /** Reference to the children component function */
-        //rename it to function component
-        static __component__ = component;
-
-        //obaserable attributes is deps on props
-        static observedAttributes: string[] = []
-
-        /** Component props */
-        public props: P
-        public propDict: Record<string, string>
-        childs: Node[] = []
-        public slots: HTMLSlotElement
-        public placeHolder: Comment
-
-        constructor(props?: P) {
-            super()
-            this.props = !!props ? props : defaultPropsFn() || {} as P
-            C.observedAttributes = Object.keys(this.props)
-
-            if (!isJsx(this.props)) {
-                const shadowRoot = this.attachShadow({ mode: 'open', serializable: true })
-                if (!($$(this.props.children) instanceof HTMLSlotElement)) {
-                    this.slots = document.createElement('slot')
-                    // this.slots.onslotchange = () => {
-                    //     console.log('slotchange', this.slots.assignedElements())
-                    // }
-                    this.props.children(this.slots)
-                }
-
-                // console.log('isLightDom', isLightDom(this), [this])
-                // if (isLightDom(this)) {
-                //     const { lightDom } = useLightDom(this)
-                //     useEffect(() => {
-                //         console.log('lightDom parent', $$(lightDom), /* ($$(lp) as Element).assignedSlot, */ this, [component])
-                //     })
-                // }
-                // Check if stylesheet encapsulation should be ignored
-                const ignoreStyle = (this.props as any).ignoreStyle === true
-
-                // Only adopt stylesheets if not explicitly disabled
-                if (!ignoreStyle) {
-                    // Get the latest cached stylesheets
-                    // The stylesheet observation is initialized once at the module level
-                    const allSheets = convertAllDocumentStylesToConstructed()
-
-                    // Adopt all the retrieved stylesheets
-                    shadowRoot.adoptedStyleSheets = allSheets
-                }
-
-                // this.placeHolder = document.createComment('')
-                // shadowRoot.append(this.placeHolder/* , this.slots */)
-                // render(createElement(component, this.props), shadowRoot) 
-
-                //creating the child in tsx
-                setChild(shadowRoot, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
-            }
-            else {
-                //never happen
-                setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
-            }
-
-            if (!this.propDict) {
-                this.propDict = {}
-
-                Object.keys(this.props).forEach((k) => {
-                    const c = camelToKebabCase(k)
-                    this.propDict[c] = k
-                    this.propDict[k] = c
-                })
-            }
-        }
-
-        /**
-         * Called when the element is added to the document
-         * 
-         * Sets up attribute observation and initializes the element.
-         */
-        connectedCallback() {
-            // ------------ not working for <my-comp> in TSX files------------
-            const { observedAttributes } = C
-            const { props: p } = this
-            const aKeys = Object.keys(p).filter(k => /* !isPureFunction(p[k]) && !isObject(p[k]) && */ k !== 'children' && isObservable(p[k]))
-            const rKeys = Object.keys(p).filter(k => isPureFunction(p[k]) || isObject(p[k]))
-
-            // this.props.children(this.slots/* .assignedNodes() */)
-            // setChildReplacement(jsx(children, this.props), this.placeHolder, callStack('connectedCallback'))
-
-            rKeys.forEach(k => this.removeAttribute(k))
-
-            // props -> attr (1st)
-            for (const k of aKeys as any)
-                if (!this.attributes[this.propDict[k]] || isJsx(p))
-                    setProp(this, this.propDict[k], p[k], callStack('connectedCallback'))
-            // ------------
-
-            // attr -> props (1st)
-            for (const attr of this.attributes as any)
-                this.attributeChangedCallback1(attr.name, undefined, attr.value)
-
-            // // props -> attr(1st)
-            // aKeys.forEach((k) => {
-            //     if (!this.attributes[k])
-            //         this.setAttribute(k, JSON.stringify($$(this.props[k])))
-            //     // setAttribute(this, k, this.props[k], callStack('init connected'))
-            // })
-
-            const observer = new MutationObserver(mutations => {
-                mutations.forEach(m => {
-                    if (m.type === 'attributes') {
-                        const name = m.attributeName
-                        const newValue = this.getAttribute(name)
-                        const oldValue = m.oldValue
-                        // attr -> props (on change)
-                        this.attributeChangedCallback1(name, oldValue, newValue)
-                    }
-                })
-            })
-
-            observer.observe(this, { attributes: true, attributeOldValue: true })
-        }
-
-        /**
-         * Called when the element is removed from the document
-         * 
-         * Cleans up observers and resources.
-         */
-        disconnectedCallback() {
-            // Note: We don't unobserve stylesheet changes at the module level
-            // since stylesheet observation is shared across all custom elements
-            // and only initialized once
-        }
-
-        /**
-         * Called when an observed attribute changes
-         * 
-         * Updates the corresponding prop and handles nested properties.
-         * 
-         * @param name - The name of the changed attribute
-         * @param oldValue - The previous value of the attribute
-         * @param newValue - The new value of the attribute
-         */
-        attributeChangedCallback1(name, oldValue, newValue) {
-            if (oldValue === newValue) return
-
-            if (newValue === '[object Object]') return //TSX's <my-comp obj={{}}> obj is raw object literal but not $()
-
-            const { props } = this
-            // if (!matchesWildcard(name, C.observedAttributes)) return
-
-            // Check if this is a nested property (contains $ or .)
-            if (name.includes('$') || name.includes('.')) {
-                // Normalize the property path using the utility function
-                const normalizedPath = normalizePropertyPath(name)
-
-                // Handle nested properties (including style properties)
-                setNestedProperty(this, normalizedPath, newValue)
-
-                // Also update any observable in the nested path
-                // Note: We need to convert the attribute name to the property name for the propDict lookup
-                const propName = kebabToCamelCase(name.replace(/\$/g, '.').replace(/\./g, '.'))
-                setObservableValue(props, propName, newValue)
-            } else {
-                // Handle flat properties (existing behavior)
-                // Convert kebab-case attribute name to camelCase property name
-                const propName = kebabToCamelCase(name)
-                setObservableValue(this.props, propName, newValue)
-            }
-        }
-    }
-
-    const ec = customElements.get(tagName)
-    if (!!ec)
-        console.warn(`Element ${tagName} already exists. (ignore this in dev env), use ec.__component__ to find target component`)
-    else
-        customElements.define(tagName, C)
-
-    return C
+export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>): void => {
+    createSSRCustomElement(tagName, component)
+    if (globalThis.window && globalThis.document)
+        createBrowserCustomElement(tagName, component)
 }

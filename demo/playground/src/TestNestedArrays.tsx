@@ -50,37 +50,47 @@ TestNestedArrays.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        // Dynamically generate the expected HTML based on the current state
         const itemsObservable = testObservables['TestNestedArrays']
         const activeItemObservable = testObservables['TestNestedArrays-activeItem']
         const itemsState = (typeof itemsObservable === 'function' ? itemsObservable() : [0, 1, 2])
         const activeItemState = (typeof activeItemObservable === 'function' ? activeItemObservable() : 1)
 
-        // Generate the list items dynamically
-        let html = '<button>Increment</button><ul>'
-
+        // DOM expectation - includes <!----> comment placeholders from If blocks
+        let htmlDom = '<button>Increment</button><ul>'
         for (let i = 0; i < itemsState.length; i++) {
             const item = itemsState[i]
-            // Add <!-- --> for inactive If blocks (only if activeItem matches)
             if (activeItemState === item) {
-                html += '<li>test</li>'
+                htmlDom += '<li>test</li>'
+            } else {
+                htmlDom += '<!---->'
             }
-            html += `<li>${item}</li>`
+            htmlDom += `<li>${item}</li>`
         }
+        htmlDom += '</ul>'
+        const expected = htmlDom   // For main DOM test comparison
 
-        html += '</ul>'
+        // SSR expectation - NO <!----> comment placeholders
+        let htmlSsr = '<button>Increment</button><ul>'
+        for (let i = 0; i < itemsState.length; i++) {
+            const item = itemsState[i]
+            if (activeItemState === item) {
+                htmlSsr += '<li>test</li>'
+            }
+            htmlSsr += `<li>${item}</li>`
+        }
+        htmlSsr += '</ul>'
+        const expectedFull = '<h3>Nested Arrays</h3>' + htmlSsr
 
         // Test the SSR value synchronously
         const ssrComponent = testObservables['TestNestedArrays_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Nested Arrays</h3>' + html
         if (ssrResult !== expectedFull) {
             assert(false, `[TestNestedArrays] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestNestedArrays] SSR test passed: ${ssrResult}`)
         }
 
-        return html
+        return expected
     }
 }
 

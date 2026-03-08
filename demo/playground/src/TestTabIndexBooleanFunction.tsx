@@ -38,4 +38,4 @@ TestTabIndexBooleanFunction.test = {
 
 export default () => <TestSnapshots Component={TestTabIndexBooleanFunction} />
 
-console.log(renderToString(<TestTabIndexBooleanFunction />))
+// console.log(renderToString(<TestTabIndexBooleanFunction />))

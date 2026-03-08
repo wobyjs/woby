@@ -38,6 +38,35 @@ export const renderToString = (
         if (showEnvLog)
             console.log('ENV renderToString:', useEnvironment())
 
+        // If child is a component function (JSX.Element is a wrapped function), call it to initialize
+        let resolvedChild: Child = child
+        while (isFunction(resolvedChild)) {
+            try {
+                const called = (resolvedChild as Function)()
+                resolvedChild = called
+            } catch (e) {
+                break
+            }
+        }
+
+        // If result is an array, recursively resolve each element
+        if (Array.isArray(resolvedChild)) {
+            const resolveDeep = (item: any): any => {
+                let resolved = item
+                while (isFunction(resolved)) {
+                    resolved = (resolved as Function)()
+                }
+                // If still an array after unwrapping, resolve its elements too
+                if (Array.isArray(resolved)) {
+                    return resolved.map(resolveDeep)
+                }
+                return resolved
+            }
+            resolvedChild = resolvedChild.map(resolveDeep)
+        }
+
+        console.log('[renderToString] Final resolved child type:', Array.isArray(resolvedChild) ? 'array' : typeof resolvedChild)
+
         // Use document's createElement for container creation
         const container = ssrDoc.createElement('div')
         const stack = new Error()
@@ -46,7 +75,7 @@ export const renderToString = (
         const fragment = FragmentUtils.make()
 
         // Set the child content
-        setChild(container, child, fragment, stack)
+        setChild(container, resolvedChild, fragment, stack)
 
         // Get the rendered content from the container's children
         const children = Array.from(container.childNodes || [])
@@ -118,6 +147,11 @@ function getNodeContent(node: any): string {
 
 // Helper function to construct HTML from BaseNode
 function constructNodeHTML(node: BaseNode): string {
+    // Check for outerHTML property first (SSRCustomElement has this)
+    if ('outerHTML' in node && typeof node.outerHTML === 'string') {
+        return node.outerHTML
+    }
+
     // Handle different node types
     if (node.nodeType === 3) {
         // Text node - check if it has textContent property

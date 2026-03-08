@@ -23,7 +23,13 @@ const TestNestedIfsLazy = (): JSX.Element => {
         o(prev => !prev)
         updateTiming()
     }
-    useTimeout(toggle, TEST_INTERVAL)
+    // In SSR mode, toggle immediately since useTimeout won't execute
+    const isSSR = typeof window === 'undefined'
+    if (isSSR) {
+        toggle()
+    } else {
+        useTimeout(toggle, TEST_INTERVAL)
+    }
     const ret: JSX.Element = () => (
         <>
             <div>before</div>
@@ -37,7 +43,7 @@ const TestNestedIfsLazy = (): JSX.Element => {
     )
 
     // Create complete component for SSR testing
-    const fullComponent = (
+    const fullComponent = () => (
         <>
             <h3>Nested Ifs Lazy</h3>
             {ret}
@@ -47,7 +53,7 @@ const TestNestedIfsLazy = (): JSX.Element => {
     // Store the component for SSR testing
     registerTestObservable('TestNestedIfsLazy_ssr', fullComponent)
 
-    return ret
+    return fullComponent
 }
 
 TestNestedIfsLazy.test = {
@@ -112,3 +118,5 @@ TestNestedIfsLazy.test = {
 
 
 export default () => <TestSnapshots Component={TestNestedIfsLazy} />
+
+// console.log(renderToString(<TestNestedIfsLazy />))

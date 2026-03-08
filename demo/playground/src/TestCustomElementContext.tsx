@@ -93,10 +93,21 @@ const CounterElement = defaults(() => ({
     )
 })
 
-// Register custom elements
-customElement('context-consumer', ContextConsumer)
-customElement('context-provider', ContextProvider)
-customElement('counter-element', CounterElement)
+// Register custom elements inside render context
+const registerCustomElements = (): void => {
+    const env = typeof window !== 'undefined' ? 'browser' : 'ssr'
+    console.log(`[registerCustomElements] Environment: ${env}`)
+    customElement('context-consumer', ContextConsumer)
+    customElement('context-provider', ContextProvider)
+    customElement('counter-element', CounterElement)
+}
+
+const TestWrapper = () => {
+    registerCustomElements()
+    return <TestCustomElementContext />
+}
+
+export default TestWrapper
 
 // Test component
 const TestCustomElementContext = () => {
@@ -178,5 +189,3 @@ const TestCustomElementContext = () => {
         </div>
     )
 }
-
-export default TestCustomElementContext

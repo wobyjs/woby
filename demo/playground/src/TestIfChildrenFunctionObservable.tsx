@@ -51,4 +51,4 @@ TestIfChildrenFunctionObservable.test = {
 
 export default () => <TestSnapshots Component={TestIfChildrenFunctionObservable} />
 
-console.log(renderToString(<TestIfChildrenFunctionObservable />))
+// console.log(renderToString(<TestIfChildrenFunctionObservable />))

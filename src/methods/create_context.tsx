@@ -29,7 +29,8 @@ const ContextProvider = defaults(
   }
 )
 
-customElement('context-provider', ContextProvider)
+// Export without registering - registration should happen inside render context
+export { ContextProvider }
 
 declare module '../index' {
   namespace JSX {

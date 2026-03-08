@@ -7,5 +7,4 @@ const DebugPElement = (): JSX.Element => {
     )
 }
 
-console.log('=== Debug P Element Test ===')
-console.log(renderToString(<DebugPElement />))
+// console.log(renderToString(<DebugPElement />))

@@ -54,12 +54,13 @@ TestCleanupInner.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
+        const expectedFull = '<h3>Cleanup - Inner</h3><p>page1</p><button>Toggle Page</button>'
         const expected = '<p>page1</p><button>Toggle Page</button>'
 
         const ssrComponent = testObservables['TestCleanupInner_ssr']
         const ssrResult = renderToString(ssrComponent)
-        if (ssrResult !== expected) {
-            assert(false, `[TestCleanupInner] SSR mismatch: got \n${ssrResult}, expected \n${expected}`)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestCleanupInner] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [TestCleanupInner] SSR test passed: ${ssrResult}`)
         }

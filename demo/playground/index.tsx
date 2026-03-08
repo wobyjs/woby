@@ -345,21 +345,22 @@ const tests = [
     // TestAttributeObservableBoolean,
     // TestAttributeRemoval,
     // TestAttributeStatic,
+
     // TestBigIntFunction,
     // TestBigIntObservable,
-
     // TestBigIntRemoval,
     // TestBigIntStatic,
     // TestBooleanFunction,
     // TestBooleanObservable,
     // TestBooleanRemoval,
     // TestBooleanStatic,
+
     // TestCheckboxIndeterminateToggle,
     // TestChildOverReexecution,
     // TestChildren,
     // TestChildrenBoolean,
-
     // TestChildrenSymbol,
+
     // TestClassesArrayCleanup,
     // TestClassesArrayFunction,
     // TestClassesArrayFunctionMultiple,
@@ -370,7 +371,6 @@ const tests = [
     // TestClassesArrayObservableValue,
     // TestClassesArrayRemoval,
     // TestClassesArrayRemovalMultiple,
-
     // TestClassesArrayStatic,
     // TestClassesArrayStaticMultiple,
     // TestClassesArrayStore,
@@ -392,13 +392,13 @@ const tests = [
     // TestClassNameFunction,
     // TestClassNameObservable,
     // TestClassNameStatic,
-
     // TestClassObservable,
     // TestClassObservableString,
     // TestClassRemoval,
     // TestClassRemovalString,
     // TestClassStatic,
     // TestClassStaticString,
+
     // TestCleanupInner,
     // TestCleanupInnerPortal,
     // TestComponentFunction,
@@ -515,48 +515,50 @@ const tests = [
     // TestIfRace,
     // TestIfStatic,
 
-    TestInputForm,
-    TestInputLabelFor,
-    TestLazy,
-    // // error (IF) TestNestedArrays,
+    // TestInputForm,
+    // TestInputLabelFor,
+    // TestLazy,
+
+    // TestNestedArrays,
     // TestNestedIfs,
-    // // error TestNestedIfsLazy,
+    // TestNestedIfsLazy,
     // TestNullFunction,
     // TestNullObservable,
-
     // TestNullRemoval,
     // TestNullStatic,
     // TestNumberFunction,
     // TestNumberObservable,
     // TestNumberRemoval,
     // TestNumberStatic,
+
     // TestPortalMountObservable,
     // TestPortalObservable,
     // TestPortalRemoval,
     // TestPortalStatic,
-
     // TestPortalWhenObservable,
     // TestPortalWrapperStatic,
+
     // TestProgressIndeterminateToggle,
     // TestPromiseRejected,
     // TestPromiseResolved,
+
     // TestPropertyCheckedFunction,
     // TestPropertyCheckedObservable,
     // TestPropertyCheckedRemoval,
     // TestPropertyCheckedStatic,
     // TestPropertyValueFunction,
-
     // TestPropertyValueObservable,
     // TestPropertyValueRemoval,
     // TestPropertyValueStatic,
+
     // TestRef,
     // TestRefContext,
     // TestRefs,
     // TestRefsNested,
     // TestRefUnmounting,
     // TestRefUntrack,
-    // TestRenderToString,
 
+    // TestRenderToString,
     // TestRenderToStringNested,
     // TestRenderToStringSuspense,
     // TestRenderToStringSuspenseNested,
@@ -574,12 +576,12 @@ const tests = [
     // TestStringObservableStatic,
     // TestStringRemoval,
     // TestStringStatic,
+
     // TestStyleFunction,
     // TestStyleFunctionNumeric,
     // TestStyleFunctionString,
     // TestStyleFunctionVariable,
     // TestStyleObservable,
-
     // TestStyleObservableNumeric,
     // TestStyleObservableString,
     // TestStyleObservableVariable,
@@ -591,36 +593,36 @@ const tests = [
     // TestStylesRemoval,
     // TestStylesStatic,
     // TestStylesStore,
-
     // TestStyleStatic,
     // TestStyleStaticNumeric,
     // TestStyleStaticString,
     // TestStyleStaticVariable,
     // TestSuspenseAlive,
+
     // TestSuspenseAlwaysLatest,
     // TestSuspenseAlwaysValue,
     // TestSuspenseChildrenFunction,
     // TestSuspenseChildrenObservableStatic,
     // TestSuspenseCleanup,
     // TestSuspenseFallbackFunction,
-
     // TestSuspenseFallbackObservableStatic,
     // TestSuspenseMiddleman,
     // TestSuspenseNever,
     // TestSuspenseNeverRead,
     // TestSuspenseObservable,
     // TestSuspenseWhen,
+
     // TestSVGAttributeRemoval,
     // TestSVGClassObject,
     // TestSVGClassString,
     // TestSVGFunction,
     // TestSVGObservable,
     // TestSVGStatic,
-
     // TestSVGStaticCamelCase,
     // TestSVGStaticComplex,
     // TestSVGStyleObject,
     // TestSVGStyleString,
+
     // TestSwitchCaseFunction,
     // TestSwitchCaseObservableStatic,
     // TestSwitchDefaultFunction,
@@ -636,6 +638,7 @@ const tests = [
     // TestSymbolObservable,
     // TestSymbolRemoval,
     // TestSymbolStatic,
+
     // TestTabIndexBooleanFunction,
     // TestTabIndexBooleanObservable,
     // TestTabIndexBooleanStatic,
@@ -649,13 +652,14 @@ const tests = [
     // TestTernaryObservableChildren,
     // TestTernaryStatic,
     // TestTernaryStaticInline,
+
     // TestUndefinedFunction,
     // TestUndefinedObservable,
     // TestUndefinedRemoval,
     // TestUndefinedStatic,
 
     //ignore for now api not ready
-    // TestCustomElementBasic,
+    TestCustomElementBasic,
     // TestCustomElementSlots,
     // TestCustomElementContext,
     // TestCustomElementNested,

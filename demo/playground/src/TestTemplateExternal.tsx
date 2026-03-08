@@ -48,4 +48,4 @@ TestTemplateExternal.test = {
 
 export default () => <TestSnapshots Component={TestTemplateExternal} />
 
-console.log(renderToString(<TestTemplateExternal />))
+// console.log(renderToString(<TestTemplateExternal />))

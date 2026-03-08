@@ -18,7 +18,7 @@ export const If = <T>({ when, fallback, children }: { when: FunctionMaybe<T>, fa
     // In SSR mode, don't use useGuarded as it throws errors for falsy values
     // Evaluate when value and handle accordingly
     const whenValue = isFunction(when) ? when() : when
-
+    
     if (isFunction(children) && !isObservable(children as any) && !isComponent(children)) {
       // For SSR with function children, call the function directly without guard
       if (!whenValue) {
@@ -29,8 +29,10 @@ export const If = <T>({ when, fallback, children }: { when: FunctionMaybe<T>, fa
       // When truthy, call children function with value accessor
       return (children as Function)(() => whenValue)
     } else {
-      // Direct children - use ternary
-      return ternary(when, children as Child, fallback) as any
+      // Direct children - evaluate ternary result for SSR
+      const result = ternary(when, children as Child, fallback)
+      // If result is an observable/function, resolve it immediately for SSR
+      return (isFunction(result) && !isComponent(result) ? resolve(result) : result) as any
     }
   }
 

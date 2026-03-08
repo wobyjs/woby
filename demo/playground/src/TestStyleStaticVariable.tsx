@@ -37,4 +37,4 @@ TestStyleStaticVariable.test = {
 
 export default () => <TestSnapshots Component={TestStyleStaticVariable} />
 
-console.log(renderToString(<TestStyleStaticVariable />))
+// console.log(renderToString(<TestStyleStaticVariable />))

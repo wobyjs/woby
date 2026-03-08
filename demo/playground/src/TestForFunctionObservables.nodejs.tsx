@@ -46,4 +46,4 @@ TestForFunctionObservables.test = {
 }
 
 
-console.log(renderToString(<TestForFunctionObservables />))
+// console.log(renderToString(<TestForFunctionObservables />))
