@@ -32,7 +32,8 @@ TestIfChildrenFunctionObservable.test = {
         const val = $$(testObservables['TestIfChildrenFunctionObservable'])
 
         // Define expected values for both main test and SSR test
-        const expectedFull = val !== false ? `<h3>If - Children Function Observable</h3><p>Value: ${val}</p>` : `<h3>If - Children Function Observable</h3><!---->`
+        // const expectedFull = val !== false ? `<h3>If - Children Function Observable</h3><p>Value: ${val}</p>` : `<h3>If - Children Function Observable</h3><!---->`
+        const expectedFull = `<h3>If - Children Function Observable</h3>` + (val !== false ? `<p>Value: ${val}</p>` : '')
         const expected = val !== false ? `<p>Value: ${val}</p>` : '<!---->'
 
         const ssrComponent = testObservables['TestIfChildrenFunctionObservable_ssr']

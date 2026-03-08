@@ -49,3 +49,5 @@ TestDynamicFunctionProps.test = {
 
 
 export default () => <TestSnapshots Component={TestDynamicFunctionProps} />
+
+// console.log(renderToString(<TestDynamicFunctionProps />))

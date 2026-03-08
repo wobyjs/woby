@@ -219,7 +219,6 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
     const prevLast = prevIsArray ? prev[prevLength - 1] : prev
     const prevSibling = prevLast?.nextSibling || null
 
-
     const isSSR = useEnvironment() === 'ssr'
     const createText = isSSR ? createTextSSR : createTextDOM
     const createComment = isSSR ? createCommentSSR : createCommentDOM

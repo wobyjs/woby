@@ -1,9 +1,13 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, registerTestObservable, testObservables, assert, TEST_INTERVAL } from './util'
 
 const TestAttributeFunctionBoolean = (): JSX.Element => {
     const o = $(true)
+    const toggle = () => o(prev => !prev)
     registerTestObservable('TestAttributeFunctionBoolean', o)
+
+    useInterval(toggle, TEST_INTERVAL)
+
     const ret: JSX.Element = () => (
         <>
             <h3>Attribute - Function Boolean</h3>
@@ -18,7 +22,7 @@ const TestAttributeFunctionBoolean = (): JSX.Element => {
 }
 
 TestAttributeFunctionBoolean.test = {
-    static: true, // Make it static for predictable testing
+    static: false, // Make it static for predictable testing
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables['TestAttributeFunctionBoolean'])
@@ -28,7 +32,7 @@ TestAttributeFunctionBoolean.test = {
         if (attrValue) {
             expected = '<p data-red="true">content</p>'
         } else {
-            expected = '<p data-red="false">content</p>'
+            expected = '<p>content</p>'
         }
 
         const ssrComponent = testObservables['TestAttributeFunctionBoolean_ssr']

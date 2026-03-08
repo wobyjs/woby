@@ -338,7 +338,7 @@ globalThis.Woby = Woby
 
 const tests = [
     // TestABCD,
-    TestAttributeBooleanStatic,
+    // TestAttributeBooleanStatic,
     // TestAttributeFunction,
     // TestAttributeFunctionBoolean,
     // TestAttributeObservable,
@@ -410,13 +410,13 @@ const tests = [
     // TestComponentStaticRenderProps,
     // TestComponentStaticRenderState,
     // TestContextComponents,
-    // TestContextDynamicContext,
     // TestContextHook,
     // TestDirective,
     // TestDirectiveRef,
     // TestDirectiveRegisterLocal,
-
     // TestDirectiveSingleArgument,
+
+    // TestContextDynamicContext,
     // TestDynamicFunctionComponent,
     // TestDynamicFunctionProps,
     // TestDynamicHeading,
@@ -424,20 +424,20 @@ const tests = [
     // TestDynamicObservableComponent,
     // TestDynamicObservableProps,
     // TestDynamicStoreProps,
+
     // TestErrorBoundary,
     // TestErrorBoundaryNoError,
-
     // TestErrorBoundaryChildrenFunction,
     // TestErrorBoundaryChildrenObservableStatic,
     // TestErrorBoundaryFallbackFunction,
     // TestErrorBoundaryFallbackObservableStatic,
+
     // TestEventClickAndClickCaptureStatic,
     // TestEventClickCaptureObservable,
     // TestEventClickCaptureRemoval,
     // TestEventClickCaptureStatic,
     // TestEventClickObservable,
     // TestEventClickRemoval,
-
     // TestEventClickStatic,
     // TestEventClickStopImmediatePropagation,
     // TestEventClickStopPropagation,
@@ -447,8 +447,8 @@ const tests = [
     // TestEventMiddleClickCaptureStatic,
     // TestEventMiddleClickStatic,
     // TestEventTargetCurrentTarget,
-    // TestForFallbackFunction,
 
+    // TestForFallbackFunction,
     // TestForFallbackObservable,
     // TestForFallbackObservableStatic,
     // TestForFallbackStatic,
@@ -470,8 +470,8 @@ const tests = [
     // TestForUnkeyedObservablesStatic,
     // TestForUnkeyedRandom,
     // TestForUnkeyedRandomOnlyChild,
-
     // TestForUnkeyedStatic,
+
     // TestFragmentStatic,
     // TestFragmentStaticComponent,
     // TestFragmentStaticDeep,
@@ -480,8 +480,7 @@ const tests = [
     // TestHTMLDangerouslySetInnerHTMLObservable,
     // TestHTMLDangerouslySetInnerHTMLObservableString,
     // TestHTMLDangerouslySetInnerHTMLStatic,
-    // // error TestHTMLFunctionStatic,
-
+    // // error TestHTMLFunctionStatic, // html template
     // // error TestHTMLFunctionStaticRegistry,
 
     // TestHTMLInnerHTMLFunction,
@@ -499,11 +498,11 @@ const tests = [
     // TestIdRemoval,
     // TestIdStatic,
     // TestIfChildrenFunction,
-    // // error TestIfChildrenFunctionObservable,
+    // TestIfChildrenFunctionObservable,
     // TestIfChildrenObservable,
     // TestIfChildrenObservableStatic,
     // TestIfFallbackFunction,
-    // // error TestIfFallbackObservable,
+    TestIfFallbackObservable,
 
     // TestIfFallbackObservableStatic,
     // TestIfFallbackStatic,

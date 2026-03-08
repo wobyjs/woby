@@ -67,10 +67,17 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
         static __component__ = component
         public props: P
         public attributes: Record<string, string> = {}
+        public childNodes: any[] = []
 
         constructor(props?: P) {
             // In SSR, we just store the props
             this.props = props || {} as P
+
+            // Store children if provided
+            if (props && (props as any).children) {
+                const children = (props as any).children
+                this.childNodes = Array.isArray(children) ? children : [children]
+            }
         }
 
         // Mock methods for SSR
@@ -89,6 +96,29 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
 
         removeAttribute(name: string) {
             delete this.attributes[name]
+        }
+
+        // Add outerHTML getter to render the custom element with its children
+        get outerHTML() {
+            // Build attributes string
+            const attrs = Object.entries(this.attributes)
+                .map(([name, value]) => `${name.toLowerCase()}="${value}"`)
+                .join(' ')
+            const attrStr = attrs ? ` ${attrs}` : ''
+
+            // Build children string by converting each child to HTML
+            const children = this.childNodes.map((child: any) => {
+                if (typeof child === 'object' && child !== null) {
+                    if ('outerHTML' in child) {
+                        return child.outerHTML
+                    } else if ('textContent' in child) {
+                        return child.textContent
+                    }
+                }
+                return String(child ?? '')
+            }).join('')
+
+            return `<${tagName.toLowerCase()}${attrStr}>${children}</${tagName.toLowerCase()}>`
         }
 
         connectedCallback() { }
