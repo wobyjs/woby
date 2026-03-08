@@ -35,9 +35,6 @@ export const renderToString = (
         // Create or use provided document instance for isolated context
         const ssrDoc = options?.document ?? createDocument()
 
-        if (showEnvLog)
-            console.log('ENV renderToString:', useEnvironment())
-
         // If child is a component function (JSX.Element is a wrapped function), call it to initialize
         let resolvedChild: Child = child
         while (isFunction(resolvedChild)) {
@@ -64,8 +61,6 @@ export const renderToString = (
             }
             resolvedChild = resolvedChild.map(resolveDeep)
         }
-
-        console.log('[renderToString] Final resolved child type:', Array.isArray(resolvedChild) ? 'array' : typeof resolvedChild)
 
         // Use document's createElement for container creation
         const container = ssrDoc.createElement('div')

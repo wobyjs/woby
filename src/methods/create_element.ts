@@ -70,9 +70,6 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
     }
     const isSSR = useEnvironment() === 'ssr' || !globalThis.window
-    console.log('[createElement] component:', typeof component, isString(component) ? component : '', 'isSSR:', isSSR)
-    if (!isSSR)
-        console.log(new Error().stack)
     // Use different logic based on SSR mode
     // if (isSSR) {
     //     // SSR-specific logic
@@ -202,7 +199,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
             // Check if this is a custom element
             const ce = isSSR ? ces.get(component) : customElements.get(component) as ReturnType<typeof customElement>
-                        
+
             const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
 
             // if (!!ce)

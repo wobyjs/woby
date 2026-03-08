@@ -73,19 +73,19 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
 
         constructor(props?: P) {
             super(tagName) // Initialize Element with tagName
-                    
+
             // Get the component function
             const componentFn = (this.constructor as any).__component__
-                    
+
             // Store provided props
             this.props = props || {} as P
-        
+
             // Execute component and render children if component exists
             if (componentFn && typeof componentFn === 'function') {
                 try {
                     // Call component with props to get JSX result
                     const jsxResult = componentFn.call(null, this.props)
-                            
+
                     // For SSR, we need to resolve the JSX.Element to actual nodes
                     // The jsxResult is typically a function wrapper (JSX.Element)
                     // We'll store it in childNodes to be resolved later by outerHTML
