@@ -16,7 +16,7 @@ const TestIfFunctionUntrackedUnnarrowed = (): JSX.Element => {
     // Store the component for SSR testing
     registerTestObservable('TestIfFunctionUntrackedUnnarrowed_ssr', ret)
 
-    return null //ret
+    return ret
 }
 
 TestIfFunctionUntrackedUnnarrowed.test = {
