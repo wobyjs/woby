@@ -82,6 +82,9 @@ export class Element extends BaseNode {
         } else if (name === 'class' || name === 'className') {
             // Use the setter to ensure synchronization
             this.className = value
+        } else if (name === 'htmlFor') {
+            // Convert htmlFor to for for HTML compliance
+            this.attributes['for'] = String(value)
         } else {
             this.attributes[name] = String(value)
         }

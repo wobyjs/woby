@@ -141,7 +141,11 @@ function constructNodeHTML(node: BaseNode): string {
 
         // Build attributes string
         const attrs = Object.entries(node.attributes || {})
-            .map(([name, value]) => `${name}="${value}"`)
+            .map(([name, value]) => {
+                // Convert htmlFor to for for HTML compliance
+                const attrName = name.toLowerCase() === 'htmlfor' ? 'for' : name
+                return `${attrName}="${value}"`
+            })
             .join(' ')
         const attrStr = attrs ? ` ${attrs}` : ''
 
