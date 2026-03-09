@@ -20,7 +20,7 @@ TestPropertyValueFunction.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Property - Value Function</h3><p><input value="0.123456"></input></p>'  // For SSR comparison
+        const expectedFull = '<h3>Property - Value Function</h3><p><input value="0.123456" /></p>'  // For SSR comparison
         const expected = '<p><input></p>'   // For main DOM test comparison
 
         const ssrComponent = testObservables['TestPropertyValueFunction_ssr']

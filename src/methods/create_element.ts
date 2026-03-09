@@ -198,7 +198,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                 console.log('ENV createElement wrapElement: ', useEnvironment())
 
             // Check if this is a custom element
-            const ce = isSSR ? ces.get(component) : customElements.get(component) as ReturnType<typeof customElement>
+            const ce = isSSR ? ces.get(component) : customElements.get(component)
 
             const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
 

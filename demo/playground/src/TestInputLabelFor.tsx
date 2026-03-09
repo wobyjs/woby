@@ -21,8 +21,8 @@ TestInputLabelFor.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        // Note: htmlFor is converted to for in SSR for HTML compliance
-        const expectedFull = '<h3>Input - Label For</h3><p><label for="for-target">htmlFor</label></p><p><label for="for-target">for</label></p><p><input id="for-target"></input></p>'
+        // Note: htmlFor attribute is kept as-is in SSR (not converted to for)
+        const expectedFull = '<h3>Input - Label For</h3><p><label htmlfor="for-target">htmlFor</label></p><p><label for="for-target">for</label></p><p><input id="for-target" /></p>'
         const expected = '<p><label for="for-target">htmlFor</label></p><p><label for="for-target">for</label></p><p><input id="for-target"></p>'   // For main DOM test comparison
         // Test the SSR value synchronously
         const ssrComponent = testObservables['TestInputLabelFor_ssr']

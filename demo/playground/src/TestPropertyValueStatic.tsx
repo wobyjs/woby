@@ -19,7 +19,7 @@ TestPropertyValueStatic.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Property - Value Static</h3><p><input value="value"></input></p>'  // For SSR comparison
+        const expectedFull = '<h3>Property - Value Static</h3><p><input value="value" /></p>'  // For SSR comparison
         const expected = '<p><input></p>'   // For main DOM test comparison
 
         const ssrComponent = testObservables['TestPropertyValueStatic_ssr']

@@ -42,7 +42,7 @@ TestDirectiveRegisterLocal.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Directive</h3><input value="bar - baz"></input>'  // For SSR comparison
+        const expectedFull = '<h3>Directive</h3><input value="bar - baz" />'  // For SSR comparison
         const expected = '<input value="bar - baz">'   // For main test comparison
 
         const ssrComponent = testObservables['TestDirectiveRegisterLocal_ssr']

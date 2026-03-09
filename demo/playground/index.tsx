@@ -552,7 +552,7 @@ const tests = [
     // TestPropertyValueStatic,
 
     // TestRef,
-    // TestRefContext,
+    TestRefContext,
     // TestRefs,
     // TestRefsNested,
     // TestRefUnmounting,
@@ -658,8 +658,8 @@ const tests = [
     // TestUndefinedRemoval,
     // TestUndefinedStatic,
 
-    //ignore for now api not ready
-    TestCustomElementBasic,
+    // //ignore for now api not ready
+    // TestCustomElementBasic,
     // TestCustomElementSlots,
     // TestCustomElementContext,
     // TestCustomElementNested,

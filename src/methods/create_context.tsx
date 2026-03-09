@@ -7,6 +7,7 @@ import { } from '../soby'
 import { defaults } from './defaults'
 import { customElement, ElementAttributes } from './custom_element'
 import { jsx } from '../jsx-runtime'
+import { HtmlSymbol } from '../html/html-symbol'
 
 // const serializer = { toHtml: (o) => o + '', fromHtml: o => o } as ObservableOptions
 const hidden = { toHtml: o => undefined } as ObservableOptions
@@ -22,15 +23,14 @@ const ContextProvider = defaults(
   (): ContextProviderProps => ({
     value: $(undefined),
     children: $(undefined),
-    symbol: $<Symbol>(undefined)
+    symbol: $<Symbol>(undefined, HtmlSymbol)
   }),
   ({ children }: ContextProviderProps) => {
     return children
   }
 )
 
-// Export without registering - registration should happen inside render context
-export { ContextProvider }
+customElement('context-provider', ContextProvider)
 
 declare module '../index' {
   namespace JSX {

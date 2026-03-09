@@ -21,7 +21,7 @@ TestInputForm.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Input - Input Form</h3><input></input><input></input><input form="foo"></input>'  // For SSR comparison
+        const expectedFull = '<h3>Input - Input Form</h3><input /><input /><input form="foo" />'  // For SSR comparison
         const expected = '<input><input><input form="foo">'   // For main DOM test comparison
 
         // Test the SSR value synchronously

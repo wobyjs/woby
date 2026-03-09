@@ -549,16 +549,16 @@ const getNestedProperty = (obj: any, path: string) => {
 }
 
 
-const isLightDom = (node: Node): boolean => {
-    let current: Node | null = node?.parentNode
-    while (current) {
-        if ((current as Element)?.shadowRoot) {
-            return true
-        }
-        current = current.parentNode
-    }
-    return false
-}
+// const isLightDom = (node: Node): boolean => {
+//     let current: Node | null = node?.parentNode
+//     while (current) {
+//         if ((current as Element)?.shadowRoot) {
+//             return true
+//         }
+//         current = current.parentNode
+//     }
+//     return false
+// }
 
 /**
  * Creates a custom HTML element with reactive properties

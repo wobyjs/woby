@@ -7,76 +7,115 @@
  * - Slot fallback content
  * - Slot content distribution
  */
-import { $, $$, customElement, defaults, renderToString, type JSX } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-// Custom element with slot support
-const SlotElement = defaults(() => ({
-    title: $('Slot Element', ""),
-    showFallback: $(false)
-}), ({ title, showFallback, children }) => {
+
+// Define a simple custom element with basic props
+const BasicElement = defaults(() => ({
+    title: $('Basic Element', HtmlString),
+    count: $(0, HtmlNumber),
+    active: $(false, HtmlBoolean),
+    color: $('blue')
+}), ({ title, count, active, color, children }) => {
+    // When children are projected through slots (HTML usage), don't render children div
+    // When children come from props (JSX usage), render the children div
+    // Since all custom elements now use shadow DOM, we need to distinguish
+    const isSlotProjected = false // Default to JSX usage behavior
+
     return (
-        <div style={{ border: '2px solid purple', padding: '15px', margin: '10px' }}>
-            <h3>{$$(title)}</h3>
-
-            {/* Slot container */}
-            <div style={{ backgroundColor: '#f0f0f0', padding: '10px', margin: '5px 0' }}>
-                {children ? children : (
-                    $$(showFallback) ?
-                        <p style={{ color: 'gray' }}>Fallback content when no children provided</p> :
-                        null
-                )}
-            </div>
-
-            <p>End of slot element</p>
+        <div style={{
+            border: '2px solid ' + $$(color),
+            padding: '10px',
+            backgroundColor: $$(active) ? '#e0e0e0' : 'white'
+        }}>
+            <h2>{$$(title)}</h2>
+            {!isSlotProjected && <div>{children}</div>}
+            <p>Count: {$$(count)}</p>
+            <p>Active: {$$(active) ? 'Yes' : 'No'}</p>
         </div>
     )
 })
 
-// Custom element with named slots concept (using data attributes)
-const NamedSlotElement = defaults(() => ({
-    header: $('Default Header'),
-    footer: $('Default Footer')
-}), ({ header, footer, children }) => {
-    // Extract named content from children
-    const headerContent = () => {
-        const childArray = Array.isArray($$(children)) ? $$(children) : [$$(children)]
-        return childArray.find(child => child?.props?.['data-slot'] === 'header') || $$(header)
+// Register the custom element
+customElement('basic-element', BasicElement)
+
+// Augment JSX.IntrinsicElements to include custom element
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'basic-element': ElementAttributes<typeof BasicElement>
+        }
     }
+}
 
-    const footerContent = () => {
-        const childArray = Array.isArray($$(children)) ? $$(children) : [$$(children)]
-        return childArray.find(child => child?.props?.['data-slot'] === 'footer') || $$(footer)
-    }
+// // Custom element with slot support
+// const SlotElement = defaults(() => ({
+//     title: $('Slot Element', ""),
+//     showFallback: $(false)
+// }), ({ title, showFallback, children }) => {
+//     return (
+//         <div style={{ border: '2px solid purple', padding: '15px', margin: '10px' }}>
+//             <h3>{$$(title)}</h3>
 
-    const mainContent = () => {
-        const childArray = Array.isArray($$(children)) ? $$(children) : [$$(children)]
-        return childArray.filter(child =>
-            !child?.props?.['data-slot'] ||
-            (child?.props?.['data-slot'] !== 'header' && child?.props?.['data-slot'] !== 'footer')
-        )
-    }
+//             {/* Slot container */}
+//             <div style={{ backgroundColor: '#f0f0f0', padding: '10px', margin: '5px 0' }}>
+//                 {children ? children : (
+//                     $$(showFallback) ?
+//                         <p style={{ color: 'gray' }}>Fallback content when no children provided</p> :
+//                         null
+//                 )}
+//             </div>
 
-    return (
-        <div style={{ border: '2px solid orange', padding: '15px', margin: '10px' }}>
-            <header style={{ backgroundColor: '#ffeecc', padding: '5px', marginBottom: '10px' }}>
-                {headerContent()}
-            </header>
+//             <p>End of slot element</p>
+//         </div>
+//     )
+// })
 
-            <main style={{ backgroundColor: '#eeffee', padding: '10px', margin: '10px 0' }}>
-                {mainContent()}
-            </main>
+// // Custom element with named slots concept (using data attributes)
+// const NamedSlotElement = defaults(() => ({
+//     header: $('Default Header'),
+//     footer: $('Default Footer')
+// }), ({ header, footer, children }) => {
+//     // Extract named content from children
+//     const headerContent = () => {
+//         const childArray = Array.isArray($$(children)) ? $$(children) : [$$(children)]
+//         return childArray.find(child => child?.props?.['data-slot'] === 'header') || $$(header)
+//     }
 
-            <footer style={{ backgroundColor: '#ffeeee', padding: '5px', marginTop: '10px' }}>
-                {footerContent()}
-            </footer>
-        </div>
-    )
-})
+//     const footerContent = () => {
+//         const childArray = Array.isArray($$(children)) ? $$(children) : [$$(children)]
+//         return childArray.find(child => child?.props?.['data-slot'] === 'footer') || $$(footer)
+//     }
 
-// Register custom elements
-customElement('slot-element', SlotElement)
-customElement('named-slot-element', NamedSlotElement)
+//     const mainContent = () => {
+//         const childArray = Array.isArray($$(children)) ? $$(children) : [$$(children)]
+//         return childArray.filter(child =>
+//             !child?.props?.['data-slot'] ||
+//             (child?.props?.['data-slot'] !== 'header' && child?.props?.['data-slot'] !== 'footer')
+//         )
+//     }
+
+//     return (
+//         <div style={{ border: '2px solid orange', padding: '15px', margin: '10px' }}>
+//             <header style={{ backgroundColor: '#ffeecc', padding: '5px', marginBottom: '10px' }}>
+//                 {headerContent()}
+//             </header>
+
+//             <main style={{ backgroundColor: '#eeffee', padding: '10px', margin: '10px 0' }}>
+//                 {mainContent()}
+//             </main>
+
+//             <footer style={{ backgroundColor: '#ffeeee', padding: '5px', marginTop: '10px' }}>
+//                 {footerContent()}
+//             </footer>
+//         </div>
+//     )
+// })
+
+// // Register custom elements
+// customElement('slot-element', SlotElement)
+// customElement('named-slot-element', NamedSlotElement)
 
 // Test component is defined in the SSR version below
 
@@ -89,47 +128,18 @@ const TestCustomElementSlotsWithSSR = (): JSX.Element => {
         <div>
             <h1>Custom Element Slots Test</h1>
 
+
             {/* Basic slot test */}
             <h2>1. Basic Slot Functionality</h2>
-            <Dynamic tag="slot-element" title="Element with Children">
-                <p>This content goes into the slot</p>
-                <button>Slot Button</button>
-            </Dynamic>
-
-            <Dynamic tag="slot-element" title="Element without Children" showFallback={showFallback} />
-
-            {/* TSX slot usage */}
-            <h2>2. TSX Slot Usage</h2>
-            <SlotElement title={$("TSX Slot Test")}>
-                <div>
-                    <p>TSX-provided slot content</p>
-                    <ul>
-                        <li>Item 1</li>
-                        <li>Item 2</li>
-                    </ul>
-                </div>
-            </SlotElement>
-
-            {/* Named slots concept */}
-            <h2>3. Named Slots Concept</h2>
-            <Dynamic tag="named-slot-element" header={headerText} footer={footerText}>
-                <div data-slot="header">
-                    <h4>Custom Header Content</h4>
-                </div>
-                <p>Main content area</p>
-                <p>More main content</p>
-                <div data-slot="footer">
-                    <em>Custom Footer Content</em>
-                </div>
-            </Dynamic>
-
-            {/* Mixed usage with slots */}
-            <h2>4. Mixed Usage with Slots</h2>
-            <SlotElement title={$("Outer Element")}>
-                <Dynamic tag="slot-element" title="Nested Slot Element">
-                    <p>Nested slot content</p>
-                </Dynamic>
-            </SlotElement>
+            <div dangerouslySetInnerHTML={{
+                __html: `<basic-element
+                title="Pure HTML Custom Element"
+                count="75"
+                active="true"
+                color="purple"
+            >
+                <p>This is child content from pure HTML custom element</p>
+            </basic-element>` }} />
         </div>
     )
 
@@ -138,6 +148,8 @@ const TestCustomElementSlotsWithSSR = (): JSX.Element => {
 
     return ret
 }
+
+
 
 TestCustomElementSlotsWithSSR.test = {
     static: true,

@@ -41,7 +41,7 @@ TestDirectiveRef.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Directive - Ref</h3><input value="foo"></input>'  // For SSR comparison
+        const expectedFull = '<h3>Directive - Ref</h3><input value="foo" />'  // For SSR comparison
         const expected = '<input value="bar">'   // For main test comparison
 
         const ssrComponent = testObservables['TestDirectiveRef_ssr']

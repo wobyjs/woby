@@ -22,7 +22,7 @@ const TestCheckboxIndeterminateToggle = (): JSX.Element => {
 TestCheckboxIndeterminateToggle.test = {
     static: true,
     expect: () => {
-        const ssrExpected = '<input type="checkbox"></input><input type="checkbox" checked=""></input>'
+        const ssrExpected = '<input type="checkbox" /><input type="checkbox" checked="" />'
         const domExpected = '<input type="checkbox"><input type="checkbox">'
 
         const ssrComponent = testObservables['TestCheckboxIndeterminateToggle_ssr']

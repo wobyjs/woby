@@ -19,7 +19,7 @@ TestPropertyCheckedStatic.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Property - Checked Static</h3><p><input type="checkbox" checked=""></input></p>'  // For SSR comparison
+        const expectedFull = '<h3>Property - Checked Static</h3><p><input type="checkbox" checked="" /></p>'  // For SSR comparison
         const expected = '<p><input type="checkbox"></p>'   // For main DOM test comparison
 
         // Test the SSR value synchronously
