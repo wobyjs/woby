@@ -3,16 +3,16 @@ import { TestSnapshots, registerTestObservable, testObservables, assert, useTime
 
 const TEST_INTERVAL = 500
 let syncStep = 0
-
+const syncValue = {}
 const TestRenderToStringSuspenseNested = (): JSX.Element => {
     const o = $(123)
     const Content = ({ interval, title }) => {
         const resource = useResource(() => {
             return new Promise<number>(resolve => {
                 setTimeout(() => {
-                    console.log('syncStep', ++syncStep)
                     registerTestObservable('TestRenderToStringSuspenseNested_o_' + title, o)
 
+                    syncValue[++syncStep] = 123
                     resolve(o(123))
                 }, interval)
             })
@@ -22,6 +22,7 @@ const TestRenderToStringSuspenseNested = (): JSX.Element => {
 
     //just to trigger the final output
     setTimeout(() => {
+        syncValue[++syncStep] = 456
         o(456)
     }, TEST_INTERVAL * 3)
 
@@ -47,25 +48,10 @@ const TestRenderToStringSuspenseNested = (): JSX.Element => {
 const TestRenderToStringSuspenseNestedSSR = (): JSX.Element => {
     const o = $(123)
     const Content = ({ interval, title }) => {
-        // const resource = useResource(() => {
-        // return new Promise<number>(resolve => {
-        // setTimeout(() => {
-        // console.log('syncStep', ++syncStep)
-        // registerTestObservable('TestRenderToStringSuspenseNested_o_' + title, o)
-
-        // resolve(o(123))
         o(o() + 1)
-        // }, interval)
-        // })
-        // })
-        // return <p>{o}{resource.value}</p>
         return <p>{o}</p>
     }
 
-    //just to trigger the final output
-    // setTimeout(() => {
-    //     o(456)
-    // }, TEST_INTERVAL * 3)
 
     const ret: JSX.Element = () => (
         <div>
@@ -100,33 +86,23 @@ if (ssrResult !== expectedSSR /* && ssrResult !== '<div></div>' */) {
 TestRenderToStringSuspenseNested.test = {
     static: false,
     expect: () => {
-        console.log('syncStep', syncStep)
+        // console.assert(false, 'syncStep', syncStep)
 
-        // const ssr = testObservables['TestRenderToStringSuspenseNested_ssr']
-        // let ssrResult = renderToString(ssr)
-        // let expectedSSR = '<div><p>456123</p><p><!----></p></div>' //final context
-        // if (ssrResult !== expectedSSR /* && ssrResult !== '<div></div>' */) {
-        //     assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
-        // } else {
-        //     console.log(`✅ [TestRenderToStringSuspenseNested] SSR test passed: ${ssrResult}`)
-        // }
-
+        // SSR test move to module leval
 
         if (syncStep === 0) {
             return '<div><!----></div>'
-        } else if (syncStep === 1) {
-            return '<div><p>123123</p><!----></div>'
-        }
-
-        // syncStep >= 2, both resources are loaded
-        // Check current value of o from the registered observable
-        const oObservable = testObservables['TestRenderToStringSuspenseNested_o_1st Suspense']
-        const currentO = oObservable ? $$(oObservable) : 123
-
-        if (currentO === 456) {
-            return '<div><p>456123</p><p>456123</p></div>'
-        } else {
-            return '<div><p>123123</p><p>123123</p></div>'
+        }// else if (syncStep === 1) {
+        //     return `<div><p>${syncValue[syncStep]}${syncValue[syncStep]}</p><!----></div>`
+        // }
+        else {
+            return [
+                `<div><p>${syncValue[syncStep]}${syncValue[syncStep - 1]}</p><p>${syncValue[syncStep]}${syncValue[syncStep - 1]}</p></div>`,
+                `<div><p>${syncValue[syncStep]}${syncValue[syncStep]}</p><p>${syncValue[syncStep]}${syncValue[syncStep]}</p></div>`,
+                `<div><p>${syncValue[syncStep]}${syncValue[syncStep - 1]}</p><!----></div>`,
+                `<div><p>${syncValue[syncStep]}${syncValue[syncStep]}</p><!----></div>`,
+                `<div><p>${syncValue[syncStep]}${syncValue[syncStep]}</p></div>`,
+            ]
         }
     }
 }
@@ -134,4 +110,10 @@ TestRenderToStringSuspenseNested.test = {
 
 export default () => <TestSnapshots Component={TestRenderToStringSuspenseNested} />
 
-// console.log(renderToString(<TestRenderToStringSuspenseNestedSSR />))
+console.log(renderToString(<TestRenderToStringSuspenseNestedSSR />))
+
+//<div><p>123123</p><p>123123</p></div>
+//<div><p>123456</p><p>123456</p></div>
+//<div><p>123456</p><!----></div>
+//<div><p>123123</p><!----></div>
+//<div><p>123123</p></div>

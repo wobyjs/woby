@@ -855,12 +855,14 @@ export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: Fun
 
     if (isSSR)
         setHTMLStatic(element, $$($$(value).__html))
-    else
+    else if (isObservable(value))
         useRenderEffect(() => {
 
             setHTMLStatic(element, $$($$(value).__html))
 
         }, stack)
+    else
+        setHTMLStatic(element, $$($$(value).__html))
 
 }
 

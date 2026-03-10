@@ -36,10 +36,10 @@ export const Suspense = ({ when, fallback, children }: { when?: FunctionMaybe<un
           if (hasObservableSymbol) {
             try {
               const invoked = resolved()
-              console.log('deepResolve')
+              // console.log('deepResolve')
               return deepResolve(invoked)
             } catch (e) {
-              console.error('[Suspense] SSR: invocation failed', e)
+              // console.error('[Suspense] SSR: invocation failed', e)
               return resolved
             }
           }

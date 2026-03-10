@@ -150,51 +150,52 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                     // The expect function is being executed - this is the key verification
                     const expectedValue = Component.test.expect()
 
+                    // Normalize expected value to array for uniform handling
+                    const expectedValues = Array.isArray(expectedValue) ? expectedValue : [expectedValue]
+
                     // For static components, verify exact match
                     if (Component.test.static) {
                         // For static tests, DO NOT convert actual values to placeholders
                         // Compare actual literal values directly with expected values
                         const actualForComparison = actualSnapshot
 
-                        // console.log('STATIC TEST - Actual (before conversion):', JSON.stringify(actualForComparison))
-                        // console.log('STATIC TEST - Expected (before conversion):', JSON.stringify(expectedValue))
-                        // console.log('STATIC TEST - Actual (after conversion):', JSON.stringify(actualForComparison))
-                        // console.log('STATIC TEST - Expected (unchanged):', JSON.stringify(expectedValue))
-                        // console.log('STATIC TEST - Equal:', actualForComparison === expectedValue)
-                        if (actualForComparison === expectedValue) {
+                        // Check if actual matches any of the expected values
+                        const matches = expectedValues.some(expected => actualForComparison === expected)
+
+                        if (matches) {
                             //temp hide for assertion only
                             console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                         } else {
-                            assert(false, `[${Component.name}]: Expected actual \n'${actualForComparison}' to be equal to function result \n'${expectedValue}'`)
+                            assert(false, `[${Component.name}]: Expected actual \n'${actualForComparison}' to match one of the expected values \n'${JSON.stringify(expectedValues)}'`)
                         }
                     } else {
                         // For dynamic components with compareActualValues, use the expect function result directly
                         // without placeholder conversion
                         if (Component.test.compareActualValues) {
-                            if (actualSnapshot === expectedValue) {
+                            const matches = expectedValues.some(expected => actualSnapshot === expected)
+
+                            if (matches) {
                                 //temp hide for assertion only
                                 console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                             } else {
-                                assert(false, `[${Component.name}]: Expected '${actualSnapshot}' to match function result '${expectedValue}'`)
+                                assert(false, `[${Component.name}]: Expected '${actualSnapshot}' to match one of the expected values '${JSON.stringify(expectedValues)}'`)
                             }
                         } else {
-                            // For other dynamic components, we need to convert both actual and expected to the same format
-                            // using the same placeholder logic as getSnapshot()
-                            // console.log(`${Component.name} expect function executed, returned: ${expectedValue}`)
-                            // console.log('DYNAMIC TEST - Actual (before conversion):', JSON.stringify(actualSnapshot))
-                            // console.log('DYNAMIC TEST - Expected (before conversion):', JSON.stringify(expectedValue))
-
                             // For dynamic components with registered observables, compare actual values directly
                             // Components must use registerTestObservable and return concrete values in expect function
-                            if (expectedValue && expectedValue.trim() !== '') {
-                                if (actualSnapshot === expectedValue) {
+                            const nonEmptyExpected = expectedValues.filter(expected => expected && expected.trim() !== '')
+
+                            if (nonEmptyExpected.length > 0) {
+                                const matches = nonEmptyExpected.some(expected => actualSnapshot === expected)
+
+                                if (matches) {
                                     // temp hide for assertion only
                                     console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                                 } else {
-                                    assert(false, `[${Component.name}]: Expected actual '${actualSnapshot}' to match expected '${expectedValue}'`)
+                                    assert(false, `[${Component.name}]: Expected actual '${actualSnapshot}' to match one of the expected values '${JSON.stringify(nonEmptyExpected)}'`)
                                 }
                             } else {
-                                assert(false, `[${Component.name}]: Expect function returned empty result: '${expectedValue}'`)
+                                assert(false, `[${Component.name}]: Expect function returned empty result: '${JSON.stringify(expectedValues)}'`)
                             }
                         }
                     }

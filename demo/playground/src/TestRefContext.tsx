@@ -22,7 +22,8 @@ TestRefContext.test = {
     static: false,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Ref - Context</h3><context-provider value="321" symbol="Symbol()"><p>content</p></context-provider>'  // For SSR comparison
+        // Note: SSR doesn't render symbol attributes
+        const expectedFull = '<h3>Ref - Context</h3><context-provider value="321"><p>content</p></context-provider>'  // For SSR comparison
         const expected = '<context-provider value="321"><p>content</p></context-provider>'   // For main DOM test comparison
 
         const ssrComponent = testObservables['TestRefContext_ssr']

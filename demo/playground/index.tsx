@@ -409,14 +409,12 @@ const tests = [
     // TestComponentStaticProps,
     // TestComponentStaticRenderProps,
     // TestComponentStaticRenderState,
-    // TestContextComponents,
-    // TestContextHook,
+
     // TestDirective,
     // TestDirectiveRef,
     // TestDirectiveRegisterLocal,
     // TestDirectiveSingleArgument,
 
-    // TestContextDynamicContext,
     // TestDynamicFunctionComponent,
     // TestDynamicFunctionProps,
     // TestDynamicHeading,
@@ -480,8 +478,7 @@ const tests = [
     // TestHTMLDangerouslySetInnerHTMLObservable,
     // TestHTMLDangerouslySetInnerHTMLObservableString,
     // TestHTMLDangerouslySetInnerHTMLStatic,
-    // // error TestHTMLFunctionStatic, // html template
-    // // error TestHTMLFunctionStaticRegistry,
+
 
     // TestHTMLInnerHTMLFunction,
     // TestHTMLInnerHTMLObservable,
@@ -551,8 +548,12 @@ const tests = [
     // TestPropertyValueRemoval,
     // TestPropertyValueStatic,
 
+    // TestContextComponents,
+    // TestContextHook,
+    // TestContextDynamicContext,
+    // TestRefContext,
+
     // TestRef,
-    TestRefContext,
     // TestRefs,
     // TestRefsNested,
     // TestRefUnmounting,
@@ -561,7 +562,7 @@ const tests = [
     // TestRenderToString,
     // TestRenderToStringNested,
     // TestRenderToStringSuspense,
-    // TestRenderToStringSuspenseNested,
+    // TestRenderToStringSuspenseNested, //timing issue
     // TestResourceFallbackLatest,
     // TestResourceFallbackValue,
     // TestSelectObservableOption,
@@ -658,12 +659,16 @@ const tests = [
     // TestUndefinedRemoval,
     // TestUndefinedStatic,
 
-    // //ignore for now api not ready
+    //ignore for now api not ready
     // TestCustomElementBasic,
-    // TestCustomElementSlots,
+    TestCustomElementSlots,
     // TestCustomElementContext,
     // TestCustomElementNested,
     // TestCustomElementComprehensive,
+
+    // html()
+    // // error TestHTMLFunctionStatic, // html template
+    // // error TestHTMLFunctionStaticRegistry,
 
     // KIV Component
     // TestKeepAliveObservable,

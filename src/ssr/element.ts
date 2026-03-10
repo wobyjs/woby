@@ -137,6 +137,8 @@ export class Element extends BaseNode {
             if (typeof child === 'object' && child !== null) {
                 if ('outerHTML' in child) {
                     return child.outerHTML
+                } else if (child.shadowRRoot){
+                    return child.shadowRRoot.innerHTML
                 } else if ('textContent' in child) {
                     return child.textContent
                 }

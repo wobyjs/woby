@@ -27,63 +27,74 @@ export interface RenderToStringOptions {
     returnDocument?: boolean
 }
 
-export const renderToString = (
+export function renderToString<T extends RenderToStringOptions = RenderToStringOptions>(
     child: Child,
-    options?: RenderToStringOptions
-): string | { html: string; document: SSRDocument } => {
-    return EnvironmentContext.Provider('ssr', () => {
+    options?: T
+): T extends { returnDocument: true } ? { html: string; document: SSRDocument } : string {
+  console.log('\n[renderToString] ========== START ==========')
+  console.log('[renderToString] Input child:', typeof child, child?.name || child?.constructor?.name || 'primitive')
+ return EnvironmentContext.Provider('ssr', () => {
         // Create or use provided document instance for isolated context
-        const ssrDoc = options?.document ?? createDocument()
+       const ssrDoc = options?.document ?? createDocument()
+       console.log('[renderToString] SSR document created')
 
         // If child is a component function (JSX.Element is a wrapped function), call it to initialize
         let resolvedChild: Child = child
         while (isFunction(resolvedChild)) {
             try {
-                const called = (resolvedChild as Function)()
-                resolvedChild = called
+               const called = (resolvedChild as Function)()
+               resolvedChild = called
             } catch (e) {
                 break
             }
         }
 
         // If result is an array, recursively resolve each element
-        if (Array.isArray(resolvedChild)) {
-            const resolveDeep = (item: any): any => {
+       if (Array.isArray(resolvedChild)) {
+           const resolveDeep = (item: any): any => {
                 let resolved = item
                 while (isFunction(resolved)) {
-                    resolved = (resolved as Function)()
+                   resolved = (resolved as Function)()
                 }
                 // If still an array after unwrapping, resolve its elements too
-                if (Array.isArray(resolved)) {
-                    return resolved.map(resolveDeep)
+               if (Array.isArray(resolved)) {
+                   return resolved.map(resolveDeep)
                 }
-                return resolved
+               return resolved
             }
-            resolvedChild = resolvedChild.map(resolveDeep)
+           resolvedChild = resolvedChild.map(resolveDeep)
         }
 
         // Use document's createElement for container creation
-        const container = ssrDoc.createElement('div')
-        const stack = new Error()
+       const container= ssrDoc.createElement('div')
+       console.log('[renderToString] Container created:', container.tagName)
+       const stack = new Error()
 
         // Use a fragment for the root
-        const fragment = FragmentUtils.make()
+       const fragment = FragmentUtils.make()
+       console.log('[renderToString] Fragment created')
 
         // Set the child content
+       console.log('[renderToString] About to call setChild with resolvedChild:', typeof resolvedChild)
         setChild(container, resolvedChild, fragment, stack)
+       console.log('[renderToString] setChild complete')
 
         // Get the rendered content from the container's children
-        const children = Array.from(container.childNodes || [])
-        const childrenContent = children.map((child: any) => {
-            return getNodeContent(child)
+       const children = Array.from(container.childNodes || [])
+       console.log('[renderToString] Container childNodes count:', children.length)
+       const childrenContent = children.map((child: any) => {
+           console.log('[renderToString.getNodeContent] Processing child:', child?.constructor?.name || typeof child)
+           return getNodeContent(child)
         }).join('')
+       console.log('[renderToString] Children content length:', childrenContent.length)
 
         // Return both html and document if requested
-        if (options?.returnDocument) {
-            return { html: childrenContent, document: ssrDoc }
+       if (options?.returnDocument) {
+           return { html: childrenContent, document: ssrDoc }
         }
 
-        return childrenContent
+       console.log('[renderToString] ========== END ==========\\n')
+       return childrenContent
     }) as any
 }
 
