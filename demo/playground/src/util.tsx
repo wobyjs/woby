@@ -54,6 +54,8 @@ export const registerTestObservable = (name: string, observable: Observable<any>
  */
 export function getInnerHTML(element: Element): string {
     if (!element) return ''
+
+    // return element.innerHTML
     return _serializeChildren(element)
 }
 export function minimiseHtml(html: string): string {
@@ -114,6 +116,9 @@ function _serializeShadowRoot(shadowRoot: ShadowRoot): string {
             }
         } else if (node.nodeType === Node.TEXT_NODE) {
             html += (node as Text).textContent || ''
+        } else if (node.nodeType === Node.COMMENT_NODE) {
+            // Preserve HTML comments in shadow DOM
+            html += `<!--${(node as Comment).textContent || ''}-->`
         }
     })
     return html
@@ -144,6 +149,9 @@ function _serializeChildren(element: Element, slotContext?: ShadowRoot): string 
             }
         } else if (node.nodeType === Node.TEXT_NODE) {
             html += (node as Text).textContent || ''
+        } else if (node.nodeType === Node.COMMENT_NODE) {
+            // Preserve HTML comments
+            html += `<!--${(node as Comment).textContent || ''}-->`
         }
     })
     return html
