@@ -7,15 +7,16 @@
  * - Context value passing between TSX and custom elements
  * - Nested context providers
  */
-import { $, $$, customElement, defaults, createContext, useContext, useMountedContext, HtmlString, HtmlNumber, type JSX } from 'woby'
+import { $, $$, customElement, defaults, createContext, useContext, useMountedContext, HtmlString, HtmlNumber, type JSX, useEffect } from 'woby'
 
 // Create contexts
-const ThemeContext = createContext('light')
-const CounterContext = createContext(0)
-const NestedContext = createContext('default')
+const ThemeContext = createContext($('light'))
+const CounterContext = createContext($(0))
+const NestedContext = createContext($('default'))
 
 // Hook for theme context
-const useTheme = () => useMountedContext(ThemeContext)
+// const useTheme = () => useMountedContext(ThemeContext)
+const useTheme = () => useContext(ThemeContext)
 const useCounter = () => useMountedContext(CounterContext)
 const useNested = () => useMountedContext(NestedContext)
 
@@ -27,19 +28,23 @@ const ContextConsumer = defaults(() => ({
     const counter = useCounter()
     const nested = useNested()
 
+    useEffect(() => {
+        console.log('context', $$(theme.context))
+    })
+
     return (
         <div style={{
             border: '1px solid gray',
             padding: '8px',
             margin: '5px',
-            backgroundColor: $$(theme) === 'dark' ? '#333' : '#fff',
-            color: $$(theme) === 'dark' ? '#fff' : '#000'
+            backgroundColor: () => $$(theme.context) === 'dark' ? '#333' : '#fff',
+            color: () => $$(theme.context) === 'dark' ? '#fff' : '#000'
         }}>
-            <strong>{$$(label)}:</strong>
+            <strong>{label}:</strong>
             <ul>
-                <li>Theme: {$$(theme)}</li>
-                <li>Counter: {$$(counter)}</li>
-                <li>Nested: {$$(nested)}</li>
+                <li>Theme: {theme.context}</li>
+                <li>Counter: {counter.context}</li>
+                <li>Nested: {nested.context}</li>
             </ul>
         </div>
     )
@@ -53,7 +58,7 @@ const ContextProvider = defaults(() => ({
 }), ({ theme, counter, nested, children }) => {
     return (
         <div style={{ border: '2px solid blue', padding: '10px', margin: '10px' }}>
-            <h4>Context Provider (Theme: {$$(theme)}, Counter: {$$(counter)})</h4>
+            <h4>Context Provider (Theme: {theme}, Counter: {counter}</h4>
             <ThemeContext.Provider value={theme}>
                 <CounterContext.Provider value={counter}>
                     <NestedContext.Provider value={nested}>
@@ -78,8 +83,8 @@ const CounterElement = defaults(() => ({
 
     return (
         <div style={{ border: '2px solid green', padding: '15px', margin: '10px' }}>
-            <h3>{$$(title)}</h3>
-            <p>Internal Count: {$$(count)}</p>
+            <h3>{title}</h3>
+            <p>Internal Count: {count}</p>
             <button onClick={increment}>+</button>
             <button onClick={decrement}>-</button>
 
@@ -121,18 +126,20 @@ const TestCustomElementContext = () => {
 
             {/* App-level context providers */}
             <ThemeContext.Provider value={appTheme}>
+                {() => {
+                    const t = useTheme()
+                    return <div>Theme: {t.context}</div>
+                }}
                 <CounterContext.Provider value={appCounter}>
                     <NestedContext.Provider value={appNested}>
 
-                        {/* Direct TSX usage */}
                         <h2>1. Direct TSX Context Usage</h2>
                         <ContextConsumer label="Direct TSX Consumer" />
-
-                        {/* Custom element consuming context */}
+                        {/* 
+                        Custom element consuming context
                         <h2>2. Custom Element Context Consumption</h2>
                         <context-consumer label="HTML Custom Element Consumer" />
 
-                        {/* Context provider custom element */}
                         <h2>3. Context Provider Custom Element</h2>
                         <context-provider
                             theme="dark"
@@ -143,7 +150,6 @@ const TestCustomElementContext = () => {
                             <ContextConsumer label="Nested Consumer 2" />
                         </context-provider>
 
-                        {/* Counter element with context */}
                         <h2>4. Counter Element with Context</h2>
                         <counter-element
                             initial-value="10"
@@ -152,7 +158,6 @@ const TestCustomElementContext = () => {
                             <context-consumer label="Counter Context Consumer" />
                         </counter-element>
 
-                        {/* Mixed nested usage */}
                         <h2>5. Complex Nested Context</h2>
                         <ContextProvider
                             theme="light"
@@ -170,18 +175,17 @@ const TestCustomElementContext = () => {
                             </counter-element>
                         </ContextProvider>
 
-                        {/* Context inheritance test */}
                         <h2>6. Context Inheritance Test</h2>
                         <div>
                             <p>App-level context values:</p>
                             <ul>
-                                <li>Theme: {$$(appTheme)}</li>
-                                <li>Counter: {$$(appCounter)}</li>
-                                <li>Nested: {$$(appNested)}</li>
+                                <li>Theme: {appTheme}</li>
+                                <li>Counter: {appCounter}</li>
+                                <li>Nested: {appNested}</li>
                             </ul>
 
                             <ContextConsumer label="App-level Context Consumer" />
-                        </div>
+                        </div> */}
 
                     </NestedContext.Provider>
                 </CounterContext.Provider>

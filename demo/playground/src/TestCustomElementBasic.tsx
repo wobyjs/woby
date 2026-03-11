@@ -30,10 +30,10 @@ const BasicElement = defaults(() => ({
             padding: '10px',
             backgroundColor: $$(active) ? '#e0e0e0' : 'white'
         }}>
-            <h2>{$$(title)}</h2>
+            <h2>{title}</h2>
             {!isSlotProjected && <div>{children}</div>}
-            <p>Count: {$$(count)}</p>
-            <p>Active: {$$(active) ? 'Yes' : 'No'}</p>
+            <p>Count: {count}</p>
+            <p>Active: {() => $$(active) ? 'Yes' : 'No'}</p>
         </div>
     )
 })

@@ -46,6 +46,121 @@ export const registerTestObservable = (name: string, observable: Observable<any>
     testObservables[name] = observable
 }
 
+/**
+ * Serializes an element to HTML string, recursively handling shadow DOM.
+ * For custom elements with shadowRoot: wraps shadow content in <template shadowrootmode="open">,
+ * then appends only light DOM children that are NOT assigned to any slot (hidden from output).
+ * Falls back to element.innerHTML for elements without shadow DOM.
+ */
+export function getInnerHTML(element: Element): string {
+    if (!element) return ''
+    return _serializeChildren(element)
+}
+export function minimiseHtml(html: string): string {
+    return html.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim()
+}
+
+function _serializeElement(el: Element): string {
+    const shadowRoot = (el as any).shadowRoot as ShadowRoot | null
+
+    if (shadowRoot) {
+        // Open tag
+        const tag = el.tagName.toLowerCase()
+        let attrs = ''
+        for (let i = 0; i < el.attributes.length; i++) {
+            const a = el.attributes[i]
+            attrs += ` ${a.name}="${a.value}"`
+        }
+
+        // Shadow DOM: emit <template shadowrootmode="open"> with shadow content
+        // <slot> elements inside will be replaced with assignedNodes() content
+        let inner = `<template shadowrootmode="open" shadowrootserializable="">`
+        inner += _serializeShadowRoot(shadowRoot)
+        inner += `</template>`
+
+        return `<${tag}${attrs}>${inner}</${tag}>`
+    }
+
+    // No shadow root: regular element — recurse into children
+    const tag = el.tagName.toLowerCase()
+    let attrs = ''
+    for (let i = 0; i < el.attributes.length; i++) {
+        const a = el.attributes[i]
+        attrs += ` ${a.name}="${a.value}"`
+    }
+    return `<${tag}${attrs}>${_serializeChildren(el)}</${tag}>`
+}
+
+function _serializeShadowRoot(shadowRoot: ShadowRoot): string {
+    let html = ''
+    shadowRoot.childNodes.forEach((node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            const el = node as Element
+            if (el.tagName === 'SLOT') {
+                // Keep <slot> tag, populate with assignedNodes() content inside it
+                let slotContent = ''
+                const assigned = (el as HTMLSlotElement).assignedNodes({ flatten: true })
+                assigned.forEach((assignedNode) => {
+                    if (assignedNode.nodeType === Node.ELEMENT_NODE) {
+                        slotContent += _serializeElement(assignedNode as Element)
+                    } else if (assignedNode.nodeType === Node.TEXT_NODE) {
+                        slotContent += (assignedNode as Text).textContent || ''
+                    }
+                })
+                html += `<slot>${slotContent}</slot>`
+            } else {
+                // Pass shadowRoot as slotContext so nested <slot> inside e.g. <div> can be resolved
+                html += _serializeElementWithSlot(el, shadowRoot)
+            }
+        } else if (node.nodeType === Node.TEXT_NODE) {
+            html += (node as Text).textContent || ''
+        }
+    })
+    return html
+}
+
+function _serializeChildren(element: Element, slotContext?: ShadowRoot): string {
+    let html = ''
+    element.childNodes.forEach((node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            const el = node as Element
+            // Only process <slot> elements if we have a shadow context (shadow DOM)
+            // Otherwise, skip <slot> elements entirely (SSR mode without shadow DOM)
+            if (el.tagName === 'SLOT' && slotContext) {
+                // Keep <slot> tag, populate with assignedNodes() content inside it
+                let slotContent = ''
+                const assigned = (el as HTMLSlotElement).assignedNodes({ flatten: true })
+                assigned.forEach((assignedNode) => {
+                    if (assignedNode.nodeType === Node.ELEMENT_NODE) {
+                        slotContent += _serializeElement(assignedNode as Element)
+                    } else if (assignedNode.nodeType === Node.TEXT_NODE) {
+                        slotContent += (assignedNode as Text).textContent || ''
+                    }
+                })
+                html += `<slot>${slotContent}</slot>`
+            } else if (el.tagName !== 'SLOT') {
+                // Skip <slot> elements when there's no shadow context
+                html += _serializeElementWithSlot(el, slotContext)
+            }
+        } else if (node.nodeType === Node.TEXT_NODE) {
+            html += (node as Text).textContent || ''
+        }
+    })
+    return html
+}
+
+function _serializeElementWithSlot(el: Element, slotContext?: ShadowRoot): string {
+    const shadowRoot = (el as any).shadowRoot as ShadowRoot | null
+    if (shadowRoot) return _serializeElement(el)
+    const tag = el.tagName.toLowerCase()
+    let attrs = ''
+    for (let i = 0; i < el.attributes.length; i++) {
+        const a = el.attributes[i]
+        attrs += ` ${a.name}="${a.value}"`
+    }
+    return `<${tag}${attrs}>${_serializeChildren(el, slotContext)}</${tag}>`
+}
+
 // Custom useInterval that runs 4 times then stops to prevent spam
 export const useInterval = (callback, delay) => {
     let count = 0
@@ -113,24 +228,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
     const getHTML = (): string => {
         const element = ref()
         if (!element) return ''
-        return element.innerHTML
-    }
-    const getSnapshot = (html: string, isStatic: boolean, componentName: string): string => {
-        const htmlWithoutTitle = html.replace(/<h3>[^<]*<\/h3>/, '')
-        // For deterministic tests, don't convert random values to placeholders
-        // Only convert BigInt values for specific test cases
-        let htmlWitRandomBigint = htmlWithoutTitle
-
-
-        // Handle empty placeholders for removal tests
-        // But preserve actual empty parentheses for NullRemoval and UndefinedRemoval tests
-        if (!(componentName === 'TestNullRemoval' || componentName === 'TestUndefinedRemoval')) {
-            // Convert empty parentheses with whitespace to empty placeholder for other tests
-            htmlWitRandomBigint = htmlWitRandomBigint.replace(/\(\s*\)/g, '(<!---->)')
-        }
-
-        const htmlWithRandomHex = htmlWitRandomBigint.replace(/#[a-fA-F0-9]+\{random-bigint\}/g, '{random-color}').replace(/#[a-fA-F0-9]{6,8}/g, '{random-color}')
-        return htmlWithRandomHex
+        return minimiseHtml(getInnerHTML(element))
     }
     const tick = (): void => {
         if (done) return

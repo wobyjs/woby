@@ -1,13 +1,26 @@
-import { $, $$, createContext, renderToString, type JSX } from 'woby'
+import { $, $$, createContext, useContext, renderToString, tick, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+let syncStep = 0
 const TestRefContext = (): JSX.Element => {
+    const message = $('')
     const Context = createContext(123)
-    const ret: JSX.Element = () => (
+
+    const Reffed = (): JSX.Element => {
+        const ref = (element: HTMLElement) => {
+            if (element) {
+                // console.log('syncStep', syncStep++)
+                // console.log('syncStep: element', element)
+                message(`Got ref - Has parent: ${!!element.parentElement} - Is connected: ${element.isConnected} - Context: ${useContext(Context)}`)
+            }
+        }
+        return <p ref={ref}>{message}</p>
+    }
+    const ret = () => (
         <>
             <h3>Ref - Context</h3>
             <Context.Provider value={321}>
-                <p>content</p>
+                <Reffed />
             </Context.Provider>
         </>
     )
@@ -23,8 +36,11 @@ TestRefContext.test = {
     expect: () => {
         // Define expected values for both main test and SSR test
         // Note: SSR doesn't render symbol attributes
-        const expectedFull = '<h3>Ref - Context</h3><context-provider value="321"><p>content</p></context-provider>'  // For SSR comparison
-        const expected = '<context-provider value="321"><p>content</p></context-provider>'   // For main DOM test comparison
+        const expectedFull = '<h3>Ref - Context</h3><context-provider value="321"><p>Got ref - Has parent: false - Is connected: false - Context: 321</p></context-provider>'  // For SSR comparison
+        const expected = [
+            '<context-provider value="321"><p>Got ref - Has parent: true - Is connected: true - Context: 321</p></context-provider>',   // For main DOM test comparison
+            '<context-provider value="321"><p>Got ref - Has parent: false - Is connected: false - Context: 321</p></context-provider>',   // For main DOM test comparison
+        ]
 
         const ssrComponent = testObservables['TestRefContext_ssr']
         const ssrResult = renderToString(ssrComponent)
@@ -40,3 +56,11 @@ TestRefContext.test = {
 
 
 export default () => <TestSnapshots Component={TestRefContext} />
+
+const ts = <TestRefContext />
+console.log(renderToString(ts))
+
+tick()
+tick()
+tick()
+console.log(renderToString(ts))

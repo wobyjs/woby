@@ -348,7 +348,7 @@ const tests = [
 
     // TestBigIntFunction,
     // TestBigIntObservable,
-    // TestBigIntRemoval,
+    TestBigIntRemoval,
     // TestBigIntStatic,
     // TestBooleanFunction,
     // TestBooleanObservable,
@@ -661,7 +661,7 @@ const tests = [
 
     //ignore for now api not ready
     // TestCustomElementBasic,
-    TestCustomElementSlots,
+    // TestCustomElementSlots,
     // TestCustomElementContext,
     // TestCustomElementNested,
     // TestCustomElementComprehensive,

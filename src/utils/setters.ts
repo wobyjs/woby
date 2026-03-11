@@ -249,9 +249,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
             const node = child as Node
 
             if (!fragmentOnly) {
-                try {
-                    parent.insertBefore(node, null)
-                } catch { /* debugger */ }
+                parent.insertBefore(node, null)
             }
 
             FragmentUtils.replaceWithNode(fragment, node)
@@ -854,15 +852,15 @@ export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: Fun
     const isSSR = useEnvironment() === 'ssr'
 
     if (isSSR)
-        setHTMLStatic(element, $$($$(value).__html))
+        setHTMLStatic(element, $$($$(value as any).__html))
     else if (isObservable(value))
         useRenderEffect(() => {
 
-            setHTMLStatic(element, $$($$(value).__html))
+            setHTMLStatic(element, $$($$(value as any).__html))
 
         }, stack)
     else
-        setHTMLStatic(element, $$($$(value).__html))
+        setHTMLStatic(element, $$($$(value as any).__html))
 
 }
 
@@ -929,7 +927,7 @@ export const setProperty = (element: HTMLElement | Comment, key: string, value: 
 
 }
 
-export const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null | undefined | Ref<T>)[]): void => { // Scheduling a microtask to dramatically increase the probability that the element will get connected to the DOM in the meantime, which would be more convenient
+export const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null | undefined | Ref<T>)[]): void => {
 
     if (isNil(value)) return
 
@@ -937,8 +935,18 @@ export const setRef = <T>(element: T, value: null | undefined | Ref<T> | (null |
 
     if (!values.length) return
 
-    const stack = new Error()
-    useMicrotask(() => untrack(() => values.forEach(value => value?.(element))), stack)
+    const isSSR = useEnvironment() === 'ssr'
+
+    // In SSR, execute ref callbacks synchronously since microtasks don't run during renderToString
+    if (isSSR) {
+        values.forEach(value => {
+            value?.(element)
+        })
+    } else {
+        // In browser, use microtask to ensure element is connected to DOM
+        const stack = new Error()
+        useMicrotask(() => untrack(() => values.forEach(value => value?.(element))), stack)
+    }
 
 }
 
@@ -1168,8 +1176,10 @@ export const setProp = (element: HTMLElement | Comment, key: string, value: any,
     if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
 
     if (element instanceof Comment || element instanceof Text) {
-        if (key === 'ref')
+        if (key === 'ref') {
+
             setRef(element, value)
+        }
         else if (key in element)
             setProperty(element, key, value, stack)
     }

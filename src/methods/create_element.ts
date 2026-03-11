@@ -8,7 +8,7 @@
  * @module createElement
  */
 
-import { untrack } from '../methods/soby'
+import { untrack, $$ } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
 import { createComment as createCommentDOM, createHTMLNode as createHTMLNodeDOM, createSVGNode as createSVGNodeDOM, createText as createTextDOM } from '../utils/creators'
 import { createHTMLNode as createHTMLNodeSSR, createSVGNode as createSVGNodeSSR, createComment as createCommentSSR, createText as createTextSSR } from '../ssr'
@@ -211,6 +211,13 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
             untrack(() => {
 
+                // Only set children from _arguments_ if they weren't already in props
+                // setProps already handles props.children via setProp, so we only need to handle separate _children
+                if (hasChildren && !(props && 'children' in props)) {
+                    setChild(child, children, FragmentUtils.make(), stack)
+                }
+
+
                 if (props) {
                     if (!!ce) {
                         const { children, ...np } = props as any //children already initialized in new ce(props)
@@ -218,12 +225,6 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                     }
                     else
                         setProps(child, props as any, stack)  // This will handle props.children automatically via setProp
-                }
-
-                // Only set children from _arguments_ if they weren't already in props
-                // setProps already handles props.children via setProp, so we only need to handle separate _children
-                if (hasChildren && !(props && 'children' in props)) {
-                    setChild(child, children, FragmentUtils.make(), stack)
                 }
 
             })

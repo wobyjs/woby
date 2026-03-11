@@ -4,7 +4,7 @@
 
 import type { Component } from "../types"
 import { Element } from './element'
-import { renderToString } from '../methods/render_to_string'
+import { renderToString, getNodeContent } from '../methods/render_to_string'
 
 // Simple dictionary to store custom element definitions in SSR environment
 const customElementsRegistry: Map<string, any> = new Map()
@@ -37,7 +37,6 @@ export class SSRCustomElement extends Element {
 
     constructor(tagName: string, props?: any) {
         super(tagName)
-        console.log('[SSRCustomElement]: ', tagName)
         // Get the component function
         const componentFn = (this.constructor as any).__component__
 
@@ -54,8 +53,7 @@ export class SSRCustomElement extends Element {
                 // The jsxResult is typically a function wrapper (JSX.Element)
                 // We'll store it in childNodes to be resolved later by outerHTML
                 this.childNodes = [jsxResult]
-            } catch (e) {
-                console.error('[SSRCustomElement] Failed to execute component:', e)
+            } catch (e: any) {
                 this.childNodes = []
             }
         } else {
@@ -91,7 +89,12 @@ export class SSRCustomElement extends Element {
 
         // Build children string by resolving and converting each child to HTML
         const children = this.childNodes.map((child: any) => {
-            // Resolve function children (JSX.Element wrappers)
+            // Set parent reference for element objects before processing
+            if (child && typeof child === 'object' && child.nodeType === 1 && !child.parentNode) {
+                child.parentNode = this
+            }
+
+            // Resolve function children(JSX.Element wrappers)
             if (typeof child === 'function') {
                 try {
                     let resolved = child()
@@ -100,20 +103,19 @@ export class SSRCustomElement extends Element {
                         resolved = resolved()
                     }
 
-                    // For SSR, use renderToString to convert JSX/Elements to HTML
+                    // For SSR, use getNodeContent to preserve parent relationships
                     if (resolved !== null && resolved !== undefined) {
-                        return renderToString(resolved)
+                        return getNodeContent(resolved)
                     }
 
                     return String(resolved ?? '')
-                } catch (e) {
-                    console.error('[SSRCustomElement.outerHTML] Failed to resolve child:', e)
+                } catch (e: any) {
                     return String(child ?? '')
                 }
             }
             if (typeof child === 'object' && child !== null) {
-                // For Element objects, use renderToString
-                return renderToString(child)
+                // For Element objects, use getNodeContent to preserve parent relationships
+                return getNodeContent(child)
             }
             return String(child ?? '')
         }).join('')
@@ -128,7 +130,7 @@ export class SSRCustomElement extends Element {
                 return renderToString(node)
             }).join('')
 
-            return `<${this.tagName.toLowerCase()}${attrStr}>${shadowContent}${children}</${this.tagName.toLowerCase()}>`
+            return `<${this.tagName.toLowerCase()}${attrStr}>${shadowContent}</${this.tagName.toLowerCase()}>`
         }
 
         return `<${this.tagName.toLowerCase()}${attrStr}>${children}</${this.tagName.toLowerCase()}>`
@@ -160,17 +162,10 @@ export class SSRShadowRoot extends Element {
  * Represents a <slot> element within a shadow DOM
  */
 export class SSRSlotElement extends Element {
-    assignedNodes: any[] = []
+    public assignedNodes: any[] = []
 
     constructor() {
         super('slot')
-    }
-
-    /**
-     * Get nodes assigned to this slot
-     */
-    assignedNodes() {
-        return this.assignedNodes
     }
 
     get outerHTML() {

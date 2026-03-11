@@ -48,10 +48,10 @@ import { renderToString } from './render_to_string'
 if (isSSR) {
     globalThis.customElements = ces as any
     globalThis.document = doc as any
-    // Export the SSRCustomElement class for direct use
-    ;(globalThis as any).SSRCustomElement = SSRCustomElement
-    ;(globalThis as any).SSRShadowRoot = SSRShadowRoot
-    ;(globalThis as any).SSRSlotElement = SSRSlotElement
+        // Export the SSRCustomElement class for direct use
+        ; (globalThis as any).SSRCustomElement = SSRCustomElement
+        ; (globalThis as any).SSRShadowRoot = SSRShadowRoot
+        ; (globalThis as any).SSRSlotElement = SSRSlotElement
 }
 
 /**
@@ -69,65 +69,41 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
     tagName: string,
     component: Component<P>
 ): void => {
-    console.log('[createSSRCustomElement] Creating SSR custom element:', tagName)
     // Create a subclass of SSRCustomElement for this specific component
     class ComponentCustomElement extends SSRCustomElement {
         static __component__ = component
 
         constructor(props?: P) {
-            console.log('\n[ComponentCustomElement.constructor] ========== CONSTRUCTOR START ==========')
-            console.log('[ComponentCustomElement.constructor] Constructing', tagName, 'with props:', props)
             super(tagName, props)
-            
+
             // Get the component function
             const componentFn = (this.constructor as any).__component__
-            console.log('[ComponentCustomElement.constructor] Component function found:', !!componentFn)
-            
+
             // Always create shadow root for custom elements to encapsulate styling
             const shadowRoot = this.attachShadow({ mode: 'open', serializable: true })
-            console.log('[ComponentCustomElement.constructor] Shadow root created')
-            
+
             // Execute the component once and set the result directly in shadow DOM
             if (componentFn && typeof componentFn === 'function') {
                 try {
-                    console.log('[ComponentCustomElement.constructor] About to execute component:', tagName)
                     const componentResult = componentFn.call(null, this.props)
-                    console.log('[ComponentCustomElement.constructor] Component executed, result type:', typeof componentResult)
-                    
+
                     // Store component result ONLY in shadow root childNodes
                     // This will be rendered as the shadow DOM content
                     shadowRoot.childNodes.push(componentResult)
-                    console.log('[ComponentCustomElement.constructor] Component result added to shadowRoot.childNodes')
-                    
-                    // Also create a slot element to show where light DOM children appear
-                    const slotElement = new SSRSlotElement()
-                    slotElement.assignedNodes = Array.isArray(this.props?.children) 
-                        ? this.props.children 
-                        : [this.props?.children].filter(Boolean)
-                    console.log('[ComponentCustomElement.constructor] Slot element created with assignedNodes:', slotElement.assignedNodes?.length)
-                    
-                    // Add slot to shadow root after component content
-                    // This represents where children would appear in the rendered output
-                    shadowRoot.childNodes.push(slotElement)
-                    console.log('[ComponentCustomElement.constructor] Slot element added to shadowRoot.childNodes')
-                    
-                } catch (e) {
-                    console.error('[ComponentCustomElement] Failed to execute component:', e)
-                    console.error('[ComponentCustomElement] Error stack:', e.stack)
+
+                } catch (e: any) {
+                    // Error handling
                 }
             }
-            
+
             // Clear childNodes since everything is now in shadow DOM
             // This prevents duplication in outerHTML
             this.childNodes = []
-            console.log('[ComponentCustomElement.constructor] Construction complete for', tagName)
-            console.log('[ComponentCustomElement.constructor] ========== CONSTRUCTOR END ==========\n')
         }
     }
 
     // Register the component in our dictionary
     ces.define(tagName, ComponentCustomElement as any)
-    console.log('[createSSRCustomElement] SSR custom element registered:', tagName)
 }
 
 // let stackCount = 0
@@ -138,7 +114,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
     tagName: string,
     component: JSX.Component<P>
 ): void => {
-    console.log('[createBrowserCustomElement] Creating browser custom element:', tagName)
     const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
     if (!defaultPropsFn) {
         console.error(`Component ${tagName} is missing default props.`)
@@ -154,14 +129,11 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         public placeHolder: Comment
 
         constructor(props?: P) {
-            console.log('[BrowserCustomElement.constructor] Constructing', tagName, 'with props:', props)
             super()
             this.props = !!props ? props : defaultPropsFn() || {} as P
             C.observedAttributes = Object.keys(this.props)
-            console.log('[BrowserCustomElement.constructor] Props initialized, observedAttributes:', C.observedAttributes)
 
             if (!isJsx(this.props)) {
-                console.log('[BrowserCustomElement.constructor] Creating shadow DOM (non-JSX mode)')
                 const shadowRoot = this.attachShadow({ mode: 'open', serializable: true })
                 if (!($$(this.props.children) instanceof HTMLSlotElement)) {
                     this.slots = document.createElement('slot')
@@ -172,16 +144,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 if (!ignoreStyle) {
                     const allSheets = convertAllDocumentStylesToConstructed()
                     shadowRoot.adoptedStyleSheets = allSheets
-                    console.log('[BrowserCustomElement.constructor] Adopted stylesheets:', allSheets.length)
                 }
 
                 // Execute the component once and set the result directly, avoiding reactive re-execution
                 const componentResult = createElement(component, this.props)
-                console.log('[BrowserCustomElement.constructor] createElement returned:', componentResult?.constructor?.name)
                 setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
-                console.log('[BrowserCustomElement.constructor] Component result set in shadowRoot')
             } else {
-                console.log('[BrowserCustomElement.constructor] JSX mode detected, setting child directly on element')
                 setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
             }
 
@@ -192,18 +160,14 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     this.propDict[c] = k
                     this.propDict[k] = c
                 })
-                console.log('[BrowserCustomElement.constructor] propDict created:', this.propDict)
             }
         }
 
         connectedCallback() {
-            console.log('[BrowserCustomElement.connectedCallback] Called for', tagName)
             const { observedAttributes } = C
             const { props: p } = this
             const aKeys = Object.keys(p).filter(k => k !== 'children' && isObservable(p[k]))
             const rKeys = Object.keys(p).filter(k => isPureFunction(p[k]) || isObject(p[k]))
-
-            console.log('[BrowserCustomElement.connectedCallback] Observable keys:', aKeys, 'Function/Object keys:', rKeys)
 
             rKeys.forEach(k => this.removeAttribute(k))
 
@@ -212,7 +176,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     setProp(this, this.propDict[k], p[k], callStack('connectedCallback'))
 
             for (const attr of this.attributes as any) {
-                console.log('[BrowserCustomElement.connectedCallback] Processing attribute:', attr.name, '=', attr.value)
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
             }
 
@@ -222,26 +185,22 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                         const name = m.attributeName
                         const newValue = this.getAttribute(name)
                         const oldValue = m.oldValue
-                        console.log('[BrowserCustomElement.observer] Attribute changed:', name, 'from', oldValue, 'to', newValue)
                         this.attributeChangedCallback1(name, oldValue, newValue)
                     }
                 })
             })
 
             observer.observe(this, { attributes: true, attributeOldValue: true })
-            console.log('[BrowserCustomElement.connectedCallback] MutationObserver attached')
         }
 
         disconnectedCallback() { }
 
         attributeChangedCallback1(name, oldValue, newValue) {
-            console.log('[BrowserCustomElement.attributeChangedCallback1]', name, 'old:', oldValue, 'new:', newValue)
             if (oldValue === newValue) return
             if (newValue === '[object Object]') return
 
             const { props } = this
             if (name.includes('$') || name.includes('.')) {
-                console.log('[BrowserCustomElement.attributeChangedCallback1] Nested property detected:', name)
                 const normalizedPath = normalizePropertyPath(name)
                 setNestedProperty(this, normalizedPath, newValue)
                 const propName = kebabToCamelCase(name.replace(/\$/g, '.').replace(/\./g, '.'))
@@ -250,7 +209,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 const propName = kebabToCamelCase(name)
                 setObservableValue(this.props, propName, newValue)
             }
-            console.log('[BrowserCustomElement.attributeChangedCallback1] Processing complete for', name)
         }
     }
 
@@ -258,9 +216,7 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
     if (!!ec)
         console.warn(`Element ${tagName} already exists.`)
     else {
-        console.log('[createBrowserCustomElement] Defining browser custom element:', tagName)
         customElements.define(tagName, C)
-        console.log('[createBrowserCustomElement] Browser custom element defined:', tagName)
     }
 }
 
@@ -624,19 +580,9 @@ const getNestedProperty = (obj: any, path: string) => {
  * ```
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>): void => {
-    console.log('\n[customElement] ========== START ==========')
-    console.log('[customElement] Registering custom element:', tagName)
-    console.log('[customElement] Component type:', typeof component, component?.name || 'anonymous')
-    
     createSSRCustomElement(tagName, component)
-    console.log('[customElement] SSR registration complete')
-    
+
     if (globalThis.window && globalThis.document) {
-        console.log('[customElement] Browser environment detected, registering browser custom element')
         createBrowserCustomElement(tagName, component)
-    } else {
-        console.log('[customElement] SSR environment only, skipping browser registration')
     }
-    
-    console.log('[customElement] ========== END ==========\n')
 }
