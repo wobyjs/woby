@@ -173,7 +173,7 @@ export const createDocument = (): SSRDocument => {
     // Mock body element for SSR - fresh instance per document
     const body = createElement('body')
 
-    return {
+    const doc = {
         // Map to store event listeners - isolated per document instance
         _eventListeners: new Map<string, Array<{
             listener: EventListenerOrEventListenerObject
@@ -217,7 +217,10 @@ export const createDocument = (): SSRDocument => {
 
         // Body property for portal component - isolated per instance
         body
-    }
+    };
+
+    (body as any).parentNode = doc
+    return doc
 }
 
 /**

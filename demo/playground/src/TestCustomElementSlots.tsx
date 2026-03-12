@@ -12,7 +12,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 
 // Define a simple custom element with basic props
-const BasicElement = defaults(() => ({
+const BasicElement2 = defaults(() => ({
     title: $('Basic Element', HtmlString),
     count: $(0, HtmlNumber),
     active: $(false, HtmlBoolean),
@@ -20,26 +20,26 @@ const BasicElement = defaults(() => ({
 }), ({ title, count, active, color, children }) => {
     return (
         <div style={{
-            border: '2px solid ' + $$(color),
+            border: () => '2px solid ' + $$(color),
             padding: '10px',
-            backgroundColor: $$(active) ? '#e0e0e0' : 'white'
+            backgroundColor: () => $$(active) ? '#e0e0e0' : 'white'
         }}>
-            <h2>{$$(title)}</h2>
+            <h2>{title}</h2>
             <div>{children}</div>
-            <p>Count: {$$(count)}</p>
-            <p>Active: {$$(active) ? 'Yes' : 'No'}</p>
+            <p>Count: {count}</p>
+            <p>Active: {() => $$(active) ? 'Yes' : 'No'}</p>
         </div>
     )
 })
 
 // Register the custom element
-customElement('basic-element', BasicElement)
+customElement('basic-element2', BasicElement2)
 
 // Augment JSX.IntrinsicElements to include custom element
 declare module 'woby' {
     namespace JSX {
         interface IntrinsicElements {
-            'basic-element': ElementAttributes<typeof BasicElement>
+            'basic-element2': ElementAttributes<typeof BasicElement2>
         }
     }
 }
@@ -119,23 +119,23 @@ const TestCustomElementSlotsWithSSR = (): JSX.Element => {
 
             <h2>1. Basic Slot Functionality</h2>
             <div dangerouslySetInnerHTML={{
-                __html: `<basic-element
+                __html: `<basic-element2
                 title="Pure HTML Custom Element"
                 count="75"
                 active="true"
                 color="purple"
             >
-                <h3>Innner basic-element</h3>
-                    <basic-element
+                <h3>Innner basic-element2</h3>
+                    <basic-element2
                     title="Pure HTML Custom Element nested"
                     count="75"
                     active="true"
                     color="purple"
                     >
                     <p>This is child content from pure nested HTML custom element</p>
-                </basic-element>
+                </basic-element2>
                 <p>Footer</>
-            </basic-element>` }} />
+            </basic-element2>` }} />
         </div>
     )
 
@@ -149,16 +149,16 @@ const a = <>
     <h1>Custom Element Slots Test</h1>
     <h2>1. Basic Slot Functionality</h2>
     <div>
-        <basic-element title="Pure HTML Custom Element" count="75" active="true" color="purple">
+        <basic-element2 title="Pure HTML Custom Element" count="75" active="true" color="purple">
             <template shadowrootmode="open" shadowrootserializable="">
-                <div style="border: 2px solid blue; padding: 10px; background-color: white;">
+                <div style="border: 2px solid purple; padding: 10px; background-color: rgb(224, 224, 224);">
                     <h2>Basic Element</h2>
                     <div>
                         <slot>
-                            <h3>Innner basic-element</h3>
-                            <basic-element title="Pure HTML Custom Element nested" count="75" active="true" color="purple">
+                            <h3>Innner basic-element2</h3>
+                            <basic-element2 title="Pure HTML Custom Element nested" count="75" active="true" color="purple">
                                 <template shadowrootmode="open" shadowrootserializable="">
-                                    <div style="border: 2px solid blue; padding: 10px; background-color: white;">
+                                    <div style="border: 2px solid purple; padding: 10px; background-color: rgb(224, 224, 224);">
                                         <h2>Basic Element</h2>
                                         <div>
                                             <slot>
@@ -168,125 +168,16 @@ const a = <>
                                         <p>Count: 0</p>
                                         <p>Active: No</p>
                                     </div>
-                                </template></basic-element>
+                                </template></basic-element2>
                             <p>Footer</p>
                         </slot>
                     </div>
                     <p>Count: 0</p>
                     <p>Active: No</p>
                 </div>
-            </template></basic-element>
+            </template></basic-element2>
     </div>
 </>
-
-/**
- * Serializes an element to HTML string, recursively handling shadow DOM.
- * For custom elements with shadowRoot: wraps shadow content in <template shadowrootmode="open">,
- * then appends only light DOM children that are NOT assigned to any slot (hidden from output).
- * Falls back to element.innerHTML for elements without shadow DOM.
- */
-function getInnerHTML(element: Element): string {
-    if (!element) return ''
-    return _serializeChildren(element)
-}
-
-function _serializeElement(el: Element): string {
-    const shadowRoot = (el as any).shadowRoot as ShadowRoot | null
-
-    if (shadowRoot) {
-        // Open tag
-        const tag = el.tagName.toLowerCase()
-        let attrs = ''
-        for (let i = 0; i < el.attributes.length; i++) {
-            const a = el.attributes[i]
-            attrs += ` ${a.name}="${a.value}"`
-        }
-
-        // Shadow DOM: emit <template shadowrootmode="open"> with shadow content
-        // <slot> elements inside will be replaced with assignedNodes() content
-        let inner = `<template shadowrootmode="open" shadowrootserializable="">`
-        inner += _serializeShadowRoot(shadowRoot)
-        inner += `</template>`
-
-        return `<${tag}${attrs}>${inner}</${tag}>`
-    }
-
-    // No shadow root: regular element — recurse into children
-    const tag = el.tagName.toLowerCase()
-    let attrs = ''
-    for (let i = 0; i < el.attributes.length; i++) {
-        const a = el.attributes[i]
-        attrs += ` ${a.name}="${a.value}"`
-    }
-    return `<${tag}${attrs}>${_serializeChildren(el)}</${tag}>`
-}
-
-function _serializeShadowRoot(shadowRoot: ShadowRoot): string {
-    let html = ''
-    shadowRoot.childNodes.forEach((node) => {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-            const el = node as Element
-            if (el.tagName === 'SLOT') {
-                // Keep <slot> tag, populate with assignedNodes() content inside it
-                let slotContent = ''
-                const assigned = (el as HTMLSlotElement).assignedNodes({ flatten: true })
-                assigned.forEach((assignedNode) => {
-                    if (assignedNode.nodeType === Node.ELEMENT_NODE) {
-                        slotContent += _serializeElement(assignedNode as Element)
-                    } else if (assignedNode.nodeType === Node.TEXT_NODE) {
-                        slotContent += (assignedNode as Text).textContent || ''
-                    }
-                })
-                html += `<slot>${slotContent}</slot>`
-            } else {
-                // Pass shadowRoot as slotContext so nested <slot> inside e.g. <div> can be resolved
-                html += _serializeElementWithSlot(el, shadowRoot)
-            }
-        } else if (node.nodeType === Node.TEXT_NODE) {
-            html += (node as Text).textContent || ''
-        }
-    })
-    return html
-}
-
-function _serializeChildren(element: Element, slotContext?: ShadowRoot): string {
-    let html = ''
-    element.childNodes.forEach((node) => {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-            const el = node as Element
-            if (el.tagName === 'SLOT' && slotContext) {
-                // Keep <slot> tag, populate with assignedNodes() content inside it
-                let slotContent = ''
-                const assigned = (el as HTMLSlotElement).assignedNodes({ flatten: true })
-                assigned.forEach((assignedNode) => {
-                    if (assignedNode.nodeType === Node.ELEMENT_NODE) {
-                        slotContent += _serializeElement(assignedNode as Element)
-                    } else if (assignedNode.nodeType === Node.TEXT_NODE) {
-                        slotContent += (assignedNode as Text).textContent || ''
-                    }
-                })
-                html += `<slot>${slotContent}</slot>`
-            } else {
-                html += _serializeElementWithSlot(el, slotContext)
-            }
-        } else if (node.nodeType === Node.TEXT_NODE) {
-            html += (node as Text).textContent || ''
-        }
-    })
-    return html
-}
-
-function _serializeElementWithSlot(el: Element, slotContext?: ShadowRoot): string {
-    const shadowRoot = (el as any).shadowRoot as ShadowRoot | null
-    if (shadowRoot) return _serializeElement(el)
-    const tag = el.tagName.toLowerCase()
-    let attrs = ''
-    for (let i = 0; i < el.attributes.length; i++) {
-        const a = el.attributes[i]
-        attrs += ` ${a.name}="${a.value}"`
-    }
-    return `<${tag}${attrs}>${_serializeChildren(el, slotContext)}</${tag}>`
-}
 
 
 TestCustomElementSlotsWithSSR.test = {
@@ -296,15 +187,15 @@ TestCustomElementSlotsWithSSR.test = {
             <div>
     <h1>Custom Element Slots Test</h1>
     <h2>1. Basic Slot Functionality</h2>
-    <div><basic-element title="Pure HTML Custom Element" count="75" active="true" color="purple"><template
+    <div><basic-element2 title="Pure HTML Custom Element" count="75" active="true" color="purple"><template
                 shadowrootmode="open" shadowrootserializable="">
-                <div style="border: 2px solid blue; padding: 10px; background-color: white;">
+                <div style="border: 2px solid purple; padding: 10px; background-color: rgb(224, 224, 224);">
                     <h2>Pure HTML Custom Element</h2>
                     <div>
                         <slot>
-                            <basic-element title="Pure HTML Custom Element nested" count="75" active="true"
+                            <basic-element2 title="Pure HTML Custom Element nested" count="75" active="true"
                                color="purple"><template shadowrootmode="open" shadowrootserializable="">
-                                    <div style="border: 2px solid blue; padding: 10px; background-color: white;">
+                                    <div style="border: 2px solid purple; padding: 10px; background-color: rgb(224, 224, 224);">
                                         <h2>Pure HTML Custom Element nested</h2>
                                         <div>
                                             <slot>
@@ -314,7 +205,7 @@ TestCustomElementSlotsWithSSR.test = {
                                         <p>Count: 75</p>
                                         <p>Active: Yes</p>
                                     </div>
-                                </template></basic-element>
+                                </template></basic-element2>
                             <p>Footer
                             </p>
                         </slot>
@@ -323,7 +214,7 @@ TestCustomElementSlotsWithSSR.test = {
                     <p>Active: Yes</p>
                 </div>
             </template>
-        </basic-element>
+        </basic-element2>
     </div>
 </div>`)
 

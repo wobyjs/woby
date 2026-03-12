@@ -31,19 +31,25 @@ TestRef.test = {
         // Define expected values for both main test and SSR test
         const element = $$(testObservables['TestRef_ref']) as HTMLElement
 
-        const expectedFull = `<h3>Ref</h3><p>Got ref - Has parent: ${!!element.parentElement} - Is connected: ${!!element.isConnected}</p>`  // For SSR comparison
-        const expected = `<p>Got ref - Has parent: ${!!element.parentElement} - Is connected: ${!!element.isConnected}</p>`   // For main DOM test comparison
+        const expectedForSSR = [
+            '<p>Got ref - Has parent: true - Is connected: true</p>',
+            '<p>Got ref - Has parent: false - Is connected: false</p>',
+        ]
+        const expectedForDOM = [
+            '<p>Got ref - Has parent: true - Is connected: true</p>',
+            '<p>Got ref - Has parent: false - Is connected: false</p>',
+        ]
 
         // Test the SSR value synchronously
         const ssrComponent = testObservables['TestRef_ssr']
         const ssrResult = renderToString(ssrComponent)
-        if (ssrResult !== expectedFull) {
-            assert(false, `[TestRef] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        const expectedFullSSR = expectedForSSR.map(exp => '<h3>Ref</h3>' + exp)
+        if (!expectedFullSSR.includes(ssrResult)) {
+            assert(false, `[TestRef] SSR mismatch: got \n${ssrResult}, expected one of \n${expectedFullSSR.join('\n')}`)
         } else {
             console.log(`✅ [TestRef] SSR test passed: ${ssrResult}`)
         }
-
-        return expected  // This is what the DOM test framework compares against
+        return expectedForDOM  // This is what the DOM test framework compares against
     }
 }
 

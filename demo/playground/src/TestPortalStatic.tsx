@@ -2,11 +2,11 @@ import { $, $$, Portal, renderToString, createDocument, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const TestPortalStatic = (): JSX.Element => {
-    const ret: JSX.Element = () => (
+    const ret: JSX.Element = (props?: { mount?: Element }) => (
         <>
             <h3>Portal - Static</h3>
-            <Portal mount={document.body}>
-                <p>content</p>
+            <Portal mount={props?.mount ?? document.body}>
+                <p>content TestPortalStatic "Portal - Static"</p>
             </Portal>
         </>
     )
@@ -21,7 +21,7 @@ TestPortalStatic.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Portal - Static</h3><!---->'  // For SSR comparison (portal renders as comment)
+        const expectedFull = '<h3>Portal - Static</h3><div id="portal-container-static"></div><p>content TestPortalStatic "Portal - Static"</p>'  // For SSR comparison (portal renders as comment)
         const expected = '<!---->'   // For main DOM test comparison
 
         // SSR test - create isolated document context and shared container
@@ -30,18 +30,12 @@ TestPortalStatic.test = {
         const container = doc.createElement('div')
         container.id = 'portal-container-static'
         doc.body.appendChild(container)
-            ; (globalThis as any).__portal_container = container
-            ; (globalThis as any).__ssr_document__ = doc
 
-        try {
-            const ssrResult = renderToString(ssrComponent, { document: doc })
-            console.log(`✅ [TestPortalStatic] SSR body: ${doc.body.innerHTML}`)
-        } catch (error) {
-            console.error('❌ [TestPortalStatic] SSR error:', error)
-        } finally {
-            // Cleanup
-            ; (globalThis as any).__portal_container = undefined
-                ; (globalThis as any).__ssr_document__ = undefined
+        const SsrComponent = ssrComponent as any
+        const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
+        console.log(`✅ [TestPortalStatic] SSR body: ${doc.body.innerHTML}`)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestPortalStatic] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
         }
 
         return expected  // This is what the DOM test framework compares against

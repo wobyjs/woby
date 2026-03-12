@@ -26,9 +26,9 @@ const BasicElement = defaults(() => ({
 
     return (
         <div style={{
-            border: '2px solid ' + $$(color),
+            border: () => '2px solid ' + $$(color),
             padding: '10px',
-            backgroundColor: $$(active) ? '#e0e0e0' : 'white'
+            backgroundColor: () => $$(active) ? '#e0e0e0' : 'white'
         }}>
             <h2>{title}</h2>
             {!isSlotProjected && <div>{children}</div>}

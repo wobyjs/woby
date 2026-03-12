@@ -34,7 +34,7 @@ TestCleanupInnerPortal.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        const expected = ''
+        const expected = '<div id="portal-container-cleanup-inner"></div>'
 
         // SSR test - create isolated document context and shared container
         const ssrComponent = testObservables['TestCleanupInnerPortal_ssr']
@@ -42,18 +42,11 @@ TestCleanupInnerPortal.test = {
         const container = doc.createElement('div')
         container.id = 'portal-container-cleanup-inner'
         doc.body.appendChild(container)
-            ; (globalThis as any).__portal_container = container
-            ; (globalThis as any).__ssr_document__ = doc
 
-        try {
-            const ssrResult = renderToString(ssrComponent, { document: doc })
-            console.log(`✅ [TestCleanupInnerPortal] SSR body: ${doc.body.innerHTML}`)
-        } catch (error) {
-            console.error('❌ [TestCleanupInnerPortal] SSR error:', error)
-        } finally {
-            // Cleanup
-            ; (globalThis as any).__portal_container = undefined
-                ; (globalThis as any).__ssr_document__ = undefined
+        const ssrResult = renderToString(ssrComponent, { document: doc })
+        console.log(`✅ [TestCleanupInnerPortal] SSR body: ${doc.body.innerHTML}`)
+        if (ssrResult !== expected) {
+            assert(false, `[TestCleanupInnerPortal] SSR mismatch: got \n"${ssrResult}", expected \n"${expected}"`)
         }
 
         return '<!---->'

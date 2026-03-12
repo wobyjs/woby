@@ -27,18 +27,19 @@ const TestRenderToStringNested = (): JSX.Element => {
 TestRenderToStringNested.test = {
     static: true,
     expect: () => {
-        const expected = '<div><p>123123&lt;div&gt;&lt;h3&gt;renderToString&lt;/h3&gt;&lt;p&gt;123&lt;/p&gt;&lt;/div&gt;</p></div>'
+        const expectedForDOM = '<div><p>123123<div><h3>renderToString</h3><p>123</p></div></p></div>'
+        const expectedForSSR = '<div><h3>renderToString - Nested</h3><p>123123<div><h3>renderToString</h3><p>123</p></div></p></div>'
 
         const ssrComponent = testObservables['TestRenderToStringNested_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<div><h3>renderToString - Nested</h3><p>123123<div><h3>renderToString</h3><p>123</p></div></p></div>'
-        if (ssrResult !== expectedFull) {
-            assert(false, `[TestRenderToStringNested] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+
+        if (ssrResult !== expectedForSSR) {
+            assert(false, `[TestRenderToStringNested] SSR mismatch: got \n${ssrResult}, expected \n${expectedForSSR}`)
         } else {
             console.log(`✅ [TestRenderToStringNested] SSR test passed: ${ssrResult}`)
         }
 
-        return expected
+        return expectedForDOM
     }
 }
 

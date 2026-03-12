@@ -4,11 +4,11 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 const TestPortalWhenObservable = (): JSX.Element => {
     // Static when for static test - set to true to show portal content
     const when = true
-    const ret: JSX.Element = () => (
+    const ret: JSX.Element = (props?: { mount?: Element }) => (
         <>
             <h3>Portal - When Observable</h3>
-            <Portal mount={document.body} when={when}>
-                <p>content</p>
+            <Portal mount={props?.mount ?? document.body} when={when}>
+                <p>content for TestPortalWhenObservable "Portal - When Observable"</p>
             </Portal>
         </>
     )
@@ -23,7 +23,7 @@ TestPortalWhenObservable.test = {
     static: true,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const expectedFull = '<h3>Portal - When Observable</h3><!---->'  // For SSR comparison (portal renders as comment)
+        const expectedFull = '<h3>Portal - When Observable</h3><div id="portal-container-when-observable"></div><p>content for TestPortalWhenObservable "Portal - When Observable"</p>'  // For SSR comparison (portal renders as comment)
         const expected = '<!---->'   // For main DOM test comparison
 
         // SSR test - create isolated document context and shared container
@@ -32,18 +32,12 @@ TestPortalWhenObservable.test = {
         const container = doc.createElement('div')
         container.id = 'portal-container-when-observable'
         doc.body.appendChild(container)
-            ; (globalThis as any).__portal_container = container
-            ; (globalThis as any).__ssr_document__ = doc
 
-        try {
-            const ssrResult = renderToString(ssrComponent, { document: doc })
-            console.log(`✅ [TestPortalWhenObservable] SSR body: ${doc.body.innerHTML}`)
-        } catch (error) {
-            console.error('❌ [TestPortalWhenObservable] SSR error:', error)
-        } finally {
-            // Cleanup
-            ; (globalThis as any).__portal_container = undefined
-                ; (globalThis as any).__ssr_document__ = undefined
+        const SsrComponent = ssrComponent as any
+        const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
+        console.log(`✅ [TestPortalWhenObservable] SSR body: ${doc.body.innerHTML}`)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestPortalWhenObservable] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
         }
 
         return expected  // This is what the DOM test framework compares against

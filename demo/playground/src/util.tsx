@@ -166,6 +166,13 @@ function _serializeElementWithSlot(el: Element, slotContext?: ShadowRoot): strin
         const a = el.attributes[i]
         attrs += ` ${a.name}="${a.value}"`
     }
+
+    // Void elements (self-closing) should not have closing tags or children
+    const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']
+    if (voidElements.includes(tag)) {
+        return `<${tag}${attrs}>`
+    }
+
     return `<${tag}${attrs}>${_serializeChildren(el, slotContext)}</${tag}>`
 }
 
@@ -272,7 +279,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                             //temp hide for assertion only
                             console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                         } else {
-                            assert(false, `[${Component.name}]: Expected actual \n'${actualForComparison}' to match one of the expected values \n'${JSON.stringify(expectedValues)}'`)
+                            assert(false, `[${Component.name}]: Expected actual \n'${actualForComparison}' to match one of the expected values \n'${expectedValues.join(' or \n')}'`)
                         }
                     } else {
                         // For dynamic components with compareActualValues, use the expect function result directly
@@ -284,7 +291,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                                 //temp hide for assertion only
                                 console.log(`✅ Expect function test passed for ${Component.name}`, ' expect: ', actualSnapshot)
                             } else {
-                                assert(false, `[${Component.name}]: Expected '${actualSnapshot}' to match one of the expected values '${JSON.stringify(expectedValues)}'`)
+                                assert(false, `[${Component.name}]: Expected '${actualSnapshot}' to match one of the expected values '${expectedValues.join(' or \n')}'`)
                             }
                         } else {
                             // For dynamic components with registered observables, compare actual values directly
@@ -301,7 +308,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                                     assert(false, `[${Component.name}]: Expected actual '${actualSnapshot}' to match one of the expected values '${JSON.stringify(nonEmptyExpected)}'`)
                                 }
                             } else {
-                                assert(false, `[${Component.name}]: Expect function returned empty result: '${JSON.stringify(expectedValues)}'`)
+                                assert(false, `[${Component.name}]: Expect function returned empty result: '${expectedValues.join(' or \n')}'`)
                             }
                         }
                     }

@@ -41,7 +41,7 @@ export function renderToString<T extends RenderToStringOptions = RenderToStringO
             try {
                 const called = (resolvedChild as Function)()
                 resolvedChild = called
-            } catch (e) {
+            } catch (e: any) {
                 break
             }
         }
@@ -60,6 +60,20 @@ export function renderToString<T extends RenderToStringOptions = RenderToStringO
                 return resolved
             }
             resolvedChild = resolvedChild.map(resolveDeep)
+
+            // Flatten nested arrays and filter out null/undefined/boolean false
+            const flattenAndFilter = (arr: any[]): any[] => {
+                const result: any[] = []
+                for (const item of arr) {
+                    if (Array.isArray(item)) {
+                        result.push(...flattenAndFilter(item))
+                    } else if (item !== null && item !== undefined && item !== false) {
+                        result.push(item)
+                    }
+                }
+                return result
+            }
+            resolvedChild = flattenAndFilter(Array.isArray(resolvedChild) ? resolvedChild : [resolvedChild])
         }
 
         // Use document's createElement for container creation
@@ -70,20 +84,24 @@ export function renderToString<T extends RenderToStringOptions = RenderToStringO
         const fragment = FragmentUtils.make()
 
         // Set the child content
+
         setChild(container, resolvedChild, fragment, stack)
 
-        // Get the rendered content from the container's children
+        // Get the rendered content from the container's children AND document body (for portals)
         const children = Array.from(container.childNodes || [])
         const childrenContent = children.map((child: any) => {
             return getNodeContent(child)
         }).join('')
 
+        // Include document body content for portals
+        const bodyContent = ssrDoc.body?.innerHTML || ''
+
         // Return both html and document if requested
         if (options?.returnDocument) {
-            return { html: childrenContent, document: ssrDoc }
+            return { html: childrenContent + bodyContent, document: ssrDoc }
         }
 
-        return childrenContent
+        return childrenContent + bodyContent
     }) as any
 }
 

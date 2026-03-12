@@ -25,6 +25,9 @@ TestCheckboxIndeterminateToggle.test = {
         const ssrExpected = '<input type="checkbox" /><input type="checkbox" checked="" />'
         const domExpected = '<input type="checkbox"><input type="checkbox">'
 
+        //<input type="checkbox"></input><input type="checkbox"></input>' to match one of the expected values 
+        //<input type=\"checkbox\"><input type=\"checkbox\">
+
         const ssrComponent = testObservables['TestCheckboxIndeterminateToggle_ssr']
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3>${ssrExpected}`

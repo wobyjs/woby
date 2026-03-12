@@ -7,7 +7,7 @@ const TestRefUnmounting = (): JSX.Element => {
         <>
             <h3>Ref - Unmounting</h3>
             <p>{message}</p>
-            <p>content</p> {/* Static content, not conditional */}
+            <p>content</p>
         </>
     )
 
@@ -21,11 +21,11 @@ TestRefUnmounting.test = {
     static: true,
     wrap: false,
     expect: () => {
-        const expected = '<p>No ref</p><p>content</p> '
+        const expected = '<p>No ref</p><p>content</p>'
 
         const ssrComponent = testObservables['TestRefUnmounting_ssr']
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Ref - Unmounting</h3><p>No ref</p><p>content</p> '
+        const expectedFull = '<h3>Ref - Unmounting</h3><p>No ref</p><p>content</p>'
         if (ssrResult !== expectedFull) {
             assert(false, `[TestRefUnmounting] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {

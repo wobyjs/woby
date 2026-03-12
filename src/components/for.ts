@@ -8,7 +8,6 @@ export function For<T>({ values, fallback, unkeyed, children }: { values: Functi
 export function For<T>({ values, fallback, unkeyed, children }: { values: FunctionMaybe<readonly T[]>, fallback?: Child, unkeyed: true, children: ((value: Indexed<T>, index: FunctionMaybe<number>) => Child) }): ObservableReadonly<Child>
 export function For<T>({ values, fallback, unkeyed, children }: { values: FunctionMaybe<readonly T[]>, fallback?: Child, unkeyed?: boolean, children: ((value: T | Indexed<T>, index: FunctionMaybe<number>) => Child) }): ObservableReadonly<Child> {
 
-    console.log('[FOR] For (WOBY)')
     return _for(values, children, fallback, { unkeyed } as any) //TSC
 
 }

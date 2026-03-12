@@ -249,7 +249,8 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
             const node = child as Node
 
             if (!fragmentOnly) {
-                parent.insertBefore(node, null)
+                try { parent.insertBefore(node, null) }
+                catch (e) { throw e }
             }
 
             FragmentUtils.replaceWithNode(fragment, node)
@@ -380,10 +381,22 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
     }
 
     let next = FragmentUtils.getChildren(fragmentNext)
-    let nextLength = fragmentNext.length
+    let nextLength = next instanceof Array ? next.length : 1
+
+    // Special case: first-time render with content - directly append to parent
+    if (prevLength === 0 && nextLength > 0 && !fragmentOnly) {
+        if (next instanceof Array) {
+            for (const node of next) {
+                parent.appendChild(node as any)
+            }
+        } else {
+            parent.appendChild(next as any)
+        }
+        FragmentUtils.replaceWithFragment(fragment, fragmentNext)
+        return
+    }
 
     if (nextLength === 0 && prevLength === 1 && prevFirst.nodeType === 8) { // It's a placeholder already, no need to replace it
-
         return
 
     }
