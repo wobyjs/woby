@@ -188,8 +188,8 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         const isText = component === 'text'
 
         const createNode = isSVG ? (isSSR ? createSVGNodeSSR : createSVGNodeDOM) : (isSSR ? createHTMLNodeSSR : createHTMLNodeDOM)
-        const createComment = isSSR ? createCommentDOM : createCommentSSR
-        const createText = isSSR ? createTextDOM : createTextSSR
+        const createComment = isSSR ? createCommentSSR : createCommentDOM
+        const createText = isSSR ? createTextSSR : createTextDOM
         const create = isComment ? () => createComment((props as any).data ?? '') : isText ? () => createText((props as any).data ?? '') : createNode
 
         return wrapElement((): Child => {
