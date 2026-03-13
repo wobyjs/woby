@@ -1,32 +1,17 @@
 import { $, $$, createContext, useContext, renderToString, jsx, customElement, useMountedContext, useEffect, useMemo, defaults, context, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
 
-const readerContext = createContext<string>($())
+const readerContext = createContext<string>()
+const otherContext = createContext<string>()
 customElement('reader-context', readerContext.Provider)
+customElement('other-context', otherContext.Provider)
 
 const TestContextHookHtml = (): JSX.Element => {
-    // const Context = createContext('')
-
-    // Register Reader as a custom element
     const Reader = defaults(() => ({}), () => {
-        // const { mounted, context: ctx0 } = useMountedContext(readerContext)
-        const ref = $()
-        const ctx = useMemo(() => {
-            $$(ref)
-            const ctx = useContext(readerContext)
+        const ctx = useContext(readerContext)
+        const oth = useContext(otherContext)
 
-            console.log('[Reader] useEffect', $$(ctx), /* $$(ctx0)) */ context(readerContext.symbol))
-            return ctx
-        }
-        )
-        // console.log('[Reader] ctx:', $$(ctx))
-        // console.log('[Reader] context value:', $$(ctx0))
-
-        useEffect(() => {
-            console.log('[Reader] ref', $$(ref))
-        })
-
-        return <p ref={ref}>{ctx}{/* {mounted} */}</p>
+        return <p>{ctx} other: {oth}</p>
     })
 
 
@@ -36,14 +21,17 @@ const TestContextHookHtml = (): JSX.Element => {
         <div dangerouslySetInnerHTML={{
             __html: `
             <h3>Context - Hook in HTML</h3>
-            <reader-context value="outer">
-                <p>header</p>
-                <reader-context value="inner">
-                    <test-reader />/
+            <other-context value="456">
+                <reader-context value="outer">
+                    <p>header</p>
+                    <test-reader></test-reader>
+                    <reader-context value="inner">
+                        <test-reader></test-reader>
+                    </reader-context>
+                    <test-reader></test-reader>
+                    <p>Footer</p>
                 </reader-context>
-                <Reader />
-                <p>Footer</p>
-            </reader-context>
+            </outer-context>
             `}}>
 
         </div>
@@ -60,16 +48,16 @@ TestContextHookHtml.test = {
     expect: () => {
         // Define expected values for both main test and SSR test
         // Note: SSR doesn't render symbol attributes
-        const expectedFull = '<h3>Context - Hook</h3><context-provider value="outer"><p>outer</p><context-provider value="inner"><p>inner</p></context-provider><p>outer</p></context-provider><h3>context.provider(value, () => ) Test</h3><context-provider value="function-value"><p>Function provider: function-value</p></context-provider>'  // For SSR comparison
-        const expected = '<context// -provider value="outer"><p>outer</p><conTestContextHook_ssr="inner"><// p>inner</p></context-provider><p>outer</p></context-prov// ider><h3>context.provider(value, () => ) Te// st</h3><context-provider value="function-value"><p>Function provider: function-value</p></context-provider>'   ////  For main test com// parison
+        const expectedFull = '<div><h3>Context - Hook in HTML</h3><other-context value="123"><reader-context value="outer"><p>header</p><test-reader></test-reader><reader-context value="inner"><test-reader></test-reader></reader-context><test-reader></test-reader><p>Footer</p></reader-context></outer-context></div>'
+        const expected = '<div><other-context value="123"><template shadowrootmode="open" shadowrootserializable=""><slot><reader-context value="outer"><template shadowrootmode="open" shadowrootserializable=""><slot><p>header</p><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><reader-context value="inner"><template shadowrootmode="open" shadowrootserializable=""><slot><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>inner other: 123</p></template></test-reader></slot></template></reader-context><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><p>Footer</p></slot></template></reader-context></slot></template></other-context></div>'
 
-        // const ssrComponent = testObservables['TestContextHook_ssr']
-        // const ssrResult = renderToString(ssrComponent)
-        // if (ssrResult !== expectedFull) {
-        //     assert(false, `[TestContextHookHtml] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
-        // } else {
-        //     console.log(`✅ [TestContextHookHtml] SSR test passed: ${ssrResult}`)
-        // }
+        const ssrComponent = testObservables['TestContextHook_ssr']
+        const ssrResult = minimiseHtml(renderToString(ssrComponent))
+        if (ssrResult !== expectedFull) {
+            assert(false, `[TestContextHookHtml] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [TestContextHookHtml] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

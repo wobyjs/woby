@@ -24,7 +24,7 @@
 
 import { $, $$, isObservable, untrack } from "./soby"
 import { CONTEXTS_DATA, isSSR, SYMBOL_DEFAULT, SYMBOL_UNTRACKED } from '../constants'
-import {  setChild, setProp, } from "../utils/setters"
+import { setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
 import { callStack, isObservableWritable, Observable, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNTRACKED_UNWRAPPED } from "soby"
@@ -109,7 +109,6 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
     ces.define(tagName, ComponentCustomElement as any)
 }
 
-// let stackCount = 0
 /**
  * Traverses DOM ancestors (crossing shadow boundaries via assignedSlot/host)
  * and collects SYMBOL_CONTEXT_WRAP functions stored by provider custom elements,
@@ -192,14 +191,15 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     // elements can re-establish the soby context chain when they are
                     // constructed outside the reactive context scope.
                     const selfWrap = (fn: () => void) => context({ [ps.symbol]: ps.value }, fn)
-                    ;(this as any)[SYMBOL_CONTEXT_WRAP] = selfWrap
+                        ; (this as any)[SYMBOL_CONTEXT_WRAP] = selfWrap
 
                     context({ [ps.symbol]: ps.value }, () => {
                         console.log('[createBrowserCustomElement] SYMBOL_CONTEXT  __temp__', context(__temp__))
                         useEffect(() => {
-                        console.log('[createBrowserCustomElement] SYMBOL_CONTEXT useEffect __temp__', context(__temp__))
-                            
-                            console.log('[createBrowserCustomElement]', $$(context(ps.symbol)), $$(ps.value))})
+                            console.log('[createBrowserCustomElement] SYMBOL_CONTEXT useEffect __temp__', context(__temp__))
+
+                            console.log('[createBrowserCustomElement]', $$(context(ps.symbol)), $$(ps.value))
+                        })
                         const componentResult = createElement(component, this.props)
                         setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
                     })

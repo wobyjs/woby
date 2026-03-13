@@ -17,8 +17,7 @@ export function createContext<T>(defaultValue: T): ContextWithDefault<T>
 export function createContext<T>(defaultValue?: T): Context<T>
 export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> {
 
-  const symbol = Symbol(Math.random() + '')
-  // const value = $<T>(undefined)
+  const symbol = Symbol()
 
   const Provider = defaults(
     () => ({
@@ -30,33 +29,7 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
     } as { value: ObservableMaybe<T>, children: Child }),
     ({ value, children, ref, ...props }): Child => {
 
-      // const symbol = props[SYMBOL_CONTEXT]
-
-      return context({ [symbol]: value }, () => {
-        defaultValue
-        console.log('[createContext] __temp__', context(__temp__))
-
-        console.log('[createContext] context: ', symbol, $$(value), $$(context(symbol)))
-        useEffect(() => console.log('[createContext] context useEffect: ', symbol, $$(value), $$(context(symbol))))
-
-        const ret = resolve(children)
-
-        useEffect(() => {
-          console.log('[createContext] useEffect __temp__', context(__temp__))
-          console.log('[createContext] ref', $$(ref), $$(ref).shadowRoot, $$(ref).shadowRoot.querySelectorAll('slot')[0])
-        })
-
-        const ob = resolve(ret)
-        if (isObservable(ob)) {
-          const slots = $$(ob) as HTMLSlotElement
-          slots.addEventListener('slotchange', (evt) => {
-            console.log('[slotchange]', evt.target)
-          })
-          return slots
-        }
-
-        return ret
-      })
+      return context({ [symbol]: value }, () => resolve(children))
 
     }
   )
