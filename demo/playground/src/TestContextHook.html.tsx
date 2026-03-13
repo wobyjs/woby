@@ -1,5 +1,5 @@
 import { $, $$, createContext, useContext, renderToString, jsx, customElement, useMountedContext, useEffect, useMemo, defaults, context, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
+import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
 
 const readerContext = createContext<string>()
 const otherContext = createContext<string>()
@@ -17,11 +17,19 @@ const TestContextHookHtml = (): JSX.Element => {
 
     customElement('test-reader', Reader)
 
+    // Programmatically change other-context value from "123" to "123" after mount
+    useTimeout(() => {
+        const otherContextEl = document.querySelector('other-context')
+        if (otherContextEl) {
+            otherContextEl.setAttribute('value', '456')
+        }
+    }, TEST_INTERVAL)
+
     const ret: JSX.Element = () => (
         <div dangerouslySetInnerHTML={{
             __html: `
             <h3>Context - Hook in HTML</h3>
-            <other-context value="456">
+                <other-context value="123">
                 <reader-context value="outer">
                     <p>header</p>
                     <test-reader></test-reader>
@@ -44,12 +52,15 @@ const TestContextHookHtml = (): JSX.Element => {
 }
 
 TestContextHookHtml.test = {
-    static: true,
+    static: false,
     expect: () => {
-        // Define expected values for both main test and SSR test
-        // Note: SSR doesn't render symbol attributes
+        // SSR renders the initial HTML string (before any client-side mutations)
         const expectedFull = '<div><h3>Context - Hook in HTML</h3><other-context value="123"><reader-context value="outer"><p>header</p><test-reader></test-reader><reader-context value="inner"><test-reader></test-reader></reader-context><test-reader></test-reader><p>Footer</p></reader-context></outer-context></div>'
-        const expected = '<div><other-context value="123"><template shadowrootmode="open" shadowrootserializable=""><slot><reader-context value="outer"><template shadowrootmode="open" shadowrootserializable=""><slot><p>header</p><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><reader-context value="inner"><template shadowrootmode="open" shadowrootserializable=""><slot><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>inner other: 123</p></template></test-reader></slot></template></reader-context><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><p>Footer</p></slot></template></reader-context></slot></template></other-context></div>'
+        // After useInterval changes value from "123" to "123", all test-readers show "123"
+        const expected = [
+            '<div><other-context value="123"><template shadowrootmode="open" shadowrootserializable=""><slot><reader-context value="outer"><template shadowrootmode="open" shadowrootserializable=""><slot><p>header</p><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><reader-context value="inner"><template shadowrootmode="open" shadowrootserializable=""><slot><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>inner other: 123</p></template></test-reader></slot></template></reader-context><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><p>Footer</p></slot></template></reader-context></slot></template></other-context></div>',
+            '<div><other-context value="456"><template shadowrootmode="open" shadowrootserializable=""><slot><reader-context value="outer"><template shadowrootmode="open" shadowrootserializable=""><slot><p>header</p><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><reader-context value="inner"><template shadowrootmode="open" shadowrootserializable=""><slot><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>inner other: 123</p></template></test-reader></slot></template></reader-context><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><p>Footer</p></slot></template></reader-context></slot></template></other-context></div>'
+        ]
 
         const ssrComponent = testObservables['TestContextHook_ssr']
         const ssrResult = minimiseHtml(renderToString(ssrComponent))
