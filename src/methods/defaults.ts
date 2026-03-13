@@ -151,10 +151,12 @@ export const defaults = <P extends Record<string, any>>(
             d.children = $(d.children)
         if (!d.children)
             d.children = $()
+
         return d
     }
     // const compFactory = Object.assign((props: Observant<P>) => component(merge(props, defFactory()) as unknown as P),
-    const compFactory = Object.assign((props: P & { children?: CustomElementChildren } & StyleEncapsulationProps) => component(isJsxProp(props) ? merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any : props),
+    const compFactory = Object.assign((props: P & { children?: CustomElementChildren } & StyleEncapsulationProps) =>
+        component(isJsxProp(props) ? merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any : props),
         {
             [SYMBOL_DEFAULT]: defFactory
         })

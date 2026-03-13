@@ -20,6 +20,7 @@ import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMa
 import { Stack } from '../soby'
 import { isJsx } from '../jsx-runtime'
 import { useEnvironment, showEnvLog } from '../components/environment_context'
+import {__temp__,}from '../constants'
 
 export const setAttributeStatic = (() => {
 
@@ -488,7 +489,14 @@ export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fra
 
     if (showEnvLog)
         console.log('ENV setChild: ', useEnvironment())
+
+    console.log('[setChild] __temp__', context(__temp__))
+
+    console.log('[setChild] parent:', parent + '', parent instanceof ShadowRoot, [(parent as any).host])
+
     resolveChild(cd, (child, dynamic, stack) => {
+        console.log('[setChild] resolveChild __temp__', context(__temp__))
+
         return setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack)
     }, false, stack)
 }
@@ -855,9 +863,9 @@ export const setEvent = (element: HTMLElement, event: string, value: ObservableM
     }
 }
 
-export const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | string): void => {
 
-    element.innerHTML = String(isNil(value) ? '' : value)
+export const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | string): void => {
+    context({ [__temp__]: 123 }, () => element.innerHTML = String(isNil(value) ? '' : value))
 
 }
 

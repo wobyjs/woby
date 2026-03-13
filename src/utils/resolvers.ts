@@ -1,4 +1,4 @@
-import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE, /* SYMBOL_DOM */ } from '../constants'
+import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE, __temp__ /* SYMBOL_DOM */ } from '../constants'
 import { isObservable, untrack } from '../methods/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { $$ } from '../methods/soby'
@@ -8,6 +8,7 @@ import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { Observable, Stack } from '../soby'
 import { useEnvironment, EnvironmentContext, showEnvLog } from '../components/environment_context'
+import {context} from '../soby'
 
 // const replaceSelf = <T extends { [SYMBOL_DOM]: HTMLElement | HTMLElement[] } & Observable<HTMLElement>>(value: T, newNode: HTMLElement | HTMLElement[]) => {
 //   const node = value[SYMBOL_DOM]
@@ -47,6 +48,8 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
         (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
       const newValue = value()
+      
+      console.log('[resolveChild] isFunction(value) __temp__', context(__temp__))
       resolveChild(newValue, setter, _dynamic, stack)
 
     } else {
@@ -56,8 +59,10 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
         if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
           (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
+        console.log('[resolveChild] useRenderEffect before value __temp__', context(__temp__))
         const newValue = $$(value)
         // if (!replaceSelf(value as any, newValue as any))
+        console.log('[resolveChild] useRenderEffect __temp__', context(__temp__))
         resolveChild(newValue, setter, true, stack)
 
       }, stack)
@@ -65,6 +70,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
     }
 
   } else {
+        console.log('[resolveChild] setter __temp__', context(__temp__))
 
     setter(value, _dynamic, stack)
 

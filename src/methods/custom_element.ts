@@ -23,8 +23,8 @@
  */
 
 import { $, $$, isObservable, untrack } from "./soby"
-import { isSSR, SYMBOL_DEFAULT, SYMBOL_UNTRACKED } from '../constants'
-import { setChild, setProp, } from "../utils/setters"
+import { CONTEXTS_DATA, isSSR, SYMBOL_DEFAULT, SYMBOL_UNTRACKED } from '../constants'
+import {  setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
 import { callStack, isObservableWritable, Observable, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNTRACKED_UNWRAPPED } from "soby"
@@ -44,6 +44,9 @@ import { document as doc } from '../ssr/document'
 import { useEnvironment } from "../components"
 import { Element } from '../ssr/element'
 import { renderToString } from './render_to_string'
+import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP, __temp__, } from '../constants'
+import { context } from ".."
+
 
 if (isSSR) {
     globalThis.customElements = ces as any
@@ -108,6 +111,26 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
 
 // let stackCount = 0
 /**
+ * Traverses DOM ancestors (crossing shadow boundaries via assignedSlot/host)
+ * and collects SYMBOL_CONTEXT_WRAP functions stored by provider custom elements,
+ * returning a composed wrap function that re-establishes the full soby context chain.
+ */
+const collectAncestorContextWrap = (el: HTMLElement): ((fn: () => void) => void) | undefined => {
+    const wraps: ((fn: () => void) => void)[] = []
+    let cur: any = el.parentNode
+    while (cur) {
+        const w = cur[SYMBOL_CONTEXT_WRAP]
+        if (w) wraps.unshift(w)
+        cur = cur.assignedSlot ?? cur.parentNode ?? cur.host ?? null
+    }
+    if (!wraps.length) return undefined
+    return (fn: () => void) => {
+        const run = wraps.reduceRight((inner: () => void, wrap) => () => wrap(inner), fn)
+        run()
+    }
+}
+
+/**
  * Creates a browser custom element with reactive properties
  */
 export const createBrowserCustomElement = <P extends { children?: Observable<JSX.Child> }>(
@@ -130,6 +153,9 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
 
         constructor(props?: P) {
             super()
+            console.log('C.__component__', tagName, 'props: ', props, ' this.props: ', this.props)
+            console.log('[createBrowserCustomElement] __temp__', context(__temp__))
+
             this.props = !!props ? props : defaultPropsFn() || {} as P
             C.observedAttributes = Object.keys(this.props)
 
@@ -137,6 +163,18 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 const shadowRoot = this.attachShadow({ mode: 'open', serializable: true })
                 if (!($$(this.props.children) instanceof HTMLSlotElement)) {
                     this.slots = document.createElement('slot')
+                    // this.slots.id = 'i create'
+                    console.log('[CONTEXTS_DATA]', CONTEXTS_DATA.get(this.props[SYMBOL_CONTEXT]))
+                    // useEffect(() => console.log('[createBrowserCustomElement]: CONTEXTS_DATA', $$(context(CONTEXTS_DATA.get(this.props[SYMBOL_CONTEXT])?.symbol))))
+
+                    const { Provider, value } = this.props[SYMBOL_CONTEXT] ?? {}
+                    useEffect(() => console.log('this.props[SYMBOL_CONTEXT]', $$(value)))
+                    this.slots[SYMBOL_CONTEXT] = (this.props as any).value
+                    // this.slots.addEventListener('slotchange', (evt) => {
+                    //     console.log('[slotchange]', evt)
+                    // })
+
+                    this.props.children[SYMBOL_ISSLOT] = true
                     this.props.children(this.slots)
                 }
 
@@ -147,8 +185,39 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 }
 
                 // Execute the component once and set the result directly, avoiding reactive re-execution
-                const componentResult = createElement(component, this.props)
-                setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
+
+                const ps = this.props as any as { symbol: symbol, value: any }
+                if (SYMBOL_CONTEXT in this.props) {
+                    // Store a context-replay function on this element so descendant custom
+                    // elements can re-establish the soby context chain when they are
+                    // constructed outside the reactive context scope.
+                    const selfWrap = (fn: () => void) => context({ [ps.symbol]: ps.value }, fn)
+                    ;(this as any)[SYMBOL_CONTEXT_WRAP] = selfWrap
+
+                    context({ [ps.symbol]: ps.value }, () => {
+                        console.log('[createBrowserCustomElement] SYMBOL_CONTEXT  __temp__', context(__temp__))
+                        useEffect(() => {
+                        console.log('[createBrowserCustomElement] SYMBOL_CONTEXT useEffect __temp__', context(__temp__))
+                            
+                            console.log('[createBrowserCustomElement]', $$(context(ps.symbol)), $$(ps.value))})
+                        const componentResult = createElement(component, this.props)
+                        setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                    })
+                }
+                else {
+                    // Collect context-replay functions from ancestor custom elements and
+                    // re-establish the full soby context chain before rendering.
+                    const ancestorWrap = collectAncestorContextWrap(this)
+                    if (ancestorWrap) {
+                        ancestorWrap(() => {
+                            const componentResult = createElement(component, this.props)
+                            setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                        })
+                    } else {
+                        const componentResult = createElement(component, this.props)
+                        setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                    }
+                }
             } else {
                 setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
             }
@@ -168,6 +237,10 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             const { props: p } = this
             const aKeys = Object.keys(p).filter(k => k !== 'children' && isObservable(p[k]))
             const rKeys = Object.keys(p).filter(k => isPureFunction(p[k]) || isObject(p[k]))
+
+            console.log('[createBrowserCustomElement] connectedCallback __temp__', context(__temp__))
+
+            console.log('C.connectedCallback', tagName, 'props: ', p)
 
             rKeys.forEach(k => this.removeAttribute(k))
 

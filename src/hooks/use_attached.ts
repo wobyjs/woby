@@ -37,9 +37,13 @@ export const useAttached = (ref?: ObservableMaybe<Node | null>, match?: (parent:
     const parent = $<Node | null>(null)
 
     const fn = () => {
+        console.log('[updateParent] fn no ref')
         if (!$$(ref)) return
 
+        console.log('[updateParent] fn with ref')
+
         const updateParent = () => {
+            console.log('[updateParent]')
             let currentParent: Node | null = $$(ref)?.parentNode || null
 
             // If match function is provided, traverse up until match or root
@@ -47,16 +51,21 @@ export const useAttached = (ref?: ObservableMaybe<Node | null>, match?: (parent:
                 while (currentParent) {
                     if (match(currentParent)) {
                         parent(currentParent)
+                        console.log('[updateParent] parent found',)
+
                         return !!currentParent
                     }
                     // traversed through assignedSlot 1st, 
                     currentParent = (currentParent as HTMLElement).assignedSlot ?? currentParent.parentNode ?? (currentParent as ShadowRoot).host
+                    console.log('[updateParent] get next parent',)
                 }
                 // If no match found, parent remains null
+                console.log('[updateParent] parent not found',)
                 parent(null)
                 return false
             } else {
                 // Default behavior: return immediate parent
+                console.log('[updateParent] set current parent',)
                 parent(currentParent)
                 return !!currentParent
             }

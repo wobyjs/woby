@@ -18,6 +18,9 @@ export const SYMBOLS_DIRECTIVES: Record<string, symbol> = {}
 
 export const SYMBOL_CLONE = Symbol('CloneElement')
 
+export const SYMBOL_CONTEXT = Symbol('IS_CONTEXT')
+export const SYMBOL_ISSLOT = Symbol('IS_SLOT')
+
 // export const SYMBOL_DOM = Symbol('DOM')
 
 /** This symbol is indicated that the element is created through jsx/jsxDEV
@@ -27,3 +30,10 @@ export const SYMBOL_JSX = Symbol('Jsx')
 
 /** This symbol is used to store default props for components */
 export const SYMBOL_DEFAULT = Symbol('Default')
+
+
+export const __temp__ = Symbol('__temp__')
+
+/** Symbol to store a context-replay wrapper function on provider custom elements,
+ *  so consumer custom elements can re-establish the soby context chain */
+export const SYMBOL_CONTEXT_WRAP = Symbol('CONTEXT_WRAP')

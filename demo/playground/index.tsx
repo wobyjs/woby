@@ -103,6 +103,7 @@ import TestComponentStaticRenderState from './src/TestComponentStaticRenderState
 import TestContextComponents from './src/TestContextComponents'
 import TestContextDynamicContext from './src/TestContextDynamicContext'
 import TestContextHook from './src/TestContextHook'
+import TestContextHookHtml from './src/TestContextHook.html'
 import TestDirective from './src/TestDirective'
 import TestDirectiveRef from './src/TestDirectiveRef'
 import TestDirectiveRegisterLocal from './src/TestDirectiveRegisterLocal'
@@ -329,6 +330,7 @@ import TestUndefinedStatic from './src/TestUndefinedStatic'
 import TestCustomElementBasic from './src/TestCustomElementBasic'
 import TestCustomElementSlots from './src/TestCustomElementSlots'
 import TestCustomElementContext from './src/TestCustomElementContext'
+import TestCustomElementContextHtml from './src/TestCustomElementContext.html'
 import TestCustomElementNested from './src/TestCustomElementNested'
 import TestCustomElementComprehensive from './src/TestCustomElementComprehensive'
 
@@ -548,8 +550,9 @@ const tests = [
     // TestPropertyValueRemoval,
     // TestPropertyValueStatic,
 
-    TestContextComponents,
-    TestContextHook,
+    // TestContextComponents,
+    // TestContextHook,
+    TestContextHookHtml,
     // TestContextDynamicContext,
     // TestRefContext,
 
@@ -661,7 +664,8 @@ const tests = [
 
     // TestCustomElementBasic,
     // TestCustomElementSlots,
-    TestCustomElementContext,
+    // TestCustomElementContext,
+    // TestCustomElementContextHtml,
     // TestCustomElementNested,
     // TestCustomElementComprehensive,
 
