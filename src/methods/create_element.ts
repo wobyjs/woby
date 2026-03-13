@@ -22,8 +22,8 @@ import { Stack } from 'soby'
 import { customElements as ces } from '../ssr/custom_elements'
 // import { isSSR } from '../constants'
 import { useEnvironment, showEnvLog } from '../components/environment_context'
-import {__temp__} from '../constants'
-import {context} from '../soby'
+import { __temp__ } from '../constants'
+import { context } from '../soby'
 
 // if (isSSR) globalThis.customElements = ces as any
 
@@ -196,10 +196,6 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
         return wrapElement((): Child => {
             const isSSR = useEnvironment() === 'ssr'
-            if (showEnvLog)
-                console.log('ENV createElement wrapElement: ', useEnvironment())
-
-        console.log('[createElement] wrapElement __temp__', context(__temp__))
 
             // Check if this is a custom element
             const ce = isSSR ? ces.get(component) : customElements.get(component)

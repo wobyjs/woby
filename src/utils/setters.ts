@@ -487,16 +487,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
     const cd = child
 
-    if (showEnvLog)
-        console.log('ENV setChild: ', useEnvironment())
-
-    console.log('[setChild] __temp__', context(__temp__))
-
-    console.log('[setChild] parent:', parent + '', parent instanceof ShadowRoot, [(parent as any).host])
-
     resolveChild(cd, (child, dynamic, stack) => {
-        console.log('[setChild] resolveChild __temp__', context(__temp__))
-
         return setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack)
     }, false, stack)
 }

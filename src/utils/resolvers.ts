@@ -49,7 +49,6 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
 
       const newValue = value()
       
-      console.log('[resolveChild] isFunction(value) __temp__', context(__temp__))
       resolveChild(newValue, setter, _dynamic, stack)
 
     } else {
@@ -59,10 +58,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
         if (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE])
           (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
-        console.log('[resolveChild] useRenderEffect before value __temp__', context(__temp__))
         const newValue = $$(value)
-        // if (!replaceSelf(value as any, newValue as any))
-        console.log('[resolveChild] useRenderEffect __temp__', context(__temp__))
         resolveChild(newValue, setter, true, stack)
 
       }, stack)
@@ -70,7 +66,6 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
     }
 
   } else {
-        console.log('[resolveChild] setter __temp__', context(__temp__))
 
     setter(value, _dynamic, stack)
 
@@ -164,9 +159,6 @@ export const resolveArraysAndStatics = (() => {
 
   const resolveArraysAndStaticsInner = (values: any[], resolved: any[], hasObservables: boolean): [any[], boolean] => {
     const isSSR = useEnvironment() === 'ssr'
-    if (showEnvLog)
-      console.log('ENV resolveArraysAndStaticsInner', useEnvironment())
-
 
     const createText = isSSR ? createTextSSR : createTextDOM
 

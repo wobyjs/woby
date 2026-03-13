@@ -334,7 +334,6 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
         tick()
         const timeoutId = setTimeout(yesUpdate, 1500)
         const onMutation = Component.test.static ? noUpdate : () => {
-            console.log(`[util.tsx] Mutation detected for ${Component.name}`)
             // Call tick immediately to see if this works
             tick()
         }
