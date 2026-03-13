@@ -44,8 +44,8 @@ import { document as doc } from '../ssr/document'
 import { useEnvironment } from "../components"
 import { Element } from '../ssr/element'
 import { renderToString } from './render_to_string'
-import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP, __temp__, } from '../constants'
-import { context } from ".."
+import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP } from '../constants'
+import { context } from '../soby'
 
 
 if (isSSR) {

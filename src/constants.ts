@@ -30,7 +30,6 @@ export const SYMBOL_JSX = Symbol('Jsx')
 export const SYMBOL_DEFAULT = Symbol('Default')
 
 
-export const __temp__ = Symbol('__temp__')
 
 /** Symbol to store a context-replay wrapper function on provider custom elements,
  *  so consumer custom elements can re-establish the soby context chain */

@@ -8,7 +8,7 @@ import type { Child, Context, ObservableMaybe, ContextWithDefault } from '../typ
 import { defaults } from './defaults'
 import { HtmlChild } from '../html/html-child'
 import { useEffect } from '../hooks'
-import { SYMBOL_CONTEXT, __temp__, } from '../constants'
+import { SYMBOL_CONTEXT } from '../constants'
 
 /* MAIN */
 

@@ -1,4 +1,4 @@
-import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE, __temp__ /* SYMBOL_DOM */ } from '../constants'
+import { SYMBOL_OBSERVABLE_READABLE, SYMBOL_UNCACHED, SYMBOL_OBSERVABLE_WRITABLE } from '../constants'
 import { isObservable, untrack } from '../methods/soby'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { $$ } from '../methods/soby'
@@ -8,7 +8,7 @@ import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { Observable, Stack } from '../soby'
 import { useEnvironment, EnvironmentContext, showEnvLog } from '../components/environment_context'
-import {context} from '../soby'
+import { context } from '../soby'
 
 // const replaceSelf = <T extends { [SYMBOL_DOM]: HTMLElement | HTMLElement[] } & Observable<HTMLElement>>(value: T, newNode: HTMLElement | HTMLElement[]) => {
 //   const node = value[SYMBOL_DOM]
@@ -48,7 +48,7 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
         (value[SYMBOL_OBSERVABLE_READABLE] ?? value[SYMBOL_OBSERVABLE_WRITABLE]).stack = stack
 
       const newValue = value()
-      
+
       resolveChild(newValue, setter, _dynamic, stack)
 
     } else {

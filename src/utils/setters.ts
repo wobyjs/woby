@@ -20,7 +20,6 @@ import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMa
 import { Stack } from '../soby'
 import { isJsx } from '../jsx-runtime'
 import { useEnvironment, showEnvLog } from '../components/environment_context'
-import {__temp__,}from '../constants'
 
 export const setAttributeStatic = (() => {
 
@@ -856,8 +855,7 @@ export const setEvent = (element: HTMLElement, event: string, value: ObservableM
 
 
 export const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | string): void => {
-    context({ [__temp__]: 123 }, () => element.innerHTML = String(isNil(value) ? '' : value))
-
+    element.innerHTML = String(isNil(value) ? '' : value)
 }
 
 export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
