@@ -3,12 +3,13 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const name = 'TestForFallbackFunction'
 const TestForFallbackFunction = (): JSX.Element => {
+    const o = $('0.5') // Use fixed value instead of random
+    registerTestObservable('TestForFallbackFunction', o)
+    // const randomize = () => o(String(random()))
+    // useInterval(randomize, TEST_INTERVAL)
+    o()
+
     const Fallback = () => {
-        const o = $('0.5') // Use fixed value instead of random
-        registerTestObservable('TestForFallbackFunction', o)
-        // const randomize = () => o(String(random()))
-        // useInterval(randomize, TEST_INTERVAL)
-        o()
         return (
             <>
                 <p>Fallback: {o()}</p>

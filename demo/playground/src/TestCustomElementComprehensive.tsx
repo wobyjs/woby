@@ -10,16 +10,16 @@
  * - Type conversion and serialization
  * - Style and attribute handling
  */
-import { $, $$, customElement, defaults, createContext, useMountedContext, HtmlString, HtmlNumber, HtmlBoolean, HtmlDate, type JSX } from 'woby'
+import { $, $$, customElement, defaults, createContext, useContext, HtmlString, HtmlNumber, HtmlBoolean, HtmlDate, type JSX } from 'woby'
 
 // Contexts for testing
 const AppContext = createContext('default-app')
 const UserContext = createContext({ name: 'Anonymous', id: 0 })
 const ThemeContext = createContext('light')
 
-const useApp = () => useMountedContext(AppContext)
-const useUser = () => useMountedContext(UserContext)
-const useTheme = () => useMountedContext(ThemeContext)
+const useApp = () => useContext(AppContext)
+const useUser = () => useContext(UserContext)
+const useTheme = () => useContext(ThemeContext)
 
 // Comprehensive custom element
 const ComprehensiveElement = defaults(() => ({

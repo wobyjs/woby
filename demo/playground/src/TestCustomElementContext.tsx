@@ -7,7 +7,7 @@
  * - Context value passing between TSX and custom elements
  * - Nested context providers
  */
-import { $, $$, customElement, defaults, createContext, useContext, useMountedContext, HtmlString, HtmlNumber, type JSX, useEffect, renderToString, type ElementAttributes } from 'woby'
+import { $, $$, customElement, defaults, createContext, useContext, HtmlString, HtmlNumber, type JSX, useEffect, renderToString, type ElementAttributes } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
 
 // TypeScript type augmentation for custom elements
@@ -15,7 +15,7 @@ declare module 'woby' {
     namespace JSX {
         interface IntrinsicElements {
             'context-consumer': ElementAttributes<typeof ContextConsumer>
-            'context-provider2': ElementAttributes<typeof ContextProvider2>
+            'context-provider3': ElementAttributes<typeof ContextProvider2>
             'counter-element': ElementAttributes<typeof CounterElement>
         }
     }
@@ -40,7 +40,7 @@ const ContextConsumer = defaults(() => ({
     const nested = useNested()
 
     // useEffect(() => {
-    //     // useMountedContext returns an array-based observable
+    //     // useContext returns an array-based observable
     //     // Access the value directly with $$()
     //     console.log('context theme=', $$(theme), 'counter=', $$(counter), 'nested=', $$(nested))
     // })
@@ -90,9 +90,9 @@ const CounterElement = defaults(() => ({
     initialValue: $(0, HtmlNumber),
     title: $('Counter Element', HtmlString)
 }), ({ initialValue, title, children }) => {
-    const count = $(initialValue)
-    const increment = () => count(+$$(count) + 1)
-    const decrement = () => count(+$$(count) - 1)
+    const count = $(initialValue, HtmlNumber)
+    const increment = () => count($$(count) + 1)
+    const decrement = () => count($$(count) - 1)
 
     return (
         <div style={{ border: '2px solid green', padding: '15px', margin: '10px' }}>
@@ -116,7 +116,7 @@ const registerCustomElements = (): void => {
     const env = typeof window !== 'undefined' ? 'browser' : 'ssr'
     console.log(`[registerCustomElements] Environment: ${env}`)
     customElement('context-consumer', ContextConsumer)
-    customElement('context-provider2', ContextProvider2)
+    customElement('context-provider3', ContextProvider2)
     customElement('counter-element', CounterElement)
 }
 
@@ -144,14 +144,14 @@ const TestCustomElementContext = (): JSX.Element => {
                         <context-consumer label="HTML Custom Element Consumer" />
 
                         <h2>3. Context Provider Custom Element</h2>
-                        <context-provider2
+                        <context-provider3
                             theme="dark"
                             counter="50"
                             nested="custom-provider"
                         >
                             <context-consumer label="Nested Consumer 1" />
                             <ContextConsumer label="Nested Consumer 2" />
-                        </context-provider2>
+                        </context-provider3>
 
                         <h2>4. Counter Element with Context</h2>
                         <counter-element
@@ -172,9 +172,9 @@ const TestCustomElementContext = (): JSX.Element => {
                             <counter-element initial-value="5" title="Nested Counter">
                                 <context-consumer label="Level 2 Consumer" />
 
-                                <context-provider2 theme="dark" counter="999">
+                                <context-provider3 theme="dark" counter="999">
                                     <context-consumer label="Level 3 Consumer" />
-                                </context-provider2>
+                                </context-provider3>
                             </counter-element>
                         </ContextProvider2>
 
@@ -224,7 +224,7 @@ TestWrapper.test = {
         </ul>
     </div>Custom element consuming context<h2>2. Custom Element Context Consumption</h2><context-consumer
         label="HTML Custom Element Consumer"></context-consumer>
-    <h2>3. Context Provider Custom Element</h2><context-provider2 theme="dark" counter="50" nested="custom-provider">
+    <h2>3. Context Provider Custom Element</h2><context-provider3 theme="dark" counter="50" nested="custom-provider">
         <div style="border: 2px solid blue; padding: 10px; margin: 10px;">
             <h4>Context Provider (Theme: light, Counter: 0</h4>
             <div style="margin-left: 20px;"><context-consumer label="Nested Consumer 1"></context-consumer>
@@ -239,7 +239,7 @@ TestWrapper.test = {
                 </div>
             </div>
         </div>
-    </context-provider2>
+    </context-provider3>
     <h2>4. Counter Element with Context</h2><counter-element initial-value="10" title="HTML Counter Element">
         <div style="border: 2px solid green; padding: 15px; margin: 10px;">
             <h3>HTML Counter Element</h3>
@@ -256,13 +256,13 @@ TestWrapper.test = {
                     <h3>Nested Counter</h3>
                     <p>Internal Count: 5</p><button>+</button><button>-</button>
                     <div style="margin-top: 10px;"><context-consumer
-                            label="Level 2 Consumer"></context-consumer><context-provider2 theme="dark" counter="999">
+                            label="Level 2 Consumer"></context-consumer><context-provider3 theme="dark" counter="999">
                             <div style="border: 2px solid blue; padding: 10px; margin: 10px;">
                                 <h4>Context Provider (Theme: light, Counter: 0</h4>
                                 <div style="margin-left: 20px;"><context-consumer
                                         label="Level 3 Consumer"></context-consumer></div>
                             </div>
-                        </context-provider2></div>
+                        </context-provider3></div>
                 </div>
             </counter-element></div>
     </div>

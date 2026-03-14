@@ -1,4 +1,4 @@
-import { $, $$, createContext, useContext, renderToString, jsx, customElement, useMountedContext, useEffect, useMemo, defaults, context, type JSX } from 'woby'
+import { $, $$, createContext, useContext, renderToString, jsx, customElement, useEffect, useMemo, defaults, context, type JSX } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
 
 const readerContext = createContext<string>()

@@ -7,7 +7,7 @@
  * - Context value passing between TSX and custom elements
  * - Nested context providers
  */
-import { $, $$, customElement, defaults, createContext, useContext, useMountedContext, HtmlString, HtmlNumber, type JSX, useEffect, renderToString } from 'woby'
+import { $, $$, customElement, defaults, createContext, useContext, HtmlString, HtmlNumber, type JSX, useEffect, renderToString } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
 
 // Create contexts
@@ -16,9 +16,9 @@ const CounterContext = createContext(0)
 const NestedContext = createContext('default')
 
 // Hook for theme context
-const useTheme = () => useMountedContext(ThemeContext)
-const useCounter = () => useMountedContext(CounterContext)
-const useNested = () => useMountedContext(NestedContext)
+const useTheme = () => useContext(ThemeContext)
+const useCounter = () => useContext(CounterContext)
+const useNested = () => useContext(NestedContext)
 
 // Custom element that consumes context
 const ContextConsumer = defaults(() => ({
@@ -29,7 +29,7 @@ const ContextConsumer = defaults(() => ({
     const nested = useNested()
 
     useEffect(() => {
-        // useMountedContext returns an array-based observable
+        // useContext returns an array-based observable
         // Access the value directly with $$()
         console.log('context theme=', $$(theme), 'counter=', $$(counter), 'nested=', $$(nested))
     })
@@ -104,9 +104,9 @@ const CounterElement = defaults(() => ({
 const registerCustomElements = (): void => {
     const env = typeof window !== 'undefined' ? 'browser' : 'ssr'
     console.log(`[registerCustomElements] Environment: ${env}`)
-    customElement('context-consumer', ContextConsumer)
+    customElement('context-consumer2', ContextConsumer)
     customElement('context-provider2', ContextProvider2)
-    customElement('counter-element', CounterElement)
+    customElement('counter-element2', CounterElement)
 }
 
 
@@ -131,7 +131,7 @@ const TestCustomElementContextHtml = (): JSX.Element => {
                         <ContextConsumer label="Direct TSX Consumer" />
                         Custom element consuming context
                         <h2>2. Custom Element Context Consumption</h2>
-                        <context-consumer label="HTML Custom Element Consumer" />
+                        <context-consumer2 label="HTML Custom Element Consumer" />
 
                         <h2>3. Context Provider Custom Element</h2>
                         <context-provider2
@@ -139,17 +139,17 @@ const TestCustomElementContextHtml = (): JSX.Element => {
                             counter="50"
                             nested="custom-provider"
                         >
-                            <context-consumer label="Nested Consumer 1" />
+                            <context-consumer2 label="Nested Consumer 1" />
                             <ContextConsumer label="Nested Consumer 2" />
                         </context-provider2>
 
                         <h2>4. Counter Element with Context</h2>
-                        <counter-element
+                        <counter-element2
                             initial-value="10"
                             title="HTML Counter Element"
                         >
-                            <context-consumer label="Counter Context Consumer" />
-                        </counter-element>
+                            <context-consumer2 label="Counter Context Consumer" />
+                        </counter-element2>
 
                         <h2>5. Complex Nested Context</h2>
                         <ContextProvider2
@@ -157,15 +157,15 @@ const TestCustomElementContextHtml = (): JSX.Element => {
                             counter={200}
                             nested="tsx-provider"
                         >
-                            <context-consumer label="Level 1 Consumer" />
+                            <context-consumer2 label="Level 1 Consumer" />
 
-                            <counter-element initial-value="5" title="Nested Counter">
-                                <context-consumer label="Level 2 Consumer" />
+                            <counter-element2 initial-value="5" title="Nested Counter">
+                                <context-consumer2 label="Level 2 Consumer" />
 
                                 <context-provider2 theme="dark" counter="999">
-                                    <context-consumer label="Level 3 Consumer" />
+                                    <context-consumer2 label="Level 3 Consumer" />
                                 </context-provider2>
-                            </counter-element>
+                            </counter-element2>
                         </ContextProvider2>
 
                         <h2>6. Context Inheritance Test</h2>
@@ -212,12 +212,12 @@ TestWrapper.test = {
             <li>Counter: 100</li>
             <li>Nested: app-level</li>
         </ul>
-    </div>Custom element consuming context<h2>2. Custom Element Context Consumption</h2><context-consumer
-        label="HTML Custom Element Consumer"></context-consumer>
+    </div>Custom element consuming context<h2>2. Custom Element Context Consumption</h2><context-consumer2
+        label="HTML Custom Element Consumer"></context-consumer2>
     <h2>3. Context Provider Custom Element</h2><context-provider2 theme="dark" counter="50" nested="custom-provider">
         <div style="border: 2px solid blue; padding: 10px; margin: 10px;">
             <h4>Context Provider (Theme: light, Counter: 0</h4>
-            <div style="margin-left: 20px;"><context-consumer label="Nested Consumer 1"></context-consumer>
+            <div style="margin-left: 20px;"><context-consumer2 label="Nested Consumer 1"></context-consumer2>
                 <div
                     style="border: 1px solid gray; padding: 8px; margin: 5px; background-color: rgb(51, 51, 51); color: rgb(255, 255, 255);">
                     <strong>Nested Consumer 2:</strong>
@@ -230,31 +230,31 @@ TestWrapper.test = {
             </div>
         </div>
     </context-provider2>
-    <h2>4. Counter Element with Context</h2><counter-element initial-value="10" title="HTML Counter Element">
+    <h2>4. Counter Element with Context</h2><counter-element2 initial-value="10" title="HTML Counter Element">
         <div style="border: 2px solid green; padding: 15px; margin: 10px;">
             <h3>HTML Counter Element</h3>
             <p>Internal Count: 10</p><button>+</button><button>-</button>
-            <div style="margin-top: 10px;"><context-consumer label="Counter Context Consumer"></context-consumer></div>
+            <div style="margin-top: 10px;"><context-consumer2 label="Counter Context Consumer"></context-consumer2></div>
         </div>
-    </counter-element>
+    </counter-element2>
     <h2>5. Complex Nested Context</h2>
     <div style="border: 2px solid blue; padding: 10px; margin: 10px;">
         <h4>Context Provider (Theme: light, Counter: 200</h4>
-        <div style="margin-left: 20px;"><context-consumer label="Level 1 Consumer"></context-consumer><counter-element
+        <div style="margin-left: 20px;"><context-consumer2 label="Level 1 Consumer"></context-consumer2><counter-element2
                 initial-value="5" title="Nested Counter">
                 <div style="border: 2px solid green; padding: 15px; margin: 10px;">
                     <h3>Nested Counter</h3>
                     <p>Internal Count: 5</p><button>+</button><button>-</button>
-                    <div style="margin-top: 10px;"><context-consumer
-                            label="Level 2 Consumer"></context-consumer><context-provider2 theme="dark" counter="999">
+                    <div style="margin-top: 10px;"><context-consumer2
+                            label="Level 2 Consumer"></context-consumer2><context-provider2 theme="dark" counter="999">
                             <div style="border: 2px solid blue; padding: 10px; margin: 10px;">
                                 <h4>Context Provider (Theme: light, Counter: 0</h4>
-                                <div style="margin-left: 20px;"><context-consumer
-                                        label="Level 3 Consumer"></context-consumer></div>
+                                <div style="margin-left: 20px;"><context-consumer2
+                                        label="Level 3 Consumer"></context-consumer2></div>
                             </div>
                         </context-provider2></div>
                 </div>
-            </counter-element></div>
+            </counter-element2></div>
     </div>
     <h2>6. Context Inheritance Test</h2>
     <div>
