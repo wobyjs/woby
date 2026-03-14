@@ -8,19 +8,9 @@ const TestClassesObjectRemoval = (): JSX.Element => {
     registerTestObservable('TestClassesObjectRemoval', o)
 
     // Add logging for state changes
-    useEffect(() => {
-        console.log('[TestClassesObjectRemoval] Initial state:', $$(o))
-    })
-
-    // Log when the observable changes
-    useEffect(() => {
-        const currentValue = $$(o)
-        console.log('[TestClassesObjectRemoval] Observable changed to:', currentValue)
-    })
 
     const toggle = () => {
         const newState = o(prev => prev ? null : { red: true, blue: false })
-        console.log('[TestClassesObjectRemoval] Toggled to:', newState)
         return newState
     }
     useInterval(toggle, TEST_INTERVAL)
@@ -30,11 +20,6 @@ const TestClassesObjectRemoval = (): JSX.Element => {
             <p class={o}>content</p>
         </>
     )
-
-    // Log the rendered component
-    useEffect(() => {
-        console.log('[TestClassesObjectRemoval] Component rendered with class observable:', $$(o))
-    })
 
     // Store the component for SSR testing
     registerTestObservable(`${name}_ssr`, ret)

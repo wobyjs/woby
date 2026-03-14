@@ -39,12 +39,6 @@ const ContextConsumer = defaults(() => ({
     const counter = useCounter()
     const nested = useNested()
 
-    // useEffect(() => {
-    //     // useContext returns an array-based observable
-    //     // Access the value directly with $$()
-    //     console.log('context theme=', $$(theme), 'counter=', $$(counter), 'nested=', $$(nested))
-    // })
-
     return (
         <div style={{
             border: '1px solid gray',
@@ -113,8 +107,6 @@ const CounterElement = defaults(() => ({
 
 // Register custom elements inside render context
 const registerCustomElements = (): void => {
-    const env = typeof window !== 'undefined' ? 'browser' : 'ssr'
-    console.log(`[registerCustomElements] Environment: ${env}`)
     customElement('context-consumer', ContextConsumer)
     customElement('context-provider3', ContextProvider2)
     customElement('counter-element', CounterElement)

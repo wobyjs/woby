@@ -37,7 +37,6 @@ import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
 import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from "../utils/stylesheets"
 import { ObservableMaybe, Child, Component, ContextProvider } from "../types"
-import { useLightDom } from "../hooks/use_attached"
 import { mark } from "../utils/mark"
 import { customElements as ces, SSRCustomElement, SSRShadowRoot, SSRSlotElement } from '../ssr/custom_elements'
 import { document as doc } from '../ssr/document'

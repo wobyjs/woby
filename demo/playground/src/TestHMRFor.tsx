@@ -179,16 +179,14 @@ const renderApp = () => {
     }
 
     const appElement = document.getElementById('app')
-    console.log('Attempting to render app, app element:', appElement)
 
     if (appElement) {
         try {
-            console.log('Calling render with element:', appElement)
             render(<Test />, appElement)
             appRendered = true
             console.log('App rendered successfully')
         } catch (error) {
-            console.error('Failed to render app:', error)
+            console.error('Failed to render app:', error)S
             console.error('Error details:', {
                 message: error.message,
                 name: error.name,

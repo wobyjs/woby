@@ -10,7 +10,7 @@ import { HtmlChild } from '../html/html-child'
 import { SYMBOL_CONTEXT } from '../constants'
 import { jsx } from '../jsx-runtime'
 import { customElement, ElementAttributes } from './custom_element'
-import { HtmlSymbol } from '../html/html-symbol'
+import { HtmlHidden } from '../html/html-hidden'
 
 /* MAIN */
 
@@ -26,7 +26,7 @@ const ContextProvider = defaults(
   (): ContextProviderProps => ({
     value: $(undefined),
     children: $(undefined),
-    symbol: $<Symbol>(Symbol(Math.random() + ''), HtmlSymbol)
+    symbol: $<Symbol>(Symbol(Math.random() + ''), HtmlHidden)
   }),
   ({ children, symbol, value }: ContextProviderProps) => {
     return Object.assign(context({ [$$(symbol) as symbol]: value }, () => {
