@@ -1,6 +1,7 @@
 import { $, $$, Portal, renderToString, createDocument, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestPortalWhenObservable'
 const TestPortalWhenObservable = (): JSX.Element => {
     // Static when for static test - set to true to show portal content
     const when = true
@@ -27,7 +28,7 @@ TestPortalWhenObservable.test = {
         const expected = '<!---->'   // For main DOM test comparison
 
         // SSR test - create isolated document context and shared container
-        const ssrComponent = testObservables['TestPortalWhenObservable_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const doc = createDocument()
         const container = doc.createElement('div')
         container.id = 'portal-container-when-observable'
@@ -35,9 +36,9 @@ TestPortalWhenObservable.test = {
 
         const SsrComponent = ssrComponent as any
         const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
-        console.log(`✅ [TestPortalWhenObservable] SSR body: ${doc.body.innerHTML}`)
+        console.log(`✅ ${name}] SSR body: ${doc.body.innerHTML}`)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestPortalWhenObservable] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
+            assert(false, `${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
         }
 
         return expected  // This is what the DOM test framework compares against

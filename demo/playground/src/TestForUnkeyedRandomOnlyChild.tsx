@@ -1,6 +1,7 @@
 import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
 import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestForUnkeyedRandomOnlyChild'
 const TestForUnkeyedRandomOnlyChild = (): JSX.Element => {
     // Use fixed values instead of random for static test
     const values = [0.123456, 0.789012, 0.345678]  // Fixed values for static test
@@ -28,12 +29,12 @@ TestForUnkeyedRandomOnlyChild.test = {
         const expectedFull = '<h3>For - Unkeyed - Random Only Child</h3><p>0.123456</p><p>0.789012</p><p>0.345678</p>'
         const expected = '<p>0.123456</p><p>0.789012</p><p>0.345678</p>'
 
-        const ssrComponent = testObservables['TestForUnkeyedRandomOnlyChild_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForUnkeyedRandomOnlyChild] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestForUnkeyedRandomOnlyChild] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         // For static test, return the fixed values

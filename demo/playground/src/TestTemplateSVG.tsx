@@ -1,6 +1,7 @@
 import { $, $$, template, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, randomColor, assert } from './util'
 
+const name = 'TestTemplateSVG'
 const TestTemplateSVG = (): JSX.Element => {
     const color = $(randomColor())
     registerTestObservable('TestTemplateSVG', color)
@@ -34,14 +35,14 @@ TestTemplateSVG.test = {
     expect: () => {
         const value = $$(testObservables['TestTemplateSVG'])
 
-        const ssrComponent = testObservables['TestTemplateSVG_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Note: SSR renders viewBox as viewbox (lowercase)
         const expectedFull = `<h3>Template - SVG</h3><svg viewbox="0 0 50 50" width="50px" stroke="${value}" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestTemplateSVG] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestTemplateSVG] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         // DOM uses camelCase attributes

@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestStylesCleanup'
 const TestStylesCleanup = (): JSX.Element => {
     const styles = { color: 'orange', fontWeight: 'bold' }  // Static value
     const ret: JSX.Element = () => (
@@ -22,13 +23,13 @@ TestStylesCleanup.test = {
         const expected = '<p style="color: orange; font-weight: bold;">content</p>'
 
         // Test the SSR value
-        const ssrComponent = testObservables['TestStylesCleanup_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Styles - Observable Cleanup</h3><p style="color: orange; font-weight: bold;">content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestStylesCleanup] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestStylesCleanup] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

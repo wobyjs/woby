@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestRefUntrack'
 const TestRefUntrack = (): JSX.Element => {
     const o = $(0)
     const increment = () => o(prev => prev + 1)
@@ -32,13 +33,13 @@ TestRefUntrack.test = {
         // DOM shows dynamic value from observable (0 initially)
         const expectedForDOM = '<p>0</p>'
 
-        const ssrComponent = testObservables['TestRefUntrack_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Ref - Untrack</h3>' + expectedForSSR
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestRefUntrack] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestRefUntrack] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expectedForDOM

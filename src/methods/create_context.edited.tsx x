@@ -25,7 +25,7 @@ const ContextProvider = defaults(
         children: $(undefined),
         // symbol: $<Symbol>(Symbol(Math.random()+''))
     }),
-    ({ children,symbol : sym, value }: ContextProviderProps) => {
+    ({ children, symbol: sym, value }: ContextProviderProps) => {
         const symbol = Symbol()
 
         // console.log('[ContextProvider]', symbol, $$(sym))
@@ -36,13 +36,13 @@ const ContextProvider = defaults(
         //     console.log('[context-provider]', $$(value)/* , $$(symbol) */)
         // })
 
-        return Object.assign( context({ [$$(symbol)]: value }, () => {
+        return Object.assign(context({ [$$(symbol)]: value }, () => {
             // console.log('[context]', symbol, $$(context(symbol)), $$(value))
             // useEffect(() => {
             //     console.log('[context]', $$(symbol), $$(context($$(symbol))), $$(value))
             // })    
             return children
-        }), {symbol})
+        }), { symbol })
     })
 
 customElement('context-provider', ContextProvider)

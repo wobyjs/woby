@@ -2,6 +2,7 @@ import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
+const name = 'TestNestedIfsLazy'
 const TestNestedIfsLazy = (): JSX.Element => {
     const o = $(false)
     const enable = $(0)
@@ -59,7 +60,7 @@ const TestNestedIfsLazy = (): JSX.Element => {
 TestNestedIfsLazy.test = {
     static: false,
     enable: () => {
-        const observableTiming = $$(testObservables['TestNestedIfsLazy_timing'])
+        const observableTiming = $$(testObservables[`${name}_timing`])
         return observableTiming > 0
     },
     compareActualValues: true,
@@ -67,7 +68,7 @@ TestNestedIfsLazy.test = {
         // Use timing pattern to handle timing issues
         let expected: string
         let expectedFull: string
-        let currentTiming = $$(testObservables['TestNestedIfsLazy_timing'])
+        let currentTiming = $$(testObservables[`${name}_timing`])
 
         // Always read current state to avoid timing issues
         const isInnerVisible = $$(testObservables['TestNestedIfsLazy'])
@@ -80,7 +81,7 @@ TestNestedIfsLazy.test = {
         timing = currentTiming
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestNestedIfsLazy_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Extract the actual rendered content from SSR result to handle timing differences
         // The SSR result might not include the h3 tag, so we create dynamic expected based on what we get
@@ -100,16 +101,16 @@ TestNestedIfsLazy.test = {
             : '<div>before</div><!----><div>after</div>'
         const staticExpectedFull = '<h3>Nested Ifs Lazy</h3>' + expectedContent
 
-        console.log('[TestNestedIfsLazy] SSR result:', ssrResult)
+        console.log('${name}] SSR result:', ssrResult)
         console.log('[TestNestedIfsLazy] Dynamic expected:', dynamicExpectedFull)
         console.log('[TestNestedIfsLazy] Current state visible:', isInnerVisible)
 
         // Use dynamic matching to avoid timing mismatches
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestNestedIfsLazy] ❌ SSR ASSERTION FAILED')
-            assert(false, `[TestNestedIfsLazy] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ [TestNestedIfsLazy] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

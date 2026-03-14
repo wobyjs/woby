@@ -41,6 +41,11 @@ export const setAttributeStatic = (() => {
             return
         }
 
+        // Skip setting symbol values as attributes (they should not be serialized)
+        if (typeof value === 'symbol') {
+            return
+        }
+
         if (isSVG(element)) {
 
             key = (key === 'xlinkHref' || key === 'xlink:href') ? 'href' : normalizeKeySvg(key)

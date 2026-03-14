@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestProgressIndeterminateToggle'
 const TestProgressIndeterminateToggle = (): JSX.Element => {
     const o = $<number | null | undefined>(.25)
     registerTestObservable('TestProgressIndeterminateToggle', o)
@@ -28,13 +29,13 @@ TestProgressIndeterminateToggle.test = {
         const expected = (val !== null && val !== undefined) ? `<progress value="${val}"></progress>` : '<progress></progress>'
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestProgressIndeterminateToggle_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Progress - Indeterminate Toggle</h3>' + expected
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestProgressIndeterminateToggle] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestProgressIndeterminateToggle] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestAttributeRemoval'
 const TestAttributeRemoval = (): JSX.Element => {
     const o = $<string | null>(null)  // Start with null to test removal
     registerTestObservable('TestAttributeRemoval', o)
@@ -24,13 +25,13 @@ TestAttributeRemoval.test = {
         const value = $$(testObservables['TestAttributeRemoval'])
         const expected = value ? `<p data-color="${value}">content</p>` : '<p>content</p>'
 
-        const ssrComponent = testObservables['TestAttributeRemoval_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Attribute - Removal</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestAttributeRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestAttributeRemoval] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

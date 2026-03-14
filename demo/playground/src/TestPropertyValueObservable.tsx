@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestPropertyValueObservable'
 const TestPropertyValueObservable = (): JSX.Element => {
     // Static value for static test
     const ret: JSX.Element = () => (
@@ -24,12 +25,12 @@ TestPropertyValueObservable.test = {
         const expected = '<p><input></p>'   // For main DOM test comparison
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestPropertyValueObservable_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestPropertyValueObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestPropertyValueObservable] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected  // This is what the DOM test framework compares against

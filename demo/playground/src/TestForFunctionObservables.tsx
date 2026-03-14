@@ -1,6 +1,7 @@
 import { $, $$, For, Observable, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestForFunctionObservables'
 const TestForFunctionObservables = (): JSX.Element => {
     const v1 = $(1) // Force refresh
     const v2 = $(2) // Force refresh
@@ -31,13 +32,13 @@ TestForFunctionObservables.test = {
         // For static test, return the fixed values
         const expected = `<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>`
 
-        const ssrComponent = testObservables['TestForFunctionObservables_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>For - Function Observables</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForFunctionObservables] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestForFunctionObservables] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

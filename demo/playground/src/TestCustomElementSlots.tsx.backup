@@ -80,6 +80,7 @@ customElement('named-slot-element', NamedSlotElement)
 
 // Test component is defined in the SSR version below
 
+const name = 'TestCustomElementSlotsWithSSR'
 const TestCustomElementSlotsWithSSR = (): JSX.Element => {
     const showFallback = $(true)
     const headerText = $('Custom Header')
@@ -146,7 +147,7 @@ TestCustomElementSlotsWithSSR.test = {
         
         // Test the SSR value asynchronously
         setTimeout(() => {
-            const ssrComponent = testObservables['TestCustomElementSlots_ssr']
+            const ssrComponent = testObservables[`${name}_ssr`]
             if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
                 renderToString(elementToRender).then(ssrResult => {

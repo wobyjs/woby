@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestClassesArrayObservableMultiple'
 const TestClassesArrayObservableMultiple = (): JSX.Element => {
     const o = $(['red bold', false])
     registerTestObservable('TestClassesArrayObservableMultiple', o)
@@ -27,13 +28,13 @@ TestClassesArrayObservableMultiple.test = {
         const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : (value || '')
         const expected = `<p class="${classes}">content</p>`
 
-        const ssrComponent = testObservables['TestClassesArrayObservableMultiple_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Classes - Array Observable Multiple</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestClassesArrayObservableMultiple] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestClassesArrayObservableMultiple] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

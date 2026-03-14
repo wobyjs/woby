@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestEventClickCaptureRemoval'
 const TestEventClickCaptureRemoval = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
@@ -52,18 +53,18 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
 TestEventClickCaptureRemoval.test = {
     static: false,
     expect: () => {
-        const value = testObservables['TestEventClickCaptureRemoval_o']?.() ?? 0
+        const value = testObservables[`${name}_o`]?.() ?? 0
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Event - Click Capture Removal</h3><p><button>${value}</button></p>`  // For SSR comparison
         const expected = `<p><button>${value}</button></p>`   // For main test comparison
 
-        const ssrComponent = testObservables['TestEventClickCaptureRemoval_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventClickCaptureRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestEventClickCaptureRemoval] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

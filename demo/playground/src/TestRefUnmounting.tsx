@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestRefUnmounting'
 const TestRefUnmounting = (): JSX.Element => {
     const message = $('No ref') // Static value
     const ret: JSX.Element = () => (
@@ -23,13 +24,13 @@ TestRefUnmounting.test = {
     expect: () => {
         const expected = '<p>No ref</p><p>content</p>'
 
-        const ssrComponent = testObservables['TestRefUnmounting_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Ref - Unmounting</h3><p>No ref</p><p>content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestRefUnmounting] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestRefUnmounting] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

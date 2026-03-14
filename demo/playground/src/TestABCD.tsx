@@ -1,6 +1,7 @@
 import { $, $$, renderToString, useEnvironment, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestABCD'
 const TestABCD = (): JSX.Element => {
     const states = [
         () => <i>a</i>,
@@ -41,7 +42,7 @@ TestABCD.test = {
         const elements = ['<p><i>a</i></p>', '<p><u>b</u></p>', '<p><b>c</b></p>', '<p><span>d</span></p>']
         const expected = elements[idx]
 
-        const ssrComponent = testObservables['TestABCD_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
 
         const fullElements = [
@@ -59,9 +60,9 @@ TestABCD.test = {
         ]
         const expectedFull = actualElements[idx]
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestABCD] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestABCD] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

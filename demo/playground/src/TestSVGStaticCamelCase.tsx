@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestSVGStaticCamelCase'
 const TestSVGStaticCamelCase = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -22,13 +23,13 @@ TestSVGStaticCamelCase.test = {
     expect: () => {
         const expected = '<svg viewBox="0 0 50 50" width="50px" stroke="#abcdef" stroke-width="3" edgeMode="foo" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
 
-        const ssrComponent = testObservables['TestSVGStaticCamelCase_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>SVG - Static CamelCase</h3><svg viewBox="0 0 50 50" width="50px" stroke="#abcdef" stroke-width="3" edgeMode="foo" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSVGStaticCamelCase] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestSVGStaticCamelCase] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

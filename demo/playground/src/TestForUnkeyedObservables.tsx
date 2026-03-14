@@ -1,6 +1,7 @@
 import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestForUnkeyedObservables'
 const TestForUnkeyedObservables = (): JSX.Element => {
     const v1 = $(1)
     const v2 = $(2)
@@ -31,12 +32,12 @@ TestForUnkeyedObservables.test = {
         const expectedFull = '<h3>For - Unkeyed - Observables</h3><p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
         const expected = '<p>Value: 1</p><p>Value: 2</p><p>Value: 3</p>'
 
-        const ssrComponent = testObservables['TestForUnkeyedObservables_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForUnkeyedObservables] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestForUnkeyedObservables] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         // For static test, return the fixed values

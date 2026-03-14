@@ -13,6 +13,7 @@ declare module 'woby' {
     }
 }
 
+const name = 'TestDirectiveSingleArgument'
 const TestDirectiveSingleArgument = (): JSX.Element => {
     const model = (element, arg1) => {
         //actual usage -> enable this, SSR test make it stackoverflow
@@ -46,12 +47,12 @@ TestDirectiveSingleArgument.test = {
         const expectedFull = '<h3>Directive - Single Argument</h3><input value="bar" />'  // For SSR comparison
         const expected = '<input value="bar">'   // For main test comparison
 
-        const ssrComponent = testObservables['TestDirectiveSingleArgument_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestDirectiveSingleArgument] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestDirectiveSingleArgument] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

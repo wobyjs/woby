@@ -26,12 +26,12 @@ TestComponentStaticProps.test = {
         const expectedFull = `<h3>Component - Static Props</h3><p>${propValue}</p>`  // For SSR comparison
         const expected = `<p>${propValue}</p>`   // For main test comparison
 
-        const ssrComponent = testObservables['TestComponentStaticProps_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestComponentStaticProps] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestComponentStaticProps] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

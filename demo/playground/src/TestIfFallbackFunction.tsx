@@ -1,6 +1,7 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestIfFallbackFunction'
 const TestIfFallbackFunction = (): JSX.Element => {
     const initialValue = "0.123456"  // Fixed value for static test
     const Fallback = () => {
@@ -26,12 +27,12 @@ TestIfFallbackFunction.test = {
         const expectedFull = '<h3>If - Fallback Function</h3><p>Fallback: 0.123456</p>'
         const expected = '<p>Fallback: 0.123456</p>'
 
-        const ssrComponent = testObservables['TestIfFallbackFunction_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIfFallbackFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestIfFallbackFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

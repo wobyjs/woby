@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestClassesArrayCleanup'
 const TestClassesArrayCleanup = (): JSX.Element => {
     const o = $<string[]>(['red'])
     registerTestObservable('TestClassesArrayCleanup', o)
@@ -26,13 +27,13 @@ TestClassesArrayCleanup.test = {
         const value = $$(testObservables['TestClassesArrayCleanup'])
         const expected = `<p class="${Array.isArray(value) ? value.filter(v => v).join(' ') : value}">content</p>`
 
-        const ssrComponent = testObservables['TestClassesArrayCleanup_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Classes - Array Cleanup</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestClassesArrayCleanup] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestClassesArrayCleanup] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

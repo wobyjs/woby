@@ -1,7 +1,9 @@
 import { $, $$, Portal, renderToString, createDocument, type JSX, useTimeout } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestPortalObservable'
 const TestPortalObservable = (): JSX.Element => {
+    const name = 'AB'
     const AB = (): JSX.Element => {
         const a = <i>a</i>
         const b = <u>b</u>
@@ -10,6 +12,7 @@ const TestPortalObservable = (): JSX.Element => {
         useInterval(toggle, TEST_INTERVAL / 2)
         return component
     }
+    const name = 'CD'
     const CD = (): JSX.Element => {
         const c = <b>c</b>
         const d = <span>d</span>
@@ -46,7 +49,7 @@ TestPortalObservable.test = {
         const expected = '<!---->'   // For main DOM test comparison
 
         // SSR test - create isolated document context and shared container
-        const SsrComponent = testObservables['TestPortalObservable_ssr'] as any
+        const SsrComponent = testObservables[`${name}_ssr`] as any
         const doc = createDocument()
         const container = doc.createElement('div')
         container.id = 'portal-container-observable'
@@ -54,9 +57,9 @@ TestPortalObservable.test = {
 
         const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
         // const ssrResult = renderToString((SsrComponent as any)({ mount: container }), { document: doc })
-        console.log(`✅ [TestPortalObservable] SSR body: ${doc.body.innerHTML}`)
+        console.log(`✅ ${name}] SSR body: ${doc.body.innerHTML}`)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestPortalObservable] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
+            assert(false, `${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
         }
 
         return expected  // This is what the DOM test framework compares against

@@ -3,6 +3,7 @@ import { TestSnapshots, registerTestObservable, testObservables, assert } from '
 
 let timing = 0
 
+const name = 'TestKeepAliveStatic'
 const TestKeepAliveStatic = (): JSX.Element => {
     const enable = $(0)
     const timingObservable = $(0)
@@ -40,7 +41,7 @@ const TestKeepAliveStatic = (): JSX.Element => {
 TestKeepAliveStatic.test = {
     static: false,
     enable: () => {
-        const observableTiming = $$(testObservables['TestKeepAliveStatic_timing'])
+        const observableTiming = $$(testObservables[`${name}_timing`])
         return observableTiming > 0
     },
     expect: () => {
@@ -49,12 +50,12 @@ TestKeepAliveStatic.test = {
         const expected = '<p>123</p>'   // For main DOM test comparison
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestKeepAliveStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestKeepAliveStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestKeepAliveStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected  // This is what the DOM test framework compares against

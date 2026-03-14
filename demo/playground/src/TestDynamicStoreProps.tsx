@@ -2,6 +2,7 @@ import { $, $$, Dynamic, store, useEffect, isStore, renderToString, type JSX } f
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let timing = Math.random()
+const name = 'TestDynamicStoreProps'
 const TestDynamicStoreProps = (): JSX.Element => {
     const count = $(1)
     const props = store({ class: 'red' })
@@ -58,7 +59,7 @@ TestDynamicStoreProps.test = {
     static: false,
     enable: () => {
         // Use only the observable timing to avoid sync issues
-        const observableTiming = $$(testObservables['TestDynamicStoreProps_timing'])
+        const observableTiming = $$(testObservables[`${name}_timing`])
         return observableTiming > 0  // Any positive value indicates an update
     },
     compareActualValues: true,
@@ -66,17 +67,17 @@ TestDynamicStoreProps.test = {
         // Read from actual DOM to avoid timing mismatches with store updates
         const testDiv = document.querySelector('[data-test="TestDynamicStoreProps-class"]')
         const className = testDiv?.className || 'red'
-        const countObservable: any = testObservables['TestDynamicStoreProps_count']
+        const countObservable: any = testObservables[`${name}_count`]
         const currentCount = $$(countObservable) || 1
 
         const expected = `<div class="${className}" data-test="TestDynamicStoreProps-class"><p>${currentCount}</p></div>`
         const expectedFull = `<h3>Dynamic - Store Props</h3><div class="${className}" data-test="TestDynamicStoreProps-class"><p>${currentCount}</p></div>`
 
         // Get current timing from timing observable for proper synchronization
-        let currentTiming = $$(testObservables['TestDynamicStoreProps_timing'])
+        let currentTiming = $$(testObservables[`${name}_timing`])
         timing = currentTiming
 
-        const ssrComponent = testObservables['TestDynamicStoreProps_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Extract the class and paragraph values from SSR result to use for comparison
         // Extract the actual paragraph value from SSR result
@@ -90,9 +91,9 @@ TestDynamicStoreProps.test = {
 
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestDynamicStoreProps] ❌ SSR ASSERTION FAILED')
-            assert(false, `[TestDynamicStoreProps] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ [TestDynamicStoreProps] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -1,6 +1,7 @@
 import { $, $$, template, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestTemplateExternal'
 const TestTemplateExternal = (): JSX.Element => {
     const ret: JSX.Element = () => {
         const Templated = template<{ class: string, color: string }>(props => {
@@ -32,13 +33,13 @@ TestTemplateExternal.test = {
         //<h3>Template - External</h3><div class="red"><span><span data-color="blue"></span></span></div><div class="blue"><span><span data-color="red"></span></span></div>, expected 
         //<h3>Template - External</h3><div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>
 
-        const ssrComponent = testObservables['TestTemplateExternal_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Template - External</h3><div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestTemplateExternal] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestTemplateExternal] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

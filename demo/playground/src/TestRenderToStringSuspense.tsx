@@ -3,6 +3,7 @@ import { TestSnapshots, registerTestObservable, testObservables, assert } from '
 
 const TEST_INTERVAL = 500
 
+const name = 'TestRenderToStringSuspense'
 const TestRenderToStringSuspense = (): JSX.Element => {
     const o = $(123)
     const Content = () => {
@@ -28,13 +29,13 @@ TestRenderToStringSuspense.test = {
     expect: () => {
         const expected = '<div><p>123123</p></div>'
 
-        const ssrComponent = testObservables['TestRenderToStringSuspense_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<div><h3>renderToString - Suspense</h3><p>123123</p></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestRenderToStringSuspense] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestRenderToStringSuspense] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

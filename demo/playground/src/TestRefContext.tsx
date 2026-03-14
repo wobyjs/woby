@@ -2,10 +2,12 @@ import { $, $$, createContext, useContext, renderToString, tick, type JSX } from
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let syncStep = 0
+const name = 'TestRefContext'
 const TestRefContext = (): JSX.Element => {
     const message = $('')
     const Context = createContext(123)
 
+    const name = 'Reffed'
     const Reffed = (): JSX.Element => {
         const ref = (element: HTMLElement) => {
             if (element) {
@@ -42,12 +44,12 @@ TestRefContext.test = {
             '<context-provider value="321"><p>Got ref - Has parent: false - Is connected: false - Context: 321</p></context-provider>',   // For main DOM test comparison
         ]
 
-        const ssrComponent = testObservables['TestRefContext_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestRefContext] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestRefContext] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected  // This is what the DOM test framework compares against

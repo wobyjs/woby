@@ -1,12 +1,15 @@
 import { $, $$, Suspense, useMemo, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestSuspenseChildrenObservableStatic'
 const TestSuspenseChildrenObservableStatic = (): JSX.Element => {
     const initialValue = useMemo(() => String(random()))
     registerTestObservable('TestSuspenseChildrenObservableStatic', initialValue)
+    const name = 'Children'
     const Children = (): JSX.Element => {
         return <p>Children: {initialValue}</p>
     }
+    const name = 'Fallback'
     const Fallback = (): JSX.Element => {
         return <p>Fallback!</p>
     }
@@ -33,13 +36,13 @@ TestSuspenseChildrenObservableStatic.test = {
         const expected = `<p>Children: ${initialValue}</p>`
 
         // Test the SSR value
-        const ssrComponent = testObservables['TestSuspenseChildrenObservableStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Suspense - Children Observable Static</h3><p>Children: ${initialValue}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSuspenseChildrenObservableStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestSuspenseChildrenObservableStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

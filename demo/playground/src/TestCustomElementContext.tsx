@@ -112,6 +112,7 @@ const registerCustomElements = (): void => {
 
 
 // Test component
+const name = 'TestCustomElementContext'
 const TestCustomElementContext = (): JSX.Element => {
     const appTheme = 'dark'
     const appCounter = 100
@@ -275,14 +276,14 @@ TestWrapper.test = {
 </div>`)
 
         // SSR test
-        const ssrComponent = testObservables['TestCustomElementContext_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = expected
 
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestCustomElementContext] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestCustomElementContext] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

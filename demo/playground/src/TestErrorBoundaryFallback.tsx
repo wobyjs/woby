@@ -1,7 +1,9 @@
 import { $, $$, ErrorBoundary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestErrorBoundaryFallback'
 const TestErrorBoundaryFallback = (): JSX.Element => {
+    const name = 'ErroringComponent'
     const ErroringComponent = (): JSX.Element => {
         throw new Error()
     }
@@ -32,12 +34,12 @@ TestErrorBoundaryFallback.test = {
         const expectedFull = '<h3>Error Boundary - Fallback Test</h3><p>Fallback: Error</p>'  // For SSR comparison
         const expected = '<p>Fallback: Error</p>'   // For main test comparison
 
-        const ssrComponent = testObservables['TestErrorBoundaryFallback_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestErrorBoundaryFallback] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestErrorBoundaryFallback] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

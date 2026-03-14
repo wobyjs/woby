@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestClassesArrayStaticMultiple'
 const TestClassesArrayStaticMultiple = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -20,13 +21,13 @@ TestClassesArrayStaticMultiple.test = {
     expect: () => {
         const expected = '<p class="red bold">content</p>'
 
-        const ssrComponent = testObservables['TestClassesArrayStaticMultiple_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Classes - Array Static Multiple</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestClassesArrayStaticMultiple] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestClassesArrayStaticMultiple] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

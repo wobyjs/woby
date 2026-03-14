@@ -2,6 +2,7 @@ import { $, $$, store, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let testit = true  // Track assertion cycles for timing coordination
+const name = 'TestClassesObjectStoreMultiple'
 const TestClassesObjectStoreMultiple = (): JSX.Element => {
     const o = store({ 'red bold': true, blue: false })
     registerTestObservable('TestClassesObjectStoreMultiple', o)
@@ -51,7 +52,7 @@ TestClassesObjectStoreMultiple.test = {
             testit = true
         }
 
-        const ssrComponent = testObservables['TestClassesObjectStoreMultiple_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Extract the actual class from SSR result for comparison
         const classMatch = ssrResult.match(/<p class="([^"]*)">/)
@@ -64,12 +65,12 @@ TestClassesObjectStoreMultiple.test = {
         const expectedFull = `<h3>Classes - Object Store Multiple</h3><p class="${expectedClass.trim()}">content</p>`
 
         if (ssrResult === expectedFull) {
-            console.log(`✅ [TestClassesObjectStoreMultiple] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         } else {
             console.error(`❌ SSR test failed:`)
             console.error(`  Got: ${ssrResult}`)
             console.error(`  Expected: ${expectedFull}`)
-            assert(false, `[TestClassesObjectStoreMultiple] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         }
 
         return expected

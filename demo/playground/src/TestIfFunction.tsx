@@ -1,6 +1,7 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestIfFunction'
 const TestIfFunction = (): JSX.Element => {
     // Static value for static test
     const ret: JSX.Element = () => (
@@ -23,12 +24,12 @@ TestIfFunction.test = {
         const expectedFull = '<h3>If - Function</h3><p>(content)</p>'
         const expected = '<p>(content)</p>'
 
-        const ssrComponent = testObservables['TestIfFunction_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIfFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestIfFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

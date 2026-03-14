@@ -6,6 +6,7 @@ const otherContext = createContext<string>()
 customElement('reader-context', readerContext.Provider)
 customElement('other-context', otherContext.Provider)
 
+const name = 'TestContextHookHtml'
 const TestContextHookHtml = (): JSX.Element => {
     const Reader = defaults(() => ({}), () => {
         const ctx = useContext(readerContext)
@@ -46,7 +47,7 @@ const TestContextHookHtml = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestContextHook_ssr', ret)
+    registerTestObservable('TestContextHookHtml_ssr', ret)
 
     return ret
 }
@@ -62,12 +63,12 @@ TestContextHookHtml.test = {
             '<div><other-context value="456"><template shadowrootmode="open" shadowrootserializable=""><slot><reader-context value="outer"><template shadowrootmode="open" shadowrootserializable=""><slot><p>header</p><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><reader-context value="inner"><template shadowrootmode="open" shadowrootserializable=""><slot><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>inner other: 123</p></template></test-reader></slot></template></reader-context><test-reader><template shadowrootmode="open" shadowrootserializable=""><p>outer other: 123</p></template></test-reader><p>Footer</p></slot></template></reader-context></slot></template></other-context></div>'
         ]
 
-        const ssrComponent = testObservables['TestContextHook_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = minimiseHtml(renderToString(ssrComponent))
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestContextHookHtml] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestContextHookHtml] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -1,6 +1,7 @@
 import { $, $$, For, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestForRandomOnlyChild'
 const TestForRandomOnlyChild = (): JSX.Element => {
     const values = $([random(), random(), random()])
     // Store the observable globally so the test can access it
@@ -31,13 +32,13 @@ TestForRandomOnlyChild.test = {
         const values = $$(testObservables['TestForRandomOnlyChild'])
         const expected = `<p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
 
-        const ssrComponent = testObservables['TestForRandomOnlyChild_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>For - Random</h3><p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForRandomOnlyChild] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestForRandomOnlyChild] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

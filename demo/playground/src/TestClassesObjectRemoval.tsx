@@ -1,6 +1,7 @@
 import { $, $$, renderToString, useEffect, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestClassesObjectRemoval'
 const TestClassesObjectRemoval = (): JSX.Element => {
     const o = $<JSX.Class | null>({ red: true, blue: false })
     // Store the observable globally so the test can access it
@@ -56,10 +57,10 @@ TestClassesObjectRemoval.test = {
             expected = '<p class="">content</p>'
         }
 
-        const ssrComponent = testObservables['TestClassesObjectRemoval_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Log the actual SSR result for debugging
-        console.log(`[TestClassesObjectRemoval] SSR result: ${ssrResult}`)
+        console.log(`${name}] SSR result: ${ssrResult}`)
 
         // Create expected result based on current store state
         let expectedClass = ''
@@ -70,12 +71,12 @@ TestClassesObjectRemoval.test = {
             '<h3>Classes - Object Removal</h3><p>content</p>'
 
         if (ssrResult === expectedFull) {
-            console.log(`✅ [TestClassesObjectRemoval] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         } else {
             console.error(`❌ SSR test failed:`)
             console.error(`  Got: ${ssrResult}`)
             console.error(`  Expected: ${expectedFull}`)
-            assert(false, `[TestClassesObjectRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         }
 
         return expected

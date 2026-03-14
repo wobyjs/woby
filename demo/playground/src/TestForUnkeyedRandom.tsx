@@ -2,6 +2,7 @@ import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 import { useEffect, type JSX } from 'woby'
 
+const name = 'TestForUnkeyedRandom'
 const TestForUnkeyedRandom = (): JSX.Element => {
     const values = $([random(), random(), random()])
     // Store the observable globally so the test can access it
@@ -43,12 +44,12 @@ TestForUnkeyedRandom.test = {
         const expectedFull = `<h3>For - Unkeyed - Random</h3>${values.map(value => `<p>Value: ${value}</p>`).join('')}`
         const expected = values.map(value => `<p>Value: ${value}</p>`).join('')
 
-        const ssrComponent = testObservables['TestForUnkeyedRandom_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForUnkeyedRandom] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestForUnkeyedRandom] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         // Get the actual values from the observable and return them

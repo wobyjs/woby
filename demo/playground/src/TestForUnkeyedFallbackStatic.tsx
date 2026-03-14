@@ -1,6 +1,7 @@
 import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestForUnkeyedFallbackStatic'
 const TestForUnkeyedFallbackStatic = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -26,12 +27,12 @@ TestForUnkeyedFallbackStatic.test = {
         const expectedFull = '<h3>For - Unkeyed - Fallback Static</h3><div>Fallback!</div>'
         const expected = '<div>Fallback!</div>'
 
-        const ssrComponent = testObservables['TestForUnkeyedFallbackStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForUnkeyedFallbackStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestForUnkeyedFallbackStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

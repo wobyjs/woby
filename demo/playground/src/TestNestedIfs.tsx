@@ -1,6 +1,7 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestNestedIfs'
 const TestNestedIfs = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -28,12 +29,12 @@ TestNestedIfs.test = {
         const expected = '<div>1</div><div>2</div><div>Footer</div>'   // For main DOM test comparison
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestNestedIfs_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestNestedIfs] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestNestedIfs] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected  // This is what the DOM test framework compares against

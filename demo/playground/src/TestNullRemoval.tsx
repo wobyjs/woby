@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestNullRemoval'
 const TestNullRemoval = (): JSX.Element => {
     const o = $<string | null>(null)
     // Store the observable globally so the test can access it
@@ -30,13 +31,13 @@ TestNullRemoval.test = {
         const expectedForSSR = value !== null ? `<p>(${value})</p>` : '<p>()</p>'  // SSR renders empty () for null
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestNullRemoval_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Null - Removal</h3>' + expectedForSSR
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestNullRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestNullRemoval] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expectedForDOM

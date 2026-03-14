@@ -2,6 +2,7 @@ import { $, $$, store, renderToString, type JSX } from 'woby'
 import { TestSnapshots, TEST_INTERVAL, useInterval, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
+const name = 'TestStylesStore'
 const TestStylesStore = (): JSX.Element => {
     const styles = store({ color: 'orange', fontWeight: 'normal' })
     const enable = $(0)
@@ -46,16 +47,16 @@ const TestStylesStore = (): JSX.Element => {
 
 TestStylesStore.test = {
     static: false,
-    enable: () => timing === $$(testObservables['TestStylesStore_timing']),
+    enable: () => timing === $$(testObservables[`${name}_timing`]),
     compareActualValues: true,
     expect: () => {
         // Use timing pattern to handle timing issues
         let expected: string
         let expectedFull: string
-        let currentTiming = $$(testObservables['TestStylesStore_timing'])
+        let currentTiming = $$(testObservables[`${name}_timing`])
 
         // Always read current state to avoid timing issues
-        const styles: any = testObservables['TestStylesStore_styles']
+        const styles: any = testObservables[`${name}_styles`]
         const currentColor = styles?.color || 'orange'
         const currentFontWeight = styles?.fontWeight || 'normal'
 
@@ -66,7 +67,7 @@ TestStylesStore.test = {
         timing = currentTiming
 
         // Test the SSR value
-        const ssrComponent = testObservables['TestStylesStore_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
             const ssrResult = renderToString(ssrComponent)
             // Extract the actual style values from SSR result
@@ -74,14 +75,14 @@ TestStylesStore.test = {
             const actualStyle = styleMatch ? styleMatch[1] : ''
             const dynamicExpectedFull = `<h3>Styles - Store</h3><p style="${actualStyle}">content</p>`
 
-            console.log('[TestStylesStore] SSR result:', ssrResult)
+            console.log('${name}] SSR result:', ssrResult)
             console.log('[TestStylesStore] Dynamic expected:', dynamicExpectedFull)
 
             if (ssrResult !== dynamicExpectedFull) {
                 console.error('[TestStylesStore]❌ SSR ASSERTION FAILED')
-                assert(false, `[TestStylesStore] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+                assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
             } else {
-                console.log(`✅ [TestStylesStore] SSR test passed: ${ssrResult}`)
+                console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
             }
         }
 

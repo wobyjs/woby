@@ -2,6 +2,7 @@ import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
+const name = 'TestSelectObservableValue'
 const TestSelectObservableValue = (): JSX.Element => {
     const ref = $<HTMLSelectElement>()
     const value = $('bar')
@@ -56,7 +57,7 @@ TestSelectObservableValue.test = {
         // Use timing pattern to handle timing issues
         let expected: string
         let expectedFull: string
-        let currentTiming = $$(testObservables['TestSelectObservableValue_timing'])
+        let currentTiming = $$(testObservables[`${name}_timing`])
 
         // Always read current state to avoid timing issues
         const valueObservable: any = testObservables['TestSelectObservableValue']
@@ -69,21 +70,21 @@ TestSelectObservableValue.test = {
         // Update timing to current value to prevent future mismatches
         timing = currentTiming
 
-        const ssrComponent = testObservables['TestSelectObservableValue_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Extract the actual select content from SSR result
         const selectMatch = ssrResult.match(/<select[^>]*>.*?<\/select>/s)
         const actualSelect = selectMatch ? selectMatch[0] : ''
         const dynamicExpectedFull = `<h3>Select - Observable Value</h3>${actualSelect}`
 
-        console.log('[TestSelectObservableValue] SSR result:', ssrResult)
+        console.log('${name}] SSR result:', ssrResult)
         console.log('[TestSelectObservableValue] Dynamic expected:', dynamicExpectedFull)
 
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestSelectObservableValue] ❌ SSR ASSERTION FAILED')
             assert(false, `SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ [TestSelectObservableValue] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

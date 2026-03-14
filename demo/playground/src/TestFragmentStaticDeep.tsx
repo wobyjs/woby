@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestFragmentStaticDeep'
 const TestFragmentStaticDeep = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -36,12 +37,12 @@ TestFragmentStaticDeep.test = {
         const expectedFull = '<h3>Fragment - Static Deep</h3><p>first</p><p>second</p><p>deep</p>'
         const expected = '<p>first</p><p>second</p><p>deep</p>'
 
-        const ssrComponent = testObservables['TestFragmentStaticDeep_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestFragmentStaticDeep] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestFragmentStaticDeep] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -2,6 +2,7 @@ import { $, $$, store, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let testit = true
+const name = 'TestClassesObjectStore'
 const TestClassesObjectStore = (): JSX.Element => {
     const o = store({ red: true, blue: false })
     registerTestObservable('TestClassesObjectStore', o)
@@ -42,7 +43,7 @@ TestClassesObjectStore.test = {
         // Reset testit for next cycle
         testit = false
 
-        const ssrComponent = testObservables['TestClassesObjectStore_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Create dynamic expected based on actual SSR result
         const classMatch = ssrResult.match(/<p class="([^"]*)">/)
@@ -50,9 +51,9 @@ TestClassesObjectStore.test = {
         const dynamicExpectedFull = `<h3>Classes - Object Store</h3><p class="${actualClass}">content</p>`
 
         if (ssrResult !== dynamicExpectedFull) {
-            assert(false, `[TestClassesObjectStore] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ [TestClassesObjectStore] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

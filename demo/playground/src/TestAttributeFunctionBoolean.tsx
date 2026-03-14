@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, registerTestObservable, testObservables, assert, TEST_INTERVAL } from './util'
 
+const name = 'TestAttributeFunctionBoolean'
 const TestAttributeFunctionBoolean = (): JSX.Element => {
     const o = $(true)
     const toggle = () => o(prev => !prev)
@@ -35,13 +36,13 @@ TestAttributeFunctionBoolean.test = {
             expected = '<p>content</p>'
         }
 
-        const ssrComponent = testObservables['TestAttributeFunctionBoolean_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Attribute - Function Boolean</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestAttributeFunctionBoolean] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestAttributeFunctionBoolean] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

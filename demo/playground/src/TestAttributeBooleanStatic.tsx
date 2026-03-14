@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestAttributeBooleanStatic'
 const TestAttributeBooleanStatic = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -21,13 +22,13 @@ TestAttributeBooleanStatic.test = {
     expect: () => {
         const expected = '<p disabled="">content</p><p>content</p>'
 
-        const ssrComponent = testObservables['TestAttributeBooleanStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Attribute Boolan - Static</h3><p disabled="">content</p><p>content</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestAttributeBooleanStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestAttributeBooleanStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -36,7 +36,7 @@ import { camelToKebabCase, kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
 import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from "../utils/stylesheets"
-import { ObservableMaybe, Child, Component } from "../types"
+import { ObservableMaybe, Child, Component, ContextProvider } from "../types"
 import { useLightDom } from "../hooks/use_attached"
 import { mark } from "../utils/mark"
 import { customElements as ces, SSRCustomElement, SSRShadowRoot, SSRSlotElement } from '../ssr/custom_elements'
@@ -65,12 +65,12 @@ if (isSSR) {
  *
  * @template P - Component props type
  * @param tagName - The HTML tag name for the custom element
- * @param component - The component function that renders the element's content
+ * @param component - The component function that renders the element's content (can be a regular component or Context.Provider)
  * @returns A mock custom element class
  */
 export const createSSRCustomElement = <P extends { children?: Observable<Child> }>(
     tagName: string,
-    component: Component<P>
+    component: Component<P> | ContextProvider<any>
 ): void => {
     // Create a subclass of SSRCustomElement for this specific component
     class ComponentCustomElement extends SSRCustomElement {
@@ -131,10 +131,13 @@ const collectAncestorContextWrap = (el: HTMLElement): ((fn: () => void) => void)
 
 /**
  * Creates a browser custom element with reactive properties
+ * 
+ * @param tagName - The HTML tag name for the custom element
+ * @param component - The component function that renders the element's content (can be a regular component or Context.Provider)
  */
 export const createBrowserCustomElement = <P extends { children?: Observable<JSX.Child> }>(
     tagName: string,
-    component: JSX.Component<P>
+    component: JSX.Component<P> | ContextProvider<any>
 ): void => {
     const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
     if (!defaultPropsFn) {
@@ -182,11 +185,11 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     // Store a context-replay function on this element so descendant custom
                     // elements can re-establish the soby context chain when they are
                     // constructed outside the reactive context scope.
-                    const selfWrap = (fn: () => void) => context({ [ps.symbol]: ps.value }, fn)
-                        ; (this as any)[SYMBOL_CONTEXT_WRAP] = selfWrap
+                    const selfWrap = (fn: () => void) => context({ [ps.symbol]: ps.value }, fn);
+                    (this as any)[SYMBOL_CONTEXT_WRAP] = selfWrap
 
                     context({ [ps.symbol]: ps.value }, () => {
-                        const componentResult = createElement(component, this.props)
+                        const componentResult = createElement(component as any, this.props)
                         setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
                     })
                 }
@@ -196,16 +199,16 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     const ancestorWrap = collectAncestorContextWrap(this)
                     if (ancestorWrap) {
                         ancestorWrap(() => {
-                            const componentResult = createElement(component, this.props)
+                            const componentResult = createElement(component as any, this.props)
                             setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
                         })
                     } else {
-                        const componentResult = createElement(component, this.props)
+                        const componentResult = createElement(component as any, this.props)
                         setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
                     }
                 }
             } else {
-                setChild(this, createElement(component, this.props), FragmentUtils.make(), callStack('Custom element'))
+                setChild(this, createElement(component as any, this.props), FragmentUtils.make(), callStack('Custom element'))
             }
 
             if (!this.propDict) {
@@ -544,11 +547,12 @@ const getNestedProperty = (obj: any, path: string) => {
  * - Component must have default props defined using the `defaults` helper
  * - Component props that are observables will be updated with type conversion
  * - Component can be used in both JSX/TSX and HTML
+ * - Accepts regular components or Context.Provider components
  * 
  * @template P - Component props type
  * @param tagName - The HTML tag name for the custom element (must contain a hyphen)
- * @param component - The component function that renders the element's content
- * @returns The custom element class
+ * @param component - The component function that renders the element's content (can be a regular component or Context.Provider)
+ * @returns void
  * 
  * @example
  * ```tsx
@@ -576,65 +580,15 @@ const getNestedProperty = (obj: any, path: string) => {
  * 
  * @example
  * ```tsx
- * // Component with nested properties
- * const UserCard = defaults(() => ({
- *   user: {
- *     name: $('John'),
- *     details: {
- *       age: $(30, { type: 'number' } as const)
- *     }
- *   }
- * }), ({ user }: { user: { name: Observable<string>, details: { age: Observable<number> } } }) => (
- *   <div>
- *     <h2>{user.name}</h2>
- *     <p>Age: {user.details.age}</p>
- *   </div>
- * ))
+ * // Register a Context.Provider as a custom element
+ * const readerContext = createContext<string>()
+ * customElement('reader-context', readerContext.Provider)
  * 
- * customElement('user-card', UserCard)
- * 
- * // Usage with nested attributes:
- * // <user-card user$name="Jane" user$details$age="25"></user-card> (both HTML and JSX)
- * ```
- * 
- * @example
- * ```tsx
- * // Component with custom serialization
- * const DateComponent = defaults(() => ({
- *   date: $(new Date(), { 
- *     toHtml: o => o.toISOString(), 
- *     fromHtml: o => new Date(o) 
- *   })
- * }), ({ date }: { date: Observable<Date> }) => (
- *   <div>Date: {() => $$(date).toString()}</div>
- * ))
- * 
- * customElement('date-component', DateComponent)
- * 
- * // Usage:
- * // <date-component date="2023-01-01T00:00:00.000Z"></date-component>
- * ```
- * 
- * @example
- * ```tsx
- * // Component with hidden functions
- * const Counter = defaults(() => {
- *   const value = $(0, { type: 'number' } as const)
- *   return {
- *     value,
- *     increment: $([() => { value($$(value) + 10) }], { toHtml: o => undefined }) // Hide from HTML attributes
- *   }
- * }), ({ value, increment }: { value: Observable<number>, increment: Observable<(() => void)[]> }) => (
- *   <div>
- *     <p>Count: {value}</p>
- *     <button onClick={() => increment[0]()}>+</button>
- *   </div>
- * ))
- * 
- * customElement('counter-element', Counter)
+ * // Usage in HTML:
+ * // <reader-context value="outer">...</reader-context>
  * ```
  */
-export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P>): void => {
+export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P> | ContextProvider<any>): void => {
     createSSRCustomElement(tagName, component)
 
     if (globalThis.window && globalThis.document) {

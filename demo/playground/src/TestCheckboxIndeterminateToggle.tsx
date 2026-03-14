@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestCheckboxIndeterminateToggle'
 const TestCheckboxIndeterminateToggle = (): JSX.Element => {
     const o = $<boolean>(false)
     const toggle = () => o(prev => !prev)
@@ -28,13 +29,13 @@ TestCheckboxIndeterminateToggle.test = {
         //<input type="checkbox"></input><input type="checkbox"></input>' to match one of the expected values 
         //<input type=\"checkbox\"><input type=\"checkbox\">
 
-        const ssrComponent = testObservables['TestCheckboxIndeterminateToggle_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3>${ssrExpected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestCheckboxIndeterminateToggle] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestCheckboxIndeterminateToggle] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return domExpected

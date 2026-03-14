@@ -1,6 +1,7 @@
 import { $, $$, For, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestNestedArrays'
 const TestNestedArrays = (): JSX.Element => {
     const items = $([0, 1, 2])
     const activeItem = $(1)
@@ -82,12 +83,12 @@ TestNestedArrays.test = {
         const expectedFull = '<h3>Nested Arrays</h3>' + htmlSsr
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestNestedArrays_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestNestedArrays] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestNestedArrays] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

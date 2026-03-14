@@ -1,6 +1,7 @@
 import { $, $$, useEffect, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestRef'
 const TestRef = (): JSX.Element => {
     const ref = $<HTMLElement>()
     // Start with the expected value to avoid timing issues
@@ -29,7 +30,7 @@ TestRef.test = {
     static: false,
     expect: () => {
         // Define expected values for both main test and SSR test
-        const element = $$(testObservables['TestRef_ref']) as HTMLElement
+        const element = $$(testObservables[`${name}_ref`]) as HTMLElement
 
         const expectedForSSR = [
             '<p>Got ref - Has parent: true - Is connected: true</p>',
@@ -41,13 +42,13 @@ TestRef.test = {
         ]
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestRef_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFullSSR = expectedForSSR.map(exp => '<h3>Ref</h3>' + exp)
         if (!expectedFullSSR.includes(ssrResult)) {
-            assert(false, `[TestRef] SSR mismatch: got \n${ssrResult}, expected one of \n${expectedFullSSR.join('\n')}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected one of \n${expectedFullSSR.join('\n')}`)
         } else {
-            console.log(`✅ [TestRef] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
         return expectedForDOM  // This is what the DOM test framework compares against
     }

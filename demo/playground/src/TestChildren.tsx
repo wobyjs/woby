@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestChildren'
 const TestChildren = (): JSX.Element => {
     const A = ({ children }): JSX.Element => {
         return <div class="A">{children}</div>
@@ -35,13 +36,13 @@ TestChildren.test = {
     expect: () => {
         const expected = '<div><div><div><p>content</p></div></div></div>'
 
-        const ssrComponent = testObservables['TestChildren_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Children</h3><div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestChildren] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestChildren] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return '<div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'

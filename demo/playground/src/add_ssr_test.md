@@ -28,6 +28,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 In the component function, register the JSX element for SSR testing:
 
 ```typescript
+const name = 'MyComponent'
 const MyComponent = (): JSX.Element => {
     // ... component logic ...
     const ret: JSX.Element = () => (
@@ -69,7 +70,7 @@ MyComponent.test = {
         const expectedFull = fullElements[idx]  // For SSR comparison (expectedFull)
         const expected = partialElements[idx]   // For main DOM test comparison (expected)
         
-                            const ssrComponent = testObservables['MyComponent_ssr']
+                            const ssrComponent = testObservables[`${name}_ssr`]
             if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
                 // If it's a JSX element or function, we can render it to string
                 // If it's a function, we need to call it first to get the element

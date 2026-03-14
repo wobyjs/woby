@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestNumberFunction'
 const TestNumberFunction = (): JSX.Element => {
     const o = $(random())
     registerTestObservable('TestNumberFunction', o)
@@ -27,13 +28,13 @@ TestNumberFunction.test = {
         const expected = `<p>${value}</p>`
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestNumberFunction_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Number - Function</h3>' + expected
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestNumberFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestNumberFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

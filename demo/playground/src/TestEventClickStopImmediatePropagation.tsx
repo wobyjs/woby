@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestEventClickStopImmediatePropagation'
 const TestEventClickStopImmediatePropagation = (): JSX.Element => {
     const outer = $(0)
     const inner = $(0)
@@ -63,18 +64,18 @@ TestEventClickStopImmediatePropagation.test = {
     expect: () => {
         let expected, expectedFull
 
-        const outerValue = $$(testObservables['TestEventClickStopImmediatePropagation_outer'])
-        const innerValue = $$(testObservables['TestEventClickStopImmediatePropagation_inner'])
+        const outerValue = $$(testObservables[`${name}_outer`])
+        const innerValue = $$(testObservables[`${name}_inner`])
 
         expected = `<p><button>${outerValue}<button>${innerValue}</button></button></p>`
         expectedFull = `<h3>Event - Click - Stop Immediate Propagation</h3><p><button>${outerValue}<button>${innerValue}</button></button></p>`
 
-        const ssrComponent = testObservables['TestEventClickStopImmediatePropagation_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventClickStopImmediatePropagation] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestEventClickStopImmediatePropagation] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

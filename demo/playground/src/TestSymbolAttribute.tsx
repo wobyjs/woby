@@ -1,29 +1,32 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-const name = 'TestHTMLDangerouslySetInnerHTMLStatic'
-const TestHTMLDangerouslySetInnerHTMLStatic = (): JSX.Element => {
+const name = 'TestSymbolAttribute'
+const TestSymbolAttribute = (): JSX.Element => {
+    const o = $(Symbol())
+    const randomize = () => o(Symbol())
+    useInterval(randomize, TEST_INTERVAL)
     const ret: JSX.Element = () => (
         <>
-            <h3>HTML - dangerouslySetInnerHTML - Static</h3>
-            <p dangerouslySetInnerHTML={{ __html: '<i>danger</i>' }} />
+            <h3>Symbol - Attribute</h3>
+            <p data-symbol={o()}>content</p>
         </>
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestHTMLDangerouslySetInnerHTMLStatic_ssr', ret)
+    registerTestObservable('TestSymbolAttribute_ssr', ret)
 
     return ret
 }
 
-TestHTMLDangerouslySetInnerHTMLStatic.test = {
-    static: true,
+TestSymbolAttribute.test = {
+    static: false,
     expect: () => {
-        const expected = '<p><i>danger</i></p>'
+        const expected = '<p>content</p>'
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>HTML - dangerouslySetInnerHTML - Static</h3><p><i>danger</i></p>'
+        const expectedFull = '<h3>Symbol - Attribute</h3><p>content</p>'
         if (ssrResult !== expectedFull) {
             assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
@@ -35,4 +38,4 @@ TestHTMLDangerouslySetInnerHTMLStatic.test = {
 }
 
 
-export default () => <TestSnapshots Component={TestHTMLDangerouslySetInnerHTMLStatic} />
+export default () => <TestSnapshots Component={TestSymbolAttribute} />

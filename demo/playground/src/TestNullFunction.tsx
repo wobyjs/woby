@@ -2,6 +2,7 @@ import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 let timing = 0
+const name = 'TestNullFunction'
 const TestNullFunction = (): JSX.Element => {
     const o = $<string | null>(null)
     const enable = $(0)
@@ -40,14 +41,14 @@ const TestNullFunction = (): JSX.Element => {
 TestNullFunction.test = {
     static: false,
     enable: () => {
-        const observableTiming = $$(testObservables['TestNullFunction_timing'])
+        const observableTiming = $$(testObservables[`${name}_timing`])
         return observableTiming > 0
     },
     expect: () => {
         // Use timing pattern to handle timing issues
         let expected: string
         let expectedFull: string
-        let currentTiming = $$(testObservables['TestNullFunction_timing'])
+        let currentTiming = $$(testObservables[`${name}_timing`])
 
         // Always read current state to avoid timing issues
         const value = $$(testObservables['TestNullFunction'])
@@ -58,21 +59,21 @@ TestNullFunction.test = {
         timing = currentTiming
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestNullFunction_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Extract the actual rendered content from SSR result
         const match = ssrResult.match(/<h3>Null - Function<\/h3>(.*)$/)
         const actualContent = match ? match[1] : '<p><!----></p>'
         const dynamicExpectedFull = `<h3>Null - Function</h3>${actualContent}`
 
-        console.log('[TestNullFunction] SSR result:', ssrResult)
+        console.log('${name}] SSR result:', ssrResult)
         console.log('[TestNullFunction] Dynamic expected:', dynamicExpectedFull)
 
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestNullFunction] ❌ SSR ASSERTION FAILED')
-            assert(false, `[TestNullFunction] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ [TestNullFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

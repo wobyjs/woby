@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestHTMLOuterHTMLStatic'
 const TestHTMLOuterHTMLStatic = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -20,13 +21,13 @@ TestHTMLOuterHTMLStatic.test = {
     expect: () => {
         const expected = '<p></p>'
 
-        const ssrComponent = testObservables['TestHTMLOuterHTMLStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>HTML - outerHTML - Static</h3><p></p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestHTMLOuterHTMLStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestHTMLOuterHTMLStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

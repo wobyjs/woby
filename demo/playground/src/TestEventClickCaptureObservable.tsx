@@ -13,6 +13,7 @@ if (typeof window !== 'undefined') {
     (window as any).testObservables = testObservables
 }
 
+const name = 'TestEventClickCaptureObservable'
 const TestEventClickCaptureObservable = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
@@ -70,7 +71,7 @@ TestEventClickCaptureObservable.test = {
     expect: () => {
         // For the plus2/minus1 pattern: 0 -> 2 -> 1 -> 3 -> 2 -> 4 -> 3...
         // The observable should be updating correctly with the pattern
-        const observable = testObservables['TestEventClickCaptureObservable_o']
+        const observable = testObservables[`${name}_o`]
         let currentValue = 0
         let expected, expectedFull
 
@@ -85,12 +86,12 @@ TestEventClickCaptureObservable.test = {
             expectedFull = `<h3>Event - Click Capture Observable</h3><p><button>0</button></p>`
         }
 
-        const ssrComponent = testObservables['TestEventClickCaptureObservable_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventClickCaptureObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestEventClickCaptureObservable] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

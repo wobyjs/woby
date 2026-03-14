@@ -307,6 +307,7 @@ import TestSwitchFunction from './src/TestSwitchFunction'
 import TestSwitchObservable from './src/TestSwitchObservable'
 import TestSwitchObservableComplex from './src/TestSwitchObservableComplex'
 import TestSwitchStatic from './src/TestSwitchStatic'
+import TestSymbolAttribute from './src/TestSymbolAttribute'
 import TestSymbolFunction from './src/TestSymbolFunction'
 import TestSymbolObservable from './src/TestSymbolObservable'
 import TestSymbolRemoval from './src/TestSymbolRemoval'
@@ -550,11 +551,11 @@ const tests = [
     // TestPropertyValueRemoval,
     // TestPropertyValueStatic,
 
-    // TestContextComponents,
-    // TestContextHook,
+    TestContextComponents,
+    TestContextHook,
     TestContextHookHtml,
-    // TestContextDynamicContext,
-    // TestRefContext,
+    TestContextDynamicContext,
+    TestRefContext,
 
     // TestRef,
     // TestRefs,
@@ -638,7 +639,8 @@ const tests = [
     // TestSwitchObservable,
     // TestSwitchObservableComplex,
     // TestSwitchStatic,
-    // TestSymbolFunction,
+    TestSymbolAttribute,
+    TestSymbolFunction,
     // TestSymbolObservable,
     // TestSymbolRemoval,
     // TestSymbolStatic,

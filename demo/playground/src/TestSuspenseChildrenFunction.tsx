@@ -1,12 +1,15 @@
 import { $, $$, Suspense, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestSuspenseChildrenFunction'
 const TestSuspenseChildrenFunction = (): JSX.Element => {
     const initialValue = String(random())
     registerTestObservable('TestSuspenseChildrenFunction', initialValue)
+    const name = 'Children'
     const Children = (): JSX.Element => {
         return <p>Children: {initialValue}</p>
     }
+    const name = 'Fallback'
     const Fallback = (): JSX.Element => {
         return <p>Fallback!</p>
     }
@@ -36,16 +39,16 @@ TestSuspenseChildrenFunction.test = {
         const expected = `<p>Children: ${valueForTest}</p>`
 
         // Test the SSR value
-        const ssrComponentTemp = testObservables['TestSuspenseChildrenFunction_ssr']
+        const ssrComponentTemp = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponentTemp)
         // Extract the actual value from the SSR result
         const match = ssrResult.match(/<p>Children: ([^<]+)<\/p>/)
         const actualValueFromSSR = match ? match[1] : 'unknown'
         const expectedFull = `<h3>Suspense - Children Function</h3><p>Children: ${actualValueFromSSR}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSuspenseChildrenFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestSuspenseChildrenFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         // For the main test, we need to return the actual expected value

@@ -1,6 +1,7 @@
 import { $, $$, Dynamic, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestDynamicHeading'
 const TestDynamicHeading = (): JSX.Element => {
     const level = $(1 as 1 | 2 | 3 | 4 | 5 | 6)
     registerTestObservable('TestDynamicHeading', level)
@@ -38,12 +39,12 @@ TestDynamicHeading.test = {
         const expectedFull = `<h3>Dynamic - Heading</h3><h${level}>Level: ${level}</h${level}>`  // For SSR comparison
         const expected = `<h${level}>Level: ${level}</h${level}>`   // For main test comparison
 
-        const ssrComponent = testObservables['TestDynamicHeading_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestDynamicHeading] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestDynamicHeading] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -1,6 +1,7 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestIfFunctionUntracked'
 const TestIfFunctionUntracked = (): JSX.Element => {
     // Static values for static test
     const ret: JSX.Element = () => (
@@ -30,12 +31,12 @@ TestIfFunctionUntracked.test = {
         const expectedFull = '<button>Close</button>'
         const expected = '<button>Close</button>'
 
-        const ssrComponent = testObservables['TestIfFunctionUntracked_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIfFunctionUntracked] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestIfFunctionUntracked] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

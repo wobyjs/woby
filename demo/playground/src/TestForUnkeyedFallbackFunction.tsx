@@ -1,6 +1,7 @@
 import { $, $$, For, renderToString, ObservableReadonly, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestForUnkeyedFallbackFunction'
 const TestForUnkeyedFallbackFunction = (): JSX.Element => {
     const o = $(String(random()))
     // Store the observable globally so the test can access it
@@ -40,13 +41,13 @@ TestForUnkeyedFallbackFunction.test = {
         const value = $$(testObservables['TestForUnkeyedFallbackFunction'])
         const expected = `<p>Fallback: ${value}</p>`
 
-        const ssrComponent = testObservables['TestForUnkeyedFallbackFunction_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>For - Unkeyed - Fallback Function</h3><p>Fallback: ${value}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForUnkeyedFallbackFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestForUnkeyedFallbackFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

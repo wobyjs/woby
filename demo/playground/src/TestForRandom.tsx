@@ -1,6 +1,7 @@
 import { $, $$, For, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestForRandom'
 const TestForRandom = (): JSX.Element => {
     const values = $([random(), random(), random()])
     // Store the observable globally so the test can access it
@@ -31,13 +32,13 @@ TestForRandom.test = {
         const values = $$(testObservables['TestForRandom'])
         const expected = `<p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
 
-        const ssrComponent = testObservables['TestForRandom_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>For - Random Only Child</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestForRandom] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestForRandom] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

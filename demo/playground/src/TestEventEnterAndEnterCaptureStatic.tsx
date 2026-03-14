@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestEventEnterAndEnterCaptureStatic'
 const TestEventEnterAndEnterCaptureStatic = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
@@ -46,7 +47,7 @@ TestEventEnterAndEnterCaptureStatic.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const observable = testObservables['TestEventEnterAndEnterCaptureStatic_o']
+        const observable = testObservables[`${name}_o`]
         let value = 0
 
         if (observable) {
@@ -56,7 +57,7 @@ TestEventEnterAndEnterCaptureStatic.test = {
         // For client-side test, use the current value
         const expected = `<p><button>${value}</button></p>`   // For main test comparison (current value)
 
-        const ssrComponent = testObservables['TestEventEnterAndEnterCaptureStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Extract the button value from SSR result to use for comparison
         const match = ssrResult.match(/<button[^>]*>(.*?)<\/button>/)
@@ -64,9 +65,9 @@ TestEventEnterAndEnterCaptureStatic.test = {
         const expectedFull = `<h3>Event - Enter & Enter Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
         // Handle HTML entity encoding in SSR output
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventEnterAndEnterCaptureStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestEventEnterAndEnterCaptureStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -2,6 +2,7 @@ import { $, $$, renderToString, type JSX } from 'woby'
 import type { FunctionUnwrap } from './util'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestStylesRemoval'
 const TestStylesRemoval = (): JSX.Element => {
     const o = $<FunctionUnwrap<JSX.Style> | null>({ color: 'orange', fontWeight: 'normal' })
     registerTestObservable('TestStylesRemoval', o)
@@ -38,7 +39,7 @@ TestStylesRemoval.test = {
         }
 
         // Test the SSR value
-        const ssrComponent = testObservables['TestStylesRemoval_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
             const ssrResult = renderToString(ssrComponent)
             let expectedFull
@@ -53,9 +54,9 @@ TestStylesRemoval.test = {
                 expectedFull = '<h3>Styles - Removal</h3><p>content</p>'
             }
             if (ssrResult !== expectedFull) {
-                assert(false, `[TestStylesRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+                assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
             } else {
-                console.log(`✅ [TestStylesRemoval] SSR test passed: ${ssrResult}`)
+                console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
             }
         }
 

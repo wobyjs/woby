@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, randomBigInt, assert } from './util'
 
+const name = 'TestBigIntFunction'
 const TestBigIntFunction = (): JSX.Element => {
     const o = $(randomBigInt())
     // Store the observable globally so the test can access it
@@ -26,13 +27,13 @@ TestBigIntFunction.test = {
         // Keep 'n' suffix to match actual SSR rendering
         const expected = `<p>${value}n</p>`
 
-        const ssrComponent = testObservables['TestBigIntFunction_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>BigInt - Function</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestBigIntFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestBigIntFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

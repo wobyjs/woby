@@ -1,7 +1,8 @@
 import { $, $$, createContext, useContext, Dynamic, renderToString, jsx, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-const TestContextDynamicContext = () => {
+const name = 'TestContextDynamicContext'
+const TestContextDynamicContext = (): JSX.Element => {
 
     const Context = createContext('default')
 
@@ -58,12 +59,12 @@ TestContextDynamicContext.test = {
         const expectedFull = '<h3>Dynamic - Context</h3><context-provider value="context"><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p><p><p>context</p><p></p><p></p><p></p></p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="dynamic-function-value"><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p></context-provider>'  // For SSR comparison
         const expected = '<context-provider value="context"><p>context</p><p><p>context</p><p></p><p></p><p></p></p><p><p>default</p><p></p><p></p><p></p></p><p><p>default</p><p></p><p></p><p></p></p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="dynamic-function-value"><p>Dynamic function provider: dynamic-function-value</p><p>Dynamic content: dynamic-function-value</p></context-provider>'   // For main test comparison
 
-        const ssrComponent = testObservables['TestContextDynamicContext_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestContextDynamicContext] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestContextDynamicContext] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

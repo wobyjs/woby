@@ -1,9 +1,11 @@
 import { $, $$, ErrorBoundary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestErrorBoundaryChildrenObservableStatic'
 const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
     const childrenValue = String(random())
     registerTestObservable('TestErrorBoundaryChildrenObservableStatic', $(childrenValue))
+    const name = 'Children'
     const Children = (): JSX.Element => {
         // Remove dynamic updating for static test
         // const o = $(String(random()))
@@ -12,6 +14,7 @@ const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
         // o()
         return <p>Children: {childrenValue}</p>
     }
+    const name = 'Fallback'
     const Fallback = (): JSX.Element => {
         return <p>Fallback!</p>
     }
@@ -40,12 +43,12 @@ TestErrorBoundaryChildrenObservableStatic.test = {
         const expectedFull = `<h3>Error Boundary - Children Observable Static</h3><p>Children: ${childrenValue}</p>`  // For SSR comparison
         const expected = `<p>Children: ${childrenValue}</p>`   // For main test comparison
 
-        const ssrComponent = testObservables['TestErrorBoundaryChildrenObservableStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestErrorBoundaryChildrenObservableStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestErrorBoundaryChildrenObservableStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

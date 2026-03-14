@@ -1,6 +1,7 @@
 import { $, $$, Ternary, useTimeout, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestTernaryChildrenFunction'
 const TestTernaryChildrenFunction = (): JSX.Element => {
     const trueValue = $(String(random()))
     const falseValue = $(String(random()))
@@ -56,17 +57,17 @@ TestTernaryChildrenFunction.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const trueValue = testObservables['TestTernaryChildrenFunction_true']?.() ?? '0.123456'
-        const falseValue = testObservables['TestTernaryChildrenFunction_false']?.() ?? '0.789012'
+        const trueValue = testObservables[`${name}_true`]?.() ?? '0.123456'
+        const falseValue = testObservables[`${name}_false`]?.() ?? '0.789012'
         const expected = `<p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
 
-        const ssrComponent = testObservables['TestTernaryChildrenFunction_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Ternary - Children Function</h3><p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestTernaryChildrenFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestTernaryChildrenFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

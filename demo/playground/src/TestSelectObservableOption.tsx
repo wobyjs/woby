@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestSelectObservableOption'
 const TestSelectObservableOption = (): JSX.Element => {
     const ref = $<HTMLSelectElement>()
     const branch = $(true)
@@ -36,13 +37,13 @@ TestSelectObservableOption.test = {
     expect: () => {
         const expected = '<select name="select-observable-option"><option value="foo">foo</option><option value="bar">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
 
-        const ssrComponent = testObservables['TestSelectObservableOption_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Select - Observable Option</h3><select name="select-observable-option"><option value="foo">foo</option><option value="bar" selected="">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSelectObservableOption] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestSelectObservableOption] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestEventTargetCurrentTarget'
 const TestEventTargetCurrentTarget = (): JSX.Element => {
     const clickCount = $(0)
     registerTestObservable('TestEventTargetCurrentTarget_clickCount', clickCount)
@@ -88,21 +89,21 @@ TestEventTargetCurrentTarget.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        const clickCount = $$(testObservables['TestEventTargetCurrentTarget_clickCount']) ?? 0
+        const clickCount = $$(testObservables[`${name}_clickCount`]) ?? 0
 
         // Define expected values for both main test and SSR test
         const expected = `<div><p>paragraph</p><ul><li>one</li><li>two</li><li>three</li></ul></div>`   // For main test comparison
 
-        const ssrComponent = testObservables['TestEventTargetCurrentTarget_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Extract content from SSR result to use for comparison
         const match = ssrResult.match(/<div[^>]*>(.*?)<\/div>/)
         const ssrContent = match ? match[1] : '<p>paragraph</p><ul><li>one</li><li>two</li><li>three</li></ul>'
         const expectedFull = `<h3>Event - Target - Current Target</h3><div>${ssrContent}</div>`  // For SSR comparison
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestEventTargetCurrentTarget] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            assert(true, `[TestEventTargetCurrentTarget] SSR test passed: ${ssrResult}`)
+            assert(true, `${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

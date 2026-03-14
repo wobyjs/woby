@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestStringObservableStatic'
 const TestStringObservableStatic = (): JSX.Element => {
     const initialValue = "0.123456"
     const ret: JSX.Element = () => (
@@ -23,13 +24,13 @@ TestStringObservableStatic.test = {
     expect: () => {
         const expected = '<p>0.123456</p>'
 
-        const ssrComponent = testObservables['TestStringObservableStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>String - Observable Static</h3><p>0.123456</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestStringObservableStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestStringObservableStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

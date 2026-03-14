@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestInputLabelFor'
 const TestInputLabelFor = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -25,12 +26,12 @@ TestInputLabelFor.test = {
         const expectedFull = '<h3>Input - Label For</h3><p><label htmlfor="for-target">htmlFor</label></p><p><label for="for-target">for</label></p><p><input id="for-target" /></p>'
         const expected = '<p><label for="for-target">htmlFor</label></p><p><label for="for-target">for</label></p><p><input id="for-target"></p>'   // For main DOM test comparison
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestInputLabelFor_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestInputLabelFor] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestInputLabelFor] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected  // This is what the DOM test framework compares against

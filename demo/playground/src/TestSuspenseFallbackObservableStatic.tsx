@@ -1,15 +1,18 @@
 import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestSuspenseFallbackObservableStatic'
 const TestSuspenseFallbackObservableStatic = (): JSX.Element => {
     const initialValue = String(random())
     registerTestObservable('TestSuspenseFallbackObservableStatic', initialValue)
+    const name = 'Children'
     const Children = (): JSX.Element => {
         const resource = useResource(() => {
             return new Promise<undefined>(() => { })
         })
         return <p>children {resource.value}</p>
     }
+    const name = 'Fallback'
     const Fallback = (): JSX.Element => {
         return <p>Fallback: {initialValue}</p>
     }
@@ -36,13 +39,13 @@ TestSuspenseFallbackObservableStatic.test = {
         const expected = `<p>Fallback: ${String(initialValue)}</p>`
 
         // Test the SSR value
-        const ssrComponent = testObservables['TestSuspenseFallbackObservableStatic_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Suspense - Fallback Observable Static</h3><p>Fallback: ${String(initialValue)}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSuspenseFallbackObservableStatic] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestSuspenseFallbackObservableStatic] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

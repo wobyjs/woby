@@ -1,8 +1,10 @@
 import { $, $$, createContext, useContext, renderToString, jsx, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
 
+const name = 'TestContextHook'
 const TestContextHook = (): JSX.Element => {
     const Context = createContext('')
+    const name = 'Reader'
     const Reader = (): JSX.Element => {
         const value = useContext(Context)
         return <p>{value}</p>
@@ -46,12 +48,12 @@ TestContextHook.test = {
         const expectedFull = '<h3>Context - Hook</h3><context-provider value="outer"><p>outer</p><context-provider value="inner"><p>inner</p></context-provider><p>outer</p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="function-value"><p>Function provider: function-value</p></context-provider>'  // For SSR comparison
         const expected = '<context-provider value="outer"><p>outer</p><context-provider value="inner"><p>inner</p></context-provider><p>outer</p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="function-value"><p>Function provider: function-value</p></context-provider>'   // For main test comparison
 
-        const ssrComponent = testObservables['TestContextHook_ssr']
-        const ssrResult = renderToString(ssrComponent)
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = minimiseHtml(renderToString(ssrComponent))
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestContextHook] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestContextHook] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

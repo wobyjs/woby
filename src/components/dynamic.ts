@@ -5,7 +5,6 @@ import { $$ } from '../methods/soby'
 import { isFunction } from '../utils/lang'
 import type { Child, Component, FunctionMaybe, ObservableMaybe } from '../types'
 import { EnvironmentContext, useEnvironment } from '../components/environment_context'
-import { renderToString } from '..'
 
 
 export const Dynamic = <P = {}>({ component, props: propsProp, ...restProps }: { component: ObservableMaybe<Component<P>>, props?: FunctionMaybe<P> } & Omit<P, 'props'>): Child => {

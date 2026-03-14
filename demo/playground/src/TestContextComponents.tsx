@@ -1,6 +1,7 @@
 import { $, $$, createContext, useContext, renderToString, jsx, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestContextComponents'
 const TestContextComponents = (): JSX.Element => {
     const Context = createContext('')
     const ret: JSX.Element = () => (
@@ -49,12 +50,12 @@ TestContextComponents.test = {
         const expectedFull = '<h3>Context - Components</h3><context-provider value="outer"><p>outer</p><context-provider value="inner"><p>inner</p></context-provider><p>outer</p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="component-function-value"><p>Component function provider: component-function-value</p></context-provider>'  // For SSR comparison
         const expected = '<context-provider value="outer"><p>outer</p><context-provider value="inner"><p>inner</p></context-provider><p>outer</p></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="component-function-value"><p>Component function provider: component-function-value</p></context-provider>'   // For main test comparison
 
-        const ssrComponent = testObservables['TestContextComponents_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestContextComponents] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestContextComponents] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

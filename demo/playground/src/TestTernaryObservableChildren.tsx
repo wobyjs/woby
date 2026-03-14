@@ -1,6 +1,7 @@
 import { $, $$, Ternary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestTernaryObservableChildren'
 const TestTernaryObservableChildren = (): JSX.Element => {
     // Track which component is currently active using a single state object
     const state = $({
@@ -10,6 +11,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
     })
     registerTestObservable('TestTernaryObservableChildren_state', state)
 
+    const name = 'AB'
     const AB = (): JSX.Element => {
         const a = <i>a</i>
         const b = <u>b</u>
@@ -30,6 +32,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
         (globalThis as any).toggleAB = toggle
         return component
     }
+    const name = 'CD'
     const CD = (): JSX.Element => {
         const c = <b>c</b>
         const d = <span>d</span>
@@ -89,7 +92,7 @@ TestTernaryObservableChildren.test = {
         const expectedFull = `<h3>Ternary - Observable Children</h3>${expected}`
 
         // Test the SSR value
-        const ssrComponent = testObservables['TestTernaryObservableChildren_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         if (ssrComponent && (typeof ssrComponent === 'object' || typeof ssrComponent === 'function')) {
             const ssrResult = renderToString(ssrComponent)
             // Extract the actual rendered content from SSR result
@@ -97,14 +100,14 @@ TestTernaryObservableChildren.test = {
             const actualContent = match ? match[1] : '<i>a</i>'
             const dynamicExpectedFull = `<h3>Ternary - Observable Children</h3>${actualContent}`
 
-            console.log('[TestTernaryObservableChildren] SSR result:', ssrResult)
+            console.log('${name}] SSR result:', ssrResult)
             console.log('[TestTernaryObservableChildren] Dynamic expected:', dynamicExpectedFull)
 
             if (ssrResult !== dynamicExpectedFull) {
                 console.error('[TestTernaryObservableChildren]❌ SSR ASSERTION FAILED')
-                assert(false, `[TestTernaryObservableChildren] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+                assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
             } else {
-                console.log(`✅ [TestTernaryObservableChildren] SSR test passed: ${ssrResult}`)
+                console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
             }
         }
 

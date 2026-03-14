@@ -1,6 +1,7 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestIfNestedFunctionNarrowed'
 const TestIfNestedFunctionNarrowed = (): JSX.Element => {
     // Static value for static test
     const ret: JSX.Element = () => (
@@ -24,12 +25,12 @@ TestIfNestedFunctionNarrowed.test = {
         const expected = '<p>(0)</p>'   // For main DOM test comparison
 
         // Test the SSR value synchronously
-        const ssrComponent = testObservables['TestIfNestedFunctionNarrowed_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestIfNestedFunctionNarrowed] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestIfNestedFunctionNarrowed] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected  // This is what the DOM test framework compares against

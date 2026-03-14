@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestClassObservable'
 const TestClassObservable = (): JSX.Element => {
     const o = $(true)
     // Store the observable globally so the test can access it
@@ -27,13 +28,13 @@ TestClassObservable.test = {
         const value = $$(testObservables['TestClassObservable'])
         const expected = value ? '<p class="red">content</p>' : '<p class="">content</p>'
 
-        const ssrComponent = testObservables['TestClassObservable_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = value ? '<h3>Class - Observable</h3><p class="red">content</p>' : '<h3>Class - Observable</h3><p>content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestClassObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestClassObservable] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

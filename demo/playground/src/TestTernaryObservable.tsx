@@ -1,6 +1,7 @@
 import { $, $$, Ternary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestTernaryObservable'
 const TestTernaryObservable = (): JSX.Element => {
     const o = $(true)
     registerTestObservable('TestTernaryObservable', o)
@@ -29,13 +30,13 @@ TestTernaryObservable.test = {
         const value = testObservables['TestTernaryObservable']?.() ?? true
         const expected = `<p>${value ? 'true' : 'false'}</p>`
 
-        const ssrComponent = testObservables['TestTernaryObservable_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Ternary - Observable</h3><p>${value ? 'true' : 'false'}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestTernaryObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestTernaryObservable] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

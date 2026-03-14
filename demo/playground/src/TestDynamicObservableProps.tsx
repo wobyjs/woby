@@ -1,6 +1,7 @@
 import { $, $$, Dynamic, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestDynamicObservableProps'
 const TestDynamicObservableProps = (): JSX.Element => {
     const red = { class: 'red' }
     const blue = { class: 'blue' }
@@ -35,12 +36,12 @@ TestDynamicObservableProps.test = {
         const expectedFull = `<h3>Dynamic - Observable Props</h3><h5 class="${props.class}">Content</h5>`  // For SSR comparison
         const expected = `<h5 class="${props.class}">Content</h5>`   // For main test comparison
 
-        const ssrComponent = testObservables['TestDynamicObservableProps_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestDynamicObservableProps] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestDynamicObservableProps] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

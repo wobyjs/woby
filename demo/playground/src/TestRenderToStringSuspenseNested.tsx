@@ -4,6 +4,7 @@ import { TestSnapshots, registerTestObservable, testObservables, assert, useTime
 const TEST_INTERVAL = 500
 let syncStep = 0
 const syncValue = {}
+const name = 'TestRenderToStringSuspenseNested'
 const TestRenderToStringSuspenseNested = (): JSX.Element => {
     const o = $(123)
     const Content = ({ interval, title }) => {
@@ -45,6 +46,7 @@ const TestRenderToStringSuspenseNested = (): JSX.Element => {
 }
 
 
+const name = 'TestRenderToStringSuspenseNestedSSR'
 const TestRenderToStringSuspenseNestedSSR = (): JSX.Element => {
     const o = $(123)
     const Content = ({ interval, title }) => {
@@ -72,13 +74,13 @@ const TestRenderToStringSuspenseNestedSSR = (): JSX.Element => {
 }
 
 
-// const ssr = testObservables['TestRenderToStringSuspenseNested_ssr']
+// const ssr = testObservables[`${name}_ssr`]
 let ssrResult = renderToString(<TestRenderToStringSuspenseNestedSSR />)
 let expectedSSR = '<div><h3>renderToString - Suspense Nested</h3><p>124</p><p>125</p></div>' //final context
 if (ssrResult !== expectedSSR /* && ssrResult !== '<div></div>' */) {
-    assert(false, `[TestRenderToStringSuspenseNested] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
+    assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
 } else {
-    console.log(`✅ [TestRenderToStringSuspenseNested] SSR test passed: ${ssrResult}`)
+    console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
 }
 
 

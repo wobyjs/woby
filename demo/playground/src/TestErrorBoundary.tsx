@@ -1,7 +1,9 @@
 import { $, $$, useMemo, ErrorBoundary, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, useTimeout, assert } from './util'
 
+const name = 'TestErrorBoundary'
 const TestErrorBoundary = (): JSX.Element => {
+    const name = 'Erroring'
     const Erroring = (): JSX.Element => {
         // Immediately throw error for predictable test
         throw new Error('Custom error')
@@ -32,12 +34,12 @@ TestErrorBoundary.test = {
         const expectedFull = '<h3>Error Boundary</h3><p>Error caught: Custom error</p>'  // For SSR comparison
         const expected = '<p>Error caught: Custom error</p>'   // For main test comparison
 
-        const ssrComponent = testObservables['TestErrorBoundary_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestErrorBoundary] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestErrorBoundary] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

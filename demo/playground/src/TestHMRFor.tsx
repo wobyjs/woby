@@ -42,18 +42,19 @@ TestHMRFor.test = {
         const expectedFull = `<h3>HMR - For</h3><p>prev</p>${buttons}<p>next</p>`
         const expected = `<p>prev</p>${buttons}<p>next</p>`
 
-        const ssrComponent = testObservables['TestHMRFor_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestHmrFor] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestHmrFor] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected
     }
 }
 
+const name = 'Test'
 const Test = (): JSX.Element => {
     // Removed calls to undefined test functions that were causing errors
     return (

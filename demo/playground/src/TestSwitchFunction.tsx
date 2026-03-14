@@ -1,6 +1,7 @@
 import { $, $$, Switch, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestSwitchFunction'
 const TestSwitchFunction = (): JSX.Element => {
     const ret: JSX.Element = () => (
         <>
@@ -34,13 +35,13 @@ TestSwitchFunction.test = {
         const expected = '<p>0</p>'
 
         // Test the SSR value
-        const ssrComponent = testObservables['TestSwitchFunction_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Switch - Function</h3><p>0</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSwitchFunction] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestSwitchFunction] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

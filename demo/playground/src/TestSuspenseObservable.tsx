@@ -1,6 +1,7 @@
 import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestSuspenseObservable'
 const TestSuspenseObservable = (): JSX.Element => {
     const Content = () => {
         return <p>Content! 123</p>  // Static content
@@ -25,13 +26,13 @@ TestSuspenseObservable.test = {
     expect: () => {
         const expected = '<p>Content! 123</p>'
 
-        const ssrComponent = testObservables['TestSuspenseObservable_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Suspense - Observable</h3><p>Content! 123</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestSuspenseObservable] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestSuspenseObservable] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

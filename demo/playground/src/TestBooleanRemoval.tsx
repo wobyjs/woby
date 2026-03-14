@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestBooleanRemoval'
 const TestBooleanRemoval = (): JSX.Element => {
     const o = $<boolean | string>(true)
     // Store the observable globally so the test can access it
@@ -32,13 +33,13 @@ TestBooleanRemoval.test = {
             ssrExpected = `<p>${String(value)}</p>`
         }
 
-        const ssrComponent = testObservables['TestBooleanRemoval_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Boolean - Removal</h3>${ssrExpected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `[TestBooleanRemoval] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ [TestBooleanRemoval] SSR test passed: ${ssrResult}`)
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
 
         // Return the DOM version for comparison with actual

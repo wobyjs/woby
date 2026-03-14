@@ -1,6 +1,7 @@
 import { $, $$, useEffect, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestChildOverReexecution'
 const TestChildOverReexecution = (): JSX.Element => {
     const count = $(0)
     const executions = $(0)
@@ -40,12 +41,12 @@ TestChildOverReexecution.test = {
     static: false,
     expect: () => {
         const countObservable = testObservables['TestChildOverReexecution']
-        const executionsObservable = testObservables['TestChildOverReexecution_executions']
+        const executionsObservable = testObservables[`${name}_executions`]
         const currentValue = countObservable ? $$(countObservable) : 0
         const currentExecutions = executionsObservable ? $$(executionsObservable) : 0
         const expected = `<div>1</div>${currentValue}`
 
-        const ssrComponent = testObservables['TestChildOverReexecution_ssr']
+        const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Extract the actual execution count from SSR result
         const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/)
@@ -54,9 +55,9 @@ TestChildOverReexecution.test = {
             const ssrCount = parseInt(match[2])
             const expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`
             if (ssrResult === expectedFull) {
-                console.log(`✅ [TestChildOverReexecution] SSR test passed: ${ssrResult}`)
+                console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
             } else {
-                assert(false, `[TestChildOverReexecution] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+                assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
             }
         } else {
             assert(false, `SSR result format unexpected: ${ssrResult}`)

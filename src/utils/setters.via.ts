@@ -47,6 +47,11 @@ export const setAttributeStatic = (() => {
 
     return (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {
 
+        // Skip setting symbol values as attributes (they should not be serialized)
+        if (typeof value === 'symbol') {
+            return
+        }
+
         // put in via
         // if (isSVG(element) && !isProxy(element)) {
 
@@ -76,6 +81,25 @@ export const setAttributeStatic = (() => {
 })()
 
 export const setAttribute = (element: HTMLElement, key: string, value: FunctionMaybe<null | undefined | boolean | number | string>, stack: Stack): void => {
+
+    // For observables, check if the initial value is a symbol - if so, skip setting up reactivity
+    if (isObservable(value)) {
+        try {
+            const initialValue = value()
+            if (typeof initialValue === 'symbol') {
+                return
+            }
+        } catch (e) {
+            // If reading the value fails, continue with normal processing
+        }
+    } else if (isFunction(value)) {
+        const initialValue = value()
+        if (typeof initialValue === 'symbol') {
+            return
+        }
+    } else if (typeof value === 'symbol') {
+        return
+    }
 
     if (isFunction(value)) {
 
