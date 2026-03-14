@@ -2,7 +2,10 @@ import { $, $$, jsx, Portal, renderToString, createDocument, useEnvironment, typ
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 import { TestCleanupInner } from './TestCleanupInner'
 
-const TestCleanupInnerPortal = () => {
+const name = 'TestCleanupInnerPortal'
+
+const TestCleanupInnerPortal = (): JSX.Element => {
+
     const ret = () => {
         const isSSR = useEnvironment() === 'ssr'
 
@@ -19,13 +22,15 @@ const TestCleanupInnerPortal = () => {
             }
         }
 
+        const TestCleanupInnerIns = TestCleanupInner()
+
         return <Portal mount={mount} >
-            <TestCleanupInner />
+            <TestCleanupInnerIns />
         </Portal >
     }
 
     // Store the component for SSR testing
-    registerTestObservable('TestCleanupInnerPortal_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -46,7 +51,7 @@ TestCleanupInnerPortal.test = {
         const ssrResult = renderToString(ssrComponent, { document: doc })
         console.log(`✅ ${name}] SSR body: ${doc.body.innerHTML}`)
         if (ssrResult !== expected) {
-            assert(false, `${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expected}"`)
+            assert(false, `[${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expected}"`)
         }
 
         return '<!---->'

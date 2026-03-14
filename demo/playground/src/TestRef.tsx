@@ -20,8 +20,8 @@ const TestRef = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestRef_ref', ref)
-    registerTestObservable('TestRef_ssr', ret)
+    registerTestObservable(`${name}_ref`, ref)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -46,7 +46,7 @@ TestRef.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFullSSR = expectedForSSR.map(exp => '<h3>Ref</h3>' + exp)
         if (!expectedFullSSR.includes(ssrResult)) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected one of \n${expectedFullSSR.join('\n')}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected one of \n${expectedFullSSR.join('\n')}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

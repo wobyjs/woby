@@ -17,7 +17,7 @@ const TestComponentObservable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestComponentObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -26,7 +26,7 @@ TestComponentObservable.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestComponentObservable'])
+        const value = $$(testObservables[name])
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Component - Observable</h3><p>${value}</p>`  // For SSR comparison
@@ -35,7 +35,7 @@ TestComponentObservable.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

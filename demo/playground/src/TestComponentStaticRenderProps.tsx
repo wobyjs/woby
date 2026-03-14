@@ -1,6 +1,7 @@
 import { $, $$, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
+const name = 'TestComponentStaticRenderProps'
 const TestComponentStaticRenderProps = ({ value }: { value: number }): JSX.Element => {
     const propValue = random()
     registerTestObservable('TestComponentStaticRenderProps', propValue)
@@ -12,7 +13,7 @@ const TestComponentStaticRenderProps = ({ value }: { value: number }): JSX.Eleme
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestComponentStaticRenderProps_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -21,7 +22,7 @@ TestComponentStaticRenderProps.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        const propValue = testObservables['TestComponentStaticRenderProps']
+        const propValue = testObservables[name]
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Component - Static Render Props</h3><p>${String(propValue)}</p>`  // For SSR comparison
@@ -30,7 +31,7 @@ TestComponentStaticRenderProps.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

@@ -17,7 +17,7 @@ TestSymbolStatic.test = {
         const ssrResult = renderToString(<TestSymbolStatic />)
         const expectedFull = '<h3>Symbol - Static</h3><p></p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

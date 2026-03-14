@@ -15,7 +15,7 @@ const TestPortalWhenObservable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestPortalWhenObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -38,7 +38,7 @@ TestPortalWhenObservable.test = {
         const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
         console.log(`✅ ${name}] SSR body: ${doc.body.innerHTML}`)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
+            assert(false, `[${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
         }
 
         return expected  // This is what the DOM test framework compares against

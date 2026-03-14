@@ -11,8 +11,8 @@ const TestSelectObservableValue = (): JSX.Element => {
 
     // Store the observable globally so the test can access it
     registerTestObservable('TestSelectObservableValue', value)
-    registerTestObservable('TestSelectObservableValue_enable', enable)
-    registerTestObservable('TestSelectObservableValue_timing', timingObservable)
+    registerTestObservable(`${name}_enable`, enable)
+    registerTestObservable(`${name}_timing`, timingObservable)
 
     // Track timing changes
     const updateTiming = () => {
@@ -45,7 +45,7 @@ const TestSelectObservableValue = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestSelectObservableValue_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -60,7 +60,7 @@ TestSelectObservableValue.test = {
         let currentTiming = $$(testObservables[`${name}_timing`])
 
         // Always read current state to avoid timing issues
-        const valueObservable: any = testObservables['TestSelectObservableValue']
+        const valueObservable: any = testObservables[name]
         const currentValue = $$(valueObservable) || 'bar'
 
         // SSR doesn't include value attribute on select elements

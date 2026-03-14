@@ -21,7 +21,7 @@ const TestIfChildrenFunctionObservable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestIfChildrenFunctionObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -30,7 +30,7 @@ TestIfChildrenFunctionObservable.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const val = $$(testObservables['TestIfChildrenFunctionObservable'])
+        const val = $$(testObservables[name])
 
         // Define expected values for both main test and SSR test
         // const expectedFull = val !== false ? `<h3>If - Children Function Observable</h3><p>Value: ${val}</p>` : `<h3>If - Children Function Observable</h3><!---->`
@@ -40,7 +40,7 @@ TestIfChildrenFunctionObservable.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

@@ -5,7 +5,7 @@ const name = 'TestEventClickStatic'
 const TestEventClickStatic = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
-    registerTestObservable('TestEventClickStatic_o', o)
+    registerTestObservable(`${name}_o`, o)
     const increment = () => o(prev => prev + 1)
 
     // Programmatic click firing
@@ -33,7 +33,7 @@ const TestEventClickStatic = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestEventClickStatic_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -55,7 +55,7 @@ TestEventClickStatic.test = {
         const ssrValue = match ? match[1] : '0'
         const expectedFull = `<h3>Event - Click Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

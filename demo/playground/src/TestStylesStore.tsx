@@ -7,9 +7,9 @@ const TestStylesStore = (): JSX.Element => {
     const styles = store({ color: 'orange', fontWeight: 'normal' })
     const enable = $(0)
     const timingObservable = $(0)
-    registerTestObservable('TestStylesStore_styles', styles)
-    registerTestObservable('TestStylesStore_enable', enable)
-    registerTestObservable('TestStylesStore_timing', timingObservable)
+    registerTestObservable(`${name}_styles`, styles)
+    registerTestObservable(`${name}_enable`, enable)
+    registerTestObservable(`${name}_timing`, timingObservable)
 
     store.on(styles, () => {
         const newTiming = Math.random()
@@ -40,7 +40,7 @@ const TestStylesStore = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestStylesStore_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -80,7 +80,7 @@ TestStylesStore.test = {
 
             if (ssrResult !== dynamicExpectedFull) {
                 console.error('[TestStylesStore]❌ SSR ASSERTION FAILED')
-                assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+                assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
             } else {
                 console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
             }

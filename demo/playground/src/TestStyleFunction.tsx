@@ -17,7 +17,7 @@ const TestStyleFunction = (): JSX.Element => {
 
     // Store the component for SSR testing - only in environments where function is available
     if (typeof registerTestObservable !== 'undefined') {
-        registerTestObservable('TestStyleFunction_ssr', ret)
+        registerTestObservable(`${name}_ssr`, ret)
     }
 
     return ret
@@ -27,7 +27,7 @@ TestStyleFunction.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const color = $$(testObservables['TestStyleFunction']) ?? 'green'
+        const color = $$(testObservables[name]) ?? 'green'
         const expected = `<p style="color: ${color};">content</p>`
 
         //<h3>Style - Function</h3><p>content</p>
@@ -36,7 +36,7 @@ TestStyleFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Style - Function</h3><p style="color: ${color};">content</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

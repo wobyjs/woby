@@ -15,7 +15,7 @@ const TestStyleFunctionNumeric = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestStyleFunctionNumeric_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -23,7 +23,7 @@ const TestStyleFunctionNumeric = (): JSX.Element => {
 TestStyleFunctionNumeric.test = {
     static: false,
     expect: () => {
-        const value = $$(testObservables['TestStyleFunctionNumeric'])
+        const value = $$(testObservables[name])
         const expected = `<p style="flex-grow: ${value.flexGrow}; width: ${value.width}px;">content</p>`
         //<h3>Style - Function Numeric</h3><p style="flexGrow: 1; width: 50;">content</p>
         //<h3>Style - Function Numeric</h3><p style="flex-grow: 1; width: 50px;">content</p>
@@ -33,7 +33,7 @@ TestStyleFunctionNumeric.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Style - Function Numeric</h3><p style="flex-grow: ${value.flexGrow}; width: ${value.width}px;">content</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

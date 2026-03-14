@@ -20,7 +20,7 @@ const TestRenderToStringNested = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestRenderToStringNested_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -35,7 +35,7 @@ TestRenderToStringNested.test = {
         const ssrResult = renderToString(ssrComponent)
 
         if (ssrResult !== expectedForSSR) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedForSSR}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedForSSR}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

@@ -7,8 +7,19 @@
  * - Context value passing between TSX and custom elements
  * - Nested context providers
  */
-import { $, $$, customElement, defaults, createContext, useContext, useMountedContext, HtmlString, HtmlNumber, type JSX, useEffect, renderToString } from 'woby'
+import { $, $$, customElement, defaults, createContext, useContext, useMountedContext, HtmlString, HtmlNumber, type JSX, useEffect, renderToString, type ElementAttributes } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
+
+// TypeScript type augmentation for custom elements
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'context-consumer': ElementAttributes<typeof ContextConsumer>
+            'context-provider2': ElementAttributes<typeof ContextProvider2>
+            'counter-element': ElementAttributes<typeof CounterElement>
+        }
+    }
+}
 
 // Create contexts
 const ThemeContext = createContext('light')
@@ -16,9 +27,9 @@ const CounterContext = createContext(0)
 const NestedContext = createContext('default')
 
 // Hook for theme context
-const useTheme = () => useMountedContext(ThemeContext)
-const useCounter = () => useMountedContext(CounterContext)
-const useNested = () => useMountedContext(NestedContext)
+const useTheme = () => useContext(ThemeContext)
+const useCounter = () => useContext(CounterContext)
+const useNested = () => useContext(NestedContext)
 
 // Custom element that consumes context
 const ContextConsumer = defaults(() => ({
@@ -28,11 +39,11 @@ const ContextConsumer = defaults(() => ({
     const counter = useCounter()
     const nested = useNested()
 
-    useEffect(() => {
-        // useMountedContext returns an array-based observable
-        // Access the value directly with $$()
-        console.log('context theme=', $$(theme), 'counter=', $$(counter), 'nested=', $$(nested))
-    })
+    // useEffect(() => {
+    //     // useMountedContext returns an array-based observable
+    //     // Access the value directly with $$()
+    //     console.log('context theme=', $$(theme), 'counter=', $$(counter), 'nested=', $$(nested))
+    // })
 
     return (
         <div style={{
@@ -54,9 +65,9 @@ const ContextConsumer = defaults(() => ({
 
 // Custom element that provides context
 const ContextProvider2 = defaults(() => ({
-    theme: $('light'),
-    counter: $(0),
-    nested: $('provider-value')
+    theme: $('light', HtmlString),
+    counter: $(0, HtmlNumber),
+    nested: $('provider-value', HtmlString)
 }), ({ theme, counter, nested, children }) => {
     return (
         <div style={{ border: '2px solid blue', padding: '10px', margin: '10px' }}>
@@ -80,8 +91,8 @@ const CounterElement = defaults(() => ({
     title: $('Counter Element', HtmlString)
 }), ({ initialValue, title, children }) => {
     const count = $(initialValue)
-    const increment = () => count($$(count) + 1)
-    const decrement = () => count($$(count) - 1)
+    const increment = () => count(+$$(count) + 1)
+    const decrement = () => count(+$$(count) - 1)
 
     return (
         <div style={{ border: '2px solid green', padding: '15px', margin: '10px' }}>
@@ -186,7 +197,7 @@ const TestCustomElementContext = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestCustomElementContext_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -281,7 +292,7 @@ TestWrapper.test = {
         const expectedFull = expected
 
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

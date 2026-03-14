@@ -10,9 +10,9 @@ const TestDynamicStoreProps = (): JSX.Element => {
     const timingObservable = $(0)
     isStore(props)
     registerTestObservable('TestDynamicStoreProps', props)
-    registerTestObservable('TestDynamicStoreProps_count', count)
-    registerTestObservable('TestDynamicStoreProps_enable', enable)
-    registerTestObservable('TestDynamicStoreProps_timing', timingObservable)
+    registerTestObservable(`${name}_count`, count)
+    registerTestObservable(`${name}_enable`, enable)
+    registerTestObservable(`${name}_timing`, timingObservable)
 
     store.on(props, () => {
         // Update timing observable with new timing value
@@ -49,7 +49,7 @@ const TestDynamicStoreProps = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestDynamicStoreProps_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
 
     return ret
@@ -91,7 +91,7 @@ TestDynamicStoreProps.test = {
 
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestDynamicStoreProps] ❌ SSR ASSERTION FAILED')
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

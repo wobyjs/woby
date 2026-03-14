@@ -20,7 +20,7 @@ const TestRefUntrack = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestRefUntrack_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -37,7 +37,7 @@ TestRefUntrack.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Ref - Untrack</h3>' + expectedForSSR
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

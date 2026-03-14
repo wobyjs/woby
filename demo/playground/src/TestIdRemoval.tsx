@@ -13,7 +13,7 @@ const TestIdRemoval = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestIdRemoval_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -22,14 +22,14 @@ TestIdRemoval.test = {
     static: true, // Make it static for predictable testing
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestIdRemoval'])
+        const value = $$(testObservables[name])
         const expected = value ? `<p id="${value}">content</p>` : '<p>content</p>'
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = value ? `<h3>ID - Removal</h3><p id="${value}">content</p>` : '<h3>ID - Removal</h3><p>content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

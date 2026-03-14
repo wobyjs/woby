@@ -28,7 +28,7 @@ const TestForUnkeyedRandom = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestForUnkeyedRandom_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -38,7 +38,7 @@ TestForUnkeyedRandom.test = {
     compareActualValues: true,
     expect: () => {
         // Get the actual values from the observable
-        const values = $$(testObservables['TestForUnkeyedRandom']) ?? [0, 0, 0]
+        const values = $$(testObservables[name]) ?? [0, 0, 0]
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>For - Unkeyed - Random</h3>${values.map(value => `<p>Value: ${value}</p>`).join('')}`
@@ -47,7 +47,7 @@ TestForUnkeyedRandom.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

@@ -16,7 +16,7 @@ const TestBooleanRemoval = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestBooleanRemoval_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -25,7 +25,7 @@ TestBooleanRemoval.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestBooleanRemoval'])
+        const value = $$(testObservables[name])
         let ssrExpected: string
         if (typeof value === 'boolean') {
             ssrExpected = '<p>()</p>'
@@ -37,7 +37,7 @@ TestBooleanRemoval.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Boolean - Removal</h3>${ssrExpected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

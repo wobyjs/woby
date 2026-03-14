@@ -28,6 +28,8 @@ import { useEffect } from "../hooks"
 import { ObservableMaybe } from "../types"
 import { mark } from "../utils/mark"
 
+// TODO remove this useMountedContext, as useContext handled all 
+
 export const useAttached = (ref?: ObservableMaybe<Node | null>, match?: (parent: Node | null) => boolean) => {
     const isGiven = !!ref
 

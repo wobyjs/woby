@@ -9,8 +9,8 @@ const TestNestedIfsLazy = (): JSX.Element => {
     const timingObservable = $(0)
     // Store the observable globally so the test can access it
     registerTestObservable('TestNestedIfsLazy', o)
-    registerTestObservable('TestNestedIfsLazy_enable', enable)
-    registerTestObservable('TestNestedIfsLazy_timing', timingObservable)
+    registerTestObservable(`${name}_enable`, enable)
+    registerTestObservable(`${name}_timing`, timingObservable)
 
     // Track timing changes
     const updateTiming = () => {
@@ -52,7 +52,7 @@ const TestNestedIfsLazy = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestNestedIfsLazy_ssr', fullComponent)
+    registerTestObservable(`${name}_ssr`, fullComponent)
 
     return fullComponent
 }
@@ -71,7 +71,7 @@ TestNestedIfsLazy.test = {
         let currentTiming = $$(testObservables[`${name}_timing`])
 
         // Always read current state to avoid timing issues
-        const isInnerVisible = $$(testObservables['TestNestedIfsLazy'])
+        const isInnerVisible = $$(testObservables[name])
         expected = isInnerVisible
             ? '<div>before</div><div>inner</div><div>after</div>'
             : '<div>before</div><!----><div>after</div>'
@@ -108,7 +108,7 @@ TestNestedIfsLazy.test = {
         // Use dynamic matching to avoid timing mismatches
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestNestedIfsLazy] ❌ SSR ASSERTION FAILED')
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

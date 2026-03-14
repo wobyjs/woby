@@ -5,8 +5,8 @@ const name = 'TestTernaryChildrenObservableStatic'
 const TestTernaryChildrenObservableStatic = (): JSX.Element => {
     const trueValue = $(String(random()))
     const falseValue = $(String(random()))
-    registerTestObservable('TestTernaryChildrenObservableStatic_true', trueValue)
-    registerTestObservable('TestTernaryChildrenObservableStatic_false', falseValue)
+    registerTestObservable(`${name}_true`, trueValue)
+    registerTestObservable(`${name}_false`, falseValue)
     const True = () => {
         const o = $(String(random()))
         const randomize = () => o(String(random()))
@@ -36,7 +36,7 @@ const TestTernaryChildrenObservableStatic = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestTernaryChildrenObservableStatic_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -53,7 +53,7 @@ TestTernaryChildrenObservableStatic.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Ternary - Children Observable Static</h3><p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

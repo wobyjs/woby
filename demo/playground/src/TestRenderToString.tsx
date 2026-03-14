@@ -12,7 +12,7 @@ const TestRenderToString = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestRenderToString_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -26,7 +26,7 @@ TestRenderToString.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<div><h3>renderToString</h3><p>123</p></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

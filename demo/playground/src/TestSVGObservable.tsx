@@ -13,7 +13,7 @@ const TestSVGObservable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestSVGObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -27,7 +27,7 @@ TestSVGObservable.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>SVG - Observable</h3><svg viewBox="0 0 50 50" width="50px" stroke="#abcdef" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

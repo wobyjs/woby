@@ -5,7 +5,7 @@ const name = 'TestEventClickCaptureRemoval'
 const TestEventClickCaptureRemoval = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
-    registerTestObservable('TestEventClickCaptureRemoval_o', o)
+    registerTestObservable(`${name}_o`, o)
     const onClick = $(() => { })
     const increment = () => o(prev => {
         onClick(() => null)
@@ -14,8 +14,8 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
     onClick(() => increment)
 
     // Register the ref for testing
-    registerTestObservable('TestEventClickCaptureRemoval_ref', ref)
-    registerTestObservable('TestEventClickCaptureRemoval_onClick', onClick)
+    registerTestObservable(`${name}_ref`, ref)
+    registerTestObservable(`${name}_onClick`, onClick)
 
     // Fire click event programmatically for testing
     useInterval(() => {
@@ -44,7 +44,7 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestEventClickCaptureRemoval_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -62,7 +62,7 @@ TestEventClickCaptureRemoval.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

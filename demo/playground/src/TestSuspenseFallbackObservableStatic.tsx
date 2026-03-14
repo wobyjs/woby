@@ -5,14 +5,13 @@ const name = 'TestSuspenseFallbackObservableStatic'
 const TestSuspenseFallbackObservableStatic = (): JSX.Element => {
     const initialValue = String(random())
     registerTestObservable('TestSuspenseFallbackObservableStatic', initialValue)
-    const name = 'Children'
+
     const Children = (): JSX.Element => {
         const resource = useResource(() => {
             return new Promise<undefined>(() => { })
         })
         return <p>children {resource.value}</p>
     }
-    const name = 'Fallback'
     const Fallback = (): JSX.Element => {
         return <p>Fallback: {initialValue}</p>
     }
@@ -26,7 +25,7 @@ const TestSuspenseFallbackObservableStatic = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestSuspenseFallbackObservableStatic_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -35,7 +34,7 @@ TestSuspenseFallbackObservableStatic.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        const initialValue = testObservables['TestSuspenseFallbackObservableStatic']
+        const initialValue = testObservables[name]
         const expected = `<p>Fallback: ${String(initialValue)}</p>`
 
         // Test the SSR value
@@ -43,7 +42,7 @@ TestSuspenseFallbackObservableStatic.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Suspense - Fallback Observable Static</h3><p>Fallback: ${String(initialValue)}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

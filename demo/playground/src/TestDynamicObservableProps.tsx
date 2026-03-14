@@ -21,7 +21,7 @@ const TestDynamicObservableProps = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestDynamicObservableProps_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -30,7 +30,7 @@ TestDynamicObservableProps.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const props = $$(testObservables['TestDynamicObservableProps'])
+        const props = $$(testObservables[name])
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Dynamic - Observable Props</h3><h5 class="${props.class}">Content</h5>`  // For SSR comparison
@@ -39,7 +39,7 @@ TestDynamicObservableProps.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

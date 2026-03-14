@@ -1,7 +1,8 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
-const TestIfRace = () => {
+const name = 'TestIfRace'
+const TestIfRace = () :JSX.Element=> {
     const data = { deep: 'hi' }  // Static data for static test
     const visible = true  // Static value for static test
     const ret: JSX.Element = () => (
@@ -14,7 +15,7 @@ const TestIfRace = () => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestIfRace_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -30,7 +31,7 @@ TestIfRace.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

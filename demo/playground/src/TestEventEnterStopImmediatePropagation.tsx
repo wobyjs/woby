@@ -7,14 +7,14 @@ const TestEventEnterStopImmediatePropagation = (): JSX.Element => {
     const inner = $(0)
     const refOuter = $<HTMLButtonElement>()
     const refInner = $<HTMLButtonElement>()
-    registerTestObservable('TestEventEnterStopImmediatePropagation_outer', outer)
-    registerTestObservable('TestEventEnterStopImmediatePropagation_inner', inner)
+    registerTestObservable(`${name}_outer`, outer)
+    registerTestObservable(`${name}_inner`, inner)
     const onEnterOuter = $(() => { })
     const onEnterInner = $(() => { })
 
     // Register refs for testing
-    registerTestObservable('TestEventEnterStopImmediatePropagation_refOuter', refOuter)
-    registerTestObservable('TestEventEnterStopImmediatePropagation_refInner', refInner)
+    registerTestObservable(`${name}_refOuter`, refOuter)
+    registerTestObservable(`${name}_refInner`, refInner)
 
     const incrementOuter = () => {
         outer(prev => prev + 1)
@@ -60,7 +60,7 @@ const TestEventEnterStopImmediatePropagation = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestEventEnterStopImmediatePropagation_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -80,7 +80,7 @@ TestEventEnterStopImmediatePropagation.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

@@ -29,7 +29,7 @@ const TestABCD = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestABCD_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -38,7 +38,7 @@ TestABCD.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const idx = $$(testObservables['TestABCD'])
+        const idx = $$(testObservables[name])
         const elements = ['<p><i>a</i></p>', '<p><u>b</u></p>', '<p><b>c</b></p>', '<p><span>d</span></p>']
         const expected = elements[idx]
 
@@ -60,7 +60,7 @@ TestABCD.test = {
         ]
         const expectedFull = actualElements[idx]
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

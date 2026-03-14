@@ -24,7 +24,7 @@ const TestDynamicHeading = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestDynamicHeading_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -33,7 +33,7 @@ TestDynamicHeading.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const level = $$(testObservables['TestDynamicHeading'])
+        const level = $$(testObservables[name])
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Dynamic - Heading</h3><h${level}>Level: ${level}</h${level}>`  // For SSR comparison
@@ -42,7 +42,7 @@ TestDynamicHeading.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

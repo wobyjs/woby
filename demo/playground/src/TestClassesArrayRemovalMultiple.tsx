@@ -16,7 +16,7 @@ const TestClassesArrayRemovalMultiple = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestClassesArrayRemovalMultiple_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -25,7 +25,7 @@ TestClassesArrayRemovalMultiple.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestClassesArrayRemovalMultiple'])
+        const value = $$(testObservables[name])
         let expected: string
         if (!value) expected = '<p class="">content</p>'
         else {
@@ -37,7 +37,7 @@ TestClassesArrayRemovalMultiple.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = value ? `<h3>Classes - Array Removal Multiple</h3>${expected}` : '<h3>Classes - Array Removal Multiple</h3><p>content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

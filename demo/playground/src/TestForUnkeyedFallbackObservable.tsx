@@ -28,7 +28,7 @@ const TestForUnkeyedFallbackObservable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestForUnkeyedFallbackObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -37,7 +37,7 @@ TestForUnkeyedFallbackObservable.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const oValue = $$(testObservables['TestForUnkeyedFallbackObservable'])
+        const oValue = $$(testObservables[name])
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>For - Unkeyed - Fallback Observable</h3><p>Fallback: ${oValue}</p>`
@@ -46,7 +46,7 @@ TestForUnkeyedFallbackObservable.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

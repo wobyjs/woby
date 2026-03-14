@@ -43,7 +43,7 @@ const TestSwitchObservableComplex = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestSwitchObservableComplex_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -57,7 +57,7 @@ TestSwitchObservableComplex.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Switch - Observable Complex</h3><p>1 - 0</p><p>2 - 2</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

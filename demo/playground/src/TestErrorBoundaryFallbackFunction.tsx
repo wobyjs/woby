@@ -3,13 +3,12 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const name = 'TestErrorBoundaryFallbackFunction'
 const TestErrorBoundaryFallbackFunction = (): JSX.Element => {
-    const name = 'Children'
     const Children = (): JSX.Element => {
         throw new Error()
     }
     const fallbackValue = String(random())
     registerTestObservable('TestErrorBoundaryFallbackFunction', $(fallbackValue))
-    const name = 'Fallback'
+
     const Fallback = (): JSX.Element => {
         // Remove dynamic updating for static test
         // const o = $(String(random()))
@@ -28,7 +27,7 @@ const TestErrorBoundaryFallbackFunction = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestErrorBoundaryFallbackFunction_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -37,7 +36,7 @@ TestErrorBoundaryFallbackFunction.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        const fallbackValue = $$(testObservables['TestErrorBoundaryFallbackFunction'])
+        const fallbackValue = $$(testObservables[name])
 
         // Define expected values for both main test and SSR test
         const expectedFull = `<h3>Error Boundary - Fallback Function</h3><p>Fallback: ${fallbackValue}</p>`  // For SSR comparison
@@ -46,7 +45,7 @@ TestErrorBoundaryFallbackFunction.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

@@ -9,9 +9,8 @@ const TestTernaryObservableChildren = (): JSX.Element => {
         abActive: true,  // true = <i>a</i>, false = <u>b</u>
         cdActive: true   // true = <b>c</b>, false = <span>d</span>
     })
-    registerTestObservable('TestTernaryObservableChildren_state', state)
+    registerTestObservable(`${name}_state`, state)
 
-    const name = 'AB'
     const AB = (): JSX.Element => {
         const a = <i>a</i>
         const b = <u>b</u>
@@ -32,7 +31,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
         (globalThis as any).toggleAB = toggle
         return component
     }
-    const name = 'CD'
+
     const CD = (): JSX.Element => {
         const c = <b>c</b>
         const d = <span>d</span>
@@ -79,7 +78,7 @@ const TestTernaryObservableChildren = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestTernaryObservableChildren_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -105,7 +104,7 @@ TestTernaryObservableChildren.test = {
 
             if (ssrResult !== dynamicExpectedFull) {
                 console.error('[TestTernaryObservableChildren]❌ SSR ASSERTION FAILED')
-                assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+                assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
             } else {
                 console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
             }

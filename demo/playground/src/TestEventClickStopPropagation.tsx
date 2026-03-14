@@ -8,8 +8,8 @@ const TestEventClickStopPropagation = (): JSX.Element => {
     const inner = $(0)
     const refOuter = $<HTMLButtonElement>()
     const refInner = $<HTMLButtonElement>()
-    registerTestObservable('TestEventClickStopPropagation_outer', outer)
-    registerTestObservable('TestEventClickStopPropagation_inner', inner)
+    registerTestObservable(`${name}_outer`, outer)
+    registerTestObservable(`${name}_inner`, inner)
     const onClickOuter = $(() => { })
     const onClickInner = $(() => { })
 
@@ -69,7 +69,7 @@ const TestEventClickStopPropagation = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestEventClickStopPropagation_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -95,7 +95,7 @@ TestEventClickStopPropagation.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

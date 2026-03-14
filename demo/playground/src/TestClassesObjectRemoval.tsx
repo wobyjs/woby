@@ -37,7 +37,7 @@ const TestClassesObjectRemoval = (): JSX.Element => {
     })
 
     // Store the component for SSR testing
-    registerTestObservable('TestClassesObjectRemoval_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -46,7 +46,7 @@ TestClassesObjectRemoval.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestClassesObjectRemoval'])
+        const value = $$(testObservables[name])
         let expected: string
         if (value) {
             let className = ''
@@ -60,7 +60,7 @@ TestClassesObjectRemoval.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Log the actual SSR result for debugging
-        console.log(`${name}] SSR result: ${ssrResult}`)
+        console.log(`[${name}] SSR result: ${ssrResult}`)
 
         // Create expected result based on current store state
         let expectedClass = ''
@@ -76,7 +76,7 @@ TestClassesObjectRemoval.test = {
             console.error(`❌ SSR test failed:`)
             console.error(`  Got: ${ssrResult}`)
             console.error(`  Expected: ${expectedFull}`)
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         }
 
         return expected

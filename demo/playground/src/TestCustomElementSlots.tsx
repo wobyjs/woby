@@ -129,7 +129,7 @@ const TestCustomElementSlotsWithSSR = (): JSX.Element => {
                 <h3>Innner basic-element2</h3>
                     <basic-element2
                     title="Pure HTML Custom Element nested"
-                    count="75"
+                    count="66"
                     active="true"
                     color="purple"
                     >
@@ -141,7 +141,7 @@ const TestCustomElementSlotsWithSSR = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestCustomElementSlots_ref', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -157,7 +157,7 @@ const a = <>
                     <div>
                         <slot>
                             <h3>Innner basic-element2</h3>
-                            <basic-element2 title="Pure HTML Custom Element nested" count="75" active="true" color="purple">
+                            <basic-element2 title="Pure HTML Custom Element nested" count="66" active="true" color="purple">
                                 <template shadowrootmode="open" shadowrootserializable="">
                                     <div style="border: 2px solid purple; padding: 10px; background-color: rgb(224, 224, 224);">
                                         <h2>Basic Element</h2>
@@ -194,7 +194,7 @@ TestCustomElementSlotsWithSSR.test = {
                     <h2>Pure HTML Custom Element</h2>
                     <div>
                         <slot>
-                            <basic-element2 title="Pure HTML Custom Element nested" count="75" active="true"
+                            <basic-element2 title="Pure HTML Custom Element nested" count="66" active="true"
                                color="purple"><template shadowrootmode="open" shadowrootserializable="">
                                     <div style="border: 2px solid purple; padding: 10px; background-color: rgb(224, 224, 224);">
                                         <h2>Pure HTML Custom Element nested</h2>
@@ -203,7 +203,7 @@ TestCustomElementSlotsWithSSR.test = {
                                                 <p>This is child content from pure nested HTML custom element</p>
                                             </slot>
                                         </div>
-                                        <p>Count: 75</p>
+                                        <p>Count: 66</p>
                                         <p>Active: Yes</p>
                                     </div>
                                 </template></basic-element2>
@@ -222,15 +222,14 @@ TestCustomElementSlotsWithSSR.test = {
         // console.log('[TestCustomElementSlotsWithSSR] incomplete innerHTML', getInnerHTML($$($$(testObservables[`${name}_ref`]))))
         //    console.log('[TestCustomElementSlotsWithSSR] trace shadowRoot', getInnerHTML($$($$(testObservables[`${name}_ref`])).children[2].children[0]))
 
-        // const ssrComponent = testObservables[`${name}_ssr`]
-        // const ssrResult = renderToString(ssrComponent)
-        // const expectedFull = '<h1>Custom Element Slots Test</h1><h2>1. Basic Slot Functionality</h2><slot-element title="Element with Children"><p>This content goes into the slot</p><button>Slot Button</button></slot-element><slot-element title="Element without Children" showFallback=""></slot-element><h2>2. TSX Slot Usage</h2><slot-element title="TSX Slot Test"><div><p>TSX-provided slot content</p><ul><li>Item 1</li><li>Item 2</li></ul></div></slot-element><h2>3. Named Slots Concept</h2><named-slot-element header="Custom Header" footer="Custom Footer"><div data-slot="header"><h4>Custom Header Content</h4></div><p>Main content area</p><p>More main content</p><div data-slot="footer"><em>Custom Footer Content</em></div></named-slot-element><h2>4. Mixed Usage with Slots</h2><slot-element title="Outer Element"><slot-element title="Nested Slot Element"><p>Nested slot content</p></slot-element></slot-element>'
-        // if (ssrResult !== expectedFull) {
-        //     assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
-        // } else {
-        //     console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
-        // }
-
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h1>Custom Element Slots Test</h1><h2>1. Basic Slot Functionality</h2><slot-element title="Element with Children"><p>This content goes into the slot</p><button>Slot Button</button></slot-element><slot-element title="Element without Children" showFallback=""></slot-element><h2>2. TSX Slot Usage</h2><slot-element title="TSX Slot Test"><div><p>TSX-provided slot content</p><ul><li>Item 1</li><li>Item 2</li></ul></div></slot-element><h2>3. Named Slots Concept</h2><named-slot-element header="Custom Header" footer="Custom Footer"><div data-slot="header"><h4>Custom Header Content</h4></div><p>Main content area</p><p>More main content</p><div data-slot="footer"><em>Custom Footer Content</em></div></named-slot-element><h2>4. Mixed Usage with Slots</h2><slot-element title="Outer Element"><slot-element title="Nested Slot Element"><p>Nested slot content</p></slot-element></slot-element>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+        }
 
         return expected
     }

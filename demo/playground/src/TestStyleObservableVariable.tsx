@@ -15,7 +15,7 @@ const TestStyleObservableVariable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestStyleObservableVariable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -23,7 +23,7 @@ const TestStyleObservableVariable = (): JSX.Element => {
 TestStyleObservableVariable.test = {
     static: false,
     expect: () => {
-        const value = $$(testObservables['TestStyleObservableVariable'])
+        const value = $$(testObservables[name])
         const expected = `<p style="color: var(--color); --color: ${value};">content</p>`
 
         // Test the SSR value
@@ -31,7 +31,7 @@ TestStyleObservableVariable.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Style - Observable Variable</h3><p style="color: var(--color); --color: ${value};">content</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

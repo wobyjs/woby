@@ -3,7 +3,6 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const name = 'TestErrorBoundary'
 const TestErrorBoundary = (): JSX.Element => {
-    const name = 'Erroring'
     const Erroring = (): JSX.Element => {
         // Immediately throw error for predictable test
         throw new Error('Custom error')
@@ -21,7 +20,7 @@ const TestErrorBoundary = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestErrorBoundary_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -37,7 +36,7 @@ TestErrorBoundary.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

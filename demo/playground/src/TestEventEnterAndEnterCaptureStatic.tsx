@@ -5,7 +5,7 @@ const name = 'TestEventEnterAndEnterCaptureStatic'
 const TestEventEnterAndEnterCaptureStatic = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
-    registerTestObservable('TestEventEnterAndEnterCaptureStatic_o', o)
+    registerTestObservable(`${name}_o`, o)
     const increment = () => o(prev => prev + 1)
 
     // Programmatic event firing
@@ -37,7 +37,7 @@ const TestEventEnterAndEnterCaptureStatic = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestEventEnterAndEnterCaptureStatic_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -65,7 +65,7 @@ TestEventEnterAndEnterCaptureStatic.test = {
         const expectedFull = `<h3>Event - Enter & Enter Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
         // Handle HTML entity encoding in SSR output
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

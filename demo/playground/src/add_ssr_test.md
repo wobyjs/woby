@@ -36,7 +36,7 @@ const MyComponent = (): JSX.Element => {
     )
     
     // Store the component for SSR testing
-    registerTestObservable('MyComponent_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
     
     return ret
 }
@@ -51,7 +51,7 @@ MyComponent.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const idx = $$(testObservables['MyComponent'])
+        const idx = $$(testObservables[name])
         
         // Define expected values for both main test and SSR test
         const fullElements = [

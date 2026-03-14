@@ -238,8 +238,8 @@ const useCounterContext = () => useContext(CounterContext)
 
 ```typescript
 const ContextValue = defaults(() => ({}), (props) => {
-    // Use useMountedContext for proper context propagation in custom elements
-    const context = useMountedContext(CounterContext)
+    // Use useContext for context in custom elements
+    const context = useContext(CounterContext)
     
     return <span>Context Value: {context}</span>
 })
@@ -498,18 +498,17 @@ const Counter = defaults(def, (props: CounterProps) => {
 3. **Hide functions from HTML** using `toHtml: o => undefined`
 4. **Use proper serialization** for complex objects and dates
 5. **Extend JSX namespace** for TypeScript support
-6. **Use `useMountedContext`** for context in custom elements
+6. **Use `useContext`** for context in custom elements (`useMountedContext` is deprecated)
 7. **Organize props with nested objects** for better structure
 8. **Test both HTML and JSX usage** to ensure compatibility
 
 ### Common Pitfalls
 
 1. **Not using `defaults`** - Breaks synchronization
-2. **Missing type information** - Causes incorrect type conversion
-3. **Functions in HTML attributes** - Won't work as expected
-4. **Complex objects without serialization** - Won't sync properly
-5. **Regular `useContext` instead of `useMountedContext`** - Context won't propagate
-6. **Inline parameter defaults** - Can conflict with `def()` pattern
+5. **Not using `defaults()`** - Breaks two-way synchronization
+6. **Missing type information** - Causes incorrect type conversion
+7. **Functions in HTML attributes** - Won't work as expected
+8. **Complex objects without serialization** - Won't sync properly
 
 ### Pitfall Examples
 
@@ -550,7 +549,7 @@ Here's a complete example that demonstrates all the concepts:
 ```typescript
 import { 
     $, $$, useMemo, customElement, createContext, 
-    useContext, defaults, useMountedContext, type ElementAttributes 
+    useContext, defaults, type ElementAttributes 
 } from 'woby'
 import type { ObservableReadonly } from 'soby'
 
@@ -592,7 +591,7 @@ const Counter = defaults(def, (props) => {
             <h2>{title}</h2>
             <p>Value: {displayValue}</p>
             <p>Created: {$$(metadata).createdAt.toString()}</p>
-            <p>Context: {useMountedContext(CounterContext)}</p>
+            <p>Context: {useContext(CounterContext)}</p>
             <button disabled={disabled} onClick={increment}>+</button>
             <button disabled={disabled} onClick={decrement}>-</button>
             <CounterContext.Provider value={value}>

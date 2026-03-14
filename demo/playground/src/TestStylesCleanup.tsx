@@ -12,7 +12,7 @@ const TestStylesCleanup = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestStylesCleanup_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -27,7 +27,7 @@ TestStylesCleanup.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Styles - Observable Cleanup</h3><p style="color: orange; font-weight: bold;">content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

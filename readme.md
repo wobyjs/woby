@@ -68,8 +68,8 @@ const ThemedButton = () => {
 
 // Use in custom elements
 const ThemedElement = defaults(() => ({}), () => {
-  const [theme, mount] = useMountedContext(ThemeContext)
-  return <div>{mount}Theme: {theme}</div>
+  const theme = useContext(ThemeContext)
+  return <div>Theme: {theme}</div>
 })
 
 customElement('themed-element', ThemedElement)

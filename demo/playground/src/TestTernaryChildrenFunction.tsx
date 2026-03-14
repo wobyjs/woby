@@ -5,8 +5,8 @@ const name = 'TestTernaryChildrenFunction'
 const TestTernaryChildrenFunction = (): JSX.Element => {
     const trueValue = $(String(random()))
     const falseValue = $(String(random()))
-    registerTestObservable('TestTernaryChildrenFunction_true', trueValue)
-    registerTestObservable('TestTernaryChildrenFunction_false', falseValue)
+    registerTestObservable(`${name}_true`, trueValue)
+    registerTestObservable(`${name}_false`, falseValue)
     let true1 = false
 
     const True = () => {
@@ -48,7 +48,7 @@ const TestTernaryChildrenFunction = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestTernaryChildrenFunction_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -65,7 +65,7 @@ TestTernaryChildrenFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Ternary - Children Function</h3><p>True: ${trueValue}</p><p>False: ${falseValue}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

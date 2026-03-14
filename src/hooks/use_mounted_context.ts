@@ -91,6 +91,8 @@ import { Observable } from 'soby'
  * customElement('counter-display', CounterDisplay)
  * ```
  */
+
+// TODO remove this useMountedContext, as useContext handled all 
 export function useMountedContext<T, E extends HTMLElement>(ctx: ContextWithDefault<T> | Context<T>, ref?: ObservableMaybe<Node>) {
   const { parent: provider, ref: rf, mount } = useAttached(ref, p => (p as Element).tagName === 'CONTEXT-PROVIDER' && !!p?.[ctx.symbol])
 

@@ -17,7 +17,7 @@ const TestStringRemoval = (): JSX.Element => {
 
     // Store the component for SSR testing - only in environments where function is available
     if (typeof registerTestObservable !== 'undefined') {
-        registerTestObservable('TestStringRemoval_ssr', ret)
+        registerTestObservable(`${name}_ssr`, ret)
     }
 
     return ret
@@ -27,7 +27,7 @@ TestStringRemoval.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const val = $$(testObservables['TestStringRemoval'])
+        const val = $$(testObservables[name])
         // DOM renders <!----> comment for null, SSR renders empty string
         const expected = val !== null ? `<p>(${val})</p>` : '<p>(<!---->)</p>'
 
@@ -38,7 +38,7 @@ TestStringRemoval.test = {
             `<h3>String - Removal</h3><p>(${val})</p>` :
             '<h3>String - Removal</h3><p>()</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

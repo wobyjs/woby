@@ -43,6 +43,9 @@ if (typeof window !== 'undefined') {
 }
 
 export const registerTestObservable = (name: string, observable: Observable<any> | JSX.Child) => {
+    if (name in testObservables) {
+        throw new Error(`[registerTestObservable]: Duplicate name "${name}" already registered.`)
+    }
     testObservables[name] = observable
 }
 

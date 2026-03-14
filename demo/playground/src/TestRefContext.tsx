@@ -7,7 +7,6 @@ const TestRefContext = (): JSX.Element => {
     const message = $('')
     const Context = createContext(123)
 
-    const name = 'Reffed'
     const Reffed = (): JSX.Element => {
         const ref = (element: HTMLElement) => {
             if (element) {
@@ -28,7 +27,7 @@ const TestRefContext = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestRefContext_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -47,7 +46,7 @@ TestRefContext.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
@@ -59,10 +58,10 @@ TestRefContext.test = {
 
 export default () => <TestSnapshots Component={TestRefContext} />
 
-const ts = <TestRefContext />
-console.log(renderToString(ts))
+// const ts = <TestRefContext />
+// console.log(renderToString(ts))
 
-tick()
-tick()
-tick()
-console.log(renderToString(ts))
+// tick()
+// tick()
+// tick()
+// console.log(renderToString(ts))

@@ -6,7 +6,7 @@ The Woby framework provides a context hook for sharing data between components:
 
 ## useContext (Both JSX/TSX and Custom Elements)
 
-The `useContext` hook works in both JSX/TSX components and custom elements defined directly in HTML. It provides special support for custom elements by attempting to retrieve context from parent elements.
+The `useContext` hook works in both JSX/TSX components and custom elements defined directly in HTML. It automatically handles context lookup through the DOM hierarchy.
 
 ### Usage
 
@@ -27,25 +27,34 @@ const ParentComponent = () => {
   )
 }
 
-// Consumer component
+// Consumer component in JSX/TSX
 const ChildComponent = () => {
   const contextValue = useContext(CounterContext)
   return <div>Context value: {contextValue}</div>
 }
+
+// Consumer component in custom elements
+const CustomChildElement = defaults(() => ({}), () => {
+  const contextValue = useContext(CounterContext)
+  return <div>Context value: {contextValue}</div>
+})
+
+customElement('custom-child-element', CustomChildElement)
 ```
 
 ```html
 <!-- In HTML custom elements -->
-<counter-element>
-  <counter-element><!-- This child can access parent's context --></counter-element>
-</counter-element>
+<counter-context-provider value="42">
+  <custom-child-element><!-- This child can access parent's context --></custom-child-element>
+</counter-context-provider>
 ```
 
 ### How it Works
 
 1. For JSX/TSX components, it uses the standard context provider pattern
-2. For custom elements, it attempts to retrieve context from the parent element's context property
-3. It automatically handles the differences between the two environments
+2. For custom elements, it automatically retrieves context from parent elements using the DOM hierarchy
+3. The context lookup traverses up the DOM tree to find the nearest context provider
+4. No special hooks are needed - `useContext` works everywhere
 
 ### Parameters
 
@@ -53,7 +62,74 @@ const ChildComponent = () => {
 
 ### Return Values
 
-- Returns the context value
+- Returns the context value from the nearest Provider
+- Returns the default value if no Provider is found
+- Returns `undefined` if no Provider is found and no default value was specified
+
+### Example: Multiple Contexts in HTML
+
+```tsx
+const ReaderContext = createContext<string>('')
+const OtherContext = createContext<string>('')
+
+customElement('reader-context', ReaderContext.Provider)
+customElement('other-context', OtherContext.Provider)
+
+const TestContextHookHtml = (): JSX.Element => {
+    const Reader = defaults(() => ({}), () => {
+        const ctx = useContext(readerContext)
+        const oth = useContext(otherContext)
+        return <p>{ctx} other: {oth}</p>
+    })
+
+    customElement('test-reader', Reader)
+
+    return () => (
+        <div dangerouslySetInnerHTML={{
+            __html: `
+            <h3>Context - Hook in HTML</h3>
+                <other-context value="123">
+                <reader-context value="outer">
+                    <p>header</p>
+                    <test-reader></test-reader>
+                    <reader-context value="inner">
+                        <test-reader></test-reader>
+                    </reader-context>
+                    <test-reader></test-reader>
+                    <p>Footer</p>
+                </reader-context>
+            </other-context>
+            `}}>
+        </div>
+    )
+}
+```
+
+### Example: Nested Contexts in TSX
+
+```tsx
+const TestContextHook = (): JSX.Element => {
+    const Context = createContext('')
+
+    const Reader = (): JSX.Element => {
+        const value = useContext(Context)
+        return <p>{value}</p>
+    }
+
+    return () => (
+        <>
+            <h3>Context - Hook</h3>
+            <Context.Provider value="outer">
+                <Reader />
+                <Context.Provider value="inner">
+                    <Reader />
+                </Context.Provider>
+                <Reader />
+            </Context.Provider>
+        </>
+    )
+}
+```
 
 ## Key Differences
 
@@ -62,8 +138,8 @@ const ChildComponent = () => {
 | JSX/TSX Support | ✅ |
 | Custom Element Support | ✅ |
 | Provider Required | ✅ |
-| Ref Integration | Built-in |
 | HTML Usage | ✅ |
+| Automatic Context Lookup | ✅ |
 
 ## Best Practices
 

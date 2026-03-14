@@ -17,7 +17,7 @@ The Counter demo showcases several important concepts:
 ### Component Definition
 
 ```typescript
-import { $, $$, useMemo, render, customElement, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes } from 'woby'
+import { $, $$, useMemo, render, customElement, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, type ElementAttributes } from 'woby'
 import type { ObservableReadonly } from 'soby'
 
 // Create a context for sharing values between parent and child elements
@@ -57,8 +57,8 @@ const Counter = defaults(def, (props) => {
         ...restProps
     } = props
 
-    // Use mounted context for proper context propagation in custom elements
-    const context = useMountedContext(CounterContext)
+    // Use context for proper context propagation in custom elements
+    const context = useContext(CounterContext)
 
     // Access the function from the observable array
     const increment = $$(inc)[0] ?? (() => { value($$(value) + 1) })
@@ -99,14 +99,14 @@ const Counter = defaults(def, (props) => {
 ```typescript
 // Simple context value display component
 const ContextValue = defaults(() => ({}), (props) => {
-    const context = useMountedContext(CounterContext) //direct use
+    const context = useContext(CounterContext) //direct use
     return <span >(Context Value = <b>{context}</b>)</span>
 })
 
 // Processed context value component
 const ProcessedContextValue = defaults(() => ({}), (props) => {
-    const [context, m] = useMountedContext(CounterContext)
-    return <span >(Pcocessed Context Value = <b>{useMemo(() => $$($$(context)) + ' Processed')}</b>){m}</span>
+    const context = useContext(CounterContext)
+    return <span >(Pcocessed Context Value = <b>{useMemo(() => $$($$(context)) + ' Processed')}</b>)</span>
 })
 ```
 
@@ -258,7 +258,7 @@ date: $(new Date(), {
 Custom elements automatically propagate context to child elements:
 
 ```typescript
-const context = useMountedContext(CounterContext)
+const context = useContext(CounterContext)
 ```
 
 ### 5. Nested Properties
@@ -293,7 +293,7 @@ Style properties can be set using dot notation in HTML and dash notation in JSX:
 
 1. **Always use `defaults`** for custom elements to enable proper synchronization
 2. **Store functions in arrays** with `toHtml: o => undefined` to hide them from HTML
-3. **Use `useMountedContext`** for context in custom elements
+3. **Use `useContext`** for context in custom elements (useMountedContext is deprecated)
 4. **Provide custom serialization** for complex objects and dates
 5. **Extend JSX namespace** for TypeScript support
 6. **Use proper type annotations** for all props
@@ -330,7 +330,7 @@ customElement('simple-counter', SimpleCounter)
 const MyContext = createContext(null)
 
 const ContextDisplay = defaults(() => ({}), (props) => {
-    const context = useMountedContext(MyContext)
+    const context = useContext(MyContext)
     return <span>Context Value: {context}</span>
 })
 

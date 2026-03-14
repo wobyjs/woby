@@ -25,7 +25,7 @@ const TestTemplateSVG = (): JSX.Element => {
     }
 
     // Store the component for SSR testing
-    registerTestObservable('TestTemplateSVG_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -33,14 +33,14 @@ const TestTemplateSVG = (): JSX.Element => {
 TestTemplateSVG.test = {
     static: false,
     expect: () => {
-        const value = $$(testObservables['TestTemplateSVG'])
+        const value = $$(testObservables[name])
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         // Note: SSR renders viewBox as viewbox (lowercase)
         const expectedFull = `<h3>Template - SVG</h3><svg viewbox="0 0 50 50" width="50px" stroke="${value}" stroke-width="3" fill="white"><circle cx="25" cy="25" r="20"></circle></svg>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

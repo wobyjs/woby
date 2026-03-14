@@ -16,7 +16,7 @@ const TestClassesArrayFunction = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestClassesArrayFunction_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -25,7 +25,7 @@ TestClassesArrayFunction.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestClassesArrayFunction'])
+        const value = $$(testObservables[name])
         const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : (value || '')
 
         // Define expected values for both main test and SSR test
@@ -35,7 +35,7 @@ TestClassesArrayFunction.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

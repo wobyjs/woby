@@ -17,7 +17,7 @@ const TestAttributeFunctionBoolean = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestAttributeFunctionBoolean_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -26,7 +26,7 @@ TestAttributeFunctionBoolean.test = {
     static: false, // Make it static for predictable testing
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestAttributeFunctionBoolean'])
+        const value = $$(testObservables[name])
         // Since the attribute uses !o(), when o() is true, the attr value is false
         const attrValue = !value
         let expected: string
@@ -40,7 +40,7 @@ TestAttributeFunctionBoolean.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Attribute - Function Boolean</h3>${expected}`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

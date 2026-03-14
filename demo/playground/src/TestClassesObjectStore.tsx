@@ -25,7 +25,7 @@ const TestClassesObjectStore = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestClassesObjectStore_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -34,7 +34,7 @@ TestClassesObjectStore.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestClassesObjectStore'])
+        const value = $$(testObservables[name])
         let className = ''
         if (value.red) className += 'red '
         if (value.blue) className += 'blue '
@@ -51,7 +51,7 @@ TestClassesObjectStore.test = {
         const dynamicExpectedFull = `<h3>Classes - Object Store</h3><p class="${actualClass}">content</p>`
 
         if (ssrResult !== dynamicExpectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

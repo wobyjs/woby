@@ -25,7 +25,7 @@ const TestFragmentStaticDeep = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestFragmentStaticDeep_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -40,7 +40,7 @@ TestFragmentStaticDeep.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

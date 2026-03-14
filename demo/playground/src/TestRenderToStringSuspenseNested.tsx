@@ -11,7 +11,7 @@ const TestRenderToStringSuspenseNested = (): JSX.Element => {
         const resource = useResource(() => {
             return new Promise<number>(resolve => {
                 setTimeout(() => {
-                    registerTestObservable('TestRenderToStringSuspenseNested_o_' + title, o)
+                    registerTestObservable(`${name}_` + title, o)
 
                     syncValue[++syncStep] = 123
                     resolve(o(123))
@@ -40,13 +40,13 @@ const TestRenderToStringSuspenseNested = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestRenderToStringSuspenseNested_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
 
 
-const name = 'TestRenderToStringSuspenseNestedSSR'
+const nameSSR = 'TestRenderToStringSuspenseNestedSSR'
 const TestRenderToStringSuspenseNestedSSR = (): JSX.Element => {
     const o = $(123)
     const Content = ({ interval, title }) => {
@@ -68,19 +68,19 @@ const TestRenderToStringSuspenseNestedSSR = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    // registerTestObservable('TestRenderToStringSuspenseNested_ssr', ret)
+    // registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
 
 
-// const ssr = testObservables[`${name}_ssr`]
+// const ssr = testObservables[`${nameSSR}_ssr`]
 let ssrResult = renderToString(<TestRenderToStringSuspenseNestedSSR />)
 let expectedSSR = '<div><h3>renderToString - Suspense Nested</h3><p>124</p><p>125</p></div>' //final context
 if (ssrResult !== expectedSSR /* && ssrResult !== '<div></div>' */) {
-    assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
+    assert(false, `[${nameSSR}] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
 } else {
-    console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+    console.log(`✅ [${nameSSR}] SSR test passed: ${ssrResult}`)
 }
 
 

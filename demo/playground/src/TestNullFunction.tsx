@@ -9,8 +9,8 @@ const TestNullFunction = (): JSX.Element => {
     const timingObservable = $(0)
     // Store the observable globally so the test can access it
     registerTestObservable('TestNullFunction', o)
-    registerTestObservable('TestNullFunction_enable', enable)
-    registerTestObservable('TestNullFunction_timing', timingObservable)
+    registerTestObservable(`${name}_enable`, enable)
+    registerTestObservable(`${name}_timing`, timingObservable)
 
     // Track timing changes
     const updateTiming = () => {
@@ -33,7 +33,7 @@ const TestNullFunction = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestNullFunction_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -51,7 +51,7 @@ TestNullFunction.test = {
         let currentTiming = $$(testObservables[`${name}_timing`])
 
         // Always read current state to avoid timing issues
-        const value = $$(testObservables['TestNullFunction'])
+        const value = $$(testObservables[name])
         expected = value !== null ? `<p>${value}</p>` : '<p><!----></p>'
         expectedFull = `<h3>Null - Function</h3>${expected}`
 
@@ -71,7 +71,7 @@ TestNullFunction.test = {
 
         if (ssrResult !== dynamicExpectedFull) {
             console.error('[TestNullFunction] ❌ SSR ASSERTION FAILED')
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

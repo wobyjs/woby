@@ -16,7 +16,7 @@ const TestSuspenseCleanup = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestSuspenseCleanup_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -31,7 +31,7 @@ TestSuspenseCleanup.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Suspense - Cleanup</h3><p>Loaded!</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

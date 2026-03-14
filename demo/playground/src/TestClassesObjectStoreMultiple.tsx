@@ -28,7 +28,7 @@ const TestClassesObjectStoreMultiple = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestClassesObjectStoreMultiple_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -37,7 +37,7 @@ TestClassesObjectStoreMultiple.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const value = $$(testObservables['TestClassesObjectStoreMultiple'])
+        const value = $$(testObservables[name])
         let className = ''
         if (value['red bold']) className += 'red bold '
         if (value.blue) className += 'blue '
@@ -70,7 +70,7 @@ TestClassesObjectStoreMultiple.test = {
             console.error(`❌ SSR test failed:`)
             console.error(`  Got: ${ssrResult}`)
             console.error(`  Expected: ${expectedFull}`)
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         }
 
         return expected

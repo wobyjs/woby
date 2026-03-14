@@ -4,7 +4,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 const name = 'TestContextHook'
 const TestContextHook = (): JSX.Element => {
     const Context = createContext('')
-    const name = 'Reader'
+
     const Reader = (): JSX.Element => {
         const value = useContext(Context)
         return <p>{value}</p>
@@ -35,7 +35,7 @@ const TestContextHook = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestContextHook_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -51,7 +51,7 @@ TestContextHook.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = minimiseHtml(renderToString(ssrComponent))
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }
@@ -62,3 +62,5 @@ TestContextHook.test = {
 
 
 export default () => <TestSnapshots Component={TestContextHook} />
+
+// console.log(renderToString(<TestContextHook />))

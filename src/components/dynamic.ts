@@ -7,7 +7,7 @@ import type { Child, Component, FunctionMaybe, ObservableMaybe } from '../types'
 import { EnvironmentContext, useEnvironment } from '../components/environment_context'
 
 
-export const Dynamic = <P = {}>({ component, props: propsProp, ...restProps }: { component: ObservableMaybe<Component<P>>, props?: FunctionMaybe<P> } & Omit<P, 'props'>): Child => {
+export const Dynamic = <P extends Record<string, any> = {}>({ component, props: propsProp, children, ...restProps }: { component: ObservableMaybe<Component<P> | string>, props?: FunctionMaybe<P>, children?: Child } & Omit<P, 'props' | 'children'> & Record<string, any>): Child => {
     const env = useEnvironment()
     const isSSR = env === 'ssr'
 
@@ -15,6 +15,11 @@ export const Dynamic = <P = {}>({ component, props: propsProp, ...restProps }: {
         const finalProps = propsProp !== undefined
             ? { ...restProps, ...$$(propsProp as any) }
             : restProps
+
+        // Add children to props if provided
+        if (children !== undefined) {
+            finalProps.children = children as any
+        }
 
         const comp = isObservable(component) ? $$(component) : component
         const element = createElement<P>(comp as Component<P>, finalProps as P)
@@ -29,6 +34,11 @@ export const Dynamic = <P = {}>({ component, props: propsProp, ...restProps }: {
                     ? { ...restProps, ...$$(propsProp as any) }
                     : restProps
 
+                // Add children to props if provided
+                if (children !== undefined) {
+                    finalProps.children = children as any
+                }
+
                 const comp = isObservable(component) ? $$(component) : component
 
                 return EnvironmentContext.Provider(env, () => resolve(createElement<P>(comp as Component<P>, finalProps as P)))
@@ -42,7 +52,12 @@ export const Dynamic = <P = {}>({ component, props: propsProp, ...restProps }: {
                     ? { ...restProps, ...$$(propsProp as any) }
                     : restProps
 
-                return EnvironmentContext.Provider(env, () => createElement<P>(component, finalProps as P))
+                // Add children to props if provided
+                if (children !== undefined) {
+                    finalProps.children = children as any
+                }
+
+                return EnvironmentContext.Provider(env, () => createElement(component as any, finalProps as any))
             }) as any
 
         }

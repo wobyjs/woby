@@ -20,7 +20,7 @@ const TestForRandomOnlyChild = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestForRandomOnlyChild_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -29,14 +29,14 @@ TestForRandomOnlyChild.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const values = $$(testObservables['TestForRandomOnlyChild'])
+        const values = $$(testObservables[name])
         const expected = `<p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>For - Random</h3><p>Value: ${values[0]}</p><p>Value: ${values[1]}</p><p>Value: ${values[2]}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

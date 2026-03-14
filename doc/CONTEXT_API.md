@@ -2,11 +2,18 @@
 
 The Context API in Woby provides a way to pass data through the component tree without having to pass props down manually at every level. It's especially useful for global data like themes, user authentication, or preferred language.
 
+## Quick Links
+
+- **[Quick Reference Guide](./CONTEXT_API_QUICK_REFERENCE.md)** - Fast lookup for common patterns
+- **[Comprehensive Examples](./CONTEXT_API_EXAMPLES.md)** - Detailed usage examples
+- **[Deprecation Notice](./DEPRECATION_useMountedContext_useAttached.md)** - Migration guide from useMountedContext
+- **[Update Summary](./CONTEXT_API_UPDATE_SUMMARY.md)** - Overview of documentation updates
+
 ## Table of Contents
 
 - [createContext](#createcontext)
 - [useContext](#usecontext)
-- [useMountedContext](#usemountedcontext)
+- [Deprecated: useMountedContext](#deprecated-usemountedcontext)
 - [Custom Element Context Support](#custom-element-context-support)
 
 ## createContext
@@ -56,7 +63,7 @@ const ThemedButton = () => {
 
 ## useContext
 
-Accesses the current value of a context within a functional component.
+Accesses the current value of a context within a functional component. This hook works seamlessly in both JSX/TSX components and custom elements.
 
 ### Syntax
 
@@ -77,17 +84,96 @@ const value = useContext(Context)
 ### Example
 
 ```tsx
+import { createContext, useContext } from 'woby'
+
+// Create a context
 const ThemeContext = createContext('light')
 
+// Use in JSX components
 const ThemedButton = () => {
   const theme = useContext(ThemeContext)
   return <button className={`theme-${theme}`}>Click me</button>
 }
+
+// Use in custom elements
+const ThemedElement = defaults(() => ({}), () => {
+  const theme = useContext(ThemeContext)
+  return <div>Theme: {theme}</div>
+})
+
+customElement('themed-element', ThemedElement)
 ```
 
-## useMountedContext
+### Usage in HTML Custom Elements
 
-A specialized hook that provides context values for components with special support for custom elements. This hook works in both JSX/TSX components and custom elements defined in HTML.
+```tsx
+const ReaderContext = createContext<string>('')
+const OtherContext = createContext<string>('')
+
+customElement('reader-context', ReaderContext.Provider)
+customElement('other-context', OtherContext.Provider)
+
+const TestContextHookHtml = (): JSX.Element => {
+    const Reader = defaults(() => ({}), () => {
+        const ctx = useContext(readerContext)
+        const oth = useContext(otherContext)
+        return <p>{ctx} other: {oth}</p>
+    })
+
+    customElement('test-reader', Reader)
+
+    return () => (
+        <div dangerouslySetInnerHTML={{
+            __html: `
+            <h3>Context - Hook in HTML</h3>
+                <other-context value="123">
+                <reader-context value="outer">
+                    <p>header</p>
+                    <test-reader></test-reader>
+                    <reader-context value="inner">
+                        <test-reader></test-reader>
+                    </reader-context>
+                    <test-reader></test-reader>
+                    <p>Footer</p>
+                </reader-context>
+            </other-context>
+            `}}>
+        </div>
+    )
+}
+```
+
+### Usage in TSX Components
+
+```tsx
+const TestContextHook = (): JSX.Element => {
+    const Context = createContext('')
+
+    const Reader = (): JSX.Element => {
+        const value = useContext(Context)
+        return <p>{value}</p>
+    }
+
+    return () => (
+        <>
+            <h3>Context - Hook</h3>
+            <Context.Provider value="outer">
+                <Reader />
+                <Context.Provider value="inner">
+                    <Reader />
+                </Context.Provider>
+                <Reader />
+            </Context.Provider>
+        </>
+    )
+}
+```
+
+## Deprecated: useMountedContext
+
+⚠️ **DEPRECATED**: `useMountedContext` is deprecated. Use `useContext` instead, which now handles all context needs for both JSX/TSX components and custom elements.
+
+The `useMountedContext` hook was previously used for custom elements but has been superseded by the improved `useContext` implementation.
 
 ### Syntax
 
@@ -131,9 +217,10 @@ Custom elements created with Woby's `customElement` function have special suppor
 
 ### How it works
 
-1. When a context Provider is used, the context value is stored on the first child node of the parent element
-2. Child custom elements can access this context value using `useMountedContext`
+1. For JSX/TSX components, `useContext` uses the standard context provider pattern
+2. For custom elements, it automatically retrieves context from parent elements using the DOM hierarchy
 3. The context lookup traverses up the DOM tree to find the nearest context provider
+4. No special hooks are needed - `useContext` works everywhere
 
 ### Example
 
@@ -141,10 +228,10 @@ Custom elements created with Woby's `customElement` function have special suppor
 // Create a context
 const ValueContext = createContext(0)
 
-// Create a custom element that uses context
+// Create a custom element that uses context with useContext
 const ValueDisplay = defaults(() => ({}), () => {
-  const [context, mount] = useMountedContext(ValueContext)
-  return <div>{mount}Value: {context}</div>
+  const value = useContext(ValueContext)
+  return <div>Value: {value}</div>
 })
 
 customElement('value-display', ValueDisplay)

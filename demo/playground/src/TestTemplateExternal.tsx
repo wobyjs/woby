@@ -21,7 +21,7 @@ const TestTemplateExternal = (): JSX.Element => {
     }
 
     // Store the component for SSR testing
-    registerTestObservable('TestTemplateExternal_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -37,7 +37,7 @@ TestTemplateExternal.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Template - External</h3><div class="red"><span>outer <span data-color="blue">inner</span></span></div><div class="blue"><span>outer <span data-color="red">inner</span></span></div>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

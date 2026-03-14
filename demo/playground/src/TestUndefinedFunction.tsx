@@ -16,7 +16,7 @@ const TestUndefinedFunction = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestUndefinedFunction_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -24,7 +24,7 @@ const TestUndefinedFunction = (): JSX.Element => {
 TestUndefinedFunction.test = {
     static: false,
     expect: () => {
-        const value = $$(testObservables['TestUndefinedFunction'])
+        const value = $$(testObservables[name])
         const expectedForDOM = value !== undefined ? `<p>${value}</p>` : '<p><!----></p>'
         const expectedForSSR = value !== undefined ? `<p>${value}</p>` : '<p></p>'
 
@@ -32,7 +32,7 @@ TestUndefinedFunction.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFullForSSR = value !== undefined ? `<h3>Undefined - Function</h3><p>${value}</p>` : '<h3>Undefined - Function</h3><p></p>'
         if (ssrResult !== expectedFullForSSR) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFullForSSR}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFullForSSR}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

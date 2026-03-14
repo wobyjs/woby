@@ -7,7 +7,7 @@ const TestChildOverReexecution = (): JSX.Element => {
     const executions = $(0)
     let executionsLocal = 0
     registerTestObservable('TestChildOverReexecution', count)
-    registerTestObservable('TestChildOverReexecution_executions', executions)
+    registerTestObservable(`${name}_executions`, executions)
 
     const increment = () => count(prev => Math.min(3, prev + 1))
 
@@ -32,7 +32,7 @@ const TestChildOverReexecution = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestChildOverReexecution_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -40,7 +40,7 @@ const TestChildOverReexecution = (): JSX.Element => {
 TestChildOverReexecution.test = {
     static: false,
     expect: () => {
-        const countObservable = testObservables['TestChildOverReexecution']
+        const countObservable = testObservables[name]
         const executionsObservable = testObservables[`${name}_executions`]
         const currentValue = countObservable ? $$(countObservable) : 0
         const currentExecutions = executionsObservable ? $$(executionsObservable) : 0
@@ -57,7 +57,7 @@ TestChildOverReexecution.test = {
             if (ssrResult === expectedFull) {
                 console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
             } else {
-                assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+                assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
             }
         } else {
             assert(false, `SSR result format unexpected: ${ssrResult}`)

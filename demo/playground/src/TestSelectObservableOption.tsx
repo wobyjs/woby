@@ -27,7 +27,7 @@ const TestSelectObservableOption = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestSelectObservableOption_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -41,7 +41,7 @@ TestSelectObservableOption.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Select - Observable Option</h3><select name="select-observable-option"><option value="foo">foo</option><option value="bar" selected="">bar</option><option value="baz">baz</option><option value="qux">qux</option></select>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

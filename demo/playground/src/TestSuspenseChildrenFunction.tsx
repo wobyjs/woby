@@ -5,11 +5,11 @@ const name = 'TestSuspenseChildrenFunction'
 const TestSuspenseChildrenFunction = (): JSX.Element => {
     const initialValue = String(random())
     registerTestObservable('TestSuspenseChildrenFunction', initialValue)
-    const name = 'Children'
+
     const Children = (): JSX.Element => {
         return <p>Children: {initialValue}</p>
     }
-    const name = 'Fallback'
+
     const Fallback = (): JSX.Element => {
         return <p>Fallback!</p>
     }
@@ -23,7 +23,7 @@ const TestSuspenseChildrenFunction = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestSuspenseChildrenFunction_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -33,7 +33,7 @@ TestSuspenseChildrenFunction.test = {
     compareActualValues: true,
     expect: () => {
         // Get the actual random value that was registered
-        const initialValue = testObservables['TestSuspenseChildrenFunction']
+        const initialValue = testObservables[name]
         const actualValue = initialValue ? (typeof initialValue === 'function' ? initialValue() : initialValue) : 'unknown'
         const valueForTest = actualValue
         const expected = `<p>Children: ${valueForTest}</p>`
@@ -46,7 +46,7 @@ TestSuspenseChildrenFunction.test = {
         const actualValueFromSSR = match ? match[1] : 'unknown'
         const expectedFull = `<h3>Suspense - Children Function</h3><p>Children: ${actualValueFromSSR}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

@@ -36,11 +36,11 @@ const TestKeepAliveObservable = (): JSX.Element => {
     )
 
     // Store observables for test framework access
-    registerTestObservable('TestKeepAliveObservable_enable', enable)
-    registerTestObservable('TestKeepAliveObservable_timing', timingObservable)
+    registerTestObservable(`${name}_enable`, enable)
+    registerTestObservable(`${name}_timing`, timingObservable)
 
     // Store the component for SSR testing
-    registerTestObservable('TestKeepAliveObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -60,7 +60,7 @@ TestKeepAliveObservable.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

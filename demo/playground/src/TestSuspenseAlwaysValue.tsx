@@ -22,7 +22,7 @@ const TestSuspenseAlwaysValue = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestSuspenseAlwaysValue_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -37,7 +37,7 @@ TestSuspenseAlwaysValue.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Suspense - Always Value</h3><p>Loading...</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

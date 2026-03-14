@@ -5,11 +5,11 @@ const name = 'TestEventMiddleClickStatic'
 const TestEventMiddleClickStatic = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
-    registerTestObservable('TestEventMiddleClickStatic_o', o)
+    registerTestObservable(`${name}_o`, o)
     const increment = () => o(prev => prev + 1)
 
     // Register the ref for testing
-    registerTestObservable('TestEventMiddleClickStatic_ref', ref)
+    registerTestObservable(`${name}_ref`, ref)
 
     // Fire click events programmatically for testing
     useInterval(() => {
@@ -39,7 +39,7 @@ const TestEventMiddleClickStatic = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestEventMiddleClickStatic_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -61,7 +61,7 @@ TestEventMiddleClickStatic.test = {
         const ssrValue = match ? match[1] : '0'
         const expectedFull = `<h3>Event - Middle Click</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

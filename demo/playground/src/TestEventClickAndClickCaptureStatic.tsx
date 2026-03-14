@@ -5,7 +5,7 @@ const name = 'TestEventClickAndClickCaptureStatic'
 const TestEventClickAndClickCaptureStatic = (): JSX.Element => {
     const o = $(0)
     const ref = $<HTMLButtonElement>()
-    registerTestObservable('TestEventClickAndClickCaptureStatic_o', o)
+    registerTestObservable(`${name}_o`, o)
 
     const increment = () => o(prev => prev + 1)
     const captureIncrement = () => o(prev => prev + 1)
@@ -35,7 +35,7 @@ const TestEventClickAndClickCaptureStatic = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestEventClickAndClickCaptureStatic_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -57,7 +57,7 @@ TestEventClickAndClickCaptureStatic.test = {
         const expectedFull = `<h3>Event - Click & Click Capture Static</h3><p><button>${ssrValue}</button></p>`  // For SSR comparison (actual SSR value)
         // Handle HTML entity encoding in SSR output
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

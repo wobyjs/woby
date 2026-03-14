@@ -9,8 +9,8 @@ const TestIfFallbackObservable = (): JSX.Element => {
     const enable = $(0)
     const timingObservable = $(0)
     registerTestObservable('TestIfFallbackObservable', o)
-    registerTestObservable('TestIfFallbackObservable_enable', enable)
-    registerTestObservable('TestIfFallbackObservable_timing', timingObservable)
+    registerTestObservable(`${name}_enable`, enable)
+    registerTestObservable(`${name}_timing`, timingObservable)
 
     // Track timing changes
     const updateTiming = () => {
@@ -36,7 +36,7 @@ const TestIfFallbackObservable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestIfFallbackObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -51,7 +51,7 @@ TestIfFallbackObservable.test = {
     expect: () => {
         // Capture ALL values FIRST before any operations to avoid timing issues
         const currentTiming = $$(testObservables[`${name}_timing`])
-        const value = $$(testObservables['TestIfFallbackObservable'])
+        const value = $$(testObservables[name])
 
         // Build expected strings from captured values
         const expectedFull = `<h3>If - Fallback Observable</h3><p>Fallback: ${value}</p>`
@@ -65,7 +65,7 @@ TestIfFallbackObservable.test = {
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

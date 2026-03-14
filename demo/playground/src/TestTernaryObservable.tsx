@@ -18,7 +18,7 @@ const TestTernaryObservable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestTernaryObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -27,14 +27,14 @@ TestTernaryObservable.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
-        const value = testObservables['TestTernaryObservable']?.() ?? true
+        const value = testObservables[name]?.() ?? true
         const expected = `<p>${value ? 'true' : 'false'}</p>`
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = `<h3>Ternary - Observable</h3><p>${value ? 'true' : 'false'}</p>`
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

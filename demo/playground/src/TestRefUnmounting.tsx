@@ -13,7 +13,7 @@ const TestRefUnmounting = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestRefUnmounting_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -28,7 +28,7 @@ TestRefUnmounting.test = {
         const ssrResult = renderToString(ssrComponent)
         const expectedFull = '<h3>Ref - Unmounting</h3><p>No ref</p><p>content</p>'
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
         }

@@ -3,7 +3,6 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 
 const name = 'TestPortalObservable'
 const TestPortalObservable = (): JSX.Element => {
-    const name = 'AB'
     const AB = (): JSX.Element => {
         const a = <i>a</i>
         const b = <u>b</u>
@@ -12,7 +11,7 @@ const TestPortalObservable = (): JSX.Element => {
         useInterval(toggle, TEST_INTERVAL / 2)
         return component
     }
-    const name = 'CD'
+
     const CD = (): JSX.Element => {
         const c = <b>c</b>
         const d = <span>d</span>
@@ -36,7 +35,7 @@ const TestPortalObservable = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestPortalObservable_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -59,7 +58,7 @@ TestPortalObservable.test = {
         // const ssrResult = renderToString((SsrComponent as any)({ mount: container }), { document: doc })
         console.log(`✅ ${name}] SSR body: ${doc.body.innerHTML}`)
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
+            assert(false, `[${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
         }
 
         return expected  // This is what the DOM test framework compares against

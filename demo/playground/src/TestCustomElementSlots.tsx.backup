@@ -135,7 +135,7 @@ const TestCustomElementSlotsWithSSR = (): JSX.Element => {
     )
     
     // Store the component for SSR testing
-    registerTestObservable('TestCustomElementSlots_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
     
     return ret
 }

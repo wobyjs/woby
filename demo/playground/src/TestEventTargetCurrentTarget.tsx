@@ -4,7 +4,7 @@ import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, test
 const name = 'TestEventTargetCurrentTarget'
 const TestEventTargetCurrentTarget = (): JSX.Element => {
     const clickCount = $(0)
-    registerTestObservable('TestEventTargetCurrentTarget_clickCount', clickCount)
+    registerTestObservable(`${name}_clickCount`, clickCount)
 
     const handleClick = (element: string) => (e: Event) => {
         clickCount(prev => prev + 1)
@@ -80,7 +80,7 @@ const TestEventTargetCurrentTarget = (): JSX.Element => {
     )
 
     // Store the component for SSR testing
-    registerTestObservable('TestEventTargetCurrentTarget_ssr', ret)
+    registerTestObservable(`${name}_ssr`, ret)
 
     return ret
 }
@@ -101,9 +101,9 @@ TestEventTargetCurrentTarget.test = {
         const ssrContent = match ? match[1] : '<p>paragraph</p><ul><li>one</li><li>two</li><li>three</li></ul>'
         const expectedFull = `<h3>Event - Target - Current Target</h3><div>${ssrContent}</div>`  // For SSR comparison
         if (ssrResult !== expectedFull) {
-            assert(false, `${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            assert(true, `${name}] SSR test passed: ${ssrResult}`)
+            assert(true, `[${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected
