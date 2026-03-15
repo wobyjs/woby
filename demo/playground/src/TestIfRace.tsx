@@ -2,7 +2,7 @@ import { $, $$, If, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const name = 'TestIfRace'
-const TestIfRace = () :JSX.Element=> {
+const TestIfRace = (): JSX.Element => {
     const data = { deep: 'hi' }  // Static data for static test
     const visible = true  // Static value for static test
     const ret: JSX.Element = () => (
@@ -33,7 +33,7 @@ TestIfRace.test = {
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected  // This is what the DOM test framework compares against

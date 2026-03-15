@@ -53,7 +53,7 @@ TestClassesObjectStore.test = {
         if (ssrResult !== dynamicExpectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

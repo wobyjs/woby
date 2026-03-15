@@ -56,7 +56,7 @@ TestClassesObjectRemoval.test = {
             '<h3>Classes - Object Removal</h3><p>content</p>'
 
         if (ssrResult === expectedFull) {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         } else {
             console.error(`❌ SSR test failed:`)
             console.error(`  Got: ${ssrResult}`)

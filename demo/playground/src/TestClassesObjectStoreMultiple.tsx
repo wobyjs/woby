@@ -65,7 +65,7 @@ TestClassesObjectStoreMultiple.test = {
         const expectedFull = `<h3>Classes - Object Store Multiple</h3><p class="${expectedClass.trim()}">content</p>`
 
         if (ssrResult === expectedFull) {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         } else {
             console.error(`❌ SSR test failed:`)
             console.error(`  Got: ${ssrResult}`)

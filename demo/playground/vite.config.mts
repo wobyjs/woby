@@ -7,14 +7,26 @@ import { defineConfig } from 'vite'
 
 /* MAIN */
 
+// Get port from command line args or environment variable or default
+const getPortFromArgs = () => {
+    const portArg = process.argv.find(arg => arg.startsWith('--port='))
+    if (portArg) {
+        return parseInt(portArg.split('=')[1], 10)
+    }
+    return parseInt(process.env.PORT || '5276', 10)
+}
+
+const port = getPortFromArgs()
+
 const config = defineConfig({
     server: {
-        port: 5276,
-        strictPort: true,
+        port: port,
+        strictPort: false, // Allow Vite to find an available port if specified port is taken
+        host: true, // Required for --host flag
         hmr: {
             protocol: 'ws',
             host: 'localhost',
-            port: 5276
+            port: parseInt(process.env.HMR_PORT || String(port), 10)
         },
         watch: {
             // Watch the woby source directory for HMR

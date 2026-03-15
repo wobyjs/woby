@@ -49,7 +49,7 @@ TestCleanupInnerPortal.test = {
         doc.body.appendChild(container)
 
         const ssrResult = renderToString(ssrComponent, { document: doc })
-        console.log(`✅ ${name}] SSR body: ${doc.body.innerHTML}`)
+        console.log(`✅ [${name}] SSR body: ${doc.body.innerHTML}`)
         if (ssrResult !== expected) {
             assert(false, `[${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expected}"`)
         }
