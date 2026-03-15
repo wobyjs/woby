@@ -40,6 +40,9 @@ export {
     wrapCloneElement,
     SYMBOL_STACK
 } from './methods'
+
+// Export SSR utilities for Portal and other components that need mock document creation
+export * as ssr from './ssr/index'
 export type {
     ElementAttributes,
     CustomElementChildren,
@@ -110,7 +113,6 @@ export * as JSX from './types'
 
 // Add HtmlBoolean export
 export * from './html'
-export * as ssr from './ssr/index'
 
 // Export SSR document factory for isolated contexts
 export { createDocument, type SSRDocument } from './ssr/document'

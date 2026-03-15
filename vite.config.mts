@@ -16,7 +16,6 @@ const config = defineConfig({
                 "via-runtime": "./src/via/via-runtime.ts",
                 via: './src/via.ts',
                 testing: './src/testing.ts',
-                ssr: './src/ssr/index.ts',
             },
             name: 'woby',
             formats: ['cjs', 'es'],

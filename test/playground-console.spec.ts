@@ -3,12 +3,12 @@ import { spawn, ChildProcess } from 'child_process'
 import { kill } from 'process'
 
 let devServer: ChildProcess | null = null
-const PORT = 5276
-const BASE_URL = `http://localhost:${PORT}`
+const PREFERRED_PORT = 5276
+let BASE_URL = `http://localhost:${PREFERRED_PORT}`
 
 // Start dev server before tests
 test.beforeAll(async () => {
-    console.log(`🚀 Starting dev server on port ${PORT}...`)
+    console.log(`🚀 Starting dev server on port ${PREFERRED_PORT}...`)
 
     devServer = spawn('pnpm', ['dev'], {
         cwd: 'd:/Developments/tslib/@woby/woby/demo/playground',
@@ -37,11 +37,12 @@ test.beforeAll(async () => {
                 output.includes('http://localhost:')) {
                 clearTimeout(timeout)
 
-                // Extract actual port from output
+                // Extract actual port from output and update BASE_URL
                 const portMatch = output.match(/localhost:(\d+)/)
                 if (portMatch) {
                     const actualPort = portMatch[1]
-                    console.log(`✅ Dev server ready at http://localhost:${actualPort}`)
+                    BASE_URL = `http://localhost:${actualPort}`
+                    console.log(`✅ Dev server ready at ${BASE_URL}`)
                 } else {
                     console.log(`✅ Dev server ready`)
                 }
@@ -108,10 +109,23 @@ test.describe('Playground Console Logs Test', () => {
         // Listen for console events
         page.on('console', msg => {
             const text = msg.text()
-            consoleLogs.push(text)
-            console.log(`[Browser Console] ${text}`)
+            const type = msg.type()  // 'log', 'error', 'assert', etc.
+                    
+            consoleLogs.push(`[${type}] ${text}`)
+            console.log(`[Browser Console] [${type}] ${text}`)
+                    
+            // Capture console.assert() failures as errors
+            if (type === 'assert' && text && text.trim() !== '') {
+                // Ignore known harmless assertions
+                if (text.includes('Expected at least one update')) {
+                    return // Skip this assertion - it's expected in some tests
+                }
+                
+                errors.push(`ASSERTION FAILED: ${text}`)
+                console.error(`[ASSERT FAILURE] ${text}`)
+            }
         })
-
+                
         page.on('pageerror', error => {
             const errorMsg = error.message
             errors.push(errorMsg)
@@ -141,8 +155,9 @@ test.describe('Playground Console Logs Test', () => {
             console.log('✅ No critical errors detected')
         }
 
-        // Validate that we captured logs
-        expect(consoleLogs.length).toBeGreaterThan(0)
+        // Validate that we captured logs with Playwright expect
+        expect(consoleLogs.length, 'Should have captured console logs').toBeGreaterThan(0)
+        expect(errors.length, 'Should have no errors').toBe(0)
 
         // Log summary
         console.log(`\n📊 Test Summary:`)

@@ -20,11 +20,6 @@
             "require": "./dist/via.cjs.js",
             "import": "./dist/via.es.js"
         },
-        "./ssr": {
-            "types": "./dist/types/ssr.d.ts",
-            "require": "./dist/ssr.cjs.js",
-            "import": "./dist/ssr.es.js"
-        },
         "./testing": {
             "types": "./dist/types/testing.d.ts",
             "require": "./dist/testing.cjs.js",
@@ -83,8 +78,6 @@
         "test:e2e:all": "pnpm --filter=./demo/* run test:e2e",
         "test": "playwright test ./test",
         "test:ui": "playwright test --ui ./test",
-        "test:console": "playwright test ./test/playground-console.spec.ts",
-        "test:assertions": "playwright test ./test/playground-assertions.spec.ts",
         "dev:benchmark": "pnpm --filter=./demo/benchmark i && pnpm --filter=./demo/benchmark run dev",
         "prod:benchmark": "pnpm --filter=./demo/benchmark i && pnpm --filter=./demo/benchmark run prod",
         "dev:boxes": "pnpm --filter=./demo/boxes i && pnpm --filter=./demo/boxes run dev",
@@ -163,7 +156,6 @@
         "docs",
         "*.d.ts",
         "jsx-runtime.js",
-        "ssr.js",
         "via.js",
         "testing.js"
     ]
