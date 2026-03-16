@@ -110,22 +110,22 @@ test.describe('Playground Console Logs Test', () => {
         page.on('console', msg => {
             const text = msg.text()
             const type = msg.type()  // 'log', 'error', 'assert', etc.
-                    
+
             consoleLogs.push(`[${type}] ${text}`)
             console.log(`[Browser Console] [${type}] ${text}`)
-                    
+
             // Capture console.assert() failures as errors
             if (type === 'assert' && text && text.trim() !== '') {
                 // Ignore known harmless assertions
                 if (text.includes('Expected at least one update')) {
                     return // Skip this assertion - it's expected in some tests
                 }
-                
+
                 errors.push(`ASSERTION FAILED: ${text}`)
                 console.error(`[ASSERT FAILURE] ${text}`)
             }
         })
-                
+
         page.on('pageerror', error => {
             const errorMsg = error.message
             errors.push(errorMsg)
@@ -158,6 +158,21 @@ test.describe('Playground Console Logs Test', () => {
         // Validate that we captured logs with Playwright expect
         expect(consoleLogs.length, 'Should have captured console logs').toBeGreaterThan(0)
         expect(errors.length, 'Should have no errors').toBe(0)
+
+        // Display all console logs in HTML report as a test step
+        await test.step('Browser Console Logs (All)', async () => {
+            // Log first 50 messages to avoid overwhelming the report
+            const sampleSize = Math.min(consoleLogs.length, 50)
+            console.log(`\n📋 Showing ${sampleSize} of ${consoleLogs.length} console logs:`)
+            
+            for (let i = 0; i < sampleSize; i++) {
+                console.log(`   ${i + 1}. ${consoleLogs[i]}`)
+            }
+            
+            if (consoleLogs.length > 50) {
+                console.log(`\n   ... and ${consoleLogs.length - 50} more logs (see stdout attachment for full list)`)
+            }
+        })
 
         // Log summary
         console.log(`\n📊 Test Summary:`)

@@ -101,16 +101,16 @@ TestNestedIfsLazy.test = {
             : '<div>before</div><!----><div>after</div>'
         const staticExpectedFull = '<h3>Nested Ifs Lazy</h3>' + expectedContent
 
-        console.log('${name}] SSR result:', ssrResult)
-        console.log('[TestNestedIfsLazy] Dynamic expected:', dynamicExpectedFull)
-        console.log('[TestNestedIfsLazy] Current state visible:', isInnerVisible)
+        console.log(`[${name}] SSR result:`, ssrResult)
+        console.log(`[${name}] Dynamic expected:`, dynamicExpectedFull)
+        console.log(`[${name}] Current state visible:`, isInnerVisible)
 
         // Use dynamic matching to avoid timing mismatches
         if (ssrResult !== dynamicExpectedFull) {
-            console.error('[TestNestedIfsLazy] ❌ SSR ASSERTION FAILED')
+            console.error(`[${name}] ❌ SSR ASSERTION FAILED`)
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

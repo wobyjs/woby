@@ -37,7 +37,7 @@ TestRenderToStringNested.test = {
         if (ssrResult !== expectedForSSR) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedForSSR}`)
         } else {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expectedForDOM

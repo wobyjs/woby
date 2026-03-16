@@ -66,14 +66,14 @@ TestNullFunction.test = {
         const actualContent = match ? match[1] : '<p><!----></p>'
         const dynamicExpectedFull = `<h3>Null - Function</h3>${actualContent}`
 
-        console.log('${name}] SSR result:', ssrResult)
-        console.log('[TestNullFunction] Dynamic expected:', dynamicExpectedFull)
+        console.log(`[${name}] SSR result:`, ssrResult)
+        console.log(`[${name}] Dynamic expected:`, dynamicExpectedFull)
 
         if (ssrResult !== dynamicExpectedFull) {
-            console.error('[TestNullFunction] ❌ SSR ASSERTION FAILED')
+            console.error(`[${name}] ❌ SSR ASSERTION FAILED`)
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

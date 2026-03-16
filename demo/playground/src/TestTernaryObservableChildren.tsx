@@ -99,11 +99,11 @@ TestTernaryObservableChildren.test = {
             const actualContent = match ? match[1] : '<i>a</i>'
             const dynamicExpectedFull = `<h3>Ternary - Observable Children</h3>${actualContent}`
 
-            console.log('${name}] SSR result:', ssrResult)
-            console.log('[TestTernaryObservableChildren] Dynamic expected:', dynamicExpectedFull)
+            console.log(`[${name}] SSR result:`, ssrResult)
+            console.log(`[${name}] Dynamic expected:`, dynamicExpectedFull)
 
             if (ssrResult !== dynamicExpectedFull) {
-                console.error('[TestTernaryObservableChildren]❌ SSR ASSERTION FAILED')
+                console.error(`[${name}] ❌ SSR ASSERTION FAILED`)
                 assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
             } else {
                 console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)

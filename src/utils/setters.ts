@@ -1264,3 +1264,23 @@ export const setProps = (element: HTMLElement | Comment, object: Record<string, 
     }
 
 }
+
+// getSetters function for compatibility with @woby/three
+export const getSetters = () => ({
+    setChild,
+    setChildStatic,
+    setChildReplacement,
+    setChildReplacementText,
+    setChildReplacementFunction,
+    setAttributeStatic,
+    setAttribute,
+    setEventStatic,
+    setEvent,
+    setClassStatic,
+    setClass,
+    setClassBooleanStatic,
+    setClassBoolean,
+    setClassesStatic,
+    setClasses,
+    setDirective
+})

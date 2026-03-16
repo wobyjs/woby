@@ -270,8 +270,8 @@ jobs:
 # Before pushing code
 pnpm test
 
-# Or if in a hurry (not recommended)
-pnpm test:single
+# Or if developing a specific test feature (use Playwright CLI directly)
+playwright test ./test/playground-assertions.spec.ts
 ```
 
 ---
@@ -295,7 +295,18 @@ Together they provide comprehensive coverage.
 
 ### "Which command should I teach new team members?"
 
-**Answer:** Just teach them `pnpm test`. The other commands are for special cases.
+**Answer:** Just teach them `pnpm test`. That's all they need!
+
+### "How do I run a specific test file during development?"
+
+**Answer:** Use the Playwright CLI directly:
+```bash
+# Run only assertions test
+playwright test ./test/playground-assertions.spec.ts
+
+# Run with filters
+playwright test --grep "SSR" ./test
+```
 
 ---
 
@@ -304,9 +315,9 @@ Together they provide comprehensive coverage.
 **Simple Rule:**
 - **Daily use:** `pnpm test`
 - **Debugging:** `pnpm test:ui`
-- **Everything else:** Rarely needed
+- **Advanced development:** Use Playwright CLI directly for specific files
 
-The multiple commands exist for development flexibility, but `pnpm test` is all you need for normal workflows! 🎉
+The test suite is designed to be simple - just use `pnpm test` and you're good to go! 🎉
 
 ---
 

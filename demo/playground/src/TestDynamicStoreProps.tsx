@@ -90,10 +90,10 @@ TestDynamicStoreProps.test = {
         const dynamicExpectedFull = `<h3>Dynamic - Store Props</h3><div class="${actualClass}" data-test="TestDynamicStoreProps-class"><p>${actualPValue}</p></div>`
 
         if (ssrResult !== dynamicExpectedFull) {
-            console.error('[TestDynamicStoreProps] ❌ SSR ASSERTION FAILED')
+            console.error(`[${name}] ❌ SSR ASSERTION FAILED`)
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

@@ -75,14 +75,14 @@ TestStylesStore.test = {
             const actualStyle = styleMatch ? styleMatch[1] : ''
             const dynamicExpectedFull = `<h3>Styles - Store</h3><p style="${actualStyle}">content</p>`
 
-            console.log('${name}] SSR result:', ssrResult)
-            console.log('[TestStylesStore] Dynamic expected:', dynamicExpectedFull)
+            console.log(`[${name}] SSR result:`, ssrResult)
+            console.log(`[${name}] Dynamic expected:`, dynamicExpectedFull)
 
             if (ssrResult !== dynamicExpectedFull) {
-                console.error('[TestStylesStore]❌ SSR ASSERTION FAILED')
+                console.error(`[${name}] ❌ SSR ASSERTION FAILED`)
                 assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
             } else {
-                console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+                console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
             }
         }
 

@@ -34,7 +34,7 @@ TestPortalStatic.test = {
 
         const SsrComponent = ssrComponent as any
         const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
-        console.log(`✅ ${name}] SSR body: ${doc.body.innerHTML}`)
+        console.log(`✅ [${name}] SSR body: ${doc.body.innerHTML}`)
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n"${ssrResult}", expected \n"${expectedFull}"`)
         }

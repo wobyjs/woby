@@ -10,7 +10,7 @@ const TestSelectObservableValue = (): JSX.Element => {
     const timingObservable = $(0)
 
     // Store the observable globally so the test can access it
-    registerTestObservable('TestSelectObservableValue', value)
+    registerTestObservable(`[${name}]`, value)
     registerTestObservable(`${name}_enable`, enable)
     registerTestObservable(`${name}_timing`, timingObservable)
 
@@ -77,14 +77,14 @@ TestSelectObservableValue.test = {
         const actualSelect = selectMatch ? selectMatch[0] : ''
         const dynamicExpectedFull = `<h3>Select - Observable Value</h3>${actualSelect}`
 
-        console.log('${name}] SSR result:', ssrResult)
-        console.log('[TestSelectObservableValue] Dynamic expected:', dynamicExpectedFull)
+        console.log(`[${name}] SSR result:`, ssrResult)
+        console.log(`[${name}] Dynamic expected:`, dynamicExpectedFull)
 
         if (ssrResult !== dynamicExpectedFull) {
-            console.error('[TestSelectObservableValue] ❌ SSR ASSERTION FAILED')
+            console.error(`[${name}] ❌ SSR ASSERTION FAILED`)
             assert(false, `SSR mismatch: got \n${ssrResult}, expected \n${dynamicExpectedFull}`)
         } else {
-            console.log(`✅ ${name}] SSR test passed: ${ssrResult}`)
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
         return expected

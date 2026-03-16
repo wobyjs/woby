@@ -78,7 +78,9 @@ export {
     fixBigInt,
     toArray,
     setProp,
-    resolveArraysAndStatics
+    resolveArraysAndStatics,
+    getSetters,
+    FragmentUtils
 } from './utils'
 export * from "./constants"
 

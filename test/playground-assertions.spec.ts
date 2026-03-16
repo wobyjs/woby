@@ -117,14 +117,14 @@ test.describe('Playground Test Assertions', () => {
         page.on('console', msg => {
             const text = msg.text()
             const type = msg.type()  // 'log', 'error', 'assert', etc.
-                            
+
             // Capture all console messages for debugging
             console.log(`[Browser Console] [${type}] ${text}`)
-                    
+
             // Capture assertion logs (✅ pass, ❌ fail, ℹ️ info)
             if (text.includes('✅') || text.includes('❌') || text.includes('ℹ️')) {
                 assertionLogs.push(text)
-        
+
                 // Parse test results from logs
                 if (text.includes('✅')) {
                     // Extract test name from various patterns
@@ -133,7 +133,7 @@ test.describe('Playground Test Assertions', () => {
                         /✅ \[(.+?)\]/i,
                         /✅ (.+?) passed/i
                     ]
-                            
+
                     let testName = 'Unknown Test'
                     for (const pattern of patterns) {
                         const match = text.match(pattern)
@@ -142,7 +142,7 @@ test.describe('Playground Test Assertions', () => {
                             break
                         }
                     }
-                            
+
                     testResults.push({
                         name: testName,
                         passed: true,
@@ -156,7 +156,7 @@ test.describe('Playground Test Assertions', () => {
                         /❌ (.+?) test failed[:\s]+(.+)/i,
                         /❌ \[(.+?)\][:\s]+(.+)/i
                     ]
-                            
+
                     let testName = 'Unknown Test'
                     let errorMsg = text
                     for (const pattern of patterns) {
@@ -167,7 +167,7 @@ test.describe('Playground Test Assertions', () => {
                             break
                         }
                     }
-                            
+
                     testResults.push({
                         name: testName,
                         passed: false,
@@ -185,14 +185,14 @@ test.describe('Playground Test Assertions', () => {
                     })
                 }
             }
-                            
+
             // Capture console.assert() failures - these don't have emojis!
             if (type === 'assert' && text && text.trim() !== '') {
                 // Ignore known harmless assertions
                 if (text.includes('Expected at least one update')) {
                     return // Skip this assertion - it's expected in some tests
                 }
-                        
+
                 assertionLogs.push(`❌ ASSERT: ${text}`)
                 testResults.push({
                     name: 'Assertion Failure',
@@ -225,7 +225,7 @@ test.describe('Playground Test Assertions', () => {
         // Log all captured assertions
         console.log('\n📋 Captured Test Assertions:')
         assertionLogs.forEach(log => console.log(`   ${log}`))
-        
+
         // Create a summary step for HTML report visibility
         await test.step('Playground Test Results Summary', async () => {
             console.log(`\n📊 Test Results Summary:`)
@@ -233,13 +233,13 @@ test.describe('Playground Test Assertions', () => {
             console.log(`   Passed: ${passedTests.length}`)
             console.log(`   Failed: ${failedTests.length}`)
             console.log(`   Assertions captured: ${assertionLogs.length}`)
-            
+
             // Log first 10 passing tests as info steps
             const samplePassed = passedTests.slice(0, 10)
             samplePassed.forEach(test => {
                 console.log(`   ✅ ${test.name}`)
             })
-            
+
             if (passedTests.length > 10) {
                 console.log(`   ... and ${passedTests.length - 10} more passed tests`)
             }
