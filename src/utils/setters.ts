@@ -18,7 +18,6 @@ import { kebabToCamelCase } from '../utils/string'
 import { normalizePropertyPath, setNestedAttribute } from '../utils/nested'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
-import { isJsx } from '../jsx-runtime'
 import { useEnvironment, showEnvLog } from '../components/environment_context'
 
 export const setAttributeStatic = (() => {

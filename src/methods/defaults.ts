@@ -9,7 +9,8 @@
 import { isObservable, Observable } from "soby"
 import { SYMBOL_DEFAULT, SYMBOL_JSX } from "../constants"
 import { assign } from './assign'
-import { $, ObservableMaybe, Observant } from ".."
+import type { ObservableMaybe, Observant } from '../types'
+import { $ } from './soby'
 import { isJsxProp } from "./is_jsx_prop"
 import { make } from "./make"
 

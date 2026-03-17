@@ -35,7 +35,7 @@ Woby provides robust server-side rendering (SSR) capabilities through its `rende
 - [render_to_string.ts](file://src/methods/render_to_string.ts#L12-L38)
 
 ## Synchronous SSR with renderToString
-The synchronous version of `renderToString` is designed for server environments where blocking execution is acceptable. It immediately renders a React-like component tree into a string representation using a virtual DOM constructed via `happy-dom`. The implementation uses a fragment-based container to collect child nodes, processes them through `setChild`, and serializes the result using `outerHTML` or `textContent`.
+The synchronous version of `renderToString` is designed for server environments where blocking execution is acceptable. It immediately renders a React-like component tree into a string representation using a virtual DOM constructed through custom DOM mock implementations. The implementation uses a fragment-based container to collect child nodes, processes them through `setChild`, and serializes the result using `outerHTML` or `textContent`.
 
 This method avoids asynchronous operations, making it ideal for traditional server contexts where fast, deterministic rendering is required without the complexity of Suspense or dynamic resource loading.
 
@@ -218,7 +218,7 @@ To optimize SSR performance in high-throughput environments:
 - Cache rendered results for frequently accessed routes.
 - Avoid unnecessary re-renders by memoizing props and using `useMemo`.
 
-The use of `happy-dom` for virtual DOM operations ensures fast node creation and serialization without browser dependencies.
+The use of custom DOM mocks for virtual DOM operations ensures fast node creation and serialization without browser dependencies.
 
 **Section sources**
 - [render_to_string.ssr.ts](file://src/methods/render_to_string.ssr.ts#L6-L40)

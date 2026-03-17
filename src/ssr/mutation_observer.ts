@@ -5,8 +5,12 @@
 import type { BaseNode } from './base_node'
 import type { MutationObserverInit } from './mutation_observer_init'
 import type { MutationRecord } from './mutation_record'
-import type { MutationCallback } from './mutation_callback'
 import { SimpleNodeList } from './simple_node_list'
+
+/**
+ * Callback type for MutationObserver
+ */
+export type MutationCallback = (mutations: MutationRecord[], observer: MutationObserver) => void
 
 export class MutationObserver {
     private callback: MutationCallback

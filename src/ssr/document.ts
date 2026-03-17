@@ -22,7 +22,7 @@ type EventListenerOptions = {
     capture?: boolean
 }
 
-// Enhanced mock implementations for SSR without happy-dom
+// Mock implementations for SSR
 // These implementations better support the html`` template pattern from index.tsx
 
 
@@ -152,6 +152,7 @@ export interface SSRDocument {
         options?: boolean | AddEventListenerOptions
     }>>
     body: HTMLElement
+    head: HTMLElement
     createComment: typeof createComment
     createElement: typeof createElement
     createElementNS: FN<[string, string], Element>
@@ -170,8 +171,9 @@ export interface SSRDocument {
  * Use this when you need separate document contexts (e.g., parallel tests, multiple renders)
  */
 export const createDocument = (): SSRDocument => {
-    // Mock body element for SSR - fresh instance per document
+    // Mock body and head elements for SSR - fresh instance per document
     const body = createElement('body')
+    const head = createElement('head')
 
     const doc = {
         // Map to store event listeners - isolated per document instance
@@ -215,8 +217,9 @@ export const createDocument = (): SSRDocument => {
         createTextNode: createText,
         createDocumentFragment,
 
-        // Body property for portal component - isolated per instance
-        body
+        // Body and head properties for portal component and style injection - isolated per instance
+        body,
+        head
     };
 
     (body as any).parentNode = doc

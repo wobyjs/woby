@@ -27,7 +27,7 @@
 12. [Architecture Overview](#architecture-overview)
 
 ## Introduction
-This document provides comprehensive documentation for the `createElement()` function in a server-side rendering (SSR) context within the Woby framework. It details how virtual DOM representations are constructed using happy-dom-compatible node creation through `createHTMLNode` and `createSVGNode` from `creators.ssr`. The documentation covers the differences from browser implementations, special handling of custom elements, recursive children population, observable support, and reactivity preservation during server rendering. It also addresses SSR-specific issues and performance considerations for rendering large component trees on the server.
+This document provides comprehensive documentation for the `createElement()` function in a server-side rendering (SSR) context within the Woby framework. It details how virtual DOM representations are constructed using DOM mock-compatible node creation through `createHTMLNode` and `createSVGNode` from `creators.ssr`. The documentation covers the differences from browser implementations, special handling of custom elements, recursive children population, observable support, and reactivity preservation during server rendering. It also addresses SSR-specific issues and performance considerations for rendering large component trees on the server.
 
 ## createElement() in SSR Context
 
@@ -45,7 +45,7 @@ When processing string-based components, the function determines whether to use 
 
 ## Virtual DOM Construction
 
-Virtual DOM construction in the SSR context relies on happy-dom-compatible node creation functions that simulate browser DOM APIs on the server. The implementation creates a happy-dom window instance to provide the necessary DOM environment for server-side rendering.
+Virtual DOM construction in the SSR context relies on DOM mock-compatible node creation functions that simulate browser DOM APIs on the server. The implementation creates a mock window instance to provide the necessary DOM environment for server-side rendering.
 
 ```mermaid
 classDiagram
@@ -75,7 +75,7 @@ creators.ssr --> Document : "calls"
 - [creators.ssr.ts](file://src/utils/creators.ssr.ts#L9-L18)
 
 The virtual DOM construction process involves:
-1. Creating a happy-dom window instance for SSR
+1. Creating a mock window instance for SSR
 2. Extracting the document object from the window
 3. Defining creation functions that wrap document methods
 4. Using these functions to create various node types (comments, HTML nodes, SVG nodes, text nodes, document fragments)
@@ -90,7 +90,7 @@ This approach allows the framework to maintain DOM API compatibility while runni
 The SSR implementation of `createElement()` differs significantly from the browser version in several key aspects:
 
 ### Stack Tracking Mechanism
-Unlike the browser implementation that uses soby's Stack for tracking, the SSR version utilizes Error objects for stack tracking. This approach provides better compatibility with server environments and debugging tools.
+Unlike the browser implementation that uses soby's Stack for tracking, the SSR version utilizes Error objects for stack tracking. This approach provides better compatibility with server environments and debugging tools. The system uses DOM mock implementations for node creation.
 
 ```mermaid
 sequenceDiagram
@@ -113,7 +113,7 @@ createElement-->>Component : Return wrapped element
 - [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)
 
 ### Node Creation Functions
-The SSR implementation uses specialized node creation functions that are compatible with happy-dom, while the browser version can use native DOM APIs directly.
+The SSR implementation uses specialized node creation functions that are compatible with DOM mocks, while the browser version can use native DOM APIs directly.
 
 ### Observable Handling
 The SSR version has specific optimizations for handling observables in a server context, where reactivity needs to be preserved without relying on browser-specific features.
@@ -249,7 +249,7 @@ Creating SSR-safe components requires adherence to specific patterns and practic
 flowchart TD
 Start([Component Creation]) --> CheckSSR{"Is SSR environment?"}
 CheckSSR --> |Yes| UseSSRUtils["Use SSR-specific utilities"]
-UseSSRUtils --> CreateHappyDOM["Create happy-dom compatible nodes"]
+UseSSRUtils --> CreateMockNodes["Create DOM mock compatible nodes"]
 CreateHappyDOM --> AvoidBrowserAPIs["Avoid browser-specific APIs"]
 AvoidBrowserAPIs --> HandleObservables["Properly handle observables"]
 HandleObservables --> ReturnElement["Return SSR-safe element"]
@@ -264,7 +264,7 @@ UseBrowserAPIs --> ReturnElement
 Best practices for SSR-safe component creation:
 - Use the SSR-specific createElement implementation
 - Avoid direct references to browser globals (window, document, etc.)
-- Use happy-dom-compatible APIs for DOM manipulation
+- Use DOM mock-compatible APIs for DOM manipulation
 - Properly handle observables and reactivity
 - Ensure proper cleanup of resources
 - Use SSR-safe hooks and utilities
@@ -322,7 +322,7 @@ The implementation handles various content types, including text nodes, elements
 Several common issues can arise when using `createElement()` in SSR contexts. Understanding and addressing these issues is crucial for reliable server-side rendering.
 
 ### Missing Global Objects
-Server environments lack browser globals like window and document. The framework addresses this by creating a happy-dom window instance to provide the necessary DOM environment.
+Server environments lack browser globals like window and document. The framework addresses this by creating a mock window instance to provide the necessary DOM environment.
 
 ### Circular References
 Circular references in component trees can cause infinite loops during rendering. The implementation uses stack tracking and careful recursion management to prevent this issue.
@@ -336,7 +336,7 @@ Observables must be properly disconnected to prevent memory leaks. The framework
 ```mermaid
 flowchart TD
 Start([SSR Rendering]) --> PotentialIssue{"Potential Issue?"}
-PotentialIssue --> |Missing Globals| CreateHappyDOM["Create happy-dom instance"]
+PotentialIssue --> |Missing Globals| CreateMockWindow["Create mock window instance"]
 PotentialIssue --> |Circular References| LimitRecursion["Limit recursion depth"]
 PotentialIssue --> |Observable Leaks| CleanupObservables["Schedule cleanup"]
 CreateHappyDOM --> ResolveIssue
@@ -377,7 +377,7 @@ A --> C[Memory Usage]
 A --> D[Recursion Depth]
 A --> E[Observable Processing]
 A --> F[Diffing Algorithms]
-B --> B1["Use happy-dom efficiently"]
+B --> B1["Use DOM mocks efficiently"]
 B --> B2["Cache node creation functions"]
 C --> C1["Minimize object allocations"]
 C --> C2["Use fragment pooling"]

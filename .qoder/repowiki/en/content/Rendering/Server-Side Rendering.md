@@ -27,7 +27,7 @@
 11. [Performance Optimization](#performance-optimization)
 
 ## Introduction
-Woby's server-side rendering (SSR) system provides a comprehensive solution for generating static HTML on the server and seamlessly hydrating it on the client. The system leverages a custom SSR runtime environment built on happy-dom to simulate browser APIs, enabling consistent rendering across server and client environments. This documentation details the implementation of the SSR system, focusing on the core rendering functions, runtime utilities, and integration patterns that enable efficient server-side rendering.
+Woby's server-side rendering (SSR) system provides a comprehensive solution for generating static HTML on the server and seamlessly hydrating it on the client. The system leverages a custom SSR runtime environment with mock DOM implementations to simulate browser APIs, enabling consistent rendering across server and client environments. This documentation details the implementation of the SSR system, focusing on the core rendering functions, runtime utilities, and integration patterns that enable efficient server-side rendering.
 
 ## Core SSR Implementation
 
@@ -70,7 +70,7 @@ JSX --> setters["setters.ssr.ts"]
 Utils --> fragment["fragment.ssr.ts"]
 Utils --> diff["diff.ssr.ts"]
 Utils --> resolvers
-creators --> happydom["happy-dom Window/Document"]
+Utils --> creators["creators.ssr.ts"]
 setters --> fragment
 setters --> diff
 resolvers --> creators
@@ -145,7 +145,7 @@ The hydration process would typically:
 The SSR system includes a specialized JSX runtime in `src/ssr/jsx-runtime/` that optimizes rendering for server environments. This runtime replaces browser-specific operations with server-friendly alternatives while maintaining compatibility with the standard Woby JSX syntax.
 
 The SSR JSX runtime components:
-- Use happy-dom for DOM node creation
+- Use mock DOM implementations for node creation
 - Implement server-optimized attribute and property setting
 - Handle event listeners through delegation
 - Support directives and refs in SSR context
@@ -200,10 +200,10 @@ The `useRenderEffect` and microtask scheduling in the setters system already pro
 
 ## Integration with Node.js Environments
 
-Woby's SSR system is designed for seamless integration with Node.js environments. The implementation avoids browser-specific globals and uses happy-dom to provide a consistent DOM API. The SSR runtime handles browser globals through polyfills and server-appropriate alternatives.
+Woby's SSR system is designed for seamless integration with Node.js environments. The implementation avoids browser-specific globals and uses custom DOM mock implementations to provide a consistent DOM API. The SSR runtime handles browser globals through polyfills and server-appropriate alternatives.
 
 Key integration points:
-- Uses happy-dom's Window and Document implementations
+- Uses custom DOM mock implementations
 - Avoids client-only APIs in SSR context
 - Provides server-optimized versions of DOM operations
 - Handles module resolution for SSR bundles
@@ -213,8 +213,8 @@ Key integration points:
 graph LR
 Node[Node.js Environment]
 Node --> Woby[Woby SSR]
-Woby --> happydom[happy-dom]
-happydom --> DOM[DOM API]
+Woby --> MockDOM[Custom DOM Mocks]
+MockDOM --> DOM[DOM API]
 Woby --> Setters[setters.ssr]
 Setters --> DOM
 Woby --> Resolvers[resolvers.ssr]
@@ -270,7 +270,7 @@ The SSR system handles CSS classes and styles through the `setClasses` and `setS
 Scripts are not directly managed by the SSR system, but the generated HTML can include script tags in the appropriate locations. The client-side hydration script should be placed at the end of the body.
 
 ### Hydration Mismatches
-The fragment-based rendering approach minimizes hydration mismatches by ensuring the server and client produce identical DOM structures. The use of happy-dom provides a consistent environment for both server and client rendering.
+The fragment-based rendering approach minimizes hydration mismatches by ensuring the server and client produce identical DOM structures. The use of custom DOM mocks provides a consistent environment for both server and client rendering.
 
 **Section sources**
 - [setters.ssr.ts](file://src/utils/setters.ssr.ts#L356-L360)

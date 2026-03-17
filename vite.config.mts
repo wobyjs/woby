@@ -51,13 +51,13 @@ const config = defineConfig({
             '~': path.resolve(__dirname, 'src'),
             // Fix for stream/web import
             'stream/web': 'web-streams-polyfill/dist/ponyfill.mjs',
-            // Polyfills for Node.js modules that happy-dom needs
+            // Polyfills for Node.js modules
             'net': path.resolve(__dirname, 'net-polyfill.js'),
             'node:perf_hooks': path.resolve(__dirname, 'perf_hooks-polyfill.js')
         },
     },
     define: {
-        // Provide polyfills for Node.js globals that happy-dom might need
+        // Provide polyfills for Node.js globals
         global: 'globalThis',
     },
 })

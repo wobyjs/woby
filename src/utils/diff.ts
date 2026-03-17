@@ -35,7 +35,7 @@
  */
 
 import { createComment } from "./creators"
-import { Comment as CommentSSR } from "../ssr"
+import type { Comment as CommentSSR } from "../ssr/comment"
 
 
 // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes

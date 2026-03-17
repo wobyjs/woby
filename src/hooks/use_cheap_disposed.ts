@@ -1,6 +1,6 @@
 
 
-import { useCleanup } from '../hooks'
+import { cleanup as useCleanup } from '../soby'
 
 
 export const useCheapDisposed = (): (() => boolean) => {

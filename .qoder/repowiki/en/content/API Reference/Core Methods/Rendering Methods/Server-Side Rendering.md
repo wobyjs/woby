@@ -24,7 +24,7 @@
 11. [Common SSR Pitfalls](#common-ssr-pitfalls)
 
 ## Introduction
-Woby's server-side rendering (SSR) implementation provides a robust mechanism for rendering components on the server using a virtual DOM environment. The framework leverages happy-dom or similar DOM implementations to create a browser-like environment in Node.js, enabling consistent rendering behavior between server and client. This documentation details the inner workings of Woby's SSR rendering method, focusing on the `render()` function in `render.ssr.ts` and its supporting utilities.
+Woby's server-side rendering (SSR) implementation provides a robust mechanism for rendering components on the server using a virtual DOM environment. The framework leverages custom DOM mock implementations or similar DOM implementations to create a browser-like environment in Node.js, enabling consistent rendering behavior between server and client. This documentation details the inner workings of Woby's SSR rendering method, focusing on the `render()` function in `render.ssr.ts` and its supporting utilities.
 
 ## SSR Rendering Method Overview
 

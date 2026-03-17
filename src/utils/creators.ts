@@ -2,7 +2,7 @@ import type { ComponentIntrinsicElement, FN } from '../types'
 import { createComment as createCommentSSR, createText as createTextSSR, createDocumentFragment as createDocumentFragmentSSR, createElement as createHTMLNodeSSR } from '../ssr/document'
 import { createSVGNode as createSVGNodeSSR } from '../ssr/document'
 
-// Enhanced mock implementations for SSR without happy-dom
+// Mock implementations for SSR
 // These implementations better support the html`` template pattern from index.tsx
 
 declare const via

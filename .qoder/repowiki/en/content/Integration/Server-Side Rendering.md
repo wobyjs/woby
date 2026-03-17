@@ -147,7 +147,7 @@ FragmentUtils --> Fragment : "manipulates"
 
 Container creation is a fundamental part of the SSR process in Woby, providing the initial structure for rendered content. The framework creates lightweight container objects that serve as the root for component trees during server-side rendering.
 
-In the SSR implementation, containers are created as simple JavaScript objects with a `children` property initialized to an empty string. This approach avoids the overhead of creating full DOM elements on the server, instead using plain objects that can be efficiently processed and serialized.
+In the SSR implementation, containers are created as simple JavaScript objects with a `children` property initialized to an empty string. This approach avoids the overhead of creating full DOM elements on the server, instead using plain objects that can be efficiently processed and serialized. The system uses custom DOM mock implementations to provide the necessary APIs for server-side rendering.
 
 The container creation process is integrated with the fragment system, where the container serves as the parent for the root fragment. This design allows the framework to maintain a clear separation between the container (which holds the overall structure) and the fragment (which manages the component hierarchy).
 
@@ -235,7 +235,7 @@ Key differences between client and server implementations include:
 
 1. **Container Types**: Server implementations use lightweight JavaScript objects as containers, while client implementations work with actual DOM elements.
 
-2. **Node Creation**: The SSR system uses `happy-dom` to create nodes in a server environment, avoiding dependencies on browser-specific APIs.
+2. **Node Creation**: The SSR system uses custom DOM mock implementations to create nodes in a server environment, avoiding dependencies on browser-specific APIs.
 
 3. **Rendering Approach**: Server-side rendering produces string output, while client-side rendering directly manipulates the DOM.
 

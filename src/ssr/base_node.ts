@@ -3,7 +3,6 @@
  */
 
 import $ from "soby"
-import type { Component } from "../types"
 import { SimpleNodeList } from './simple_node_list'
 import type { MutationRecord } from './mutation_record'
 import type { MutationObserverInit } from './mutation_observer_init'

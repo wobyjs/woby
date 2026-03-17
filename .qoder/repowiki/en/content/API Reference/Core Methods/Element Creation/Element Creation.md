@@ -48,7 +48,7 @@ It validates against conflicting children props and normalizes input before proc
 The standard implementation uses browser-native DOM APIs through dynamically bound creators that adapt to the presence of Via.js.
 
 ### Server-Side Rendering (SSR)
-The SSR version utilizes `happy-dom`'s `Window` instance to simulate browser environment, enabling DOM construction without a real browser.
+The SSR version utilizes custom DOM mock implementations to simulate browser environment, enabling DOM construction without a real browser.
 
 ### Via.js Proxy-Based Rendering
 The Via.js variant integrates with proxy-based rendering by marking SVG elements with both direct properties and symbolic flags (`IsSvgSymbol`) for proper handling in proxy contexts.
@@ -64,7 +64,7 @@ C --> G[wrapElement + untrack]
 D --> G
 E --> H[Environment-Specific Creator]
 H --> I[Client: Native DOM]
-H --> J[SSR: happy-dom]
+H --> J[SSR: DOM Mocks]
 H --> K[Via.js: Proxy-Aware]
 ```
 
@@ -93,7 +93,7 @@ The system distinguishes between React 16 and 17 style calls, supporting both sp
 Uses native `document` methods bound at runtime, with special handling for SVG elements via `createElementNS`.
 
 ### SSR Node Creation
-Implements `happy-dom`'s `Window` instance to provide full DOM API support on the server, allowing consistent element creation.
+Implements custom DOM mock Window instance to provide full DOM API support on the server, allowing consistent element creation.
 
 ### Via.js Node Creation
 Directly references `via.document` when available, enabling seamless integration with the proxy-based rendering system.
@@ -108,7 +108,7 @@ class NodeCreator {
 +createDocumentFragment()
 }
 NodeCreator <|-- ClientCreator : "Uses native document"
-NodeCreator <|-- SSRCreator : "Uses happy-dom Window"
+NodeCreator <|-- SSRCreator : "Uses mock Window"
 NodeCreator <|-- ViaCreator : "Uses via.document"
 class ClientCreator {
 -document : Document
@@ -147,7 +147,7 @@ Children are processed through a multi-stage resolution system that handles func
 
 The SSR implementation in `create_element.ssr.ts` adapts the core creation logic for server environments:
 
-- Uses `happy-dom` instead of native DOM
+- Uses DOM mocks instead of native DOM
 - Maintains stack traces as `Error` objects rather than `Stack`
 - Properly initializes custom element props
 - Handles children through `FragmentUtils.make()`
@@ -160,12 +160,12 @@ sequenceDiagram
 participant JSX as JSX Input
 participant Runtime as jsx()
 participant SSRCreate as createElement.ssr
-participant HappyDOM as happy-dom
+participant MockDOM as Mock DOM
 participant Output as HTML String
 JSX->>Runtime : Transpiled JSX
 Runtime->>SSRCreate : Call with component, props
 SSRCreate->>HappyDOM : Create node via Window
-HappyDOM-->>SSRCreate : Return simulated DOM node
+MockDOM-->>SSRCreate : Return simulated DOM node
 SSRCreate->>SSRCreate : Set props via setters.ssr
 SSRCreate->>SSRCreate : Process children
 SSRCreate-->>Runtime : Return element

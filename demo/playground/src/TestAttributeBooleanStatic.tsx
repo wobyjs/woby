@@ -37,3 +37,5 @@ TestAttributeBooleanStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestAttributeBooleanStatic} />
+
+console.log(renderToString(< TestAttributeBooleanStatic />))
