@@ -5,11 +5,7 @@
 **Use `useContext` everywhere - it works in both JSX/TSX components and custom elements!**
 
 ```typescript
-// ✅ CORRECT - Use this everywhere
 const value = useContext(MyContext)
-
-// ❌ DEPRECATED - Don't use anymore
-const [value, mount] = useMountedContext(MyContext)
 ```
 
 ## Basic Pattern
@@ -131,22 +127,11 @@ return () => (
 
 ## Migration Checklist
 
-- [ ] Replace all `useMountedContext` with `useContext`
-- [ ] Remove mounting placeholder variables (`mount`)
-- [ ] Update imports to remove `useMountedContext`
-- [ ] Test context propagation in custom elements
-- [ ] Verify nested contexts work correctly
+**Note:** This migration has been completed. Checklist kept for historical reference.
 
 ## API Comparison
 
-| Feature | Old (Deprecated) | New (Recommended) |
-|---------|-----------------|-------------------|
-| Import | `useMountedContext` | `useContext` |
-| Return | `[value, mount]` | `value` |
-| Mounting | Required `{mount}` | Not needed |
-| Custom Elements | ✅ | ✅ |
-| JSX/TSX | ✅ | ✅ |
-| HTML Usage | ✅ | ✅ |
+**Historical reference:** The old API using `useMountedContext` has been deprecated and removed.
 
 ## Examples by Use Case
 

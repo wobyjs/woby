@@ -144,7 +144,7 @@ This example demonstrates real-time animation using the `useAnimationLoop` hook.
 ## Custom Elements and Context Usage
 
 ### Context API Implementation
-The Context API example demonstrates how to create and consume context in Woby applications. It shows the creation of a context with `createContext`, the use of `useContext` in functional components, and the integration with custom elements using `useMountedContext`. The example illustrates how context provides a way to pass data through the component tree without manually passing props down at every level.
+The Context API example demonstrates how to create and consume context in Woby applications. It shows the creation of a context with `createContext`, the use of `useContext` in functional components, and the integration with custom elements. The example illustrates how context provides a way to pass data through the component tree without manually passing props down at every level.
 
 ```mermaid
 graph TD
@@ -153,7 +153,7 @@ B --> C[Context.Provider]
 C --> D[ThemedButton]
 C --> E[ThemedElement]
 D --> F[useContext]
-E --> G[useMountedContext]
+E --> G[useContext]
 F --> H[Access theme value]
 G --> I[Access theme value]
 ```

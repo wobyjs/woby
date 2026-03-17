@@ -16,7 +16,7 @@
  */
 
 /* IMPORT */
-import { $, $$, useMemo, render, customElement, DEBUGGER, useAttached, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, useMountedContext, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe, HtmlString, HtmlFunction, HtmlDate, HtmlBoolean } from 'woby'
+import { $, $$, useMemo, render, customElement, DEBUGGER, isObservable, createContext, useContext, useEffect, defaults, SYMBOL_DEFAULT, type ElementAttributes, SYMBOL_OBSERVABLE_WRITABLE, useLightDom, Context, ObservableMaybe, HtmlString, HtmlFunction, HtmlDate, HtmlBoolean } from 'woby'
 
 DEBUGGER.verboseComment = true
 
@@ -24,8 +24,8 @@ const CounterContext = createContext(null)
 const NestedContext = createContext(null)
 // const useCounterContext = () => useContext(CounterContext)
 
-const useCounterContext = () => useMountedContext(CounterContext)
-const useNestedContext = (ref?: ObservableMaybe<Node>) => useMountedContext(NestedContext, ref)
+const useCounterContext = () => useContext(CounterContext)
+const useNestedContext = () => useContext(NestedContext)
 
 // Apply defaults to the Counter component manually
 const def = () => {
@@ -150,8 +150,8 @@ const ContextValue = defaults(() => ({}), (props) => {
 const ProcessedContextValue = defaults(() => ({}), (props) => {
     const v = $(0)
 
-    // const { context, mount, ref } = useMountedContext(CounterContext)
-    const context = useMountedContext(CounterContext)
+    // const { context, mount, ref } = useContext(CounterContext)
+    const context = useContext(CounterContext)
 
     return <span><button onClick={() => v($$(v) + 1)}>+++</button>(Pcocessed Context Value = <b>{() => context + ' Processed'}</b>){context.mount}</span>
 })

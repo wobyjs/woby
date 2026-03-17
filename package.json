@@ -1,8 +1,8 @@
 {
     "name": "woby",
-    "repository": "github:wongchichong/woby",
+    "repository": "github:wobyjs/woby",
     "description": "A high-performance framework with fine-grained observable/signal-based reactivity for building rich applications.",
-    "version": "1.58.39",
+    "version": "2.0.5",
     "type": "module",
     "sideEffects": false,
     "main": "./dist/index.cjs.js",
@@ -58,8 +58,7 @@
         }
     },
     "scripts": {
-        "git": " git-changelog -l 30 -a -o CHANGELOG.md && git-commit-m",
-        "bump": "pnpm version patch",
+        "bump": "pnpm version patch --no-git-tag-version",
         "push": "git push && git push --tags",
         "npmjs": "pnpm publish --access public",
         "commit": "pnpm git && pnpm bump && pnpm push",
@@ -69,7 +68,7 @@
         "build:only": "vite build",
         "watch:only": "vite build --watch",
         "watch": "run-p watch:only declaration:watch",
-        "build": "run-s clean build:only declaration",
+        "build": "run-s clean build:only declaration bump",
         "clean": "tsex clean",
         "compile": "tsex compile && tsc --declaration --emitDeclarationOnly --declarationMap",
         "compile:watch": "tsex compile --watch",

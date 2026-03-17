@@ -1,10 +1,12 @@
-# Deprecation Notice: useMountedContext and useAttached
+# Historical Note: useMountedContext and useAttached Deprecation
 
 ## Summary
 
-The `useMountedContext` and `useAttached` hooks have been **deprecated** as of this version. The `useContext` hook now handles all context needs for both JSX/TSX components and custom elements.
+**Note: This is a historical document.** The `useMountedContext` and `useAttached` hooks have been **deprecated and removed**. The `useContext` hook now handles all context needs for both JSX/TSX components and custom elements.
 
 ## What Changed
+
+**This change has been completed.** The deprecated hooks have been removed from the codebase.
 
 ### Before (Deprecated)
 
@@ -282,7 +284,7 @@ The `useContext` hook now:
 
 ## Related Files
 
-Source files updated:
+**Historical reference:** These files were updated as part of this completed deprecation:
 - `src/hooks/use_mounted_context.ts` - Marked as deprecated
 - `src/hooks/use_attached.ts` - Marked as deprecated  
 - `src/hooks/index.ts` - Still exports but deprecated

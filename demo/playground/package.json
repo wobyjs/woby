@@ -5,7 +5,8 @@
     "scripts": {
         "dev": "vite --force --mode dev --host",
         "prod": "vite --force",
-        "build": "vite build",
+        "bump": "pnpm version patch --no-git-tag-version",
+        "build": "vite build && pnpm bump",
         "test": "playwright test --config=playwright.direct.config.ts",
         "test:ui": "playwright test --ui",
         "test:woby": "npx playwright test test.playwright/woby-simple-umd-test.spec.ts --config=playwright.direct.config.ts"
@@ -18,5 +19,6 @@
         "@playwright/experimental-ct-react": "^1.58.2",
         "@playwright/test": "^1.56.1",
         "@types/node": "^24.10.13"
-    }
+    },
+    "version": "0.0.1"
 }

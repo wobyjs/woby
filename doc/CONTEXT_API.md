@@ -6,14 +6,13 @@ The Context API in Woby provides a way to pass data through the component tree w
 
 - **[Quick Reference Guide](./CONTEXT_API_QUICK_REFERENCE.md)** - Fast lookup for common patterns
 - **[Comprehensive Examples](./CONTEXT_API_EXAMPLES.md)** - Detailed usage examples
-- **[Deprecation Notice](./DEPRECATION_useMountedContext_useAttached.md)** - Migration guide from useMountedContext
+- **[Historical Deprecation Notice](./DEPRECATION_useMountedContext_useAttached.md)** - Migration guide from useMountedContext (completed)
 - **[Update Summary](./CONTEXT_API_UPDATE_SUMMARY.md)** - Overview of documentation updates
 
 ## Table of Contents
 
 - [createContext](#createcontext)
 - [useContext](#usecontext)
-- [Deprecated: useMountedContext](#deprecated-usemountedcontext)
 - [Custom Element Context Support](#custom-element-context-support)
 
 ## createContext
@@ -167,48 +166,6 @@ const TestContextHook = (): JSX.Element => {
         </>
     )
 }
-```
-
-## Deprecated: useMountedContext
-
-⚠️ **DEPRECATED**: `useMountedContext` is deprecated. Use `useContext` instead, which now handles all context needs for both JSX/TSX components and custom elements.
-
-The `useMountedContext` hook was previously used for custom elements but has been superseded by the improved `useContext` implementation.
-
-### Syntax
-
-```typescript
-// Without ref parameter (returns [context, mount])
-const [context, mount] = useMountedContext(Context)
-
-// With existing ref parameter (returns only context)
-const context = useMountedContext(Context, ref)
-```
-
-### Parameters
-
-- `Context`: The context object created by `createContext`
-- `ref` (optional): An existing observable ref to use
-
-### Returns
-
-- When called without `ref`: A tuple containing the context value and a mounting placeholder comment element
-- When called with `ref`: Only the context value
-
-### Example
-
-```tsx
-// Usage in custom elements (returns [context, mounting placeholder])
-const CounterContext = createContext<number>(0)
-const [context, mount] = useMountedContext(CounterContext)
-
-return <div>{mount}Context value: {context}</div>
-
-// Usage with existing ref (returns only context)
-const myRef = $<HTMLDivElement>()
-const context = useMountedContext(CounterContext, myRef)
-
-return <div ref={myRef}>Context value: {context}</div>
 ```
 
 ## Custom Element Context Support

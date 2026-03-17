@@ -238,8 +238,8 @@ const useCounterContext = () => useContext(CounterContext)
 
 ```typescript
 const ContextValue = defaults(() => ({}), (props) => {
-    // Use useMountedContext for proper context propagation in custom elements
-    const context = useMountedContext(CounterContext)
+    // Use useContext for context in custom elements
+    const context = useContext(CounterContext)
     
     return <span>Context Value: {context}</span>
 })

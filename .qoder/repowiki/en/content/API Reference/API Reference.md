@@ -255,7 +255,6 @@ The hooks API includes various utility hooks for common patterns:
 - `useAbortSignal`: Gets an abort signal from an AbortController
 - `useAnimationFrame`: Runs a function on the next animation frame
 - `useAnimationLoop`: Runs a function on every animation frame
-- `useAttached`: Tracks when an element is attached to the DOM
 - `useContext`: Accesses context values (documented above)
 - `useEventListener`: Adds event listeners with proper cleanup
 - `useFetch`: Performs HTTP requests with reactive handling
@@ -264,7 +263,6 @@ The hooks API includes various utility hooks for common patterns:
 - `useInterval`: Runs a function at regular intervals
 - `useMicrotask`: Runs a function on the next microtask
 - `useMounted`: Tracks whether a component is mounted
-- `useMountedContext`: Gets the mounted context
 - `usePromise`: Handles promises with reactive updates
 - `useResolved`: Resolves values reactively
 - `useResource`: Manages resource loading states

@@ -652,7 +652,7 @@ A custom element that uses context for theming:
 const ThemeContext = createContext('light')
 
 const ThemedButton = defaults(() => ({}), (props) => {
-  const theme = useMountedContext(ThemeContext)
+  const theme = useContext(ThemeContext)
   return <button class={() => `btn btn-${$$(theme)}`}>{props.children}</button>
 })
 

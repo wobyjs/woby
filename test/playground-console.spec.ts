@@ -164,11 +164,11 @@ test.describe('Playground Console Logs Test', () => {
             // Log first 50 messages to avoid overwhelming the report
             const sampleSize = Math.min(consoleLogs.length, 50)
             console.log(`\n📋 Showing ${sampleSize} of ${consoleLogs.length} console logs:`)
-            
+
             for (let i = 0; i < sampleSize; i++) {
                 console.log(`   ${i + 1}. ${consoleLogs[i]}`)
             }
-            
+
             if (consoleLogs.length > 50) {
                 console.log(`\n   ... and ${consoleLogs.length - 50} more logs (see stdout attachment for full list)`)
             }

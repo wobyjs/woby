@@ -373,14 +373,8 @@ const TestContextHookHtml = (): JSX.Element => {
 
 ### 1. Always Use useContext
 
-✅ **Correct**: Use `useContext` everywhere
 ```tsx
 const value = useContext(MyContext)
-```
-
-❌ **Deprecated**: Don't use `useMountedContext` anymore
-```tsx
-const [value, mount] = useMountedContext(MyContext) // Deprecated
 ```
 
 ### 2. Provide Default Values
@@ -418,7 +412,7 @@ The same `useContext` hook works in:
 
 ## Migration Guide
 
-### From useMountedContext to useContext
+**Note:** The migration from `useMountedContext` to `useContext` has been completed. This section is kept for historical reference.
 
 **Before (Deprecated):**
 ```tsx

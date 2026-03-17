@@ -2,9 +2,11 @@
 
 ## Overview
 
-This document summarizes the comprehensive update to Woby's Context API documentation, marking `useMountedContext` and `useAttached` as deprecated in favor of the unified `useContext` hook.
+**Note: This is a historical document.** The deprecation and removal of `useMountedContext` and `useAttached` has been completed. The unified `useContext` hook now handles all context needs for both JSX/TSX components and custom elements.
 
 ## What Changed
+
+**Completed:** The deprecated hooks have been removed from the codebase and all documentation has been updated.
 
 ### Deprecated APIs
 - ❌ `useMountedContext` - Deprecated

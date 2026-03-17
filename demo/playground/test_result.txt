@@ -1,6 +1,0 @@
-
-Running 1 test using 1 worker
-
-  ✓  1 [chromium-direct] › test.playground\test.playwright\TestIfFunction.spec.tsx:21:1 › If - Function component (414ms)
-
-  1 passed (4.3s)

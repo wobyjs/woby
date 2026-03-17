@@ -282,7 +282,7 @@ const Counter = defaults(() => ({
 ))
 
 const ContextValue = defaults(() => ({}), () => {
-  const context = useMountedContext(SomeContext)
+  const context = useContext(SomeContext)
   return <span>Context Value: {context}</span>
 })
 
@@ -373,7 +373,7 @@ const Counter = defaults(() => ({
 ))
 
 const ContextValue = defaults(() => ({}), () => {
-  const context = useMountedContext(SomeContext)
+  const context = useContext(SomeContext)
   return <span>Context Value: {context}</span>
 })
 
@@ -842,7 +842,7 @@ customElement('card-element', Card)
 
 ## Context Support
 
-Custom elements have special support for accessing context values from parent components using the `useMountedContext` hook.
+Custom elements have seamless support for accessing context values from parent components using the `useContext` hook.
 
 ### Usage
 
@@ -850,17 +850,16 @@ Custom elements have special support for accessing context values from parent co
 // Create a context
 const ValueContext = createContext(0)
 
-// Create a custom element that uses context for rendering only (mount is auto taken care of)
+// Create a custom element that uses context
 const ContextValue = defaults(() => ({}), () => {
-  const context = useMountedContext(ValueContext) //direct use
+  const context = useContext(ValueContext)
   return <span>(Context Value = <b>{context}</b>)</span>
 })
 
-// Create a custom element that uses context and requires manual mounting
+// Create a custom element that processes context value
 const ProcessedContextValue = defaults(() => ({}), () => {
-  const [context, m] = useMountedContext(ValueContext)
-  // Must put in {m} mounting component manually to receive context
-  return <span>(Processed Context Value = <b>{useMemo(() => $$($$(context)) + ' Processed')}</b>){m}</span>
+  const context = useContext(ValueContext)
+  return <span>(Processed Context Value = <b>{useMemo(() => $$(context) + ' Processed')}</b>)</span>
 })
 
 customElement('context-value', ContextValue)
@@ -870,10 +869,8 @@ customElement('processed-context-value', ProcessedContextValue)
 ### How it works
 
 1. When a context Provider is used, the context value is stored on the first child node of the parent element
-2. Child custom elements can access this context value using `useMountedContext`
-3. The `useMountedContext` hook returns a tuple `[context, mount]` where:
-   - `context` is the context value
-   - `mount` is a comment element that serves as a mounting point for context traversal
+2. Child custom elements can access this context value using `useContext`
+3. The `useContext` hook returns the context value directly
 
 ### Example
 
@@ -887,10 +884,7 @@ In this example, the `value-display` custom element will receive the context val
 
 ### Context Usage Patterns
 
-When using context in custom elements, there are two main patterns:
-
-1. **Direct usage**: When you only need the context value for rendering, you can use `useMountedContext` directly
-2. **Manual mounting**: When you need to process the context value or perform other operations, you must manually include the mounting element `{m}` in your JSX
+When using context in custom elements, you can directly use `useContext` to access the context value.
 
 The output of context usage in JSX looks like:
 

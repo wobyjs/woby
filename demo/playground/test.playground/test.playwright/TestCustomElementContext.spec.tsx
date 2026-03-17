@@ -18,16 +18,16 @@ test('Custom Element Context Functionality', async ({ page }) => {
     await page.evaluate(() => {
         const woby: typeof Woby = (window as any).woby
         // Fix: destructure defaults and customElement which were missing
-        const { $, $$, createContext, useMountedContext, defaults, customElement, h, render } = woby
+        const { $, $$, createContext, useContext, defaults, customElement, h, render } = woby
 
         // Create contexts
         const ThemeContext = createContext('light')
         const CounterContext = createContext(0)
         const NestedContext = createContext('default')
 
-        const useTheme = () => useMountedContext(ThemeContext)
-        const useCounter = () => useMountedContext(CounterContext)
-        const useNested = () => useMountedContext(NestedContext)
+        const useTheme = () => useContext(ThemeContext)
+        const useCounter = () => useContext(CounterContext)
+        const useNested = () => useContext(NestedContext)
 
         // Fix: ContextConsumer must destructure [value, mount] and include mounts in output
         // so the DOM traversal can locate the nearest CONTEXT-PROVIDER ancestor

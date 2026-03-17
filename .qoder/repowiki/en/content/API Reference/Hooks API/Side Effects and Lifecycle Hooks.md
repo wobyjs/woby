@@ -16,15 +16,13 @@
 1. [Introduction](#introduction)
 2. [use_effect: General Side Effects](#use_effect-general-side-effects)
 3. [use_render_effect: Pre-Paint Effects](#use_render_effect-pre-paint-effects)
-4. [use_attached: DOM Attachment Detection](#use_attached-dom-attachment-detection)
-5. [use_mounted_context: Context Access During Mounting](#use_mounted_context-context-access-during-mounting)
-6. [Common Use Cases](#common-use-cases)
-7. [Managing Subscriptions and Cleanup](#managing-subscriptions-and-cleanup)
-8. [Common Pitfalls and Best Practices](#common-pitfalls-and-best-practices)
-9. [Conclusion](#conclusion)
+4. [Common Use Cases](#common-use-cases)
+5. [Managing Subscriptions and Cleanup](#managing-subscriptions-and-cleanup)
+6. [Common Pitfalls and Best Practices](#common-pitfalls-and-best-practices)
+7. [Conclusion](#conclusion)
 
 ## Introduction
-Woby provides a comprehensive system for managing side effects and component lifecycle through a suite of specialized hooks. These hooks enable developers to interact with external systems, manipulate the DOM, manage subscriptions, and respond to rendering cycles with precision. This document details the core lifecycle hooks—`use_effect`, `use_render_effect`, `use_attached`, and `use_mounted_context`—and demonstrates their appropriate usage, integration patterns, and performance considerations.
+Woby provides a comprehensive system for managing side effects and component lifecycle through a suite of specialized hooks. These hooks enable developers to interact with external systems, manipulate the DOM, manage subscriptions, and respond to rendering cycles with precision. This document details the core lifecycle hooks—`use_effect` and `use_render_effect`—and demonstrates their appropriate usage, integration patterns, and performance considerations.
 
 ## use_effect: General Side Effects
 The `use_effect` hook is the primary mechanism for executing side effects after component rendering. It runs asynchronously after the browser has painted, making it ideal for operations that do not require immediate DOM layout access, such as logging, analytics, or non-critical API calls.
@@ -72,51 +70,6 @@ Browser->>Browser : Layout and paint
 
 **Section sources**
 - [use_render_effect.ts](file://src/hooks/use_render_effect.ts)
-
-## use_attached: DOM Attachment Detection
-The `use_attached` hook detects when a DOM element becomes physically attached to the document. It uses a `MutationObserver` to monitor changes in the DOM tree and updates an observable `parent` reference when the target element is added.
-
-This hook supports optional matching logic via a `match` function, allowing detection of attachment to specific parent elements (e.g., shadow DOM hosts). It is particularly useful for custom elements that need to react to their placement in the DOM hierarchy.
-
-```mermaid
-flowchart TD
-Start([Element Reference]) --> Observe["Initialize MutationObserver"]
-Observe --> Check["Check if Element is Attached"]
-Check --> |Attached| Update["Update parent Observable"]
-Check --> |Not Attached| Watch["Watch for childList mutations"]
-Watch --> Detect["Detect Element Addition"]
-Detect --> Update
-Update --> End([Parent Reference Updated])
-```
-
-**Diagram sources**
-- [use_attached.ts](file://src/hooks/use_attached.ts)
-
-**Section sources**
-- [use_attached.ts](file://src/hooks/use_attached.ts)
-
-## use_mounted_context: Context Access During Mounting
-The `use_mounted_context` hook enables access to context values during component mounting, with special support for custom elements. It combines `use_attached` with context symbol lookup to retrieve context values from parent elements in the DOM tree.
-
-For JSX components, it falls back to standard context resolution. For custom elements, it traverses the DOM to find a parent with the appropriate context symbol, enabling seamless context propagation across both JSX and HTML-defined components.
-
-```mermaid
-flowchart TD
-Start([useMountedContext Call]) --> Attach["useAttached to find provider"]
-Attach --> Traverse["Traverse DOM for Context Provider"]
-Traverse --> Found{"Provider Found?"}
-Found --> |Yes| Read["Read context.symbol value"]
-Found --> |No| Undefined["Return undefined"]
-Read --> Memo["Wrap in useMemo for reactivity"]
-Memo --> Assign["Return [context, mount] tuple"]
-Assign --> End([Context Accessible])
-```
-
-**Diagram sources**
-- [use_mounted_context.ts](file://src/hooks/use_mounted_context.ts)
-
-**Section sources**
-- [use_mounted_context.ts](file://src/hooks/use_mounted_context.ts)
 
 ## Common Use Cases
 
