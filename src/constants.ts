@@ -28,7 +28,6 @@ export const SYMBOL_JSX = Symbol('Jsx')
 export const SYMBOL_DEFAULT = Symbol('Default')
 
 
-
 /** Symbol to store a context-replay wrapper function on provider custom elements,
  *  so consumer custom elements can re-establish the soby context chain */
 export const SYMBOL_CONTEXT_WRAP = Symbol('CONTEXT_WRAP')
