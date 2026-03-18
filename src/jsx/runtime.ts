@@ -25,12 +25,14 @@ export const unwrapJsx = <P>(props: P) => {
   return props
 }
 
-const CES = isSSR ? ces : customElements
-
 export const isJsx = <P>(props: P) => !!props[SYMBOL_JSX]
 
 
 function getProps<P extends {} = { key?: string; children?: Child }>(component: string | Node | ComponentFunction<P>, props: P) {
+  const isSSR = useEnvironment() === 'ssr'
+  const CES = isSSR ? ces : customElements
+
+
   if (typeof component === 'string') {
     const ce = CES.get(component)
     if (!!ce) {

@@ -75,15 +75,16 @@ MyComponent.test = {
                 // If it's a JSX element or function, we can render it to string
                 // If it's a function, we need to call it first to get the element
                 const elementToRender = typeof ssrComponent === 'function' ? ssrComponent() : ssrComponent
-                renderToString(elementToRender).then(ssrResult => {
+                try {
+                    const ssrResult = renderToString(elementToRender)
                     if (ssrResult !== expectedFull) {
                         assert(false, `SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
                     } else {
                         console.log(`✅ SSR test passed: ${ssrResult}`)
                     }
-                }).catch(err => {
+                } catch (err) {
                     console.error(`SSR render error: ${err}`)
-                })
+                }
             }
         }, 0)
         
@@ -118,7 +119,8 @@ After implementing SSR tests:
 
 ## Notes
 
-- The `renderToString` function returns a Promise, so SSR testing must be handled asynchronously
+- The `renderToString` function is **synchronous** and returns a string directly (not a Promise)
+- SSR testing can be done synchronously or wrapped in async/await for convenience
 - The main test expects may need to be adjusted to match what the test framework compares against
 - SSR output includes the full rendered HTML structure
 - Use `setTimeout` to schedule SSR tests after the main test completes

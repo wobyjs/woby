@@ -1,4 +1,3 @@
-import { isSSR } from '../constants'
 import { createElement } from '../methods/create_element'
 import { isArray, isObject } from '../utils/lang'
 import type { Child, Component, Element } from '../types'

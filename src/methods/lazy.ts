@@ -1,4 +1,3 @@
-import { isSSR } from '../constants'
 import { useMemo } from '../hooks/soby'
 import { useResolved } from '../hooks/use_resolved'
 import { useResource } from '../hooks/use_resource'
@@ -7,6 +6,7 @@ import { createElement as createElementClient } from '../methods/create_element'
 import { resolve } from '../methods/soby'
 import { once } from '../utils/lang'
 import type { Child, LazyFetcher, LazyResult, ObservableReadonly } from '../types'
+import { useEnvironment } from '../components/environment_context'
 
 
 export const lazy = <P = {}>(fetcher: LazyFetcher<P>): LazyResult<P> => {
@@ -14,7 +14,7 @@ export const lazy = <P = {}>(fetcher: LazyFetcher<P>): LazyResult<P> => {
   const fetcherOnce = once(fetcher)
 
   const component = (props: P): ObservableReadonly<Child> => {
-
+    const isSSR = useEnvironment() === 'ssr'
     const resource = useResource(fetcherOnce)
 
     return useMemo(() => {

@@ -22,8 +22,8 @@
  * @module customElement
  */
 
-import { $, $$, isObservable, untrack } from "./soby"
-import { CONTEXTS_DATA, isSSR, SYMBOL_DEFAULT, SYMBOL_UNTRACKED } from '../constants'
+import { $$, isObservable } from "./soby"
+import { SYMBOL_DEFAULT } from '../constants'
 import { setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
@@ -36,25 +36,20 @@ import { camelToKebabCase, kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
 import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from "../utils/stylesheets"
-import { ObservableMaybe, Child, Component, ContextProvider } from "../types"
-import { mark } from "../utils/mark"
+import { Child, Component, ContextProvider } from "../types"
 import { customElements as ces, SSRCustomElement, SSRShadowRoot, SSRSlotElement } from '../ssr/custom_elements'
-import { document as doc } from '../ssr/document'
-import { useEnvironment } from "../components"
-import { Element } from '../ssr/element'
-import { renderToString } from './render_to_string'
 import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP } from '../constants'
 import { context } from '../soby'
 
 
-if (isSSR) {
-    globalThis.customElements = ces as any
-    globalThis.document = doc as any
-        // Export the SSRCustomElement class for direct use
-        ; (globalThis as any).SSRCustomElement = SSRCustomElement
-        ; (globalThis as any).SSRShadowRoot = SSRShadowRoot
-        ; (globalThis as any).SSRSlotElement = SSRSlotElement
-}
+// if (isSSR) {
+//     globalThis.customElements = ces as any
+//     globalThis.document = doc as any
+//         // Export the SSRCustomElement class for direct use
+//         ; (globalThis as any).SSRCustomElement = SSRCustomElement
+//         ; (globalThis as any).SSRShadowRoot = SSRShadowRoot
+//         ; (globalThis as any).SSRSlotElement = SSRSlotElement
+// }
 
 /**
  * Creates a mock custom element for SSR environments

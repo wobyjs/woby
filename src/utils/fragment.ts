@@ -1,16 +1,16 @@
 
 /* IMPORT */
 
-import { isSSR } from '../constants'
 import type { FragmentNode, FragmentFragment, Fragment } from '../types'
 import type { Comment as CommentSSR } from '../ssr/comment'
+import { BaseNode } from '../ssr/base_node'
 
 /* HELPERS */
 
 const NOOP_CHILDREN: Node[] = []
 
 /* MAIN */
-if (isSSR) globalThis.Node = class { } as any
+const Node = globalThis.Node ?? BaseNode
 
 export const FragmentUtils = {
 
