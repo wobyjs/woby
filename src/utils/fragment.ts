@@ -74,7 +74,7 @@ export const FragmentUtils = {
 
       } else {
 
-        FragmentUtils.getChildrenFragmented(values, children)
+        FragmentUtils.getChildrenFragmented(values as any, children)
 
       }
 
