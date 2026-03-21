@@ -35,7 +35,7 @@ function getProps<P extends {} = { key?: string; children?: Child }>(component: 
 
   // Use wobyCustomElements so JSX tag lookups go through the woby-scoped
   // registry first (which falls back to native for non-woby tags).
-  const CES = (isSSR || typeof globalThis.customElements === 'undefined') ? ces : wobyCustomElements
+  const CES = isSSR ? ces : wobyCustomElements
 
   if (typeof component === 'string') {
     const ce = CES.get(component)

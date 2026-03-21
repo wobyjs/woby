@@ -334,6 +334,7 @@ import TestCustomElementContext from './src/TestCustomElementContext'
 import TestCustomElementContextHtml from './src/TestCustomElementContext.html'
 import TestCustomElementNested from './src/TestCustomElementNested'
 import TestCustomElementComprehensive from './src/TestCustomElementComprehensive'
+import TestNativeCustomElementSource from './src/TestNativeCustomElementSource'
 
 globalThis.Woby = Woby
 
@@ -670,6 +671,7 @@ const tests = [
     TestCustomElementContextHtml,
     TestCustomElementNested,
     TestCustomElementComprehensive,
+    TestNativeCustomElementSource,
 
     // html()
     // // error TestHTMLFunctionStatic, // html template
