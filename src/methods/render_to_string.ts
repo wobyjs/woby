@@ -7,7 +7,7 @@ import { BaseNode } from '../ssr/base_node'
 import { $$, context, resolve } from './soby'
 import { SYMBOL_CLONE } from '../constants'
 import { isFunction } from '../utils/lang'
-import { EnvironmentContext, useEnvironment, showEnvLog } from '../components/environment_context'
+import { EnvironmentContext, useEnvironment, showEnvLog, DocumentContext, useDocument } from '../components/environment_context'
 import type { SSRDocument } from '../ssr/document'
 import { createDocument } from '../ssr/document'
 
@@ -47,77 +47,82 @@ export function renderToString<T extends RenderToStringOptions = RenderToStringO
     child: Child,
     options?: T
 ): T extends { returnDocument: true } ? { html: string; document: SSRDocument } : string {
+    const ssrDoc = options?.document ?? createDocument()
+
+    // Provide BOTH environment AND document context for entire SSR duration
     return EnvironmentContext.Provider('ssr', () => {
-        // Create or use provided document instance for isolated context
-        const ssrDoc = options?.document ?? createDocument()
+        return DocumentContext.Provider(ssrDoc, () => {
 
-        // If child is a component function (JSX.Element is a wrapped function), call it to initialize
-        let resolvedChild: Child = child
-        while (isFunction(resolvedChild)) {
-            try {
-                const called = (resolvedChild as Function)()
-                resolvedChild = called
-            } catch (e: any) {
-                break
-            }
-        }
-
-        // If result is an array, recursively resolve each element
-        if (Array.isArray(resolvedChild)) {
-            const resolveDeep = (item: any): any => {
-                let resolved = item
-                while (isFunction(resolved)) {
-                    resolved = (resolved as Function)()
+            // If child is a component function (JSX.Element is a wrapped function), call it to initialize
+            let resolvedChild: Child = child
+            while (isFunction(resolvedChild)) {
+                try {
+                    // console.log('[renderToString] Calling component function, env:', useEnvironment())
+                    const called = (resolvedChild as Function)()
+                    // console.log('[renderToString] Component returned, env:', useEnvironment())
+                    resolvedChild = called
+                } catch (e: any) {
+                    break
                 }
-                // If still an array after unwrapping, resolve its elements too
-                if (Array.isArray(resolved)) {
-                    return resolved.map(resolveDeep)
-                }
-                return resolved
             }
-            resolvedChild = resolvedChild.map(resolveDeep)
 
-            // Flatten nested arrays and filter out null/undefined/boolean false
-            const flattenAndFilter = (arr: any[]): any[] => {
-                const result: any[] = []
-                for (const item of arr) {
-                    if (Array.isArray(item)) {
-                        result.push(...flattenAndFilter(item))
-                    } else if (item !== null && item !== undefined && item !== false) {
-                        result.push(item)
+            // If result is an array, recursively resolve each element
+            if (Array.isArray(resolvedChild)) {
+                const resolveDeep = (item: any): any => {
+                    let resolved = item
+                    while (isFunction(resolved)) {
+                        resolved = (resolved as Function)()
                     }
+                    // If still an array after unwrapping, resolve its elements too
+                    if (Array.isArray(resolved)) {
+                        return resolved.map(resolveDeep)
+                    }
+                    return resolved
                 }
-                return result
+                resolvedChild = resolvedChild.map(resolveDeep)
+
+                // Flatten nested arrays and filter out null/undefined/boolean false
+                const flattenAndFilter = (arr: any[]): any[] => {
+                    const result: any[] = []
+                    for (const item of arr) {
+                        if (Array.isArray(item)) {
+                            result.push(...flattenAndFilter(item))
+                        } else if (item !== null && item !== undefined && item !== false) {
+                            result.push(item)
+                        }
+                    }
+                    return result
+                }
+                resolvedChild = flattenAndFilter(Array.isArray(resolvedChild) ? resolvedChild : [resolvedChild])
             }
-            resolvedChild = flattenAndFilter(Array.isArray(resolvedChild) ? resolvedChild : [resolvedChild])
-        }
 
-        // Use document's createElement for container creation
-        const container = ssrDoc.createElement('div')
-        const stack = new Error()
+            // Use document's createElement for container creation
+            const container = ssrDoc.createElement('div')
+            const stack = new Error()
 
-        // Use a fragment for the root
-        const fragment = FragmentUtils.make()
+            // Use a fragment for the root
+            const fragment = FragmentUtils.make()
 
-        // Set the child content
+            // Set the child content
 
-        setChild(container, resolvedChild, fragment, stack)
+            setChild(container, resolvedChild, fragment, stack)
 
-        // Get the rendered content from the container's children AND document body (for portals)
-        const children = Array.from(container.childNodes || [])
-        const childrenContent = children.map((child: any) => {
-            return getNodeContent(child)
-        }).join('')
+            // Get the rendered content from the container's children AND document body (for portals)
+            const children = Array.from(container.childNodes || [])
+            const childrenContent = children.map((child: any) => {
+                return getNodeContent(child)
+            }).join('')
 
-        // Include document body content for portals
-        const bodyContent = ssrDoc.body?.innerHTML || ''
+            // Include document body content for portals
+            const bodyContent = ssrDoc.body?.innerHTML || ''
 
-        // Return both html and document if requested
-        if (options?.returnDocument) {
-            return { html: childrenContent + bodyContent, document: ssrDoc }
-        }
+            // Return both html and document if requested
+            if (options?.returnDocument) {
+                return { html: childrenContent + bodyContent, document: ssrDoc }
+            }
 
-        return childrenContent + bodyContent
+            return childrenContent + bodyContent
+        }) as any
     }) as any
 }
 

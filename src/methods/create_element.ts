@@ -19,6 +19,7 @@ import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
 import { Stack } from 'soby'
 import { customElements as ces } from '../ssr/custom_elements'
+import { wobyCustomElements } from './custom_element_registry'
 // import { isSSR } from '../constants'
 import { useEnvironment, showEnvLog } from '../components/environment_context'
 
@@ -194,8 +195,11 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         return wrapElement((): Child => {
             const isSSR = useEnvironment() === 'ssr'
 
-            // Check if this is a custom element
-            const ce = isSSR ? ces.get(component) : customElements.get(component)
+            // Check if this is a custom element.
+            // Always route through wobyCustomElements so we resolve woby-owned
+            // elements correctly; it falls back to the native registry for tags
+            // owned by other libraries.
+            const ce = isSSR ? ces.get(component) : wobyCustomElements.get(component)
 
             const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
 

@@ -14,11 +14,10 @@ import { diff } from '../utils/diff'
 import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isObject, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
-import { kebabToCamelCase } from '../utils/string'
-import { normalizePropertyPath, setNestedAttribute } from '../utils/nested'
+import { setNestedAttribute } from '../utils/nested'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { Stack } from '../soby'
-import { useEnvironment, showEnvLog } from '../components/environment_context'
+import { useEnvironment } from '../components/environment_context'
 
 export const setAttributeStatic = (() => {
 

@@ -9,8 +9,10 @@ export { Fragment } from '../components/fragment'
 import type { Child, Component, ComponentFunction, Element } from '../types'
 import { wrapCloneElement, CloneableType } from '../methods/wrap_clone_element'
 import { createElement } from '../methods/create_element'
+import { isObject, isString } from '../utils/lang'
 import { SYMBOL_CLONE, SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
 import { customElements as ces } from '../ssr/custom_elements'
+import { wobyCustomElements } from '../methods/custom_element_registry'
 import { useEnvironment, showEnvLog } from '../components/environment_context'
 
 const wrapJsx = <P>(props: P) => {
@@ -28,9 +30,12 @@ export const isJsx = <P>(props: P) => !!props[SYMBOL_JSX]
 
 
 function getProps<P extends {} = { key?: string; children?: Child }>(component: string | Node | ComponentFunction<P>, props: P) {
-  const isSSR = useEnvironment() === 'ssr'
-  const CES = isSSR ? ces : customElements
+  const env = useEnvironment()
+  const isSSR = env === 'ssr'
 
+  // Use wobyCustomElements so JSX tag lookups go through the woby-scoped
+  // registry first (which falls back to native for non-woby tags).
+  const CES = (isSSR || typeof globalThis.customElements === 'undefined') ? ces : wobyCustomElements
 
   if (typeof component === 'string') {
     const ce = CES.get(component)
@@ -58,10 +63,13 @@ export function jsx<P extends {} = {}>(component: Component<P>, props?: P, ...ch
 //React 17
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, key?: string): Element
 export function jsx<P extends {} = { key?: string; children?: Child }>(component: Component<P>, props?: P, ...children: (string | Child)[]): Element {
+  // console.log('[jsx] Entry, env:', useEnvironment())
   if (typeof children === 'string') // React 16, key
     return wrapCloneElement(createElement<P>(component as any, props ?? {} as P, children as string), component, props)
 
+  // console.log('[jsx] Before getProps, env:', useEnvironment())
   props = getProps<P>(component, props)
+  // console.log('[jsx] After getProps, env:', useEnvironment())
 
   if (typeof children === 'string') // React 16, key
     Object.assign(props as any, { children })
@@ -74,7 +82,9 @@ export function jsx<P extends {} = { key?: string; children?: Child }>(component
 
 //React 17 only
 export const jsxDEV = <P extends {} = {}>(component: Component<P>, props: P | null, key: string, isStatic: boolean, source: { fileName: string, lineNumber: number, columnNumber: number }, self: any): Element => {
+  // console.log('[jsxDEV] Entry, env:', useEnvironment())
   props = getProps<P>(component, props)
+  // console.log('[jsxDEV] After getProps, env:', useEnvironment())
 
   if (key)
     Object.assign(props, { key })

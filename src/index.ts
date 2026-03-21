@@ -38,11 +38,14 @@ export {
     setRef,
     customElement,
     wrapCloneElement,
-    SYMBOL_STACK
+    SYMBOL_STACK,
+    setPendingContextWrap,
+    consumePendingContextWrap,
 } from './methods'
 
 // Export SSR utilities for Portal and other components that need mock document creation
 export * as ssr from './ssr/index'
+export { WobyCustomElementsRegistry, wobyCustomElements } from './methods/custom_element_registry'
 export type {
     ElementAttributes,
     CustomElementChildren,

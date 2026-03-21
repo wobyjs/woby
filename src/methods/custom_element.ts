@@ -40,6 +40,8 @@ import { Child, Component, ContextProvider } from "../types"
 import { customElements as ces, SSRCustomElement, SSRShadowRoot, SSRSlotElement } from '../ssr/custom_elements'
 import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP } from '../constants'
 import { context } from '../soby'
+import { WobyCustomElementsRegistry, wobyCustomElements } from './custom_element_registry'
+export { WobyCustomElementsRegistry, wobyCustomElements }
 
 
 // if (isSSR) {
@@ -104,6 +106,26 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
 }
 
 /**
+ * Module-level side-channel: a component may call setPendingContextWrap(fn)
+ * synchronously during its render to hand its context-wrap to the
+ * createBrowserCustomElement constructor, which picks it up via
+ * consumePendingContextWrap() right after createElement() returns.
+ * This solves the timing gap where ref-based SYMBOL_CONTEXT_WRAP assignment
+ * fires as a microtask (too late for sibling / descendant CE constructors).
+ */
+let _pendingContextWrapGlobal: ((fn: () => void) => void) | undefined
+
+export const setPendingContextWrap = (wrap: (fn: () => void) => void): void => {
+    _pendingContextWrapGlobal = wrap
+}
+
+export const consumePendingContextWrap = (): ((fn: () => void) => void) | undefined => {
+    const w = _pendingContextWrapGlobal
+    _pendingContextWrapGlobal = undefined
+    return w
+}
+
+/**
  * Traverses DOM ancestors (crossing shadow boundaries via assignedSlot/host)
  * and collects SYMBOL_CONTEXT_WRAP functions stored by provider custom elements,
  * returning a composed wrap function that re-establishes the full soby context chain.
@@ -111,13 +133,24 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
 const collectAncestorContextWrap = (el: HTMLElement): ((fn: () => void) => void) | undefined => {
     const wraps: ((fn: () => void) => void)[] = []
     let cur: any = el.parentNode
+    console.log('[collectAncestorContextWrap] Starting traversal for:', el.tagName, 'initial parentNode:', cur)
     while (cur) {
         const w = cur[SYMBOL_CONTEXT_WRAP]
-        if (w) wraps.unshift(w)
+        if (w) {
+            console.log('[collectAncestorContextWrap] Found CONTEXT_WRAP at:', cur.tagName || cur.constructor?.name, 'wraps.length:', wraps.length)
+            wraps.unshift(w)
+        } else {
+            console.log('[collectAncestorContextWrap] No CONTEXT_WRAP at:', cur.tagName || cur.constructor?.name)
+        }
         cur = cur.assignedSlot ?? cur.parentNode ?? cur.host ?? null
+        if (cur) {
+            console.log('[collectAncestorContextWrap] Continuing to:', cur.tagName || cur.constructor?.name)
+        }
     }
+    console.log('[collectAncestorContextWrap] Final wraps count:', wraps.length, 'for element:', el.tagName)
     if (!wraps.length) return undefined
     return (fn: () => void) => {
+        console.log('[collectAncestorContextWrap] Executing wrap with', wraps.length, 'context layers')
         const run = wraps.reduceRight((inner: () => void, wrap) => () => wrap(inner), fn)
         run()
     }
@@ -133,6 +166,7 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
     tagName: string,
     component: JSX.Component<P> | ContextProvider<any>
 ): void => {
+    console.log('[Woby customElement] Creating browser custom element:', tagName, 'component:', typeof component === 'function' ? (component as any).name || 'anonymous' : component)
     const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
     if (!defaultPropsFn) {
         console.error(`Component ${tagName} is missing default props.`)
@@ -148,14 +182,25 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         public placeHolder: Comment
 
         constructor(props?: P) {
+            console.log('[Woby customElement.constructor] Creating instance of:', tagName, 'props:', props ? 'provided' : 'defaults')
             super()
 
             this.props = !!props ? props : defaultPropsFn() || {} as P
             C.observedAttributes = Object.keys(this.props)
 
             if (!isJsx(this.props)) {
-                const shadowRoot = this.attachShadow({ mode: 'open', serializable: true })
-                if (!($$(this.props.children) instanceof HTMLSlotElement)) {
+                console.log('[Woby customElement.constructor] Creating shadow DOM for:', tagName)
+
+                // Check if we're inside a Canvas3D or other context provider
+                // by looking for SYMBOL_CONTEXT_WRAP on ancestors BEFORE creating shadow DOM
+                const ancestorWrap = collectAncestorContextWrap(this)
+
+                // For Three.js custom elements (tags starting with 'three-'), don't create shadow DOM
+                // so they can access the ThreeContext from Canvas3D
+                const isThreeElement = tagName.startsWith('three-')
+                const shadowRoot = !isThreeElement ? this.attachShadow({ mode: 'open', serializable: true }) : null
+
+                if (!isThreeElement && !($$(this.props.children) instanceof HTMLSlotElement)) {
                     this.slots = document.createElement('slot')
 
                     const { Provider, value } = this.props[SYMBOL_CONTEXT] ?? {}
@@ -166,10 +211,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     this.props.children(this.slots)
                 }
 
-                const ignoreStyle = (this.props as any).ignoreStyle === true
-                if (!ignoreStyle) {
-                    const allSheets = convertAllDocumentStylesToConstructed()
-                    shadowRoot.adoptedStyleSheets = allSheets
+                if (!isThreeElement) {
+                    const ignoreStyle = (this.props as any).ignoreStyle === true
+                    if (!ignoreStyle) {
+                        const allSheets = convertAllDocumentStylesToConstructed()
+                        shadowRoot.adoptedStyleSheets = allSheets
+                    }
                 }
 
                 // Execute the component once and set the result directly, avoiding reactive re-execution
@@ -177,31 +224,48 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 const ps = this.props as any as { symbol: symbol, value: any }
                 if (SYMBOL_CONTEXT in this.props) {
                     // Store a context-replay function on this element so descendant custom
-                    // elements can re-establish the soby context chain when they are
-                    // constructed outside the reactive context scope.
+                    // elements can re-establish the soby context chain.
                     const selfWrap = (fn: () => void) => context({ [ps.symbol]: ps.value }, fn);
                     (this as any)[SYMBOL_CONTEXT_WRAP] = selfWrap
 
                     context({ [ps.symbol]: ps.value }, () => {
                         const componentResult = createElement(component as any, this.props)
-                        setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                        if (shadowRoot) {
+                            setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                        } else {
+                            setChild(this, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                        }
+                        // After setChild invokes the component, capture any pending context wrap.
+                        const pendingWrap = consumePendingContextWrap()
+                        if (pendingWrap) (this as any)[SYMBOL_CONTEXT_WRAP] = pendingWrap
                     })
                 }
                 else {
-                    // Collect context-replay functions from ancestor custom elements and
-                    // re-establish the full soby context chain before rendering.
-                    const ancestorWrap = collectAncestorContextWrap(this)
-                    if (ancestorWrap) {
-                        ancestorWrap(() => {
+                    // Render the component, then capture any pending context wrap it set.
+                    const renderInto = (wrapFn?: (fn: () => void) => void) => {
+                        const doRender = () => {
                             const componentResult = createElement(component as any, this.props)
-                            setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
-                        })
+                            if (shadowRoot) {
+                                setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                            } else {
+                                setChild(this, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                            }
+                            // After setChild (which actually invokes the component via wrapElement),
+                            // capture any pending context wrap set synchronously during component render.
+                            const pendingWrap = consumePendingContextWrap()
+                            if (pendingWrap) (this as any)[SYMBOL_CONTEXT_WRAP] = pendingWrap
+                        }
+                        wrapFn ? wrapFn(doRender) : doRender()
+                    }
+
+                    if (ancestorWrap) {
+                        renderInto(ancestorWrap)
                     } else {
-                        const componentResult = createElement(component as any, this.props)
-                        setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
+                        renderInto()
                     }
                 }
             } else {
+                console.log('[Woby customElement.constructor] JSX mode for:', tagName)
                 setChild(this, createElement(component as any, this.props), FragmentUtils.make(), callStack('Custom element'))
             }
 
@@ -264,11 +328,14 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         }
     }
 
-    const ec = customElements.get(tagName)
-    if (!!ec)
-        console.warn(`Element ${tagName} already exists.`)
-    else {
-        customElements.define(tagName, C)
+    // Use the woby-scoped registry rather than the raw global customElements.
+    // This prevents name collisions with other libraries (react, lit, etc.) that
+    // also call customElements.define(), while still registering a native
+    // dispatcher so the browser can upgrade matching HTML elements.
+    if (wobyCustomElements.has(tagName)) {
+        console.warn(`[Woby] Element ${tagName} already registered in woby registry.`)
+    } else {
+        wobyCustomElements.define(tagName, C)
     }
 }
 
@@ -583,9 +650,13 @@ const getNestedProperty = (obj: any, path: string) => {
  * ```
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P> | ContextProvider<any>): void => {
+    console.log('[Woby customElement] Registering custom element:', tagName, 'component:', typeof component === 'function' ? (component as any).name || 'anonymous' : component)
     createSSRCustomElement(tagName, component)
 
     if (globalThis.window && globalThis.document) {
+        console.log('[Woby customElement] Browser detected, creating browser custom element:', tagName)
         createBrowserCustomElement(tagName, component)
+    } else {
+        console.log('[Woby customElement] SSR mode (no window/document):', tagName)
     }
 }
