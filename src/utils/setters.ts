@@ -237,11 +237,8 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
             const textValue = typeof child === 'bigint' ? `${child}n` : String(child)
             const textNode = createText(textValue as any)
 
-            if (!fragmentOnly) {
-
+            if (!fragmentOnly)
                 parent.appendChild(textNode)
-
-            }
 
             FragmentUtils.replaceWithNode(fragment, textNode)
 

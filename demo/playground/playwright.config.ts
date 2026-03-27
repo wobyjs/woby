@@ -2,7 +2,8 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
     testDir: './test.playwright',
-    testMatch: /.*\.spec\.(ts|tsx)$/,
+    testMatch: '**/*.spec.{ts,tsx}',
+    testIgnore: '**/umd x/**',
 
     projects: [
         {

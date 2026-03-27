@@ -237,6 +237,9 @@ import TestRefs from './src/TestRefs'
 import TestRefsNested from './src/TestRefsNested'
 import TestRefUnmounting from './src/TestRefUnmounting'
 import TestRefUntrack from './src/TestRefUntrack'
+import TestRenderAppend from './src/TestRenderAppend'
+import TestRenderAppendDynamic from './src/TestRenderAppendDynamic'
+import TestRenderAppendReactive from './src/TestRenderAppendReactive'
 import TestRenderToString from './src/TestRenderToString'
 import TestRenderToStringNested from './src/TestRenderToStringNested'
 import TestRenderToStringSuspense from './src/TestRenderToStringSuspense'
@@ -336,7 +339,7 @@ import TestCustomElementNested from './src/TestCustomElementNested'
 import TestCustomElementComprehensive from './src/TestCustomElementComprehensive'
 import TestNativeCustomElementSource from './src/TestNativeCustomElementSource'
 
-globalThis.Woby = Woby
+// globalThis.Woby = Woby
 
 /* MAIN */
 
@@ -564,6 +567,9 @@ const tests = [
     TestRefUnmounting,
     TestRefUntrack,
 
+    TestRenderAppend,
+    TestRenderAppendDynamic,
+    TestRenderAppendReactive,
     TestRenderToString,
     TestRenderToStringNested,
     TestRenderToStringSuspense,

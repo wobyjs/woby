@@ -166,7 +166,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
     tagName: string,
     component: JSX.Component<P> | ContextProvider<any>
 ): void => {
-    console.log('[Woby customElement] Creating browser custom element:', tagName, 'component:', typeof component === 'function' ? (component as any).name || 'anonymous' : component)
     const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
     if (!defaultPropsFn) {
         console.error(`Component ${tagName} is missing default props.`)
@@ -189,7 +188,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             C.observedAttributes = Object.keys(this.props)
 
             if (!isJsx(this.props)) {
-                console.log('[Woby customElement.constructor] Creating shadow DOM for:', tagName)
 
                 // Check if we're inside a Canvas3D or other context provider
                 // by looking for SYMBOL_CONTEXT_WRAP on ancestors BEFORE creating shadow DOM
@@ -265,7 +263,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     }
                 }
             } else {
-                console.log('[Woby customElement.constructor] JSX mode for:', tagName)
                 setChild(this, createElement(component as any, this.props), FragmentUtils.make(), callStack('Custom element'))
             }
 
@@ -650,13 +647,9 @@ const getNestedProperty = (obj: any, path: string) => {
  * ```
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P> | ContextProvider<any>): void => {
-    console.log('[Woby customElement] Registering custom element:', tagName, 'component:', typeof component === 'function' ? (component as any).name || 'anonymous' : component)
     createSSRCustomElement(tagName, component)
 
     if (globalThis.window && globalThis.document) {
-        console.log('[Woby customElement] Browser detected, creating browser custom element:', tagName)
         createBrowserCustomElement(tagName, component)
-    } else {
-        console.log('[Woby customElement] SSR mode (no window/document):', tagName)
     }
 }

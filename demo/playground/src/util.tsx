@@ -237,7 +237,7 @@ export const useTimeout = (callback, delay) => {
 
 let staticIndex = 0
 
-export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component | Constructor<any>) & { test: { static?: boolean, enable?: () => boolean, wrap?: boolean, snapshots?: string[], compareActualValues?: boolean, expect?: () => string }, name?: string }, props?: Record<any, any> }): JSX.Element => {
+export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component | Constructor<any>) & { test: { static?: boolean, enable?: () => boolean, wrap?: boolean, snapshots?: string[], compareActualValues?: boolean, expect?: () => string | string[] }, name?: string }, props?: Record<any, any> }): JSX.Element => {
     const ref = $<HTMLDivElement>()
     const index = staticIndex++
     let htmlPrev = ''

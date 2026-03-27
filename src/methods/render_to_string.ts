@@ -25,6 +25,11 @@ export interface RenderToStringOptions {
      * Useful for inspecting what was rendered to document.body (e.g., portals)
      */
     returnDocument?: boolean
+    /**
+     * If true, appends to existing content instead of replacing
+     * Mirrors the append option in render()
+     */
+    append?: boolean
 }
 
 /**
@@ -96,15 +101,30 @@ export function renderToString<T extends RenderToStringOptions = RenderToStringO
                 resolvedChild = flattenAndFilter(Array.isArray(resolvedChild) ? resolvedChild : [resolvedChild])
             }
 
-            // Use document's createElement for container creation
-            const container = ssrDoc.createElement('div')
             const stack = new Error()
 
             // Use a fragment for the root
             const fragment = FragmentUtils.make()
 
-            // Set the child content
+            if (options?.append) {
+                // Append mode: render directly into ssrDoc.body so content is appended
+                // This mirrors render(child, parent, { append: true }) which calls parent.append()
+                setChild(ssrDoc.body, resolvedChild, fragment, stack)
 
+                // Get the rendered content from ssrDoc.body children AND any extra body content (portals)
+                const children = Array.from(ssrDoc.body.childNodes || [])
+                const childrenContent = children.map((child: any) => getNodeContent(child)).join('')
+
+                if (options?.returnDocument) {
+                    return { html: childrenContent, document: ssrDoc }
+                }
+
+                return childrenContent
+            }
+
+            // Replace mode (default): render into a temp container (orphan div), extract HTML, discard container
+            // Using a temp div (not appended to ssrDoc) keeps ssrDoc.body clean for portal content
+            const container = ssrDoc.createElement('div')
             setChild(container, resolvedChild, fragment, stack)
 
             // Get the rendered content from the container's children AND document body (for portals)
