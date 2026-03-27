@@ -72,6 +72,19 @@ export class WobyCustomElementsRegistry {
             ?? (this._native?.get(tagName) as CustomElementConstructor | undefined)
     }
 
+    /**
+     * Returns `{ ctor, isNative }` where `isNative` is true when the constructor
+     * came from the browser's native registry rather than this woby-owned registry.
+     * Returns `undefined` when the tag is unknown to both registries.
+     */
+    getWithMeta(tagName: string): { ctor: CustomElementConstructor; isNative: boolean } | undefined {
+        const wobyCtor = this._registry.get(tagName)
+        if (wobyCtor) return { ctor: wobyCtor, isNative: false }
+        const nativeCtor = this._native?.get(tagName) as CustomElementConstructor | undefined
+        if (nativeCtor) return { ctor: nativeCtor, isNative: true }
+        return undefined
+    }
+
     /** Mirrors CustomElementRegistry.whenDefined(). */
     whenDefined(tagName: string): Promise<CustomElementConstructor> {
         if (this._registry.has(tagName)) return Promise.resolve(this._registry.get(tagName)!)

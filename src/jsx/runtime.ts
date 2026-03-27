@@ -38,13 +38,15 @@ function getProps<P extends {} = { key?: string; children?: Child }>(component: 
   const CES = isSSR ? ces : wobyCustomElements
 
   if (typeof component === 'string') {
-    const ce = CES.get(component)
-    if (!!ce) {
-      const defaultPropsFn = (ce as any).__component__?.[SYMBOL_DEFAULT]
-      if (!defaultPropsFn) {
-        console.error(`Component ${component} is missing default props. Please use the 'defaults' helper function to provide default props.`)
+    const ceMeta = isSSR ? (CES.get(component) ? { ctor: CES.get(component)!, isNative: false } : undefined) : (CES as typeof wobyCustomElements).getWithMeta(component)
+    if (ceMeta) {
+      if (!ceMeta.isNative) {
+        const defaultPropsFn = (ceMeta.ctor as any).__component__?.[SYMBOL_DEFAULT]
+        if (!defaultPropsFn) {
+          console.error(`Component ${component} is missing default props. Please use the 'defaults' helper function to provide default props.`)
+        }
+        if (!props) props = defaultPropsFn?.() ?? {}
       }
-      if (!props) props = defaultPropsFn() ?? {}
     }
   }
   if (!props) props = {} as any
