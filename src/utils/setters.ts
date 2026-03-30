@@ -752,6 +752,16 @@ export const setEventStatic = (() => {
     const delegate = (event: string): void => {
         const key = `_${event}`
 
+        // In SSR mode, use the mock document from context if available
+        // Event delegation is a no-op in SSR since there's no real DOM, but we need to avoid accessing global document
+        const isSSR = useEnvironment() === 'ssr'
+        if (isSSR) {
+            // Skip event delegation in SSR - no real DOM to attach listeners to
+            // The SSR mock document exists for rendering, not for actual event handling
+            return
+        }
+
+        // In browser mode, use the global document
         document.addEventListener(event.slice(2), event => {
             const targets = event.composedPath()
             let target: EventTarget | null = null
@@ -1183,7 +1193,11 @@ export const setTemplateAccessor = (element: HTMLElement, key: string, value: Te
 
 export const setProp = (element: HTMLElement | Comment, key: string, value: any, stack: Stack): void => {
     const isSSR = useEnvironment() === 'ssr'
-    if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
+    // In SSR mode, ensure Comment and Text are mocked for proper instanceof checks
+    if (isSSR) { 
+        globalThis.Comment = class { } as any
+        globalThis.Text = class { } as any 
+    }
 
     if (element instanceof Comment || element instanceof Text) {
         if (key === 'ref') {

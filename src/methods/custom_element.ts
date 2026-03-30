@@ -133,24 +133,15 @@ export const consumePendingContextWrap = (): ((fn: () => void) => void) | undefi
 const collectAncestorContextWrap = (el: HTMLElement): ((fn: () => void) => void) | undefined => {
     const wraps: ((fn: () => void) => void)[] = []
     let cur: any = el.parentNode
-    console.log('[collectAncestorContextWrap] Starting traversal for:', el.tagName, 'initial parentNode:', cur)
     while (cur) {
         const w = cur[SYMBOL_CONTEXT_WRAP]
         if (w) {
-            console.log('[collectAncestorContextWrap] Found CONTEXT_WRAP at:', cur.tagName || cur.constructor?.name, 'wraps.length:', wraps.length)
             wraps.unshift(w)
-        } else {
-            console.log('[collectAncestorContextWrap] No CONTEXT_WRAP at:', cur.tagName || cur.constructor?.name)
         }
         cur = cur.assignedSlot ?? cur.parentNode ?? cur.host ?? null
-        if (cur) {
-            console.log('[collectAncestorContextWrap] Continuing to:', cur.tagName || cur.constructor?.name)
-        }
     }
-    console.log('[collectAncestorContextWrap] Final wraps count:', wraps.length, 'for element:', el.tagName)
     if (!wraps.length) return undefined
     return (fn: () => void) => {
-        console.log('[collectAncestorContextWrap] Executing wrap with', wraps.length, 'context layers')
         const run = wraps.reduceRight((inner: () => void, wrap) => () => wrap(inner), fn)
         run()
     }
@@ -181,7 +172,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         public placeHolder: Comment
 
         constructor(props?: P) {
-            console.log('[Woby customElement.constructor] Creating instance of:', tagName, 'props:', props ? 'provided' : 'defaults')
             super()
 
             this.props = !!props ? props : defaultPropsFn() || {} as P
@@ -195,8 +185,10 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
 
                 // For Three.js custom elements (tags starting with 'three-'), don't create shadow DOM
                 // so they can access the ThreeContext from Canvas3D
+                // For woby-router, don't create shadow DOM so light DOM children can access context
                 const isThreeElement = tagName.startsWith('three-')
-                const shadowRoot = !isThreeElement ? this.attachShadow({ mode: 'open', serializable: true }) : null
+                const isWobyRouter = tagName === 'WOBY-ROUTER'
+                const shadowRoot = (!isThreeElement && !isWobyRouter) ? this.attachShadow({ mode: 'open', serializable: true }) : null
 
                 if (!isThreeElement && !($$(this.props.children) instanceof HTMLSlotElement)) {
                     this.slots = document.createElement('slot')

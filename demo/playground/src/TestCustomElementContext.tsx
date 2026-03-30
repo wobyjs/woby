@@ -66,11 +66,20 @@ const ContextProvider2 = defaults(() => ({
     return (
         <div style={{ border: '2px solid blue', padding: '10px', margin: '10px' }}>
             <h4>Context Provider (Theme: {$$(theme)}, Counter: {$$(counter)}</h4>
+            {/* First child position - before providers */}
+            <span data-test="before-providers">Before providers</span>
+
             <ThemeContext.Provider value={theme}>
+                {/* Middle child - between providers */}
+                <span data-test="between-providers">Between providers</span>
+
                 <CounterContext.Provider value={counter}>
                     <NestedContext.Provider value={nested}>
                         <div style={{ marginLeft: '20px' }}>
+                            {/* Last child in nested provider */}
                             {children}
+                            {/* Additional content after children */}
+                            <span data-test="after-children">After children</span>
                         </div>
                     </NestedContext.Provider>
                 </CounterContext.Provider>

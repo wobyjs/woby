@@ -62,9 +62,7 @@ export function renderToString<T extends RenderToStringOptions = RenderToStringO
             let resolvedChild: Child = child
             while (isFunction(resolvedChild)) {
                 try {
-                    // console.log('[renderToString] Calling component function, env:', useEnvironment())
                     const called = (resolvedChild as Function)()
-                    // console.log('[renderToString] Component returned, env:', useEnvironment())
                     resolvedChild = called
                 } catch (e: any) {
                     break

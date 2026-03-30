@@ -31,3 +31,7 @@ export const SYMBOL_DEFAULT = Symbol('Default')
 /** Symbol to store a context-replay wrapper function on provider custom elements,
  *  so consumer custom elements can re-establish the soby context chain */
 export const SYMBOL_CONTEXT_WRAP = Symbol('CONTEXT_WRAP')
+
+/** Symbol to mark a component as NOT creating shadow DOM
+ *  This allows child custom elements to access context from light DOM */
+export const SYMBOL_NO_SHADOW = Symbol('NO_SHADOW')
