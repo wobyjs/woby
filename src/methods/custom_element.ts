@@ -185,10 +185,8 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
 
                 // For Three.js custom elements (tags starting with 'three-'), don't create shadow DOM
                 // so they can access the ThreeContext from Canvas3D
-                // For woby-router, don't create shadow DOM so light DOM children can access context
                 const isThreeElement = tagName.startsWith('three-')
-                const isWobyRouter = tagName === 'WOBY-ROUTER'
-                const shadowRoot = (!isThreeElement && !isWobyRouter) ? this.attachShadow({ mode: 'open', serializable: true }) : null
+                const shadowRoot = !isThreeElement ? this.attachShadow({ mode: 'open', serializable: true }) : null
 
                 if (!isThreeElement && !($$(this.props.children) instanceof HTMLSlotElement)) {
                     this.slots = document.createElement('slot')
