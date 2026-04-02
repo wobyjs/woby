@@ -52,7 +52,7 @@ export function createContext<T>(defaultValue?: T): Context<T>
 export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> {
 
   const symbol = Symbol()
-  const isStatic = $(false)
+  // const isStatic = $(false)
 
   // Create provider component - React-like invisible context provider
   const Provider = defaults(
@@ -69,7 +69,7 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
     (props: ContextProviderProps): Child => {
       // Extract isStatic from props (already wrapped by defaults)
       const isStaticValue = $$(props?.isStatic as any)
-      CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic: isStatic(isStaticValue) })
+      CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic: /* isStatic */(isStaticValue) })
       
       const { value, children, ref, ...restProps } = props as any
       const hasJSX = SYMBOL_JSX in restProps
