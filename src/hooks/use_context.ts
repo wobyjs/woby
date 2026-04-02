@@ -67,10 +67,6 @@ export function useContext<T>(Context: ContextWithDefault<T> | Context<T>): T | 
   const contextData = CONTEXTS_DATA.get(Context)
   const { symbol, defaultValue, isStatic } = contextData || { symbol: Symbol(), isStatic: false }
   
-  // if (webComponentMap[symbol] !== undefined) {
-  //   return isNil(webComponentMap[symbol]) ? defaultValue : webComponentMap[symbol]
-  // }
-
   // Fall back to Soby's context system (for JSX components)
   const valueContext = context(symbol)
   

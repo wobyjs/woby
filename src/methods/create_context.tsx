@@ -56,13 +56,7 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
   // Create provider component that intercepts isStatic before defaults wraps it
   const Provider = ((rawProps: any) => {
     // Extract isStatic from raw props BEFORE defaults processes them
-    const providerIsStatic = rawProps?.isStatic
-    
-    // Set isStatic in CONTEXTS_DATA before checking JSX
-    if (providerIsStatic !== undefined) {
-      isStatic(providerIsStatic)
-    }
-    CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic })
+    CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic: isStatic(rawProps?.isStatic ?? false) })
     
     // Now call defaults with remaining props
     return defaults(
