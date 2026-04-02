@@ -20,6 +20,7 @@ interface ContextProviderProps {
   value?: ObservableMaybe<any>
   children?: ObservableMaybe<Child>
   symbol?: ObservableMaybe<Symbol>
+  isStatic?: boolean
 }
 
 const ContextProvider = defaults(
@@ -50,36 +51,48 @@ export function createContext<T>(defaultValue?: T): Context<T>
 export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> {
 
   const symbol = Symbol()
+  const isStatic = $(false)
 
-  const Provider = defaults(
-    () => ({
-      value: $<T>(undefined),
-      ref: $<T>(undefined),
-      children: $(undefined, HtmlChild),
-      symbol: symbol,
-      [SYMBOL_CONTEXT]: Context
-    } as { value: ObservableMaybe<T>, children: Child }),
-    ({ value, children, ref, ...props }): Child => {
-
-      if (SYMBOL_JSX in props) {
-        const child = $()
-
-        return jsx('context-provider', {
-          ref,
-          value,
-          symbol, //: $(symbol, hidden),
-          children, //: child//resolve(children) //must resolve, for non dom
-        })
-      }
-
-      return context({ [symbol]: value }, () => resolve(children))
-
+  // Create provider component that intercepts isStatic before defaults wraps it
+  const Provider = ((rawProps: any) => {
+    // Extract isStatic from raw props BEFORE defaults processes them
+    const providerIsStatic = rawProps?.isStatic
+    
+    // Set isStatic in CONTEXTS_DATA before checking JSX
+    if (providerIsStatic !== undefined) {
+      isStatic(providerIsStatic)
     }
-  )
+    CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic })
+    
+    // Now call defaults with remaining props
+    return defaults(
+      () => ({
+        value: $<T>(undefined),
+        ref: $<T>(undefined),
+        children: $(undefined, HtmlChild),
+        symbol: symbol,
+        [SYMBOL_CONTEXT]: Context
+      } as { value: ObservableMaybe<T>, children: Child }),
+      (props): Child => {
+        const { value, children, ref, ...restProps } = props as any
+
+        if (SYMBOL_JSX in restProps) {
+          const child = $()
+
+          return jsx('context-provider', {
+            ref,
+            value,
+            symbol,
+            children,
+          })
+        }
+
+        return context({ [symbol]: value }, () => resolve(children))
+      }
+    )(rawProps)
+  }) as any
 
   const Context = { Provider, symbol/* , value */ }
-
-  CONTEXTS_DATA.set(Context, { symbol, defaultValue })
 
   return Context
 

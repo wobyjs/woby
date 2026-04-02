@@ -30,6 +30,19 @@ const TestContextHook = (): JSX.Element => {
     }
     const Position5 = () => <p data-test="pos-5">After: {useContext(Context)}</p>
 
+    // Test isStatic behavior - value should be unwrapped with $$()
+    const IsStaticTestChild = () => {
+        const value = useContext(Context)
+        const valueType = typeof value
+        return (
+            <div data-test="isstatic-test">
+                <p data-test="isstatic-value">Value: {value}</p>
+                <p data-test="isstatic-type">Type: {valueType}</p>
+                <p data-test="isstatic-not-function">Is not function: {String(valueType !== 'function')}</p>
+            </div>
+        )
+    }
+
     const ret: JSX.Element = () => (
         <>
             <h3>Context - Hook</h3>
@@ -79,6 +92,12 @@ const TestContextHook = (): JSX.Element => {
                 </Context.Provider>
                 <Position5 />
             </Context.Provider>
+
+            {/* Test isStatic prop - ensures observable values are unwrapped */}
+            <h3>isStatic Test</h3>
+            <Context.Provider value={$('observable-value')} isStatic={true}>
+                <IsStaticTestChild />
+            </Context.Provider>
         </>
     )
 
@@ -93,8 +112,8 @@ TestContextHook.test = {
     expect: () => {
         // Define expected values for both main test and SSR test
         // Note: SSR doesn't render symbol attributes
-        const expectedFull = '<h3>Context - Hook</h3><context-provider value="outer"><p data-test="reader">outer</p><context-provider value="inner"><p data-test="reader">inner</p><div data-test="middle-content"><span>nested element</span></div><p data-test="nested-fn-last">inner</p></context-provider><p data-test="reader">outer</p><span data-test="separator">-</span></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="function-value"><p data-test="fn-provider">Function provider: function-value</p></context-provider><h3>Position Independence Test</h3><context-provider value="position-test"><p data-test="pos-1">Before: position-test</p><div data-test="pos-2"><p data-test="pos-2-nested">Nested Before: position-test</p></div><p data-test="pos-3">Middle: position-test</p><context-provider value="override-position"><p data-test="pos-4">Override: override-position</p></context-provider><p data-test="pos-5">After: position-test</p></context-provider>'  // For SSR comparison
-        const expected = '<context-provider value="outer"><p data-test="reader">outer</p><context-provider value="inner"><p data-test="reader">inner</p><div data-test="middle-content"><span>nested element</span></div><p data-test="nested-fn-last">inner</p></context-provider><p data-test="reader">outer</p><span data-test="separator">-</span></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="function-value"><p data-test="fn-provider">Function provider: function-value</p></context-provider><h3>Position Independence Test</h3><context-provider value="position-test"><p data-test="pos-1">Before: position-test</p><div data-test="pos-2"><p data-test="pos-2-nested">Nested Before: position-test</p></div><p data-test="pos-3">Middle: position-test</p><context-provider value="override-position"><p data-test="pos-4">Override: override-position</p></context-provider><p data-test="pos-5">After: position-test</p></context-provider>'   // For main test comparison
+        const expectedFull = '<h3>Context - Hook</h3><context-provider value="outer"><p data-test="reader">outer</p><context-provider value="inner"><p data-test="reader">inner</p><div data-test="middle-content"><span>nested element</span></div><p data-test="nested-fn-last">inner</p></context-provider><p data-test="reader">outer</p><span data-test="separator">-</span></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="function-value"><p data-test="fn-provider">Function provider: function-value</p></context-provider><h3>Position Independence Test</h3><context-provider value="position-test"><p data-test="pos-1">Before: position-test</p><div data-test="pos-2"><p data-test="pos-2-nested">Nested Before: position-test</p></div><p data-test="pos-3">Middle: position-test</p><context-provider value="override-position"><p data-test="pos-4">Override: override-position</p></context-provider><p data-test="pos-5">After: position-test</p></context-provider><h3>isStatic Test</h3><context-provider value="observable-value"><div data-test="isstatic-test"><p data-test="isstatic-value">Value: observable-value</p><p data-test="isstatic-type">Type: string</p><p data-test="isstatic-not-function">Is not function: true</p></div></context-provider>'  // For SSR comparison
+        const expected = '<context-provider value="outer"><p data-test="reader">outer</p><context-provider value="inner"><p data-test="reader">inner</p><div data-test="middle-content"><span>nested element</span></div><p data-test="nested-fn-last">inner</p></context-provider><p data-test="reader">outer</p><span data-test="separator">-</span></context-provider><h3>Context.Provider(value, () => ) Test</h3><context-provider value="function-value"><p data-test="fn-provider">Function provider: function-value</p></context-provider><h3>Position Independence Test</h3><context-provider value="position-test"><p data-test="pos-1">Before: position-test</p><div data-test="pos-2"><p data-test="pos-2-nested">Nested Before: position-test</p></div><p data-test="pos-3">Middle: position-test</p><context-provider value="override-position"><p data-test="pos-4">Override: override-position</p></context-provider><p data-test="pos-5">After: position-test</p></context-provider><h3>isStatic Test</h3><context-provider value="observable-value"><div data-test="isstatic-test"><p data-test="isstatic-value">Value: observable-value</p><p data-test="isstatic-type">Type: string</p><p data-test="isstatic-not-function">Is not function: true</p></div></context-provider>'   // For main test comparison
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = minimiseHtml(renderToString(ssrComponent))
