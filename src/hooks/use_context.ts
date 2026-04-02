@@ -63,7 +63,6 @@ export function useContext<T>(Context: ContextWithDefault<T>): T
 export function useContext<T>(Context: Context<T>): T | undefined
 export function useContext<T>(Context: ContextWithDefault<T> | Context<T>): T | undefined {
 
-  // First try to get context from webComponentMap (for custom elements)
   const contextData = CONTEXTS_DATA.get(Context)
   const { symbol, defaultValue, isStatic } = contextData || { symbol: Symbol(), isStatic: false }
   

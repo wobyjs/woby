@@ -258,7 +258,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
 
             // New format: component uses compareActualValues without snapshots, or has an expect function
             const actualHTMLForNewFormat = getHTML()
-            const actualSnapshot = actualHTMLForNewFormat ? actualHTMLForNewFormat.replace(/<h3>[^<]*<\/h3>/, '') : ''
+            const actualSnapshot = actualHTMLForNewFormat ? minimiseHtml(actualHTMLForNewFormat.replace(/<h3>[^<]*<\/h3>/, '')) : ''
 
             if (!Component.test.enable || Component.test.enable())
                 // If the component has an expect function (like our new format), use that for comparison
