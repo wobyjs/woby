@@ -1,7 +1,7 @@
 
 /* IMPORT */
 
-import { CONTEXTS_DATA, SYMBOL_JSX } from '../constants'
+import { CONTEXTS_DATA, SYMBOL_CONTEXT_WRAP, SYMBOL_JSX, SYMBOL_DEFAULT } from '../constants'
 // import {resolve} from '../utils/resolve';
 import { $, $$, context, resolve } from './soby'
 import type { Child, Context, ObservableMaybe, ContextWithDefault } from '../types'
@@ -20,6 +20,8 @@ interface ContextProviderProps {
   value?: ObservableMaybe<any>
   children?: ObservableMaybe<Child>
   symbol?: ObservableMaybe<Symbol>
+  isStatic?: boolean
+  visible?: boolean
 }
 
 const ContextProvider = defaults(
@@ -50,33 +52,37 @@ export function createContext<T>(defaultValue?: T): Context<T>
 export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> {
 
   const symbol = Symbol()
-  const isStatic = $(false)
+  // const isStatic = $(false)
 
+  // Create provider component - React-like invisible context provider
   const Provider = defaults(
     () => ({
       value: $<T>(undefined),
       ref: $<T>(undefined),
       children: $(undefined, HtmlChild),
-      isStatic,
       symbol: symbol,
-      [SYMBOL_CONTEXT]: Context
-    } as { value: ObservableMaybe<T>, children: Child }),
-    ({ value, children, isStatic, ref, ...props }): Child => {
+      [SYMBOL_CONTEXT]: Context,
+      isStatic: false
+      // Note: visible is NOT in defaults - it should be undefined by default
+      // so JSX providers are invisible unless visible={true} is explicitly passed
+    } as { value: ObservableMaybe<T>, children: Child, isStatic?: boolean, visible?: boolean }),
+    (props: ContextProviderProps): Child => {
+      // Extract isStatic from props (already wrapped by defaults)
+      const isStaticValue = $$(props?.isStatic as any)
+      CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic: /* isStatic */(isStaticValue) })
+      
+      const { value, children, ref, ...restProps } = props as any
+      const hasJSX = SYMBOL_JSX in restProps
+      const visible = props?.visible ?? false
 
-      if (!(SYMBOL_JSX in props)) {
-        CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic })
-
-        return jsx('context-provider', {
-          ref,
-          value,
-          symbol, //: $(symbol, hidden),
-          children, //: child//resolve(children) //must resolve, for non dom
-        })
+      // hasJSX = true (JSX usage): invisible like React, unless visible={true} opts in to DOM node
+      // hasJSX = false (native browser customElement): <context-provider> IS a DOM node
+      if (!hasJSX || visible) {
+        return jsx('context-provider', { ref, value, symbol, children })
       }
-      CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic })
 
-      return context({ [symbol]: value }, () => resolve(children))
-
+      // Default JSX behavior: invisible provider, context propagated via Soby
+      return context({ [symbol]: value }, () => resolve($$(children as any)))
     }
   )
 

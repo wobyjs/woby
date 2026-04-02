@@ -1,5 +1,5 @@
 import { $, $$, createContext, useContext, renderToString, tick, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
 
 let syncStep = 0
 const name = 'TestRefContext'
@@ -37,10 +37,10 @@ TestRefContext.test = {
     expect: () => {
         // Define expected values for both main test and SSR test
         // Note: SSR doesn't render symbol attributes
-        const expectedFull = '<h3>Ref - Context</h3><context-provider value="321"><p>Got ref - Has parent: false - Is connected: false - Context: 321</p></context-provider>'  // For SSR comparison
+        const expectedFull = minimiseHtml( '<h3>Ref - Context</h3><p>Got ref - Has parent: false - Is connected: false - Context: 321</p>' ) // For SSR comparison
         const expected = [
-            '<context-provider value="321"><p>Got ref - Has parent: true - Is connected: true - Context: 321</p></context-provider>',   // For main DOM test comparison
-            '<context-provider value="321"><p>Got ref - Has parent: false - Is connected: false - Context: 321</p></context-provider>',   // For main DOM test comparison
+            minimiseHtml('<p>Got ref - Has parent: true - Is connected: true - Context: 321</p>'),   // For main DOM test comparison
+            minimiseHtml('<p>Got ref - Has parent: false - Is connected: false - Context: 321</p>'),   // For main DOM test comparison
         ]
 
         const ssrComponent = testObservables[`${name}_ssr`]
