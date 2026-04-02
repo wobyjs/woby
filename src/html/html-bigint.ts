@@ -24,7 +24,7 @@ export const HtmlBigInt: ObservableOptions<bigint | string | number | undefined>
         return (bigA === undefined && bigB === undefined) ||
             (bigA !== undefined && bigB !== undefined && bigA === bigB)
     },
-    type: BigInt,
+    type: 'bigint',
     toHtml: (value) => {
         const big = toBigInt(value)
         return big ? big.toString() : undefined as any

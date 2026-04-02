@@ -181,7 +181,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         public placeHolder: Comment
 
         constructor(props?: P) {
-            console.log('[Woby customElement.constructor] Creating instance of:', tagName, 'props:', props ? 'provided' : 'defaults')
             super()
 
             this.props = !!props ? props : defaultPropsFn() || {} as P

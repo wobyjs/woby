@@ -34,9 +34,9 @@ export type Constructor<T = unknown> = { new(): T }
 
 export type ConstructorWith<T = unknown, Arguments extends unknown[] = []> = { new(...args: Arguments): T }
 
-export type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T }
+export type ContextData<T = unknown> = { symbol: symbol, defaultValue?: T, isStatic?: ObservableMaybe<boolean> }
 
-export type ContextProvider<T = unknown> = (props: { value: ObservableMaybe<T>, children: Child, ref?: Observable<Node> }) => Child
+export type ContextProvider<T = unknown> = (props: { value: ObservableMaybe<T>, isStatic?: ObservableMaybe<boolean>, children: Child, ref?: Observable<Node> }) => Child
 
 export type Context<T = unknown> = { Provider: ContextProvider<T>, symbol: symbol }
 
