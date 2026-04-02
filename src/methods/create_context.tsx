@@ -1,7 +1,7 @@
 
 /* IMPORT */
 
-import { CONTEXTS_DATA, SYMBOL_CONTEXT_WRAP, SYMBOL_JSX } from '../constants'
+import { CONTEXTS_DATA, SYMBOL_JSX } from '../constants'
 // import {resolve} from '../utils/resolve';
 import { $, $$, context, resolve } from './soby'
 import type { Child, Context, ObservableMaybe, ContextWithDefault } from '../types'
@@ -50,19 +50,21 @@ export function createContext<T>(defaultValue?: T): Context<T>
 export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> {
 
   const symbol = Symbol()
+  const isStatic = $(false)
 
   const Provider = defaults(
     () => ({
       value: $<T>(undefined),
       ref: $<T>(undefined),
       children: $(undefined, HtmlChild),
+      isStatic,
       symbol: symbol,
       [SYMBOL_CONTEXT]: Context
     } as { value: ObservableMaybe<T>, children: Child }),
-    ({ value, children, ref, ...props }): Child => {
+    ({ value, children, isStatic, ref, ...props }): Child => {
 
-      if (SYMBOL_JSX in props) {
-        const child = $()
+      if (!(SYMBOL_JSX in props)) {
+        CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic })
 
         return jsx('context-provider', {
           ref,
@@ -71,6 +73,7 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
           children, //: child//resolve(children) //must resolve, for non dom
         })
       }
+      CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic })
 
       return context({ [symbol]: value }, () => resolve(children))
 
@@ -78,8 +81,6 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
   )
 
   const Context = { Provider, symbol/* , value */ }
-
-  CONTEXTS_DATA.set(Context, { symbol, defaultValue })
 
   return Context
 
