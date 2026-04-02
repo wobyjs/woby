@@ -97,9 +97,45 @@ const App = () => {
 }
 ```
 
+### Advanced Provider Options
+
+#### visible Prop
+
+By default, Context.Provider is invisible in JSX (doesn't render a DOM node). Use `visible={true}` to render it as a `<context-provider>` DOM element:
+
+```tsx
+// Invisible provider (default) - React-like behavior
+<ThemeContext.Provider value={theme}>
+  <ChildComponent />
+</ThemeContext.Provider>
+
+// Visible provider - renders <context-provider> DOM node
+<ThemeContext.Provider value={theme} visible={true}>
+  <ChildComponent />
+</ThemeContext.Provider>
+```
+
+#### isStatic Prop
+
+Control whether context values are observable or static:
+
+```tsx
+// Static context value (not reactive)
+<ThemeContext.Provider value="dark" isStatic={true}>
+  <ChildComponent />
+</ThemeContext.Provider>
+
+// Observable context value (reactive by default)
+<ThemeContext.Provider value={theme$} isStatic={false}>
+  <ChildComponent />
+</ThemeContext.Provider>
+```
+
 Context is automatically propagated from parent to child custom elements.
 
 ## Consuming Context
+
+### Consuming Context
 
 ### With useContext (Both JSX/TSX and Custom Elements)
 
@@ -117,6 +153,64 @@ const ThemedComponent = () => {
 }
 ```
 
+### Complete Example with Nested Providers
+
+```tsx
+import { $, $$, createContext, useContext } from 'woby'
+
+const ThemeContext = createContext<'light' | 'dark'>('light')
+const UserContext = createContext<string>('anonymous')
+
+// Multiple siblings consuming context
+const Sibling1 = () => <p>First: {useContext(UserContext)}</p>
+const Sibling2 = () => <p>Second: {useContext(UserContext)}</p>
+const Sibling3Nested = () => <p>Nested: {useContext(UserContext)}</p>
+const Sibling4 = () => <p>Last: {useContext(UserContext)}</p>
+
+const App = () => {
+  return (
+    <>
+      <h3>Context - Components</h3>
+      <ThemeContext.Provider value="outer">
+        {/* First child - function component */}
+        <p>{useContext(ThemeContext)}</p>
+        
+        {/* Second child - regular element */}
+        <span>separator</span>
+        
+        {/* Third child - nested provider with children at different positions */}
+        <ThemeContext.Provider value="inner">
+          {/* First child in nested provider */}
+          <p>{useContext(ThemeContext)}</p>
+          
+          {/* Middle child - another nested element */}
+          <div>
+            <span>nested content</span>
+          </div>
+          
+          {/* Last child in nested provider */}
+          <p>{useContext(ThemeContext)}</p>
+        </ThemeContext.Provider>
+        
+        {/* Last child - function component after nested provider */}
+        <p>{useContext(ThemeContext)}</p>
+      </ThemeContext.Provider>
+      
+      {/* Multiple siblings test */}
+      <h3>Multiple Siblings Test</h3>
+      <UserContext.Provider value="multi-test">
+        <Sibling1 />
+        <Sibling2 />
+        <div>
+          <Sibling3Nested />
+        </div>
+        <Sibling4 />
+      </UserContext.Provider>
+    </>
+  )
+}
+```
+
 ## Best Practices
 
 1. Use `useContext` for all context needs as it now supports both JSX/TSX and custom elements
@@ -125,3 +219,6 @@ const ThemedComponent = () => {
 4. Avoid passing complex objects in context; prefer primitive values or observables
 5. Use context sparingly - only for data that needs to be shared across many components
 6. Consider using props for data that only needs to be passed down a few levels
+7. Use `visible={true}` prop when you need the provider to render as a DOM node (for debugging or specific layout needs)
+8. Use `isStatic={true}` for non-reactive context values to improve performance
+9. Context providers can wrap multiple sibling children - all will have access to the context value

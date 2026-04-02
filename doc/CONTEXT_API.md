@@ -58,6 +58,20 @@ const ThemedButton = () => {
   const theme = useContext(ThemeContext)
   return <button className={theme}>Themed Button</button>
 }
+
+// Advanced: Using visible prop to render provider as DOM node
+const DebugApp = () => (
+  <ThemeContext.Provider value="dark" visible={true}>
+    <Toolbar />
+  </ThemeContext.Provider>
+)
+
+// Advanced: Using isStatic prop for non-reactive values
+const StaticApp = () => (
+  <ThemeContext.Provider value="light" isStatic={true}>
+    <Toolbar />
+  </ThemeContext.Provider>
+)
 ```
 
 ## useContext
@@ -168,6 +182,62 @@ const TestContextHook = (): JSX.Element => {
 }
 ```
 
+### Multiple Siblings Example
+
+```tsx
+import { createContext, useContext } from 'woby'
+
+const UserContext = createContext<string>('anonymous')
+
+// Define sibling components that consume context
+const Sibling1 = () => <p>First: {useContext(UserContext)}</p>
+const Sibling2 = () => <p>Second: {useContext(UserContext)}</p>
+const Sibling3Nested = () => <p>Nested: {useContext(UserContext)}</p>
+const Sibling4 = () => <p>Last: {useContext(UserContext)}</p>
+
+const App = () => (
+  <UserContext.Provider value="multi-test">
+    <Sibling1 />
+    <Sibling2 />
+    <div>
+      <Sibling3Nested />
+    </div>
+    <Sibling4 />
+  </UserContext.Provider>
+)
+```
+
+### Nested Providers with Position-based Context
+
+```tsx
+import { $, $$, createContext, useContext } from 'woby'
+
+const ThemeContext = createContext<'light' | 'dark'>('light')
+
+const App = () => {
+  return (
+    <ThemeContext.Provider value="outer">
+      {/* First child */}
+      <p>{useContext(ThemeContext)} {/* outputs: "outer" */}</p>
+      
+      {/* Second child */}
+      <span>separator</span>
+      
+      {/* Third child - nested provider */}
+      <ThemeContext.Provider value="inner">
+        {/* Children inside nested provider get "inner" value */}
+        <p>{useContext(ThemeContext)} {/* outputs: "inner" */}</p>
+        <div><span>nested content</span></div>
+        <p>{useContext(ThemeContext)} {/* outputs: "inner" */}</p>
+      </ThemeContext.Provider>
+      
+      {/* Last child - back to outer context */}
+      <p>{useContext(ThemeContext)} {/* outputs: "outer" */}</p>
+    </ThemeContext.Provider>
+  )
+}
+```
+
 ## Custom Element Context Support
 
 Custom elements created with Woby's `customElement` function have special support for context. The context value is stored on the first child node of the parent element and can be accessed by child custom elements.
@@ -178,6 +248,15 @@ Custom elements created with Woby's `customElement` function have special suppor
 2. For custom elements, it automatically retrieves context from parent elements using the DOM hierarchy
 3. The context lookup traverses up the DOM tree to find the nearest context provider
 4. No special hooks are needed - `useContext` works everywhere
+5. **Invisible by default**: In JSX, Context.Provider doesn't render a DOM node (React-like behavior)
+6. **Visible option**: Use `visible={true}` prop to render `<context-provider>` as a DOM node
+7. **Static values**: Use `isStatic={true}` for non-reactive context values
+
+### Provider Behavior
+
+- **JSX usage** (`<Context.Provider value={...}>`): Invisible wrapper, no DOM node rendered by default
+- **Custom element usage** (`<context-provider value="...">`): Always renders as DOM node
+- **Visible JSX usage** (`<Context.Provider visible={true}>`): Renders as `<context-provider>` DOM node
 
 ### Example
 

@@ -22,7 +22,6 @@ class NativeCustomElement extends HTMLElement {
 
     constructor() {
         super()
-        console.log('[NativeCustomElement] Constructor called')
 
         // Create shadow DOM
         const shadow = this.attachShadow({ mode: 'open' })
