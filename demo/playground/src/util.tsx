@@ -49,6 +49,121 @@ export const registerTestObservable = (name: string, observable: Observable<any>
     testObservables[name] = observable
 }
 
+// Helper to get computed style of an element by selector
+export const getComputedStyleValue = (selector: string, property: string): string | null => {
+    if (typeof document === 'undefined') return null
+    
+    const element = document.querySelector(selector)
+    if (!element) {
+        console.warn(`[getComputedStyleValue] Element not found: ${selector}`)
+        return null
+    }
+    
+    const computedStyle = window.getComputedStyle(element)
+    return computedStyle.getPropertyValue(property)
+}
+
+// Helper to get computed styles from shadow DOM
+export const getShadowComputedStyleValue = (customElementTag: string, innerSelector: string, property: string): string | null => {
+    if (typeof document === 'undefined') return null
+    
+    const customElement = document.querySelector(customElementTag)
+    if (!customElement) {
+        console.warn(`[getShadowComputedStyleValue] Custom element not found: ${customElementTag}`)
+        return null
+    }
+    
+    const shadowRoot = (customElement as any).shadowRoot
+    if (!shadowRoot) {
+        console.warn(`[getShadowComputedStyleValue] No shadow root on: ${customElementTag}`)
+        return null
+    }
+    
+    const element = shadowRoot.querySelector(innerSelector)
+    if (!element) {
+        console.warn(`[getShadowComputedStyleValue] Inner element not found: ${innerSelector} in ${customElementTag}`)
+        return null
+    }
+    
+    const computedStyle = window.getComputedStyle(element)
+    return computedStyle.getPropertyValue(property)
+}
+
+// Helper to get computed styles from slotted content (light DOM children of custom element)
+export const getSlottedComputedStyleValue = (customElementTag: string, selector: string, property: string): string | null => {
+    if (typeof document === 'undefined') return null
+    
+    const customElement = document.querySelector(customElementTag)
+    if (!customElement) {
+        console.warn(`[getSlottedComputedStyleValue] Custom element not found: ${customElementTag}`)
+        return null
+    }
+    
+    // Query light DOM children (slotted content)
+    const element = customElement.querySelector(selector)
+    if (!element) {
+        console.warn(`[getSlottedComputedStyleValue] Slotted element not found: ${selector} in ${customElementTag}`)
+        return null
+    }
+    
+    const computedStyle = window.getComputedStyle(element)
+    return computedStyle.getPropertyValue(property)
+}
+
+// Helper to print all computed styles for debugging
+export const printComputedStyles = (selector: string, properties: string[]): Record<string, string> => {
+    if (typeof document === 'undefined') return {}
+    
+    const element = document.querySelector(selector)
+    if (!element) {
+        console.warn(`[printComputedStyles] Element not found: ${selector}`)
+        return {}
+    }
+    
+    const computedStyle = window.getComputedStyle(element)
+    const result: Record<string, string> = {}
+    
+    properties.forEach(prop => {
+        result[prop] = computedStyle.getPropertyValue(prop)
+    })
+    
+    console.log(`[Computed Styles for ${selector}]`, result)
+    return result
+}
+
+// Helper to print shadow DOM computed styles
+export const printShadowComputedStyles = (customElementTag: string, innerSelector: string, properties: string[]): Record<string, string> => {
+    if (typeof document === 'undefined') return {}
+    
+    const customElement = document.querySelector(customElementTag)
+    if (!customElement) {
+        console.warn(`[printShadowComputedStyles] Custom element not found: ${customElementTag}`)
+        return {}
+    }
+    
+    const shadowRoot = (customElement as any).shadowRoot
+    if (!shadowRoot) {
+        console.warn(`[printShadowComputedStyles] No shadow root on: ${customElementTag}`)
+        return {}
+    }
+    
+    const element = shadowRoot.querySelector(innerSelector)
+    if (!element) {
+        console.warn(`[printShadowComputedStyles] Inner element not found: ${innerSelector} in ${customElementTag}`)
+        return {}
+    }
+    
+    const computedStyle = window.getComputedStyle(element)
+    const result: Record<string, string> = {}
+    
+    properties.forEach(prop => {
+        result[prop] = computedStyle.getPropertyValue(prop)
+    })
+    
+    console.log(`[Shadow Computed Styles for ${customElementTag} > ${innerSelector}]`, result)
+    return result
+}
+
 /**
  * Serializes an element to HTML string, recursively handling shadow DOM.
  * For custom elements with shadowRoot: wraps shadow content in <template shadowrootmode="open">,

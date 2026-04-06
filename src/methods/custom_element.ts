@@ -35,7 +35,7 @@ import { isJsx } from "../jsx-runtime"
 import { camelToKebabCase, kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
-import { convertAllDocumentStylesToConstructed, observeStylesheetChanges } from "../utils/stylesheets"
+import { observeStylesheetChanges, refreshStylesheetCache, registerShadowRoot } from "../utils/stylesheets"
 import { Child, Component, ContextProvider } from "../types"
 import { customElements as ces, SSRCustomElement, SSRShadowRoot, SSRSlotElement } from '../ssr/custom_elements'
 import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP } from '../constants'
@@ -199,12 +199,18 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     this.props.children(this.slots)
                 }
 
-                if (!isThreeElement) {
-                    const ignoreStyle = (this.props as any).ignoreStyle === true
-                    if (!ignoreStyle) {
-                        const allSheets = convertAllDocumentStylesToConstructed()
-                        shadowRoot.adoptedStyleSheets = allSheets
-                    }
+                const ignoreStyle = (this.props as any).ignoreStyle === true
+                if (!ignoreStyle) {
+                    // Force refresh the cache to ensure we get the latest styles
+                    // This is important for dynamically loaded stylesheets like Tailwind CDN
+                    const allSheets = refreshStylesheetCache()
+
+                    // Use adopted stylesheets (modern approach per Tailwind CSS v4 Shadow DOM guide)
+                    // https://meefik.dev/2025/03/19/tailwindcss-and-shadow-dom/
+                    shadowRoot.adoptedStyleSheets = allSheets
+
+                    // Register this shadow root for automatic style updates via MutationObserver
+                    registerShadowRoot(shadowRoot)
                 }
 
                 // Execute the component once and set the result directly, avoiding reactive re-execution

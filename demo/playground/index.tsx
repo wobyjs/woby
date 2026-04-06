@@ -338,6 +338,10 @@ import TestCustomElementContextHtml from './src/TestCustomElementContext.html'
 import TestCustomElementNested from './src/TestCustomElementNested'
 import TestCustomElementComprehensive from './src/TestCustomElementComprehensive'
 import TestNativeCustomElementSource from './src/TestNativeCustomElementSource'
+import TestTailwindNoImport from './src/TestTailwindNoImport'
+import TestTailwindWithImport from './src/TestTailwindWithImport'
+import TestTailwindNoImportHTML from './src/TestTailwindNoImportHTML'
+import TestTailwindWithImportHTML from './src/TestTailwindWithImportHTML'
 
 // globalThis.Woby = Woby
 
@@ -678,6 +682,12 @@ const tests = [
     TestCustomElementNested,
     TestCustomElementComprehensive,
     TestNativeCustomElementSource,
+
+    // Tailwind CSS Tests (Shadow DOM Compatibility)
+    TestTailwindNoImport,
+    TestTailwindWithImport,
+    TestTailwindNoImportHTML,
+    TestTailwindWithImportHTML,
 
     // html()
     // // error TestHTMLFunctionStatic, // html template
