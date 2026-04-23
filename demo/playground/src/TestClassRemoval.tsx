@@ -21,6 +21,18 @@ const TestClassRemoval = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestClassRemoval()
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const value = $$(testObservables[name])
+    const expectedFull = value ? '<h3>Class - Removal</h3><p class="red">content</p>' : '<h3>Class - Removal</h3><p>content</p>'
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestClassRemoval.test = {
     static: false,
     compareActualValues: true,

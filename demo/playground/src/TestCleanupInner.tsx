@@ -5,6 +5,37 @@ let ins = 0
 export const TestCleanupInner = () => {
     const name = 'TestCleanupInner' + (ins++)
 
+    // Conditional: SSR tests (Node.js environment - tsx mode)
+    // Must run before TestCleanupInner1 to register _ssr observable
+    if (typeof window === 'undefined') {
+        // Create a temporary instance to get the ret component for SSR
+        const tempInstance = (() => {
+            const page = $(true)
+            const togglePage = () => page(prev => !prev)
+            const Page1 = () => (
+                <>
+                    <p>page1</p>
+                    <button onClick={togglePage}>Toggle Page</button>
+                </>
+            )
+            const ret = () => (
+                <>
+                    <h3>Cleanup - Inner</h3>
+                    <Page1 />
+                </>
+            )
+            return ret
+        })()
+
+        registerTestObservable(`${name}_ssr`, tempInstance)
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Cleanup - Inner</h3><p>page1</p><button>Toggle Page</button>'
+        const passed = ssrResult === expectedFull
+        console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+        if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+    }
+
     const TestCleanupInner1 = (): JSX.Element => {
         const page = $(true)
         registerTestObservable(name, page)
@@ -78,4 +109,7 @@ export const TestCleanupInner = () => {
 
 export default () => <TestSnapshots Component={TestCleanupInner()} />
 
-// console.log(renderToString(<TestCleanupInner />))
+// Run SSR test in tsx mode
+if (typeof window === 'undefined') {
+    TestCleanupInner()
+}

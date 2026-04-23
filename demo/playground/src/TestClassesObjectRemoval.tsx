@@ -27,6 +27,26 @@ const TestClassesObjectRemoval = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestClassesObjectRemoval()
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const value = $$(testObservables[name])
+    let expectedClass = ''
+    if (value && value.red) expectedClass += 'red '
+    if (value && value.blue) expectedClass += 'blue '
+    const expected = value ?
+        `<p class="${expectedClass.trim()}">content</p>` :
+        '<p class="">content</p>'
+    const expectedFull = value ?
+        `<h3>Classes - Object Removal</h3><p class="${expectedClass.trim()}">content</p>` :
+        '<h3>Classes - Object Removal</h3><p>content</p>'
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestClassesObjectRemoval.test = {
     static: false,
     compareActualValues: true,
@@ -40,28 +60,6 @@ TestClassesObjectRemoval.test = {
             expected = `<p class="${className.trim()}">content</p>`
         } else {
             expected = '<p class="">content</p>'
-        }
-
-        const ssrComponent = testObservables[`${name}_ssr`]
-        const ssrResult = renderToString(ssrComponent)
-        // Log the actual SSR result for debugging
-        console.log(`[${name}] SSR result: ${ssrResult}`)
-
-        // Create expected result based on current store state
-        let expectedClass = ''
-        if (value && value.red) expectedClass += 'red '
-        if (value && value.blue) expectedClass += 'blue '
-        const expectedFull = value ?
-            `<h3>Classes - Object Removal</h3><p class="${expectedClass.trim()}">content</p>` :
-            '<h3>Classes - Object Removal</h3><p>content</p>'
-
-        if (ssrResult === expectedFull) {
-            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
-        } else {
-            console.error(`❌ SSR test failed:`)
-            console.error(`  Got: ${ssrResult}`)
-            console.error(`  Expected: ${expectedFull}`)
-            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         }
 
         return expected

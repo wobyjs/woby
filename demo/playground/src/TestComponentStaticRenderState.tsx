@@ -17,6 +17,17 @@ const TestComponentStaticRenderState = ({ value = 0 }: { value?: number }): JSX.
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestComponentStaticRenderState({})
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const expectedFull = '<h3>Component - Static Render State</h3><p>0</p>'
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestComponentStaticRenderState.test = {
     static: true,
     expect: () => {

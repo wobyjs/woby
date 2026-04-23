@@ -18,6 +18,18 @@ const TestComponentStaticRenderProps = ({ value }: { value: number }): JSX.Eleme
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestComponentStaticRenderProps({} as any)
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const propValue = testObservables[name]
+    const expectedFull = `<h3>Component - Static Render Props</h3><p>${String(propValue)}</p>`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestComponentStaticRenderProps.test = {
     static: true,
     compareActualValues: true,
