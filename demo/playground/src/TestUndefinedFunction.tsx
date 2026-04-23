@@ -21,6 +21,17 @@ const TestUndefinedFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestUndefinedFunction()
+    const ssrComponent = testObservables[`TestUndefinedFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestUndefinedFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestUndefinedFunction.test = {
     static: false,
     expect: () => {

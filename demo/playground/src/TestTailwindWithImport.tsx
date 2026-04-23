@@ -210,6 +210,17 @@ const TestTailwindWithImportHTML = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTailwindWithImportHTML()
+    const ssrComponent = testObservables[`TestTailwindWithImportHTML_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTailwindWithImportHTML\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTailwindWithImportHTML.test = {
     static: true,
     expect: () => {

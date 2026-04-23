@@ -169,6 +169,17 @@ const TestTailwindNoImportTSX = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTailwindNoImportTSX()
+    const ssrComponent = testObservables[`TestTailwindNoImportTSX_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTailwindNoImportTSX\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTailwindNoImportTSX.test = {
     static: true,
     expect: () => {
@@ -205,6 +216,17 @@ const TestTailwindNoImportHTML = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTailwindNoImportHTML()
+    const ssrComponent = testObservables[`TestTailwindNoImportHTML_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTailwindNoImportHTML\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTailwindNoImportHTML.test = {
     static: true,
     expect: () => {
@@ -238,6 +260,17 @@ const TestTailwindNoImportNested = (): JSX.Element => {
 
     registerTestObservable(`${name3}_ssr`, ret)
     return ret
+}
+
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTailwindNoImportNested()
+    const ssrComponent = testObservables[`TestTailwindNoImportNested_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTailwindNoImportNested\n   SSR: ${ssrResult} ✅\n`)
+    }
 }
 
 TestTailwindNoImportNested.test = {
