@@ -31,20 +31,20 @@ const TestChildren = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestChildren() // Register the component
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const expectedFull = '<h3>Children</h3><div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestChildren.test = {
     static: true,
     expect: () => {
-        const expected = '<div><div><div><p>content</p></div></div></div>'
-
-        const ssrComponent = testObservables[`${name}_ssr`]
-        const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Children</h3><div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
-        if (ssrResult !== expectedFull) {
-            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
-        } else {
-            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
-        }
-
         return '<div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
     }
 }

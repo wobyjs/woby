@@ -20,25 +20,21 @@ const TestCheckboxIndeterminateToggle = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestCheckboxIndeterminateToggle() // Register the component
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3><input type="checkbox" /><input type="checkbox" checked="" />`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestCheckboxIndeterminateToggle.test = {
     static: true,
     expect: () => {
-        const ssrExpected = '<input type="checkbox" /><input type="checkbox" checked="" />'
-        const domExpected = '<input type="checkbox"><input type="checkbox">'
-
-        //<input type="checkbox"></input><input type="checkbox"></input>' to match one of the expected values 
-        //<input type=\"checkbox\"><input type=\"checkbox\">
-
-        const ssrComponent = testObservables[`${name}_ssr`]
-        const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3>${ssrExpected}`
-        if (ssrResult !== expectedFull) {
-            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
-        } else {
-            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
-        }
-
-        return domExpected
+        return '<input type="checkbox"><input type="checkbox">'
     }
 }
 

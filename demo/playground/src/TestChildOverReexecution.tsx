@@ -37,33 +37,31 @@ const TestChildOverReexecution = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestChildOverReexecution() // Register the component
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    // Extract the actual execution count from SSR result
+    const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/)
+    let passed = false
+    if (match) {
+        const ssrExecutions = parseInt(match[1])
+        const ssrCount = parseInt(match[2])
+        const expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`
+        passed = ssrResult === expectedFull
+    }
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestChildOverReexecution.test = {
     static: false,
     expect: () => {
         const countObservable = testObservables[name]
         const executionsObservable = testObservables[`${name}_executions`]
         const currentValue = countObservable ? $$(countObservable) : 0
-        const currentExecutions = executionsObservable ? $$(executionsObservable) : 0
-        const expected = `<div>1</div>${currentValue}`
-
-        const ssrComponent = testObservables[`${name}_ssr`]
-        const ssrResult = renderToString(ssrComponent)
-        // Extract the actual execution count from SSR result
-        const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/)
-        if (match) {
-            const ssrExecutions = parseInt(match[1])
-            const ssrCount = parseInt(match[2])
-            const expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`
-            if (ssrResult === expectedFull) {
-                console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
-            } else {
-                assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
-            }
-        } else {
-            assert(false, `SSR result format unexpected: ${ssrResult}`)
-        }
-
-        return expected
+        return `<div>1</div>${currentValue}`
     }
 }
 
