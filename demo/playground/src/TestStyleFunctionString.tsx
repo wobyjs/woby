@@ -20,6 +20,17 @@ const TestStyleFunctionString = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestStyleFunctionString()
+    const ssrComponent = testObservables[`TestStyleFunctionString_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestStyleFunctionString\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestStyleFunctionString.test = {
     static: false,
     expect: () => {
@@ -42,5 +53,4 @@ TestStyleFunctionString.test = {
 
 
 export default () => <TestSnapshots Component={TestStyleFunctionString} />
-
-// console.log(renderToString(<TestStyleFunctionString />))
+

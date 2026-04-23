@@ -45,6 +45,17 @@ const TestStylesStore = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestStylesStore()
+    const ssrComponent = testObservables[`TestStylesStore_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestStylesStore\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestStylesStore.test = {
     static: false,
     enable: () => timing === $$(testObservables[`${name}_timing`]),

@@ -20,6 +20,17 @@ const TestStyleObservableString = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestStyleObservableString()
+    const ssrComponent = testObservables[`TestStyleObservableString_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestStyleObservableString\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestStyleObservableString.test = {
     static: false,
     expect: () => {

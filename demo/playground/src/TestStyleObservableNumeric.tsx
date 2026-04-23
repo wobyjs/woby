@@ -20,6 +20,17 @@ const TestStyleObservableNumeric = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestStyleObservableNumeric()
+    const ssrComponent = testObservables[`TestStyleObservableNumeric_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestStyleObservableNumeric\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestStyleObservableNumeric.test = {
     static: false,
     expect: () => {

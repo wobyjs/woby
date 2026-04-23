@@ -16,6 +16,17 @@ const TestStyleStaticVariable = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestStyleStaticVariable()
+    const ssrComponent = testObservables[`TestStyleStaticVariable_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestStyleStaticVariable\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestStyleStaticVariable.test = {
     static: true,
     expect: () => {
@@ -37,5 +48,4 @@ TestStyleStaticVariable.test = {
 
 
 export default () => <TestSnapshots Component={TestStyleStaticVariable} />
-
-// console.log(renderToString(<TestStyleStaticVariable />))
+
