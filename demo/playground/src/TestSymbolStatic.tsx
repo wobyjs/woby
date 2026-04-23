@@ -9,6 +9,17 @@ const TestSymbolStatic = (): JSX.Element => (
     </>
 )
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSymbolStatic()
+    const ssrComponent = testObservables[`TestSymbolStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSymbolStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSymbolStatic.test = {
     static: true,
     expect: () => {
@@ -28,5 +39,4 @@ TestSymbolStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestSymbolStatic} />
-
-// console.log(renderToString(<TestSymbolStatic />))
+

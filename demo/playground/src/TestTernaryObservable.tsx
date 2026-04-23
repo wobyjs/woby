@@ -23,6 +23,17 @@ const TestTernaryObservable = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTernaryObservable()
+    const ssrComponent = testObservables[`TestTernaryObservable_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTernaryObservable\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTernaryObservable.test = {
     static: false,
     compareActualValues: true,

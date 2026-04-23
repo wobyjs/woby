@@ -17,6 +17,17 @@ const TestTernaryStaticInline = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTernaryStaticInline()
+    const ssrComponent = testObservables[`TestTernaryStaticInline_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTernaryStaticInline\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTernaryStaticInline.test = {
     static: true,
     expect: () => {

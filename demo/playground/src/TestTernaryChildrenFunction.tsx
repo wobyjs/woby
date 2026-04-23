@@ -53,6 +53,17 @@ const TestTernaryChildrenFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTernaryChildrenFunction()
+    const ssrComponent = testObservables[`TestTernaryChildrenFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTernaryChildrenFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTernaryChildrenFunction.test = {
     static: false,
     compareActualValues: true,

@@ -29,6 +29,17 @@ const TestSwitchStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSwitchStatic()
+    const ssrComponent = testObservables[`TestSwitchStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSwitchStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSwitchStatic.test = {
     static: true,
     expect: () => {

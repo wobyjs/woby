@@ -18,6 +18,17 @@ const TestTabIndexBooleanFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTabIndexBooleanFunction()
+    const ssrComponent = testObservables[`TestTabIndexBooleanFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTabIndexBooleanFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTabIndexBooleanFunction.test = {
     static: true,
     expect: () => {
@@ -38,5 +49,4 @@ TestTabIndexBooleanFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestTabIndexBooleanFunction} />
-
-// console.log(renderToString(<TestTabIndexBooleanFunction />))
+

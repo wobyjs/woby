@@ -41,6 +41,17 @@ const TestTernaryChildrenObservableStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTernaryChildrenObservableStatic()
+    const ssrComponent = testObservables[`TestTernaryChildrenObservableStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTernaryChildrenObservableStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTernaryChildrenObservableStatic.test = {
     static: true,
     compareActualValues: true,

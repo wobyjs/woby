@@ -26,6 +26,17 @@ const TestTemplateExternal = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestTemplateExternal()
+    const ssrComponent = testObservables[`TestTemplateExternal_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestTemplateExternal\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestTemplateExternal.test = {
     static: true,
     expect: () => {
@@ -48,5 +59,4 @@ TestTemplateExternal.test = {
 
 
 export default () => <TestSnapshots Component={TestTemplateExternal} />
-
-// console.log(renderToString(<TestTemplateExternal />))
+

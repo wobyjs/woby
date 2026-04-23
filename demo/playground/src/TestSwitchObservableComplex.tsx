@@ -48,6 +48,17 @@ const TestSwitchObservableComplex = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSwitchObservableComplex()
+    const ssrComponent = testObservables[`TestSwitchObservableComplex_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSwitchObservableComplex\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSwitchObservableComplex.test = {
     static: true,
     expect: () => {
