@@ -18,6 +18,19 @@ const TestAttributeRemoval = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestAttributeRemoval()
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const value = $$(testObservables[name])
+    const expected = value ? `<p data-color="${value}">content</p>` : '<p>content</p>'
+    const expectedFull = `<h3>Attribute - Removal</h3>${expected}`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestAttributeRemoval.test = {
     static: true, // Make it static for predictable testing
     compareActualValues: true,

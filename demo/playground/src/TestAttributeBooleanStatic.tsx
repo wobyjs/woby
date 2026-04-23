@@ -17,6 +17,25 @@ const TestAttributeBooleanStatic = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestAttributeBooleanStatic() // Register the component
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const expectedFull = `<h3>Attribute Boolan - Static</h3><p disabled="">content</p><p>content</p>`
+    const passed = ssrResult === expectedFull
+    
+    console.log(`\n📝 Test: ${name}`)
+    console.log(`   SSR Output: ${ssrResult}`)
+    console.log(`   Expected:   ${expectedFull}`)
+    console.log(`   Pass:       ${passed ? '✅ YES' : '❌ NO'}\n`)
+    
+    if (!passed) {
+        console.error(`❌ [${name}] SSR test failed`)
+        process.exit(1)
+    }
+}
+
 TestAttributeBooleanStatic.test = {
     static: true,
     expect: () => {

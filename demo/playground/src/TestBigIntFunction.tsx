@@ -19,6 +19,18 @@ const TestBigIntFunction = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestBigIntFunction() // Register the component
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const value = $$(testObservables[name])
+    const expectedFull = `<h3>BigInt - Function</h3><p>${value}n</p>`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestBigIntFunction.test = {
     static: true, // Make it static for predictable testing
     compareActualValues: true, // Use compareActualValues to bypass conversion logic
@@ -26,16 +38,6 @@ TestBigIntFunction.test = {
         const value = $$(testObservables[name])
         // Keep 'n' suffix to match actual SSR rendering
         const expected = `<p>${value}n</p>`
-
-        const ssrComponent = testObservables[`${name}_ssr`]
-        const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>BigInt - Function</h3>${expected}`
-        if (ssrResult !== expectedFull) {
-            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
-        } else {
-            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
-        }
-
         return expected
     }
 }

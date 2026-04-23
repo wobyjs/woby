@@ -18,6 +18,19 @@ const TestAttributeObservableBoolean = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestAttributeObservableBoolean()
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const value = $$(testObservables[name])
+    const expected = value ? '<p data-red="true">content</p>' : '<p>content</p>'
+    const expectedFull = `<h3>Attribute - Observable Boolean</h3>${expected}`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestAttributeObservableBoolean.test = {
     static: true, // Make it static for predictable testing
     compareActualValues: true,

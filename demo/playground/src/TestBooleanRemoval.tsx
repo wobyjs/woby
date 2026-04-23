@@ -21,27 +21,28 @@ const TestBooleanRemoval = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestBooleanRemoval() // Register the component
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const value = $$(testObservables[name])
+    let expectedFull: string
+    if (typeof value === 'boolean') {
+        expectedFull = '<h3>Boolean - Removal</h3><p>()</p>'
+    } else {
+        expectedFull = `<h3>Boolean - Removal</h3><p>${String(value)}</p>`
+    }
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestBooleanRemoval.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables[name])
-        let ssrExpected: string
-        if (typeof value === 'boolean') {
-            ssrExpected = '<p>()</p>'
-        } else {
-            ssrExpected = `<p>${String(value)}</p>`
-        }
-
-        const ssrComponent = testObservables[`${name}_ssr`]
-        const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<h3>Boolean - Removal</h3>${ssrExpected}`
-        if (ssrResult !== expectedFull) {
-            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
-        } else {
-            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
-        }
-
         // Return the DOM version for comparison with actual
         if (typeof value === 'boolean') {
             return '<p>(<!---->)</p>'
