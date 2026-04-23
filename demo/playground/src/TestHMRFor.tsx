@@ -1,6 +1,7 @@
 import { $, $$, For, hmr, render, useTimeout, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
+const name = 'TestHMRFor'
 const TestHMRFor = () => {
     const o = $([1, 2, 3])
     // Store the observable globally so the test can access it
@@ -31,6 +32,16 @@ const TestHMRFor = () => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestHMRFor()
+    const ssrComponent = testObservables[`TestHMRFor_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestHMRFor\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestHMRFor.test = {
     static: false,
     compareActualValues: true,
@@ -54,7 +65,6 @@ TestHMRFor.test = {
     }
 }
 
-const name = 'Test'
 const Test = (): JSX.Element => {
     // Removed calls to undefined test functions that were causing errors
     return (
@@ -186,7 +196,7 @@ const renderApp = () => {
             appRendered = true
             console.log('App rendered successfully')
         } catch (error) {
-            console.error('Failed to render app:', error)S
+            console.error('Failed to render app:', error)
             console.error('Error details:', {
                 message: error.message,
                 name: error.name,

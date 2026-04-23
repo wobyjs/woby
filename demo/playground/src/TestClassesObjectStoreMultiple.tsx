@@ -33,6 +33,17 @@ const TestClassesObjectStoreMultiple = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestClassesObjectStoreMultiple()
+    const ssrComponent = testObservables[`TestClassesObjectStoreMultiple_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestClassesObjectStoreMultiple\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestClassesObjectStoreMultiple.test = {
     static: false,
     compareActualValues: true,

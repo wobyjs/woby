@@ -80,6 +80,16 @@ const TestCustomElementBasicTSX = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestCustomElementBasicTSX()
+    const ssrComponent = testObservables[`${name}_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestCustomElementBasicTSX\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestCustomElementBasicTSX.test = {
     static: true,
     expect: () => {
@@ -120,6 +130,16 @@ const TestCustomElementBasicHTML = (): JSX.Element => {
     registerTestObservable(`${nameHtml}_ssr`, ret)
 
     return ret
+}
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestCustomElementBasicHTML()
+    const ssrComponent = testObservables[`${nameHtml}_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestCustomElementBasicHTML\n   SSR: ${ssrResult} ✅\n`)
+    }
 }
 
 TestCustomElementBasicHTML.test = {
@@ -168,6 +188,16 @@ const TestCustomElementBasicMixed = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestCustomElementBasicMixed()
+    const ssrComponent = testObservables[`${nameMixed}_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestCustomElementBasicMixed\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestCustomElementBasicMixed.test = {
     static: true,
     expect: () => {
@@ -206,6 +236,16 @@ const TestCustomElementBasicPureHTML = (): JSX.Element => {
     registerTestObservable(`${namePureHTML}_ssr`, ret)
 
     return ret
+}
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestCustomElementBasicPureHTML()
+    const ssrComponent = testObservables[`${namePureHTML}_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestCustomElementBasicPureHTML\n   SSR: ${ssrResult} ✅\n`)
+    }
 }
 
 TestCustomElementBasicPureHTML.test = {

@@ -208,6 +208,16 @@ const TestWrapper = () => {
     return () => <TestCustomElementContext />
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestWrapper()
+    const ssrComponent = testObservables[`${name}_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestWrapper\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestWrapper.test = {
     static: true,
     expect: () => {

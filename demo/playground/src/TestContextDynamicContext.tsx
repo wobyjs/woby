@@ -51,6 +51,17 @@ const TestContextDynamicContext = (): JSX.Element => {
 
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestContextDynamicContext()
+    const ssrComponent = testObservables[`TestContextDynamicContext_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestContextDynamicContext\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestContextDynamicContext.test = {
     static: true,
     expect: () => {
@@ -73,5 +84,4 @@ TestContextDynamicContext.test = {
 
 
 export default () => <TestSnapshots Component={TestContextDynamicContext} />
-
-// console.log(renderToString(<TestContextDynamicContext />))
+

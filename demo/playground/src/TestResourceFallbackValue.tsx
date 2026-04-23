@@ -26,6 +26,17 @@ const TestResourceFallbackValue = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestResourceFallbackValue()
+    const ssrComponent = testObservables[`TestResourceFallbackValue_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestResourceFallbackValue\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestResourceFallbackValue.test = {
     static: true,
     expect: () => {

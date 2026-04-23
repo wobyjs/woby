@@ -28,6 +28,17 @@ const TestResourceFallbackLatest = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestResourceFallbackLatest()
+    const ssrComponent = testObservables[`TestResourceFallbackLatest_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestResourceFallbackLatest\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestResourceFallbackLatest.test = {
     static: true,
     expect: () => {
@@ -50,5 +61,4 @@ TestResourceFallbackLatest.test = {
 
 
 export default () => <TestSnapshots Component={TestResourceFallbackLatest} />
-
-// console.log(renderToString(<TestResourceFallbackLatest />))
+

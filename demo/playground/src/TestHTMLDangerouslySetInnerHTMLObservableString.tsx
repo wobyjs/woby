@@ -17,6 +17,17 @@ const TestHTMLDangerouslySetInnerHTMLObservableString = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestHTMLDangerouslySetInnerHTMLObservableString()
+    const ssrComponent = testObservables[`TestHTMLDangerouslySetInnerHTMLObservableString_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestHTMLDangerouslySetInnerHTMLObservableString\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestHTMLDangerouslySetInnerHTMLObservableString.test = {
     static: true,
     expect: () => {

@@ -107,6 +107,17 @@ const TestContextHook = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestContextHook()
+    const ssrComponent = testObservables[`TestContextHook_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestContextHook\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestContextHook.test = {
     static: true,
     expect: () => {
@@ -129,5 +140,4 @@ TestContextHook.test = {
 
 
 export default () => <TestSnapshots Component={TestContextHook} />
-
-// console.log(renderToString(<TestContextHook />))
+

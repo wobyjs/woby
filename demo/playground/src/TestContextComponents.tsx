@@ -73,6 +73,17 @@ const TestContextComponents = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestContextComponents()
+    const ssrComponent = testObservables[`TestContextComponents_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestContextComponents\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestContextComponents.test = {
     static: true,
     expect: () => {
@@ -95,5 +106,4 @@ TestContextComponents.test = {
 
 
 export default () => <TestSnapshots Component={TestContextComponents} />
-
-// console.log(renderToString(<TestContextComponents />))
+

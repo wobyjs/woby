@@ -30,6 +30,17 @@ const TestClassesObjectStore = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestClassesObjectStore()
+    const ssrComponent = testObservables[`TestClassesObjectStore_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestClassesObjectStore\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestClassesObjectStore.test = {
     static: false,
     compareActualValues: true,
