@@ -27,6 +27,17 @@ const TestRefs = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestRefs()
+    const ssrComponent = testObservables[`TestRefs_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestRefs\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestRefs.test = {
     static: true,
     expect: () => {

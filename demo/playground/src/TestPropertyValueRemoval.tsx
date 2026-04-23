@@ -17,6 +17,17 @@ const TestPropertyValueRemoval = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestPropertyValueRemoval()
+    const ssrComponent = testObservables[`TestPropertyValueRemoval_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestPropertyValueRemoval\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestPropertyValueRemoval.test = {
     static: true,
     expect: () => {

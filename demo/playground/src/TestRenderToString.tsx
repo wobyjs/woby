@@ -17,6 +17,17 @@ const TestRenderToString = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestRenderToString()
+    const ssrComponent = testObservables[`TestRenderToString_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestRenderToString\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestRenderToString.test = {
     static: true,
     expect: () => {

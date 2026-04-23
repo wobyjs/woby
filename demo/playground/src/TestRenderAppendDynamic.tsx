@@ -101,6 +101,17 @@ const TestRenderAppendDynamic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestRenderAppendDynamic()
+    const ssrComponent = testObservables[`TestRenderAppendDynamic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestRenderAppendDynamic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestRenderAppendDynamic.test = {
     static: false,
     compareActualValues: true,

@@ -85,6 +85,17 @@ if (ssrResult !== expectedSSR /* && ssrResult !== '<div></div>' */) {
 
 
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestRenderToStringSuspenseNested()
+    const ssrComponent = testObservables[`TestRenderToStringSuspenseNested_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestRenderToStringSuspenseNested\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestRenderToStringSuspenseNested.test = {
     static: false,
     expect: () => {

@@ -18,6 +18,17 @@ const TestRefUnmounting = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestRefUnmounting()
+    const ssrComponent = testObservables[`TestRefUnmounting_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestRefUnmounting\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestRefUnmounting.test = {
     static: true,
     wrap: false,

@@ -85,6 +85,17 @@ const TestRenderAppendReactive = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestRenderAppendReactive()
+    const ssrComponent = testObservables[`TestRenderAppendReactive_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestRenderAppendReactive\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestRenderAppendReactive.test = {
     static: false,
     compareActualValues: true,

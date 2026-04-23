@@ -24,6 +24,17 @@ const TestRenderToStringSuspense = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestRenderToStringSuspense()
+    const ssrComponent = testObservables[`TestRenderToStringSuspense_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestRenderToStringSuspense\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestRenderToStringSuspense.test = {
     static: true,
     expect: () => {

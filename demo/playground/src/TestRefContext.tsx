@@ -32,6 +32,17 @@ const TestRefContext = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestRefContext()
+    const ssrComponent = testObservables[`TestRefContext_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestRefContext\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestRefContext.test = {
     static: false,
     expect: () => {
@@ -63,5 +74,4 @@ export default () => <TestSnapshots Component={TestRefContext} />
 
 // tick()
 // tick()
-// tick()
-// console.log(renderToString(ts))
+// tick()
