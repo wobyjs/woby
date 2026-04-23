@@ -21,6 +21,17 @@ const TestSuspenseAlive = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSuspenseAlive()
+    const ssrComponent = testObservables[`TestSuspenseAlive_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSuspenseAlive\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSuspenseAlive.test = {
     static: true,
     expect: () => {

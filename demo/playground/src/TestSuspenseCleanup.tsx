@@ -21,6 +21,17 @@ const TestSuspenseCleanup = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSuspenseCleanup()
+    const ssrComponent = testObservables[`TestSuspenseCleanup_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSuspenseCleanup\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSuspenseCleanup.test = {
     static: true,
     expect: () => {

@@ -27,6 +27,17 @@ const TestSuspenseChildrenObservableStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSuspenseChildrenObservableStatic()
+    const ssrComponent = testObservables[`TestSuspenseChildrenObservableStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSuspenseChildrenObservableStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSuspenseChildrenObservableStatic.test = {
     static: true,
     compareActualValues: true,

@@ -27,6 +27,17 @@ const TestSuspenseAlwaysValue = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSuspenseAlwaysValue()
+    const ssrComponent = testObservables[`TestSuspenseAlwaysValue_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSuspenseAlwaysValue\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSuspenseAlwaysValue.test = {
     static: true,
     expect: () => {

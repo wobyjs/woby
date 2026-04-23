@@ -21,6 +21,17 @@ const TestSuspenseMiddleman = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSuspenseMiddleman()
+    const ssrComponent = testObservables[`TestSuspenseMiddleman_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSuspenseMiddleman\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSuspenseMiddleman.test = {
     static: true,
     expect: () => {

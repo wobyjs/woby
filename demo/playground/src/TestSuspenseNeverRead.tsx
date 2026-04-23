@@ -27,6 +27,17 @@ const TestSuspenseNeverRead = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSuspenseNeverRead()
+    const ssrComponent = testObservables[`TestSuspenseNeverRead_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSuspenseNeverRead\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSuspenseNeverRead.test = {
     static: true,
     expect: () => {

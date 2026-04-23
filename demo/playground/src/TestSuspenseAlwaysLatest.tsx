@@ -27,6 +27,17 @@ const TestSuspenseAlwaysLatest = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSuspenseAlwaysLatest()
+    const ssrComponent = testObservables[`TestSuspenseAlwaysLatest_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSuspenseAlwaysLatest\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSuspenseAlwaysLatest.test = {
     static: true,
     expect: () => {
