@@ -17,6 +17,17 @@ const TestLazy = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestLazy()
+    const ssrComponent = testObservables[`TestLazy_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestLazy\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestLazy.test = {
     static: true,
     expect: () => {

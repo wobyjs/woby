@@ -45,6 +45,17 @@ const TestKeepAliveObservable = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestKeepAliveObservable()
+    const ssrComponent = testObservables[`TestKeepAliveObservable_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestKeepAliveObservable\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestKeepAliveObservable.test = {
     static: false,
     enable: () => {

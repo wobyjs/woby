@@ -107,6 +107,17 @@ const TestNativeCustomElementSource = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestNativeCustomElementSource()
+    const ssrComponent = testObservables[`TestNativeCustomElementSource_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestNativeCustomElementSource\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestNativeCustomElementSource.test = {
     static: true,
     expect: () => {

@@ -20,6 +20,17 @@ const TestIfFunctionUntrackedNarrowed = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestIfFunctionUntrackedNarrowed()
+    const ssrComponent = testObservables[`TestIfFunctionUntrackedNarrowed_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestIfFunctionUntrackedNarrowed\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestIfFunctionUntrackedNarrowed.test = {
     static: true,
     expect: () => {

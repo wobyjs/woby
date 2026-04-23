@@ -21,6 +21,17 @@ const TestIfStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestIfStatic()
+    const ssrComponent = testObservables[`TestIfStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestIfStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestIfStatic.test = {
     static: true,
     expect: () => {

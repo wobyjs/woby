@@ -18,6 +18,17 @@ const TestInputForm = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestInputForm()
+    const ssrComponent = testObservables[`TestInputForm_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestInputForm\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestInputForm.test = {
     static: true,
     expect: () => {

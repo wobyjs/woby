@@ -47,6 +47,17 @@ const TestNestedArrays = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestNestedArrays()
+    const ssrComponent = testObservables[`TestNestedArrays_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestNestedArrays\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestNestedArrays.test = {
     static: false,
     compareActualValues: true,

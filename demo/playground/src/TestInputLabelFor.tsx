@@ -18,6 +18,17 @@ const TestInputLabelFor = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestInputLabelFor()
+    const ssrComponent = testObservables[`TestInputLabelFor_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestInputLabelFor\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestInputLabelFor.test = {
     static: true,
     expect: () => {

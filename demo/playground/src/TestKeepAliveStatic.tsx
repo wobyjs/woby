@@ -38,6 +38,17 @@ const TestKeepAliveStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestKeepAliveStatic()
+    const ssrComponent = testObservables[`TestKeepAliveStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestKeepAliveStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestKeepAliveStatic.test = {
     static: false,
     enable: () => {

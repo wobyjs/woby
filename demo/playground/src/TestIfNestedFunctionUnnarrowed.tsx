@@ -18,6 +18,17 @@ const TestIfNestedFunctionUnnarrowed = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestIfNestedFunctionUnnarrowed()
+    const ssrComponent = testObservables[`TestIfNestedFunctionUnnarrowed_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestIfNestedFunctionUnnarrowed\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestIfNestedFunctionUnnarrowed.test = {
     static: true,
     expect: () => {
