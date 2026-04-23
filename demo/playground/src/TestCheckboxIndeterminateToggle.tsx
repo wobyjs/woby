@@ -34,7 +34,18 @@ if (typeof window === 'undefined') {
 TestCheckboxIndeterminateToggle.test = {
     static: true,
     expect: () => {
-        return '<input type="checkbox"><input type="checkbox">'
+        const expected = '<input type="checkbox"><input type="checkbox">'
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3><input type="checkbox" /><input type="checkbox" checked="" />`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

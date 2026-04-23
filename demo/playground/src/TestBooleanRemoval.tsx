@@ -44,11 +44,28 @@ TestBooleanRemoval.test = {
     expect: () => {
         const value = $$(testObservables[name])
         // Return the DOM version for comparison with actual
+        let expected: string
         if (typeof value === 'boolean') {
-            return '<p>(<!---->)</p>'
+            expected = '<p>(<!---->)</p>'
         } else {
-            return `<p>(${String(value)})</p>`
+            expected = `<p>(${String(value)})</p>`
         }
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        let expectedFull: string
+        if (typeof value === 'boolean') {
+            expectedFull = '<h3>Boolean - Removal</h3><p>()</p>'
+        } else {
+            expectedFull = `<h3>Boolean - Removal</h3><p>${String(value)}</p>`
+        }
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

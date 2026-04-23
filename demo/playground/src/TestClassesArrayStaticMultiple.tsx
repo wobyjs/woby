@@ -16,6 +16,18 @@ const TestClassesArrayStaticMultiple = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestClassesArrayStaticMultiple()
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const expected = '<p class="red bold">content</p>'
+    const expectedFull = `<h3>Classes - Array Static Multiple</h3>${expected}`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestClassesArrayStaticMultiple.test = {
     static: true,
     expect: () => {

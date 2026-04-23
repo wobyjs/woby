@@ -39,7 +39,18 @@ TestClassesArrayFunctionMultiple.test = {
     expect: () => {
         const value = $$(testObservables[name])
         const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : (value || '')
-        return `<p class="${classes}">content</p>`
+        const expected = `<p class="${classes}">content</p>`
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Classes - Array Function Multiple</h3><p class="${classes}">content</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

@@ -33,7 +33,18 @@ if (typeof window === 'undefined') {
 TestChildrenSymbol.test = {
     static: true,
     expect: () => {
-        return '<p>symbol</p>'
+        const expected = '<p>symbol</p>'
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Children - Boolean</h3><p>symbol</p>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

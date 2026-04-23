@@ -45,7 +45,18 @@ if (typeof window === 'undefined') {
 TestChildren.test = {
     static: true,
     expect: () => {
-        return '<div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
+        const expected = '<div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = '<h3>Children</h3><div class="A"><div class="B"><div class="C"><p>content</p></div></div></div>'
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

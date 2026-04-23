@@ -30,7 +30,18 @@ if (typeof window === 'undefined') {
 TestBigIntStatic.test = {
     static: true,
     expect: () => {
-        return '<p>123123n</p>'
+        const expected = '<p>123123n</p>'
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>BigInt - Static</h3><p>123123n</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

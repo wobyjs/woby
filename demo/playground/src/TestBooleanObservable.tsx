@@ -33,7 +33,18 @@ if (typeof window === 'undefined') {
 TestBooleanObservable.test = {
     static: true,
     expect: () => {
-        return '<p><!----></p>'
+        const expected = '<p><!----></p>'
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Boolean - Observable</h3><p></p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

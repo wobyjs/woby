@@ -61,7 +61,27 @@ TestChildOverReexecution.test = {
         const countObservable = testObservables[name]
         const executionsObservable = testObservables[`${name}_executions`]
         const currentValue = countObservable ? $$(countObservable) : 0
-        return `<div>1</div>${currentValue}`
+        const expected = `<div>1</div>${currentValue}`
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        // Extract the actual execution count from SSR result
+        const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/)
+        let expectedFull: string
+        if (match) {
+            const ssrExecutions = parseInt(match[1])
+            const ssrCount = parseInt(match[2])
+            expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`
+        } else {
+            expectedFull = `<h3>Child - OverReexecution</h3><div>1</div>${currentValue}`
+        }
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

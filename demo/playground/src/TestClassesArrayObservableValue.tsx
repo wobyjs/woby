@@ -21,6 +21,19 @@ const TestClassesArrayObservableValue = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestClassesArrayObservableValue() // Register the component
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const value = $$(testObservables[name])
+    const expected = `<p class="${value}">${value}</p>`
+    const expectedFull = `<h3>Classes - Array Observable Value</h3>${expected}`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestClassesArrayObservableValue.test = {
     static: false,
     compareActualValues: true,

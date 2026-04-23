@@ -30,7 +30,18 @@ if (typeof window === 'undefined') {
 TestBooleanStatic.test = {
     static: true,
     expect: () => {
-        return '<p>truefalse</p>'
+        const expected = '<p>truefalse</p>'
+
+        const ssrComponent = testObservables[`${name}_ssr`]
+        const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Boolean - Static</h3><p>truefalse</p>`
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
+        } else {
+            console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
+        }
+
+        return expected
     }
 }
 

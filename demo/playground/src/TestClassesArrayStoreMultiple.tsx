@@ -28,11 +28,22 @@ const TestClassesArrayStoreMultiple = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestClassesArrayStoreMultiple()
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const expected = '<p class="red bold">content</p>'
+    const expectedFull = `<h3>Classes - Array Store Multiple</h3>${expected}`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestClassesArrayStoreMultiple.test = {
     static: true,
     compareActualValues: true,
     expect: () => {
-        // For static test, just return the initial state
         const expected = '<p class="red bold">content</p>'
 
         const ssrComponent = testObservables[`${name}_ssr`]

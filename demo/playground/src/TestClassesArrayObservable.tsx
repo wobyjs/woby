@@ -20,19 +20,30 @@ const TestClassesArrayObservable = (): JSX.Element => {
     return ret
 }
 
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestClassesArrayObservable() // Register the component
+    const ssrComponent = testObservables[`${name}_ssr`]
+    const ssrResult = renderToString(ssrComponent)
+    const value = $$(testObservables[name])
+    const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : (value || '')
+    const expectedFull = `<h3>Classes - Array Observable</h3><p class="${classes}">content</p>`
+    const passed = ssrResult === expectedFull
+    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
+    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+}
+
 TestClassesArrayObservable.test = {
     static: false,
     compareActualValues: true,
     expect: () => {
         const value = $$(testObservables[name])
         const classes = Array.isArray(value) ? value.filter(v => v && v !== false).join(' ') : (value || '')
-
-        // Define expected values for both main test and SSR test
-        const expectedFull = `<h3>Classes - Array Observable</h3><p class="${classes}">content</p>`  // For SSR comparison
-        const expected = `<p class="${classes}">content</p>`   // For main test comparison
+        const expected = `<p class="${classes}">content</p>`
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
+        const expectedFull = `<h3>Classes - Array Observable</h3><p class="${classes}">content</p>`
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
