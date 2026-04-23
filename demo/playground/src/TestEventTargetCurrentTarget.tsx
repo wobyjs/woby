@@ -85,6 +85,17 @@ const TestEventTargetCurrentTarget = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestEventTargetCurrentTarget()
+    const ssrComponent = testObservables[`TestEventTargetCurrentTarget_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestEventTargetCurrentTarget\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestEventTargetCurrentTarget.test = {
     static: true,
     compareActualValues: true,

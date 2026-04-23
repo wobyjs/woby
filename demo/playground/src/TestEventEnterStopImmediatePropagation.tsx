@@ -66,6 +66,17 @@ const TestEventEnterStopImmediatePropagation = (): JSX.Element => {
 }
 
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestEventEnterStopImmediatePropagation()
+    const ssrComponent = testObservables[`TestEventEnterStopImmediatePropagation_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestEventEnterStopImmediatePropagation\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestEventEnterStopImmediatePropagation.test = {
     static: false,
     compareActualValues: true,

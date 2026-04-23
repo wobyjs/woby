@@ -43,6 +43,17 @@ const TestEventEnterAndEnterCaptureStatic = (): JSX.Element => {
 }
 
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestEventEnterAndEnterCaptureStatic()
+    const ssrComponent = testObservables[`TestEventEnterAndEnterCaptureStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestEventEnterAndEnterCaptureStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestEventEnterAndEnterCaptureStatic.test = {
     static: false,
     compareActualValues: true,

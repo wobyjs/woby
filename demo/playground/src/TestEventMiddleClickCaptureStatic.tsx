@@ -46,6 +46,17 @@ const TestEventMiddleClickCaptureStatic = (): JSX.Element => {
 }
 
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestEventMiddleClickCaptureStatic()
+    const ssrComponent = testObservables[`TestEventMiddleClickCaptureStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestEventMiddleClickCaptureStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestEventMiddleClickCaptureStatic.test = {
     static: false,
     expect: () => {

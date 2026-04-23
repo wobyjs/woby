@@ -39,6 +39,17 @@ const TestEventClickStatic = (): JSX.Element => {
 }
 
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestEventClickStatic()
+    const ssrComponent = testObservables[`TestEventClickStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestEventClickStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestEventClickStatic.test = {
     static: false,
     compareActualValues: true,

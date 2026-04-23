@@ -20,6 +20,17 @@ const TestForFallbackStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestForFallbackStatic()
+    const ssrComponent = testObservables[`TestForFallbackStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestForFallbackStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestForFallbackStatic.test = {
     static: true,
     expect: () => {

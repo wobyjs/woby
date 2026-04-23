@@ -30,6 +30,17 @@ const TestForFallbackObservable = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestForFallbackObservable()
+    const ssrComponent = testObservables[`TestForFallbackObservable_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestForFallbackObservable\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestForFallbackObservable.test = {
     static: true,
     compareActualValues: true,
@@ -52,5 +63,4 @@ TestForFallbackObservable.test = {
 
 export default () => <TestSnapshots Component={TestForFallbackObservable} />
 
-// console.log('TestForFallbackObservable:')
-// console.log(renderToString(<TestForFallbackObservable />))
+// console.log('TestForFallbackObservable:')

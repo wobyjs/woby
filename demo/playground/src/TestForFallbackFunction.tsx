@@ -33,6 +33,17 @@ const TestForFallbackFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestForFallbackFunction()
+    const ssrComponent = testObservables[`TestForFallbackFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestForFallbackFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestForFallbackFunction.test = {
     static: true,
     compareActualValues: true,
