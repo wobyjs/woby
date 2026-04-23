@@ -18,6 +18,17 @@ const TestHTMLDangerouslySetInnerHTMLFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestHTMLDangerouslySetInnerHTMLFunction()
+    const ssrComponent = testObservables[`TestHTMLDangerouslySetInnerHTMLFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestHTMLDangerouslySetInnerHTMLFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestHTMLDangerouslySetInnerHTMLFunction.test = {
     static: true,
     expect: () => {
@@ -39,5 +50,4 @@ TestHTMLDangerouslySetInnerHTMLFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestHTMLDangerouslySetInnerHTMLFunction} />
-
-// console.log(renderToString(<TestHTMLDangerouslySetInnerHTMLFunction />))
+

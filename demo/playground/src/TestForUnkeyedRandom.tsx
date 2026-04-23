@@ -33,6 +33,17 @@ const TestForUnkeyedRandom = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestForUnkeyedRandom()
+    const ssrComponent = testObservables[`TestForUnkeyedRandom_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestForUnkeyedRandom\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestForUnkeyedRandom.test = {
     static: false,
     compareActualValues: true,

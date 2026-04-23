@@ -25,6 +25,17 @@ const TestForRandom = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestForRandom()
+    const ssrComponent = testObservables[`TestForRandom_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestForRandom\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestForRandom.test = {
     static: false,
     compareActualValues: true,

@@ -34,6 +34,17 @@ const TestForUnkeyedFallbackFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestForUnkeyedFallbackFunction()
+    const ssrComponent = testObservables[`TestForUnkeyedFallbackFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestForUnkeyedFallbackFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestForUnkeyedFallbackFunction.test = {
     static: false,
     compareActualValues: true,

@@ -30,6 +30,17 @@ const TestFragmentStaticDeep = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestFragmentStaticDeep()
+    const ssrComponent = testObservables[`TestFragmentStaticDeep_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestFragmentStaticDeep\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestFragmentStaticDeep.test = {
     static: true,
     expect: () => {

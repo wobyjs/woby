@@ -22,6 +22,17 @@ const TestForUnkeyedRandomOnlyChild = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestForUnkeyedRandomOnlyChild()
+    const ssrComponent = testObservables[`TestForUnkeyedRandomOnlyChild_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestForUnkeyedRandomOnlyChild\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestForUnkeyedRandomOnlyChild.test = {
     static: true,
     expect: () => {

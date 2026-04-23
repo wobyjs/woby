@@ -30,6 +30,17 @@ const TestForUnkeyedObservablesStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestForUnkeyedObservablesStatic()
+    const ssrComponent = testObservables[`TestForUnkeyedObservablesStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestForUnkeyedObservablesStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestForUnkeyedObservablesStatic.test = {
     static: true,
     expect: () => {
