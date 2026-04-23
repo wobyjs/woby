@@ -20,6 +20,17 @@ const TestHTMLFunctionStatic = (): JSX.Element => {
   return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestHTMLFunctionStatic()
+    const ssrComponent = testObservables[`TestHTMLFunctionStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestHTMLFunctionStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestHTMLFunctionStatic.test = {
   static: true,
   expect: () => {
@@ -40,5 +51,4 @@ TestHTMLFunctionStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestHTMLFunctionStatic} />
-
-// console.log(renderToString(<TestHTMLFunctionStatic />))
+

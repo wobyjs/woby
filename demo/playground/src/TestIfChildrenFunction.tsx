@@ -25,6 +25,17 @@ const TestIfChildrenFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestIfChildrenFunction()
+    const ssrComponent = testObservables[`TestIfChildrenFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestIfChildrenFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestIfChildrenFunction.test = {
     static: true,
     expect: () => {

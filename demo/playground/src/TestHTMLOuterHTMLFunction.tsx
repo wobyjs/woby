@@ -19,6 +19,17 @@ const TestHTMLOuterHTMLFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestHTMLOuterHTMLFunction()
+    const ssrComponent = testObservables[`TestHTMLOuterHTMLFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestHTMLOuterHTMLFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestHTMLOuterHTMLFunction.test = {
     static: true,
     expect: () => {

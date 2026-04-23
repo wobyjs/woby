@@ -18,6 +18,17 @@ const TestIdRemoval = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestIdRemoval()
+    const ssrComponent = testObservables[`TestIdRemoval_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestIdRemoval\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestIdRemoval.test = {
     static: true, // Make it static for predictable testing
     compareActualValues: true,

@@ -26,6 +26,17 @@ const TestIfChildrenFunctionObservable = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestIfChildrenFunctionObservable()
+    const ssrComponent = testObservables[`TestIfChildrenFunctionObservable_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestIfChildrenFunctionObservable\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestIfChildrenFunctionObservable.test = {
     static: false,
     compareActualValues: true,
@@ -51,5 +62,4 @@ TestIfChildrenFunctionObservable.test = {
 
 
 export default () => <TestSnapshots Component={TestIfChildrenFunctionObservable} />
-
-// console.log(renderToString(<TestIfChildrenFunctionObservable />))
+

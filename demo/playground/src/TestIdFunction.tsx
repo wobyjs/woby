@@ -20,6 +20,17 @@ const TestIdFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestIdFunction()
+    const ssrComponent = testObservables[`TestIdFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestIdFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestIdFunction.test = {
     static: false,
     expect: () => {

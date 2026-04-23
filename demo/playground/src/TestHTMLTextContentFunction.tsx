@@ -19,6 +19,17 @@ const TestHTMLTextContentFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestHTMLTextContentFunction()
+    const ssrComponent = testObservables[`TestHTMLTextContentFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestHTMLTextContentFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestHTMLTextContentFunction.test = {
     static: true,
     expect: () => {
