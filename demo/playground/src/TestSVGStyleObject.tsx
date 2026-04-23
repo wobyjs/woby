@@ -18,6 +18,17 @@ const TestSVGStyleObject = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSVGStyleObject()
+    const ssrComponent = testObservables[`TestSVGStyleObject_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSVGStyleObject\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSVGStyleObject.test = {
     static: true,
     expect: () => {

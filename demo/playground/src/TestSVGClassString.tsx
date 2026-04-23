@@ -18,6 +18,17 @@ const TestSVGClassString = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSVGClassString()
+    const ssrComponent = testObservables[`TestSVGClassString_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSVGClassString\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSVGClassString.test = {
     static: true,
     expect: () => {

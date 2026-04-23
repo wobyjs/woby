@@ -55,6 +55,17 @@ const TestSVGStaticComplex = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSVGStaticComplex()
+    const ssrComponent = testObservables[`TestSVGStaticComplex_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSVGStaticComplex\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSVGStaticComplex.test = {
     static: true,
     expect: () => {

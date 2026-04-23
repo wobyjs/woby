@@ -50,6 +50,17 @@ const TestSelectObservableValue = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSelectObservableValue()
+    const ssrComponent = testObservables[`TestSelectObservableValue_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSelectObservableValue\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSelectObservableValue.test = {
     static: true,
     compareActualValues: true,

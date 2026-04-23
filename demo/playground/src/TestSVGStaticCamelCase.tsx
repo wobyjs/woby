@@ -18,6 +18,17 @@ const TestSVGStaticCamelCase = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestSVGStaticCamelCase()
+    const ssrComponent = testObservables[`TestSVGStaticCamelCase_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestSVGStaticCamelCase\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestSVGStaticCamelCase.test = {
     static: true,
     expect: () => {
