@@ -57,6 +57,17 @@ const TestNestedIfsLazy = (): JSX.Element => {
     return fullComponent
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestNestedIfsLazy()
+    const ssrComponent = testObservables[`TestNestedIfsLazy_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestNestedIfsLazy\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestNestedIfsLazy.test = {
     static: false,
     enable: () => {
@@ -119,5 +130,4 @@ TestNestedIfsLazy.test = {
 
 
 export default () => <TestSnapshots Component={TestNestedIfsLazy} />
-
-// console.log(renderToString(<TestNestedIfsLazy />))
+

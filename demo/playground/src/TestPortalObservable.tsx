@@ -40,6 +40,23 @@ const TestPortalObservable = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    const doc = createDocument()
+    const container = doc.createElement('div')
+    container.id = 'portal-container-observable'
+    doc.body.appendChild(container)
+    
+    TestPortalObservable()
+    const ssrComponent = testObservables[`TestPortalObservable_ssr`]
+    if (ssrComponent) {
+        const SsrComponent = ssrComponent as any
+        const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
+        console.log(`\n📝 Test: TestPortalObservable\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestPortalObservable.test = {
     static: true,
     expect: () => {

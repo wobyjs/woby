@@ -26,6 +26,23 @@ const TestPortalRemoval = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    const doc = createDocument()
+    const container = doc.createElement('div')
+    container.id = 'portal-container-removal'
+    doc.body.appendChild(container)
+    
+    TestPortalRemoval()
+    const ssrComponent = testObservables[`TestPortalRemoval_ssr`]
+    if (ssrComponent) {
+        const SsrComponent = ssrComponent as any
+        const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
+        console.log(`\n📝 Test: TestPortalRemoval\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestPortalRemoval.test = {
     static: true,
     expect: () => {

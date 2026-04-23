@@ -20,6 +20,17 @@ const TestNumberRemoval = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestNumberRemoval()
+    const ssrComponent = testObservables[`TestNumberRemoval_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestNumberRemoval\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestNumberRemoval.test = {
     static: false,
     compareActualValues: true,

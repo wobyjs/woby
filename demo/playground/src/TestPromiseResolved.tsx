@@ -17,6 +17,17 @@ const TestPromiseResolved = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestPromiseResolved()
+    const ssrComponent = testObservables[`TestPromiseResolved_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestPromiseResolved\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestPromiseResolved.test = {
     static: true,
     expect: () => {

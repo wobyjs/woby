@@ -20,6 +20,17 @@ const TestNumberFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestNumberFunction()
+    const ssrComponent = testObservables[`TestNumberFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestNumberFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestNumberFunction.test = {
     static: false,
     compareActualValues: true,

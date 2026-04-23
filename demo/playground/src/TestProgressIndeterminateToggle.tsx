@@ -21,6 +21,17 @@ const TestProgressIndeterminateToggle = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestProgressIndeterminateToggle()
+    const ssrComponent = testObservables[`TestProgressIndeterminateToggle_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestProgressIndeterminateToggle\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestProgressIndeterminateToggle.test = {
     static: false,
     compareActualValues: true,

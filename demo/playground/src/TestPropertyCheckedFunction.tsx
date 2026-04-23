@@ -17,6 +17,17 @@ const TestPropertyCheckedFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestPropertyCheckedFunction()
+    const ssrComponent = testObservables[`TestPropertyCheckedFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestPropertyCheckedFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestPropertyCheckedFunction.test = {
     static: true,
     expect: () => {

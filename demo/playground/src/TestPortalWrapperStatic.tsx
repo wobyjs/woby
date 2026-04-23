@@ -18,6 +18,23 @@ const TestPortalWrapperStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    const doc = createDocument()
+    const container = doc.createElement('div')
+    container.id = 'portal-container-wrapper-static'
+    doc.body.appendChild(container)
+    
+    TestPortalWrapperStatic()
+    const ssrComponent = testObservables[`TestPortalWrapperStatic_ssr`]
+    if (ssrComponent) {
+        const SsrComponent = ssrComponent as any
+        const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
+        console.log(`\n📝 Test: TestPortalWrapperStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestPortalWrapperStatic.test = {
     static: true,
     expect: () => {
@@ -51,5 +68,3 @@ export default () => <TestSnapshots Component={TestPortalWrapperStatic} />
 // const container = doc.createElement('div')
 // container.id = 'portal-container-wrapper-static'
 // doc.body.appendChild(container)
-
-// console.log(renderToString(<SsrComponent mount={doc.body} />, { document: doc }))
