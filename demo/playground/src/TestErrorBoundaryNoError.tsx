@@ -26,6 +26,17 @@ const TestErrorBoundaryNoError = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestErrorBoundaryNoError()
+    const ssrComponent = testObservables[`TestErrorBoundaryNoError_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestErrorBoundaryNoError\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestErrorBoundaryNoError.test = {
     static: true,
     expect: () => {

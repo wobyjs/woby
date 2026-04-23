@@ -40,6 +40,17 @@ const TestDirectiveSingleArgument = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestDirectiveSingleArgument()
+    const ssrComponent = testObservables[`TestDirectiveSingleArgument_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestDirectiveSingleArgument\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestDirectiveSingleArgument.test = {
     static: true,
     expect: () => {

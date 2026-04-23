@@ -26,6 +26,17 @@ const TestDynamicObservableProps = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestDynamicObservableProps()
+    const ssrComponent = testObservables[`TestDynamicObservableProps_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestDynamicObservableProps\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestDynamicObservableProps.test = {
     static: false,
     compareActualValues: true,

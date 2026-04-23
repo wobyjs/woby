@@ -34,6 +34,17 @@ const TestErrorBoundaryChildrenFunction = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestErrorBoundaryChildrenFunction()
+    const ssrComponent = testObservables[`TestErrorBoundaryChildrenFunction_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestErrorBoundaryChildrenFunction\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestErrorBoundaryChildrenFunction.test = {
     static: true,
     expect: () => {

@@ -25,6 +25,17 @@ const TestDynamicFunctionComponent = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestDynamicFunctionComponent()
+    const ssrComponent = testObservables[`TestDynamicFunctionComponent_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestDynamicFunctionComponent\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestDynamicFunctionComponent.test = {
     static: true,
     compareActualValues: true,

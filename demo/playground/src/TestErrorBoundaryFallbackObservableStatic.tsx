@@ -32,6 +32,17 @@ const TestErrorBoundaryFallbackObservableStatic = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestErrorBoundaryFallbackObservableStatic()
+    const ssrComponent = testObservables[`TestErrorBoundaryFallbackObservableStatic_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestErrorBoundaryFallbackObservableStatic\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestErrorBoundaryFallbackObservableStatic.test = {
     static: true,
     compareActualValues: true,

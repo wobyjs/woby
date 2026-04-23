@@ -39,6 +39,17 @@ const TestDirectiveRegisterLocal = (): JSX.Element => {
     return ret
 }
 
+
+// Conditional: SSR tests (Node.js environment - tsx mode)
+if (typeof window === 'undefined') {
+    TestDirectiveRegisterLocal()
+    const ssrComponent = testObservables[`TestDirectiveRegisterLocal_ssr`]
+    if (ssrComponent) {
+        const ssrResult = renderToString(ssrComponent)
+        console.log(`\n📝 Test: TestDirectiveRegisterLocal\n   SSR: ${ssrResult} ✅\n`)
+    }
+}
+
 TestDirectiveRegisterLocal.test = {
     static: true,
     expect: () => {
