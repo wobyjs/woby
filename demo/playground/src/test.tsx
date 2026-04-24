@@ -31,9 +31,10 @@ console.log(`\n🧪 Running SSR tests for ${files.length} files (concurrent)...\
 const startTime = Date.now()
 
 // Run a single test file
-function runTest(file: string): Promise<{ file: string; passed: boolean; skipped: boolean; name?: string; error?: string }> {
+function runTest(file: string): Promise<{ file: string; passed: boolean; skipped: boolean; name?: string; error?: string; time: number }> {
     return new Promise((resolve) => {
         const filePath = join(srcDir, file)
+        const childStart = Date.now()
         const child = exec(`tsx --tsconfig ${tsconfig} ${filePath}`, {
             maxBuffer: 10 * 1024 * 1024 // 10MB
         })
@@ -46,25 +47,26 @@ function runTest(file: string): Promise<{ file: string; passed: boolean; skipped
 
         const timeout = setTimeout(() => {
             child.kill()
-            resolve({ file, passed: false, skipped: false, error: 'Timeout (30s)' })
+            resolve({ file, passed: false, skipped: false, error: 'Timeout (30s)', time: Date.now() - childStart })
         }, 30000)
 
         child.on('exit', (code) => {
             clearTimeout(timeout)
+            const elapsed = Date.now() - childStart
 
             if (stdout.includes('✅')) {
                 const match = stdout.match(/📝 Test: (\S+)\s+SSR: (.+?) ✅/s)
-                resolve({ file, passed: true, skipped: false, name: match?.[1] })
+                resolve({ file, passed: true, skipped: false, name: match?.[1], time: elapsed })
             } else if (code === 0) {
-                resolve({ file, passed: false, skipped: true })
+                resolve({ file, passed: false, skipped: true, time: elapsed })
             } else {
                 // Check if it passed before failing on browser-only code
                 if (stdout.includes('✅')) {
                     const match = stdout.match(/📝 Test: (\S+)\s+SSR: (.+?) ✅/s)
-                    resolve({ file, passed: true, skipped: false, name: match?.[1] })
+                    resolve({ file, passed: true, skipped: false, name: match?.[1], time: elapsed })
                 } else {
                     const errorMsg = stderr.split('\n')[0] || stdout.split('\n')[0] || 'Unknown error'
-                    resolve({ file, passed: false, skipped: false, error: errorMsg })
+                    resolve({ file, passed: false, skipped: false, error: errorMsg, time: elapsed })
                 }
             }
         })
@@ -86,14 +88,14 @@ async function runAllTests(concurrency: number) {
         for (const result of results) {
             if (result.passed) {
                 passed++
-                console.log(`  ✅ ${result.name || result.file}`)
+                console.log(`  ✅ ${result.name || result.file} (${(result.time / 1000).toFixed(1)}s)`)
             } else if (result.skipped) {
                 skipped++
-                console.log(`  ⏭️  ${result.file} (no output)`)
+                console.log(`  ⏭️  ${result.file} (${(result.time / 1000).toFixed(1)}s, no output)`)
             } else {
                 failed++
                 failures.push(`${result.file}: ${result.error}`)
-                console.log(`  ❌ ${result.file}`)
+                console.log(`  ❌ ${result.file} (${(result.time / 1000).toFixed(1)}s)`)
                 console.log(`     ${result.error?.substring(0, 80)}...`)
             }
         }
