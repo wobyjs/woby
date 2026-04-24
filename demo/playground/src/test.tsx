@@ -4,11 +4,14 @@
  */
 
 import { readdirSync, readFileSync } from 'fs'
-import { join } from 'path'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import { execSync } from 'child_process'
 
-const srcDir = 'D:/Developments/tslib/@woby/woby/demo/playground/src'
-const tsconfig = 'demo/playground/tsconfig.json'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const srcDir = __dirname
+const tsconfig = join(dirname(__dirname), 'tsconfig.json')
 
 // Get all Test*.tsx files that have SSR pattern
 const files = readdirSync(srcDir)
