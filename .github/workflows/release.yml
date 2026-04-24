@@ -13,9 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: woby
+
+      - uses: actions/checkout@v4
+        with:
+          repository: wobyjs/soby
+          path: soby
+
+      - uses: actions/checkout@v4
+        with:
+          repository: wongchichong/via.js
+          path: via
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -23,8 +37,19 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+        working-directory: woby
+
       - run: pnpm build
+        working-directory: soby
+
+      - run: pnpm build
+        working-directory: via
+
+      - run: pnpm build
+        working-directory: woby
+
       - run: pnpm test
+        working-directory: woby
 
   publish:
     needs: test
@@ -34,9 +59,22 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          path: woby
+
+      - uses: actions/checkout@v4
+        with:
+          repository: wobyjs/soby
+          path: soby
+
+      - uses: actions/checkout@v4
+        with:
+          repository: wongchichong/via.js
+          path: via
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -44,9 +82,17 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+        working-directory: woby
+
+      - run: pnpm build
+        working-directory: soby
+
+      - run: pnpm build
+        working-directory: via
 
       - name: Bump version (patch)
         run: |
+          cd woby
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           pnpm version patch --no-git-tag-version
@@ -56,14 +102,18 @@ jobs:
           git push
 
       - run: pnpm build
+        working-directory: woby
 
       - name: Publish to npm
-        run: pnpm publish --access public --no-git-checks
+        run: |
+          cd woby
+          pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Git tag & GitHub Release
         run: |
+          cd woby
           VERSION=$(node -p "require('./package.json').version")
           git tag -a "v$VERSION" -m "Release v$VERSION"
           git push origin "v$VERSION"
