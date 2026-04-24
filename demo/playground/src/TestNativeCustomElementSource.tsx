@@ -17,65 +17,68 @@ import { TestSnapshots, registerTestObservable, testObservables, assert, minimis
 const name = 'TestNativeCustomElementSource'
 
 // Register a native custom element directly (simulating another library)
-class NativeCustomElement extends HTMLElement {
-    static observedAttributes = ['value', 'label']
+// Only in browser mode - SSR doesn't need custom elements
+if (typeof window !== 'undefined') {
+    class NativeCustomElement extends HTMLElement {
+        static observedAttributes = ['value', 'label']
 
-    constructor() {
-        super()
+        constructor() {
+            super()
 
-        // Create shadow DOM
-        const shadow = this.attachShadow({ mode: 'open' })
-        shadow.innerHTML = `
-            <style>
-                .container {
-                    padding: 16px;
-                    border: 2px solid #3498db;
-                    border-radius: 8px;
-                    background: #ecf0f1;
-                }
-                .label { font-weight: bold; color: #2c3e50; }
-                .value { color: #e74c3c; font-size: 1.2em; }
-            </style>
-            <div class="container">
-                <div class="label"></div>
-                <div class="value"></div>
-                <slot></slot>
-            </div>
-        `
-    }
+            // Create shadow DOM
+            const shadow = this.attachShadow({ mode: 'open' })
+            shadow.innerHTML = `
+                <style>
+                    .container {
+                        padding: 16px;
+                        border: 2px solid #3498db;
+                        border-radius: 8px;
+                        background: #ecf0f1;
+                    }
+                    .label { font-weight: bold; color: #2c3e50; }
+                    .value { color: #e74c3c; font-size: 1.2em; }
+                </style>
+                <div class="container">
+                    <div class="label"></div>
+                    <div class="value"></div>
+                    <slot></slot>
+                </div>
+            `
+        }
 
-    connectedCallback() {
-        console.log('[NativeCustomElement] Connected')
-        this.updateDisplay()
-        // Per W3C spec, light DOM children stay in the light DOM and are projected via <slot>
-        // No need to copy or duplicate the content
-    }
-
-    attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-        if (oldValue !== newValue) {
+        connectedCallback() {
+            console.log('[NativeCustomElement] Connected')
             this.updateDisplay()
+            // Per W3C spec, light DOM children stay in the light DOM and are projected via <slot>
+            // No need to copy or duplicate the content
+        }
+
+        attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+            if (oldValue !== newValue) {
+                this.updateDisplay()
+            }
+        }
+
+        private updateDisplay() {
+            const label = this.getAttribute('label') || 'Native Element'
+            const value = this.getAttribute('value') || 'N/A'
+
+            const shadow = this.shadowRoot
+            if (shadow) {
+                shadow.querySelector('.label')!.textContent = label
+                shadow.querySelector('.value')!.textContent = value
+            }
         }
     }
 
-    private updateDisplay() {
-        const label = this.getAttribute('label') || 'Native Element'
-        const value = this.getAttribute('value') || 'N/A'
+    globalThis.customElements.define('native-custom-element', NativeCustomElement)
 
-        const shadow = this.shadowRoot
-        if (shadow) {
-            shadow.querySelector('.label')!.textContent = label
-            shadow.querySelector('.value')!.textContent = value
-        }
+    // Register with native customElements API (NOT woby's customElement())
+    const NATIVE_TAG_NAME = 'native-custom-element'
+    if (!customElements.get(NATIVE_TAG_NAME)) {
+        customElements.define(NATIVE_TAG_NAME, NativeCustomElement)
+        console.log(`[TestNativeCustomElementSource] Registered ${NATIVE_TAG_NAME} with native customElements`)
     }
-}
-
-globalThis.customElements.define('native-custom-element', NativeCustomElement)
-
-// Register with native customElements API (NOT woby's customElement())
-const NATIVE_TAG_NAME = 'native-custom-element'
-if (!customElements.get(NATIVE_TAG_NAME)) {
-    customElements.define(NATIVE_TAG_NAME, NativeCustomElement)
-    console.log(`[TestNativeCustomElementSource] Registered ${NATIVE_TAG_NAME} with native customElements`)
 }
 
 // Woby component that uses the native custom element

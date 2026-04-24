@@ -1,4 +1,4 @@
-import { $, $$, renderToString, type JSX } from 'woby'
+import { $, $$, renderToString, type JSX, hmr } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const name = 'TestRefUntrack'

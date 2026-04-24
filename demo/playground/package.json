@@ -6,16 +6,15 @@
         "dev": "vite --force --mode dev --host",
         "prod": "vite --force",
         "bump": "pnpm version patch --no-git-tag-version",
-        "build": "vite build && pnpm bump"
+        "build": "vite build && pnpm bump",
+        "test": "tsx --tsconfig tsconfig.json src/test.tsx"
     },
     "dependencies": {
         "vite": "^4.5.14",
         "woby": "workspace:../.."
     },
     "devDependencies": {
-        "@playwright/experimental-ct-react": "^1.58.2",
-        "@playwright/test": "^1.56.1",
         "@types/node": "^24.10.13"
     },
-    "version": "0.0.1"
+    "version": "0.0.5"
 }
