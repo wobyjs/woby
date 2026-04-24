@@ -53,6 +53,8 @@ if (typeof window === 'undefined') {
     }
     console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
     if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
+    // Exit immediately to stop useEffect interval from keeping process alive
+    process.exit(0)
 }
 
 TestChildOverReexecution.test = {
