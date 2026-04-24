@@ -39,6 +39,17 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Bump version (patch)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          pnpm version patch --no-git-tag-version
+          git add package.json
+          VERSION=$(node -p "require('./package.json').version")
+          git commit -m "v$VERSION [skip ci]"
+          git push
+
       - run: pnpm build
 
       - name: Publish to npm
@@ -46,10 +57,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Create Git tag & release
+      - name: Create Git tag & GitHub Release
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           VERSION=$(node -p "require('./package.json').version")
           git tag -a "v$VERSION" -m "Release v$VERSION"
           git push origin "v$VERSION"
