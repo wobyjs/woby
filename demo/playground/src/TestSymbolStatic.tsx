@@ -12,7 +12,7 @@ const TestSymbolStatic = (): JSX.Element => (
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
 if (typeof window === 'undefined') {
-    TestSymbolStatic()
+    registerTestObservable(`${name}_ssr`, TestSymbolStatic)
     const ssrComponent = testObservables[`TestSymbolStatic_ssr`]
     if (ssrComponent) {
         const ssrResult = renderToString(ssrComponent)
@@ -39,4 +39,3 @@ TestSymbolStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestSymbolStatic} />
-

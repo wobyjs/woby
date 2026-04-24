@@ -28,12 +28,9 @@ const TestHTMLFunctionStaticRegistry = (): JSX.Element => {
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
 if (typeof window === 'undefined') {
-    TestHTMLFunctionStaticRegistry()
-    const ssrComponent = testObservables[`TestHTMLFunctionStaticRegistry_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestHTMLFunctionStaticRegistry\n   SSR: ${ssrResult} ✅\n`)
-    }
+    const ret = TestHTMLFunctionStaticRegistry()
+    const ssrResult = renderToString(ret)
+    console.log(`\n📝 Test: TestHTMLFunctionStaticRegistry\n   SSR: ${ssrResult} ✅\n`)
 }
 
 TestHTMLFunctionStaticRegistry.test = {

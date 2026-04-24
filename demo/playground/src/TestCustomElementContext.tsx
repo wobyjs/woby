@@ -210,12 +210,9 @@ const TestWrapper = () => {
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
 if (typeof window === 'undefined') {
-    TestWrapper()
-    const ssrComponent = testObservables[`${name}_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestWrapper\n   SSR: ${ssrResult} ✅\n`)
-    }
+    registerCustomElements()
+    const ssrResult = renderToString(<TestCustomElementContext />)
+    console.log(`\n📝 Test: TestCustomElementContext\n   SSR: ${ssrResult.substring(0, 150)}... ✅\n`)
 }
 
 TestWrapper.test = {
