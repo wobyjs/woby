@@ -37,8 +37,8 @@ function runTest(file: string): Promise<{ file: string; passed: boolean; skipped
         const filePath = join(srcDir, file)
         const childStart = Date.now()
 
-        // Use npx/pnpm exec with proper shell for cross-platform compatibility
-        const cmd = `npx tsx --tsconfig "${tsconfig}" "${filePath}"`
+        // Use pnpm exec to ensure workspace dependencies are available
+        const cmd = `pnpm exec tsx --tsconfig "${tsconfig}" "${filePath}"`
         const child = exec(cmd, {
             cwd: testDir,
             shell: true,
