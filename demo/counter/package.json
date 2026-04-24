@@ -6,16 +6,12 @@
         "dev": "vite --force --mode dev --host",
         "prod": "vite --force",
         "bump": "pnpm version patch --no-git-tag-version",
-        "build": "vite build && pnpm bump",
-        "test": "playwright test",
-        "test:ui": "playwright test --ui"
+        "build": "vite build && pnpm bump"
     },
     "dependencies": {
         "vite": "^4.4.11",
         "woby": "workspace:*"
     },
-    "devDependencies": {
-        "@playwright/test": "^1.56.1"
-    },
+    "devDependencies": {},
     "version": "0.0.2"
 }

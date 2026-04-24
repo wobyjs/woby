@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "vitest": ["./mock-vitest.mts"]
+    }
+  }
+}
