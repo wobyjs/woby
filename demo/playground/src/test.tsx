@@ -11,7 +11,8 @@ import { exec } from 'child_process'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const srcDir = __dirname
-const tsconfig = join(dirname(__dirname), 'tsconfig.json')
+const testDir = dirname(__dirname)
+const tsconfig = join(testDir, 'tsconfig.json')
 
 // Get all Test*.tsx files that have SSR pattern
 const files = readdirSync(srcDir)
@@ -35,8 +36,13 @@ function runTest(file: string): Promise<{ file: string; passed: boolean; skipped
     return new Promise((resolve) => {
         const filePath = join(srcDir, file)
         const childStart = Date.now()
-        const child = exec(`tsx --tsconfig ${tsconfig} ${filePath}`, {
-            maxBuffer: 10 * 1024 * 1024 // 10MB
+
+        // Use npx/pnpm exec with proper shell for cross-platform compatibility
+        const cmd = `npx tsx --tsconfig "${tsconfig}" "${filePath}"`
+        const child = exec(cmd, {
+            cwd: testDir,
+            shell: true,
+            maxBuffer: 20 * 1024 * 1024
         })
 
         let stdout = ''
@@ -47,10 +53,10 @@ function runTest(file: string): Promise<{ file: string; passed: boolean; skipped
 
         const timeout = setTimeout(() => {
             child.kill()
-            resolve({ file, passed: false, skipped: false, error: 'Timeout (30s)', time: Date.now() - childStart })
-        }, 30000)
+            resolve({ file, passed: false, skipped: false, error: 'Timeout (60s)', time: Date.now() - childStart })
+        }, 60000)
 
-        child.on('exit', (code) => {
+        child.on('exit', (code, signal) => {
             clearTimeout(timeout)
             const elapsed = Date.now() - childStart
 
@@ -60,14 +66,9 @@ function runTest(file: string): Promise<{ file: string; passed: boolean; skipped
             } else if (code === 0) {
                 resolve({ file, passed: false, skipped: true, time: elapsed })
             } else {
-                // Check if it passed before failing on browser-only code
-                if (stdout.includes('✅')) {
-                    const match = stdout.match(/📝 Test: (\S+)\s+SSR: (.+?) ✅/s)
-                    resolve({ file, passed: true, skipped: false, name: match?.[1], time: elapsed })
-                } else {
-                    const errorMsg = stderr.split('\n')[0] || stdout.split('\n')[0] || 'Unknown error'
-                    resolve({ file, passed: false, skipped: false, error: errorMsg, time: elapsed })
-                }
+                // Show full error context for debugging
+                const errorMsg = stderr.trim() || stdout.trim() || `Exit code ${code}, signal: ${signal}`
+                resolve({ file, passed: false, skipped: false, error: errorMsg, time: elapsed })
             }
         })
     })
@@ -96,7 +97,7 @@ async function runAllTests(concurrency: number) {
                 failed++
                 failures.push(`${result.file}: ${result.error}`)
                 console.log(`  ❌ ${result.file} (${(result.time / 1000).toFixed(1)}s)`)
-                console.log(`     ${result.error?.substring(0, 80)}...`)
+                console.log(`     ${result.error?.substring(0, 120)}...`)
             }
         }
     }
