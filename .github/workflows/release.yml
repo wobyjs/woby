@@ -36,17 +36,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm install --frozen-lockfile
-        working-directory: soby
+      - run: cd soby && pnpm build
 
-      - run: pnpm install --frozen-lockfile
-        working-directory: via
-
-      - run: pnpm build
-        working-directory: soby
-
-      - run: pnpm build
-        working-directory: via
+      - run: cd via && pnpm build
 
       - run: pnpm build
 
@@ -83,17 +75,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm install --frozen-lockfile
-        working-directory: soby
+      - run: cd soby && pnpm build
 
-      - run: pnpm install --frozen-lockfile
-        working-directory: via
-
-      - run: pnpm build
-        working-directory: soby
-
-      - run: pnpm build
-        working-directory: via
+      - run: cd via && pnpm build
 
       - name: Bump version (patch)
         run: |
