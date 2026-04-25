@@ -36,6 +36,12 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - run: pnpm install --frozen-lockfile
+        working-directory: soby
+
+      - run: pnpm install --frozen-lockfile
+        working-directory: via
+
       - run: pnpm build
         working-directory: soby
 
@@ -76,6 +82,12 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+
+      - run: pnpm install --frozen-lockfile
+        working-directory: soby
+
+      - run: pnpm install --frozen-lockfile
+        working-directory: via
 
       - run: pnpm build
         working-directory: soby
