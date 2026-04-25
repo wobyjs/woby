@@ -36,17 +36,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Install & Build soby
-        run: |
-          cd soby
-          pnpm install --no-frozen-lockfile
-          pnpm build
+      - run: pnpm build
+        working-directory: soby
 
-      - name: Install & Build via.js
-        run: |
-          cd via
-          pnpm install --no-frozen-lockfile
-          pnpm build
+      - run: pnpm build
+        working-directory: via
 
       - run: pnpm build
 
@@ -83,17 +77,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Install & Build soby
-        run: |
-          cd soby
-          pnpm install --no-frozen-lockfile
-          pnpm build
+      - run: pnpm build
+        working-directory: soby
 
-      - name: Install & Build via.js
-        run: |
-          cd via
-          pnpm install --no-frozen-lockfile
-          pnpm build
+      - run: pnpm build
+        working-directory: via
 
       - name: Bump version (patch)
         run: |
