@@ -36,16 +36,17 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build soby
+      - name: Install & Build soby
         run: |
           cd soby
-          npx tsex compile
-          pnpm version patch --no-git-tag-version
+          pnpm install --no-frozen-lockfile
+          pnpm build
 
-      - name: Build via.js
+      - name: Install & Build via.js
         run: |
           cd via
-          npx tsc
+          pnpm install --no-frozen-lockfile
+          pnpm build
 
       - run: pnpm build
 
@@ -82,16 +83,17 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build soby
+      - name: Install & Build soby
         run: |
           cd soby
-          npx tsex compile
-          pnpm version patch --no-git-tag-version
+          pnpm install --no-frozen-lockfile
+          pnpm build
 
-      - name: Build via.js
+      - name: Install & Build via.js
         run: |
           cd via
-          npx tsc
+          pnpm install --no-frozen-lockfile
+          pnpm build
 
       - name: Bump version (patch)
         run: |
