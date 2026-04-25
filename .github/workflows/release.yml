@@ -36,6 +36,12 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - run: pnpm install
+        working-directory: soby
+
+      - run: pnpm install
+        working-directory: via
+
       - run: cd soby && pnpm build
 
       - run: cd via && pnpm build
