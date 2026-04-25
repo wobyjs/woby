@@ -61,6 +61,10 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
 
+  ../soby: {}
+
+  ../via: {}
+
   demo/benchmark:
     dependencies:
       vite:

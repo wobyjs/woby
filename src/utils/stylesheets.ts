@@ -111,12 +111,16 @@ export function convertAllDocumentStylesToConstructed(): CSSStyleSheet[] {
     // StyleSheetList doesn't always have proper iterator support in all environments
     for (let i = 0; i < document.styleSheets.length; i++) {
         const sheet = document.styleSheets[i]
+        // Cross-origin stylesheets (e.g. CDN, Google Fonts) cannot be read due to CORS — skip silently
+        if (sheet.href && new URL(sheet.href, window.location.href).origin !== window.location.origin) {
+            continue
+        }
         try {
             const newSheet = new CSSStyleSheet()
             let allRules = ''
             for (let j = 0; j < sheet.cssRules.length; j++) {
                 const rule = sheet.cssRules[j]
-                
+
                 // Handle @property rules specially for Shadow DOM compatibility
                 if (rule instanceof CSSPropertyRule) {
                     // Extract @property rules to apply as :host variables later
@@ -132,8 +136,6 @@ export function convertAllDocumentStylesToConstructed(): CSSStyleSheet[] {
                 constructedSheets.push(newSheet)
             }
         } catch (e) {
-            // This will catch any stylesheets that are cross-origin or
-            // have other access restrictions.
             console.warn("Could not copy stylesheet:", e)
         }
     }
