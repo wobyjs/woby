@@ -49,13 +49,13 @@ export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, tt
 
         runWithSuperRoot(() => {
 
-          useRoot((stack, dispose) => {
+          useRoot((dispose) => {
 
             item.dispose = () => {
 
               delete cache[id]
 
-              dispose(stack)
+              dispose()
 
             }
 

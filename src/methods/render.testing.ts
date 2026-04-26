@@ -23,8 +23,8 @@ export const render = (child: JSX.Child) => {
     fragment.textContent = ''
 
     let disposer
-    let unmount = useRoot((stack, dispose) => {
-        setChild(fragment as any, child, FragmentUtils.make(), stack)
+    let unmount = useRoot((dispose) => {
+        setChild(fragment as any, child, FragmentUtils.make())
         // fragment.appendChild(child);
 
         renderDiv.append(fragment)
@@ -32,7 +32,7 @@ export const render = (child: JSX.Child) => {
         console.log('c', (fragment.children[0] as any).outerHTML)
 
         return disposer = (): void => {
-            dispose(stack)
+            dispose()
             fragment.textContent = ''
             fragment.remove()
 

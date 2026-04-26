@@ -7,7 +7,7 @@ import { FragmentUtils } from '../utils/fragment'
 export const render = (child: Child, parent?: Element | null | ShadowRoot, options?: { append?: boolean }): Disposer => {
     if (!parent || !(parent instanceof HTMLElement || parent instanceof ShadowRoot)) throw new Error('Invalid parent node')
 
-    return useRoot((stack, dispose) => {
+    return useRoot((dispose) => {
         if (!options?.append) {
             // Replace mode: clear existing content first
             parent.textContent = ''
@@ -15,18 +15,18 @@ export const render = (child: Child, parent?: Element | null | ShadowRoot, optio
 
         // Track the fragment so dispose() can remove only our nodes (important for append mode)
         const fragment = FragmentUtils.make()
-        setChild(parent, child, fragment, stack)
+        setChild(parent, child, fragment)
 
         return (): void => {
             if (options?.append) {
                 // Capture nodes BEFORE dispose tears down reactivity (which may clear fragment)
                 const nodes = FragmentUtils.getChildrenFragmented(fragment)
-                dispose(stack)
+                dispose()
                 for (const node of nodes) {
                     try { parent.removeChild(node as Node) } catch { /* already removed */ }
                 }
             } else {
-                dispose(stack)
+                dispose()
                 parent.textContent = ''
             }
         }

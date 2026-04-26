@@ -8,13 +8,13 @@ export const render = (child: Child, parent?: Element | null): Disposer => {
 
     parent.textContent = ''
 
-    return useRoot((stack, dispose) => {
+    return useRoot((dispose) => {
 
-        setChild(parent, child, stack)
+        setChild(parent, child)
 
         return (): void => {
 
-            dispose(stack)
+            dispose()
 
             parent.textContent = ''
 

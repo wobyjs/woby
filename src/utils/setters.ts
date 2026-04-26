@@ -16,7 +16,7 @@ import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive,
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers'
 import { setNestedAttribute } from '../utils/nested'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
-import { Stack } from '../soby'
+import { Stack, callStack } from '../soby'
 import { useEnvironment } from '../components/environment_context'
 
 export const setAttributeStatic = (() => {
@@ -483,7 +483,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
 }
 
-export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack): void => {
+export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack = callStack()!): void => {
     const cd = child
 
     resolveChild(cd, (child, dynamic, stack) => {

@@ -16,7 +16,7 @@ import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers.via
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
 import { __ArgsSymbol } from 'via.js'
 import { IsSvgSymbol } from '../methods/create_element.via'
-import { Stack } from '../soby'
+import { Stack, callStack } from '../soby'
 
 
 // import createElement from '../methods/create_element.via'
@@ -149,7 +149,7 @@ export const setChildStatic = (parent: HTMLElement, child: Child, dynamic: boole
     }
 }
 
-export const setChild = (parent: HTMLElement, child: Child, stack: Stack) => {
+export const setChild = (parent: HTMLElement, child: Child, stack: Stack = callStack()!) => {
     setChildStatic(parent, child, false, stack)
 }
 
