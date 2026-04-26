@@ -11,6 +11,7 @@
 // Cache for converted stylesheets
 let cachedConstructedSheets: CSSStyleSheet[] | null = null
 let stylesheetObserver: MutationObserver | null = null
+const loggedErrors: Record<string, boolean> = {} // Track logged errors by call stack
 
 // Registry of shadow roots that need style updates
 const shadowRootRegistry = new Set<ShadowRoot>()
@@ -111,15 +112,18 @@ export function convertAllDocumentStylesToConstructed(): CSSStyleSheet[] {
     // StyleSheetList doesn't always have proper iterator support in all environments
     for (let i = 0; i < document.styleSheets.length; i++) {
         const sheet = document.styleSheets[i]
-        // Cross-origin stylesheets (e.g. CDN, Google Fonts) cannot be read due to CORS — skip silently
-        if (sheet.href && new URL(sheet.href, window.location.href).origin !== window.location.origin) {
-            continue
-        }
+        
         try {
+            // Cross-origin check — will throw on access if inaccessible
+            if (sheet.href && new URL(sheet.href, window.location.href).origin !== window.location.origin) {
+                continue
+            }
+            
             const newSheet = new CSSStyleSheet()
             let allRules = ''
-            for (let j = 0; j < sheet.cssRules.length; j++) {
-                const rule = sheet.cssRules[j]
+            const cssRules = sheet.cssRules
+            for (let j = 0; j < cssRules.length; j++) {
+                const rule = cssRules[j]
 
                 // Handle @property rules specially for Shadow DOM compatibility
                 if (rule instanceof CSSPropertyRule) {
@@ -136,7 +140,14 @@ export function convertAllDocumentStylesToConstructed(): CSSStyleSheet[] {
                 constructedSheets.push(newSheet)
             }
         } catch (e) {
-            console.warn("Could not copy stylesheet:", e)
+            // Only log once per unique call stack to avoid spam
+            const stack = new Error().stack
+            const stackKey = stack?.split('\n').slice(2, 5).join('|').trim() || ''
+            const cacheKey = `security_error_${stackKey}`
+            if (!(cacheKey in loggedErrors)) {
+                loggedErrors[cacheKey] = true
+                console.warn("Could not copy stylesheet: SecurityError - Cannot access rules (likely cross-origin)")
+            }
         }
     }
 

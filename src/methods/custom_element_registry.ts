@@ -23,6 +23,7 @@
 export class WobyCustomElementsRegistry {
     private readonly _registry: Map<string, CustomElementConstructor> = new Map()
     private readonly _native: typeof globalThis.customElements | null
+    private readonly _warnedTags: Set<string> = new Set() // Track warned tags to avoid spam
 
     constructor() {
         this._native = (typeof globalThis !== 'undefined' && typeof (globalThis as any).customElements !== 'undefined')
@@ -41,7 +42,10 @@ export class WobyCustomElementsRegistry {
      */
     define(tagName: string, ctor: CustomElementConstructor): void {
         if (this._registry.has(tagName)) {
-            console.warn(`[WobyCustomElementsRegistry] Element ${tagName} already registered in this registry.`)
+            if (!this._warnedTags.has(tagName)) {
+                this._warnedTags.add(tagName)
+                console.warn(`[WobyCustomElementsRegistry] Element ${tagName} already registered in this registry.`)
+            }
             return
         }
         this._registry.set(tagName, ctor)
@@ -58,7 +62,10 @@ export class WobyCustomElementsRegistry {
             // Another lib already owns the native slot.
             // We keep our private record but cannot re-define.
             // Our get() will still return our constructor for programmatic use.
-            console.warn(`[WobyCustomElementsRegistry] Native customElements already has "${tagName}"; skipping native define. Programmatic instantiation only.`)
+            if (!this._warnedTags.has(tagName)) {
+                this._warnedTags.add(tagName)
+                console.warn(`[WobyCustomElementsRegistry] Native customElements already has "${tagName}"; skipping native define. Programmatic instantiation only.`)
+            }
         }
     }
 
