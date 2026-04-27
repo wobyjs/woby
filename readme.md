@@ -753,46 +753,16 @@ const noop = () => {};
 o ( () => noop );
 ```
 
-#### `
-
-This function unwraps a potentially observable value.
-
-[Read upstream documentation](https://github.com/wobyjs/soby#get).
-
-Interface:
-
-```ts
-function $ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
-```
-
-Usage:
-
-```tsx
-import {$} from 'woby';
-
-// Getting the value out of an observable
-
-const o = $(123);
-
-$ ( o ); // => 123
-
-// Getting the value out of a function
-
-$ ( () => 123 ); // => 123
-
-// Getting the value out of an observable but not out of a function
-
-$ ( o, false ); // => 123
-$ ( () => 123, false ); // => () => 123
-
-// Getting the value out of a non-observable and non-function
-
-$ ( 123 ); // => 123
-```
-
 #### `$$`
 
-This function unwraps a potentially observable value. Recent enhancements to Soby (which Woby uses as its reactive core) have added automatic `valueOf()` and `toString()` methods to observable functions, making them behave more naturally in JavaScript contexts where primitives are expected.
+This function **reads** (unwraps) a potentially observable value. It is the counterpart to `$`:
+
+- `$` **creates** an observable: `$(value)` → `Observable<T>`
+- `$$` **reads** a value: `$$(value)` → `T`
+
+For non-observable values (plain arrays, objects, primitives), `$$` returns the value unchanged. This makes it safe to use on any value regardless of whether it is reactive.
+
+> ⚠️ Never use `$` to read a value — `$(plainValue)` creates a **new** observable wrapping that value, it does not return the value itself.
 
 [Read upstream documentation](https://github.com/wobyjs/soby#get).
 
@@ -805,26 +775,23 @@ function $$ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
 Usage:
 
 ```tsx
-import {$$} from 'woby';
+import { $, $$ } from 'woby';
 
-// Getting the value out of an observable
+// Reading an observable — use $$ not $
+const o = $( 123 );
+$$ ( o ); // => 123  ✓
+// $ ( o ); // => Observable<Observable<number>>  ✗ creates a new observable wrapping o
 
-const o = $(123);
+// Reading a plain value — $$ passes it through unchanged
+$$ ( 123 );        // => 123
+$$ ( [1, 2, 3] );  // => [1, 2, 3]  (same array reference, not wrapped)
+$$ ( 'hello' );    // => 'hello'
 
-$$ ( o ); // => 123
-
-// Getting the value out of a function
-
+// Reading a function (treated as a reactive computation)
 $$ ( () => 123 ); // => 123
 
-// Getting the value out of an observable but not out of a function
-
-$$ ( o, false ); // => 123
+// Reading a function without calling it
 $$ ( () => 123, false ); // => () => 123
-
-// Getting the value out of a non-observable and non-function
-
-$$ ( 123 ); // => 123
 ```
 
 ##### Enhanced Observable Functions

@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm build *)",
+      "Bash(pnpm.cmd build *)",
+      "Bash(pnpm.cmd test *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(pnpm.cmd push *)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "nodejs-debugger",
+    "chrome-devtools",
+    "context7",
+    "playwright",
+    "github",
+    "@modelcontextprotocol/github",
+    "qgis",
+    "debugger",
+    "dap-proxy",
+    "google-drive",
+    "browsermcp",
+    "chrome-mcp-server"
+  ]
+}
