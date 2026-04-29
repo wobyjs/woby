@@ -35,7 +35,7 @@ import { isJsx } from "../jsx-runtime"
 import { camelToKebabCase, kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
-import { observeStylesheetChanges, refreshStylesheetCache, registerShadowRoot } from "../utils/stylesheets"
+import { observeStylesheetChanges, refreshStylesheetCache, registerShadowRoot, unregisterShadowRoot } from "../utils/stylesheets"
 import { Child, Component, ContextProvider } from "../types"
 import { customElements as ces, SSRCustomElement, SSRShadowRoot, SSRSlotElement } from '../ssr/custom_elements'
 import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP } from '../constants'
@@ -170,6 +170,7 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         childs: Node[] = []
         public slots: HTMLSlotElement
         public placeHolder: Comment
+        private _attrObserver: MutationObserver | null = null
 
         constructor(props?: P) {
             super()
@@ -273,6 +274,11 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         }
 
         connectedCallback() {
+            // Disconnect any existing observer before creating a new one (handles re-entry)
+            if (this._attrObserver) {
+                this._attrObserver.disconnect()
+            }
+
             const { observedAttributes } = C
             const { props: p } = this
             const aKeys = Object.keys(p).filter(k => k !== 'children' && isObservable(p[k]))
@@ -288,7 +294,8 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
             }
 
-            const observer = new MutationObserver(mutations => {
+            this._attrObserver?.disconnect()
+            this._attrObserver = new MutationObserver(mutations => {
                 mutations.forEach(m => {
                     if (m.type === 'attributes') {
                         const name = m.attributeName
@@ -299,10 +306,18 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 })
             })
 
-            observer.observe(this, { attributes: true, attributeOldValue: true })
+            this._attrObserver.observe(this, { attributes: true, attributeOldValue: true })
         }
 
-        disconnectedCallback() { }
+        disconnectedCallback() {
+            if (this._attrObserver) {
+                this._attrObserver.disconnect()
+                this._attrObserver = null
+            }
+            if (this.shadowRoot) {
+                unregisterShadowRoot(this.shadowRoot)
+            }
+        }
 
         attributeChangedCallback1(name, oldValue, newValue) {
             if (oldValue === newValue) return

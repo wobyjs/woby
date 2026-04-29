@@ -11,7 +11,8 @@
 // Cache for converted stylesheets
 let cachedConstructedSheets: CSSStyleSheet[] | null = null
 let stylesheetObserver: MutationObserver | null = null
-const loggedErrors: Record<string, boolean> = {} // Track logged errors by call stack
+const loggedErrors = new Set<string>() // Track logged errors by call stack (bounded)
+const MAX_LOGGED_ERRORS = 50
 
 // Registry of shadow roots that need style updates
 const shadowRootRegistry = new Set<ShadowRoot>()
@@ -144,8 +145,9 @@ export function convertAllDocumentStylesToConstructed(): CSSStyleSheet[] {
             const stack = new Error().stack
             const stackKey = stack?.split('\n').slice(2, 5).join('|').trim() || ''
             const cacheKey = `security_error_${stackKey}`
-            if (!(cacheKey in loggedErrors)) {
-                loggedErrors[cacheKey] = true
+            if (!loggedErrors.has(cacheKey)) {
+                if (loggedErrors.size >= MAX_LOGGED_ERRORS) loggedErrors.clear()
+                loggedErrors.add(cacheKey)
                 console.warn("Could not copy stylesheet: SecurityError - Cannot access rules (likely cross-origin)")
             }
         }
@@ -188,24 +190,35 @@ export function observeStylesheetChanges(): void {
         return // Already observing
     }
 
-    stylesheetObserver = new MutationObserver(() => {
-        // Clear cache when stylesheets change
+    stylesheetObserver = new MutationObserver((mutations) => {
+        // Only react to actual stylesheet-related mutations
+        const relevant = mutations.some(m => {
+            // style/link added or removed
+            if (m.type === 'childList') {
+                const nodes = [...Array.from(m.addedNodes), ...Array.from(m.removedNodes)]
+                return nodes.some(n => {
+                    if (n.nodeType !== Node.ELEMENT_NODE) return false
+                    const tag = (n as Element).tagName
+                    return tag === 'STYLE' || (tag === 'LINK' && (n as HTMLLinkElement).rel === 'stylesheet')
+                })
+            }
+            // <style> text content changed
+            if (m.type === 'characterData') {
+                let p = m.target.parentElement
+                while (p) { if (p.tagName === 'STYLE') return true; p = p.parentElement }
+            }
+            return false
+        })
+        if (!relevant) return
         cachedConstructedSheets = null
-        
-        // Update all registered shadow roots with new styles
         updateAllShadowRoots()
     })
 
-    // Observe changes to the document head where stylesheets are typically added/removed
+    // Only watch head childList for style/link additions, and characterData for inline <style> edits
     stylesheetObserver.observe(document.head, {
         childList: true,
-        subtree: true
-    })
-
-    // Also observe the document for style/link elements
-    stylesheetObserver.observe(document, {
-        childList: true,
-        subtree: true
+        subtree: true,
+        characterData: true
     })
 }
 
@@ -227,6 +240,7 @@ export function unobserveStylesheetChanges(): void {
     }
     cachedConstructedSheets = null
     shadowRootRegistry.clear()
+    loggedErrors.clear()
 }
 
 /**
@@ -258,13 +272,19 @@ export function unregisterShadowRoot(shadowRoot: ShadowRoot): void {
  */
 export function updateAllShadowRoots(): void {
     const allSheets = refreshStylesheetCache()
-    
+
     if (allSheets.length === 0) return
-    
+
     shadowRootRegistry.forEach(shadowRoot => {
+        // Prune stale shadow roots whose host has left the DOM
+        if (!shadowRoot.host?.isConnected) {
+            shadowRootRegistry.delete(shadowRoot)
+            return
+        }
         try {
             shadowRoot.adoptedStyleSheets = allSheets
         } catch (e) {
+            shadowRootRegistry.delete(shadowRoot)
             console.warn('[StylesheetUtils] Failed to update shadow root:', e)
         }
     })

@@ -58,7 +58,11 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
             if (!$$(condition)) return
 
             // In SSR mode, we don't pass the portal to avoid issues
-            render(children, portal as Element)
+            const disposeRender = render(children, portal as Element)
+
+            return (): void => {
+                if (disposeRender) disposeRender()
+            }
 
         }, stack)
     }

@@ -6,7 +6,18 @@
       "Bash(pnpm.cmd test *)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(pnpm.cmd push *)"
+      "Bash(pnpm.cmd push *)",
+      "mcp__chrome-devtools__list_pages",
+      "mcp__chrome-devtools__navigate_page",
+      "Bash(pnpm test *)",
+      "mcp__chrome-devtools__take_screenshot",
+      "mcp__chrome-devtools__list_console_messages",
+      "mcp__chrome-devtools__get_console_message",
+      "Bash(node *)",
+      "mcp__chrome-devtools__take_memory_snapshot",
+      "mcp__chrome-devtools__evaluate_script",
+      "Read(//d/Developments/tslib/@woby/soby/dist/**)",
+      "Read(//d/Developments/tslib/@woby/soby/**)"
     ]
   },
   "enabledMcpjsonServers": [

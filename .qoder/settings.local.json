@@ -4,7 +4,25 @@
       "Bash(git status:*)",
       "Bash(git remote:*)",
       "Bash(git log:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(gh auth:*)",
+      "Bash(GIT_TERMINAL_PROMPT=1 git push 2>&1 || echo \"Trying alternative method...\" && git push https://wongchichong@github.com/wobyjs/woby.git main 2>&1)",
+      "Bash(TOKEN=$\\(gh auth token\\) && git push \"https://wongchichong:${TOKEN}@github.com/wobyjs/woby.git\" main 2>&1)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(head:*)",
+      "Bash(powershell -Command \"Get-Content 'D:\\\\Developments\\\\tslib\\\\@woby\\\\woby\\\\heap_before.heapsnapshot' -Head 3\")",
+      "Bash(node:*)",
+      "mcp__devtools__performance_start_trace",
+      "mcp__devtools__*",
+      "Bash(pnpm dev:*)",
+      "Bash(sleep:*)",
+      "Bash(git diff:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm test:*)"
     ]
   }
 }

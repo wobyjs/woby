@@ -27,6 +27,7 @@ const cache: Record<string, Item> = {}
 const runWithSuperRoot = _with()
 
 let lockId = 1
+const MAX_CACHE_SIZE = 100 // Maximum number of cached items to prevent unbounded growth
 
 
 //TODO: Support hot-swapping owner and context, to make the context JustWork™
@@ -38,7 +39,17 @@ export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, tt
     return useResolved([id, ttl], (id, ttl) => {
 
       const lock = lockId++
+      const isNew = !(id in cache)
       const item = cache[id] ||= { id, lock }
+
+      // Enforce cache size limit — evict oldest entries when adding a new id
+      if (isNew && Object.keys(cache).length > MAX_CACHE_SIZE) {
+        const sortedKeys = Object.keys(cache).sort((a, b) => cache[a].lock - cache[b].lock)
+        for (const key of sortedKeys) {
+          if (Object.keys(cache).length <= MAX_CACHE_SIZE) break
+          cache[key].dispose?.()
+        }
+      }
 
       item.lock = lock
       item.reset?.(stack)

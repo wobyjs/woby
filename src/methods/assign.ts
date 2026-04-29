@@ -262,11 +262,14 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                 // // Copy options if requested
                 // mergeObservableOptions(target[key], source[key], copyOptions)
 
-                if (track && isObservable(source[key]))
+                if (track && isObservable(source[key])) {
+                    // NOTE: track mode creates a persistent effect - caller must manage lifecycle
+                    // Consider using useRoot or proper owner context when calling assign with track:true
                     useEffect(() => {
                         set(target[key], source[key], m[key])
                         // mergeObservableOptions(target[key], source[key], copyOptions)
                     })
+                }
             } else {
                 // Direct reference assignment/override
                 const temp = $$(target[key])
@@ -289,8 +292,10 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                     {
                         //target is primitive, then make an object
                         (target[key] as any)(assign<T, S, O>({} as T, $$(source[key]), options))
-                        if (track && isObservable(source[key]))
+                        if (track && isObservable(source[key])) {
+                            // NOTE: track mode creates a persistent effect - caller must manage lifecycle
                             useEffect(() => { (target[key] as any)(assign<T, S, O>({} as T, $$(source[key]), options)) })
+                        }
                     }
 
                     // Copy options
@@ -302,8 +307,10 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                         ? assign(m[key] ? temp : {}, $$(source[key]), options as any)
                         : $(assign(m[key] ? temp : {}, $$(source[key]), options as any))
 
-                    if (track && isObservable(target[key]) && isObservable(source[key]))
+                    if (track && isObservable(target[key]) && isObservable(source[key])) {
+                        // NOTE: track mode creates a persistent effect - caller must manage lifecycle
                         useEffect(() => { (target[key] as any)(assign(m[key] ? temp : {}, $$(source[key]), options as any)) })
+                    }
 
                     // Copy options
                     // mergeObservableOptions(target[key], source[key], copyOptions)
@@ -314,8 +321,10 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
 
                     const temp = $$(target[key])
 
-                    if (track && isObservable(source[key]))
+                    if (track && isObservable(source[key])) {
+                        // NOTE: track mode creates a persistent effect - caller must manage lifecycle
                         useEffect(() => (target[key] as any)(m[key] ? mv(temp, $$(source[key])) : $$(source[key])))
+                    }
 
                     // Copy options
                     // mergeObservableOptions(target[key], source[key], copyOptions)
@@ -330,8 +339,10 @@ export const assign = <T, S, O extends AssignOptions<T>>(target: T, source: S, o
                         (target[key] as any)(mv(temp, $$(source[key])))
 
                     if (track && isObservable(target[key]) && isObservable(source[key]))
-                        if (target[key] !== source[key])
+                        if (target[key] !== source[key]) {
+                            // NOTE: track mode creates a persistent effect - caller must manage lifecycle
                             useEffect(() => (target[key] as any)(m[key] ? mv(temp, $$(source[key])) : $$(source[key])))
+                        }
 
                     // Copy options
                     // mergeObservableOptions(target[key], source[key], copyOptions)
