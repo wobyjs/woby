@@ -54,11 +54,10 @@ export function renderToString<T extends RenderToStringOptions = RenderToStringO
 ): T extends { returnDocument: true } ? { html: string; document: SSRDocument } : string {
     const ssrDoc = options?.document ?? createDocument()
 
-    // Set up SSR mocks once at the start - not on every setProp call
-    if (typeof globalThis !== 'undefined') {
-        globalThis.Comment = class { } as any
-        globalThis.Text = class { } as any
-    }
+    // CR-03 FIX: Removed global mutation of Comment/Text constructors
+    // Using duck typing (nodeType checks) instead of mutating globals
+    // This avoids breaking instanceof checks throughout the application
+    // const ssrDoc = options?.document ?? createDocument()
 
     // Provide BOTH environment AND document context for entire SSR duration
     return EnvironmentContext.Provider('ssr', () => {

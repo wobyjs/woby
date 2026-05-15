@@ -42,12 +42,16 @@ export const KeepAlive = ({ id, ttl, children }: { id: FunctionMaybe<string>, tt
       const isNew = !(id in cache)
       const item = cache[id] ||= { id, lock }
 
-      // Enforce cache size limit — evict oldest entries when adding a new id
-      if (isNew && Object.keys(cache).length > MAX_CACHE_SIZE) {
-        const sortedKeys = Object.keys(cache).sort((a, b) => cache[a].lock - cache[b].lock)
+      // CR-05 FIX: Enforce cache size limit on EVERY access, not just new entries
+      // This prevents unbounded cache growth when the same set of IDs is repeatedly accessed
+      const cacheKeys = Object.keys(cache)
+      if (cacheKeys.length > MAX_CACHE_SIZE) {
+        const sortedKeys = cacheKeys.sort((a, b) => cache[a].lock - cache[b].lock)
         for (const key of sortedKeys) {
-          if (Object.keys(cache).length <= MAX_CACHE_SIZE) break
-          cache[key].dispose?.()
+          if (cacheKeys.length <= MAX_CACHE_SIZE) break
+          if (key !== id && cache[key].dispose) {
+            cache[key].dispose()
+          }
         }
       }
 

@@ -537,12 +537,18 @@ export const setHTMLStatic = (element: HTMLElement, value: null | undefined | nu
 
 export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
 
+    const extractHTML = (val: any): string => {
+        if (!val || typeof val !== 'object' || !('__html' in val)) {
+            console.warn('[Woby] dangerouslySetInnerHTML expects an object with __html property, got:', typeof val)
+            return ''
+        }
+        const html = $$(val.__html)
+        return String(isNil(html) ? '' : html)
+    }
+
     useRenderEffect(() => {
-
-        setHTMLStatic(element, $$($$(value).__html))
-
+        setHTMLStatic(element, extractHTML(isFunction(value) ? value() : value))
     }, stack)
-
 }
 
 export const setPropertyStatic = (element: HTMLElement, key: string, value: null | undefined | boolean | number | string): void => {

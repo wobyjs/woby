@@ -864,28 +864,51 @@ export const setEvent = (element: HTMLElement, event: string, value: ObservableM
 }
 
 
+/**
+ * Set innerHTML on an element. WARNING: This function does NOT sanitize input.
+ * Callers MUST ensure the HTML string is trusted or sanitized before passing it here.
+ * Consider using DOMPurify or similar library for user-provided content.
+ * @see https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Server-Side_Request_Forgery
+ */
 export const setHTMLStatic = (element: HTMLElement, value: null | undefined | number | string): void => {
     element.innerHTML = String(isNil(value) ? '' : value)
 }
 
+/**
+ * Set innerHTML from a dangerouslySetInnerHTML object. WARNING: This function does NOT sanitize input.
+ * Callers MUST ensure the HTML string is trusted or sanitized before passing it here.
+ * @param element - Target HTML element
+ * @param value - Object with __html property containing the HTML string
+ * @param stack - Component stack for debugging
+ */
 export const setHTML = (element: HTMLElement, value: FunctionMaybe<{ __html: FunctionMaybe<null | undefined | number | string> }>, stack: Stack): void => {
     const isSSR = useEnvironment() === 'ssr'
 
+    // Validate that value has expected structure and extract HTML
+    const extractHTML = (val: any): string => {
+        if (!val || typeof val !== 'object' || !('__html' in val)) {
+            console.warn('[Woby] dangerouslySetInnerHTML expects an object with __html property, got:', typeof val)
+            return ''
+        }
+        const html = $$(val.__html)
+        return String(isNil(html) ? '' : html)
+    }
+
     if (isSSR)
-        setHTMLStatic(element, $$($$(value as any).__html))
+        setHTMLStatic(element, extractHTML(isFunction(value) ? value() : value))
     else if (isObservable(value))
         useRenderEffect(() => {
-
-            setHTMLStatic(element, $$($$(value as any).__html))
-
+            setHTMLStatic(element, extractHTML(isFunction(value) ? value() : value))
         }, stack)
     else
-        setHTMLStatic(element, $$($$(value as any).__html))
+        setHTMLStatic(element, extractHTML(isFunction(value) ? value() : value))
 
 }
 
 export const setPropertyStatic = (element: HTMLElement | Comment, key: string, value: null | undefined | boolean | number | string): void => {
-    const isComment = (element instanceof Comment)
+    // Use duck typing instead of instanceof to support SSR mode where Comment/Text may not be defined
+    const isComment = element?.nodeType === 8
+    const htmlElement = element as HTMLElement
 
     if (key === 'tabIndex' && isBoolean(value)) {
 
@@ -895,15 +918,15 @@ export const setPropertyStatic = (element: HTMLElement | Comment, key: string, v
 
     if (key === 'value' && !isComment) {
 
-        if (element.tagName === 'PROGRESS') {
+        if (htmlElement.tagName === 'PROGRESS') {
 
             value ??= null
 
-        } else if (element.tagName === 'SELECT' && !element['_$inited']) {
+        } else if (htmlElement.tagName === 'SELECT' && !(htmlElement as any)['_$inited']) {
 
-            element['_$inited'] = true
+            (htmlElement as any)['_$inited'] = true
 
-            queueMicrotask(() => element[key] = value)
+            queueMicrotask(() => (htmlElement as any)[key] = value)
 
         }
 
@@ -911,18 +934,18 @@ export const setPropertyStatic = (element: HTMLElement | Comment, key: string, v
 
     try { // Trying setting the property
 
-        element[key] = value
+        (element as any)[key] = value
 
         if (isNil(value) && !isComment) {
 
-            setAttributeStatic(element, key, null)
+            setAttributeStatic(htmlElement, key, null)
 
         }
 
     } catch (e) { // If it fails, maybe because like HTMLInputElement.form there's only a getter, we try as an attribute instead //TODO: Figure out something better than this
 
         if (!isComment)
-            setAttributeStatic(element, key, value)
+            setAttributeStatic(htmlElement, key, value)
 
     }
 
@@ -1189,17 +1212,15 @@ export const setTemplateAccessor = (element: HTMLElement, key: string, value: Te
 
 }
 
-// if (isSSR) { globalThis.Comment = class { } as any; globalThis.Text = class { } as any }
-
+// CR-04 FIX: Use duck typing instead of global mutation to check for Comment/Text nodes
 export const setProp = (element: HTMLElement | Comment, key: string, value: any, stack: Stack): void => {
-    const isSSR = useEnvironment() === 'ssr'
-    // In SSR mode, ensure Comment and Text are mocked for proper instanceof checks
-    if (isSSR) { 
-        globalThis.Comment = class { } as any
-        globalThis.Text = class { } as any 
-    }
+    // Use duck typing to check node types instead of mutating globals or relying on instanceof
+    // This avoids breaking instanceof checks and works in both SSR and browser modes
+    const nodeType = element?.nodeType
+    const isCommentNode = nodeType === 8
+    const isTextNode = nodeType === 3
 
-    if (element instanceof Comment || element instanceof Text) {
+    if (isCommentNode || isTextNode) {
         if (key === 'ref') {
 
             setRef(element, value)
@@ -1208,6 +1229,9 @@ export const setProp = (element: HTMLElement | Comment, key: string, value: any,
             setProperty(element, key, value, stack)
     }
     else {
+        // Now TypeScript knows this is an HTMLElement (not Comment or Text)
+        const htmlElement = element as HTMLElement
+
         if (value === undefined) return // Ignoring undefined props, for performance
 
         // Special handling for tabIndex boolean values - convert before processing
@@ -1217,47 +1241,47 @@ export const setProp = (element: HTMLElement | Comment, key: string, value: any,
 
         if (isTemplateAccessor(value)) {
 
-            setTemplateAccessor(element, key, value)
+            setTemplateAccessor(htmlElement, key, value)
 
         } else if (key === 'children') {
 
-            setChild(element, value, FragmentUtils.make(), stack)
+            setChild(htmlElement, value, FragmentUtils.make(), stack)
 
         } else if (key === 'ref') {
 
-            setRef(element, value)
+            setRef(htmlElement, value)
 
         } else if (key === 'style') {
 
-            setStyles(element, value, stack)
+            setStyles(htmlElement, value, stack)
 
         } else if (key === 'class' || key === 'className') {
 
-            setClasses(element, value, stack)
+            setClasses(htmlElement, value, stack)
 
         } else if (key === 'dangerouslySetInnerHTML') {
 
-            setHTML(element, value, stack)
+            setHTML(htmlElement, value, stack)
 
         } else if (key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110) { // /^on/
 
-            setEvent(element, key.toLowerCase(), value, stack)
+            setEvent(htmlElement, key.toLowerCase(), value, stack)
 
         } else if (key.charCodeAt(0) === 117 && key.charCodeAt(3) === 58) { // /^u..:/
 
-            setDirective(element, key.slice(4), value)
+            setDirective(htmlElement, key.slice(4), value)
 
         } else if (key === 'innerHTML' || key === 'outerHTML' || key === 'textContent' || key === 'className') {
 
             // Forbidden props
 
-        } else if (key in element && !isSVG(element)) {
+        } else if (key in htmlElement && !isSVG(htmlElement)) {
 
-            setProperty(element, key, value, stack)
+            setProperty(htmlElement, key, value, stack)
 
         } else {
 
-            setAttribute(element, key, value, stack)
+            setAttribute(htmlElement, key, value, stack)
 
         }
     }

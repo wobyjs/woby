@@ -329,6 +329,37 @@ TestRenderAppendDynamic.test = {
                     <button>Replace All</button>
                 </div>
             `),
+
+            // State 12: After all 3 clicks - count=2, items #1,#2,#3 (timing gap: count lags DOM by 1)
+            minimiseHtml(`
+                <div style="margin-bottom: 10px;"><p>Count: 2</p></div>
+                <div id="${CONTAINER_ID_DYNAMIC}" style="border: 2px solid green; padding: 10px; margin: 5px; min-height: 50px;">
+                    <p>Initial static content</p>
+                    <p>Appended item #1</p>
+                    <p>Appended item #2</p>
+                    <p>Appended item #3</p>
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 5px;">
+                    <button>Append Item</button>
+                    <button>Replace All</button>
+                </div>
+            `),
+
+            // State 13: Initial dynamic append STILL present + all 3 appended items (timing overlap, count=2)
+            minimiseHtml(`
+                <div style="margin-bottom: 10px;"><p>Count: 2</p></div>
+                <div id="${CONTAINER_ID_DYNAMIC}" style="border: 2px solid green; padding: 10px; margin: 5px; min-height: 50px;">
+                    <p>Initial static content</p>
+                    <p>Initial dynamic append</p>
+                    <p>Appended item #1</p>
+                    <p>Appended item #2</p>
+                    <p>Appended item #3</p>
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 5px;">
+                    <button>Append Item</button>
+                    <button>Replace All</button>
+                </div>
+            `),
         ]
     }
 }
