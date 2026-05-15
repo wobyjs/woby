@@ -11,86 +11,89 @@ import { registerTestObservable, assert } from './util'
 const name = 'TestRealShadowOnClick'
 
 // Custom element with REAL shadow DOM (not defaults light DOM)
-class RealShadowElement extends HTMLElement {
-    private shadow: ShadowRoot
-    private count: number = 0
+// Only define in browser environment (HTMLElement not available in Node.js SSR)
+if (typeof HTMLElement !== 'undefined') {
+    class RealShadowElement extends HTMLElement {
+        private shadow: ShadowRoot
+        private count: number = 0
 
-    constructor() {
-        super()
-        // Create actual shadow DOM
-        this.shadow = this.attachShadow({ mode: 'open' })
-        this.render()
-    }
+        constructor() {
+            super()
+            // Create actual shadow DOM
+            this.shadow = this.attachShadow({ mode: 'open' })
+            this.render()
+        }
 
-    private render() {
-        this.shadow.innerHTML = `
-            <style>
-                :host {
-                    display: block;
-                    padding: 16px;
-                    border: 2px solid purple;
-                    border-radius: 8px;
-                    margin: 8px 0;
-                    background: #f8f0ff;
-                }
-                h3 { margin: 0 0 8px 0; color: #333; }
-                p { margin: 0 0 8px 0; }
-                button {
-                    padding: 8px 16px;
-                    font-size: 14px;
-                    cursor: pointer;
-                    background: #9b59b6;
-                    color: white;
-                    border: none;
-                    border-radius: 4px;
-                }
-                button:hover { background: #8e44ad; }
-            </style>
-            <div>
-                <h3>Real Shadow DOM</h3>
-                <p>Count: <span id="count">${this.count}</span></p>
-                <button id="btn">Click Me</button>
-            </div>
-        `
+        private render() {
+            this.shadow.innerHTML = `
+                <style>
+                    :host {
+                        display: block;
+                        padding: 16px;
+                        border: 2px solid purple;
+                        border-radius: 8px;
+                        margin: 8px 0;
+                        background: #f8f0ff;
+                    }
+                    h3 { margin: 0 0 8px 0; color: #333; }
+                    p { margin: 0 0 8px 0; }
+                    button {
+                        padding: 8px 16px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        background: #9b59b6;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                    }
+                    button:hover { background: #8e44ad; }
+                </style>
+                <div>
+                    <h3>Real Shadow DOM</h3>
+                    <p>Count: <span id="count">${this.count}</span></p>
+                    <button id="btn">Click Me</button>
+                </div>
+            `
 
-        // Wire up the button click
-        const btn = this.shadow.getElementById('btn')
-        btn?.addEventListener('click', () => {
-            this.count++
-            this.updateCount()
-            console.log(`[${name}] Shadow button clicked! Count: ${this.count}`)
-            
-            // Dispatch custom event to parent
-            this.dispatchEvent(new CustomEvent('shadow-click', { 
-                detail: { count: this.count },
-                bubbles: true,
-                composed: true
-            }))
-        })
-    }
+            // Wire up the button click
+            const btn = this.shadow.getElementById('btn')
+            btn?.addEventListener('click', () => {
+                this.count++
+                this.updateCount()
+                console.log(`[${name}] Shadow button clicked! Count: ${this.count}`)
 
-    private updateCount() {
-        const countEl = this.shadow.getElementById('count')
-        if (countEl) {
-            countEl.textContent = String(this.count)
+                // Dispatch custom event to parent
+                this.dispatchEvent(new CustomEvent('shadow-click', {
+                    detail: { count: this.count },
+                    bubbles: true,
+                    composed: true
+                }))
+            })
+        }
+
+        private updateCount() {
+            const countEl = this.shadow.getElementById('count')
+            if (countEl) {
+                countEl.textContent = String(this.count)
+            }
+        }
+
+        static get observedAttributes() {
+            return ['label']
+        }
+
+        attributeChangedCallback(name: string, oldVal: string, newVal: string) {
+            if (name === 'label') {
+                const h3 = this.shadow.querySelector('h3')
+                if (h3) h3.textContent = newVal || 'Real Shadow DOM'
+            }
         }
     }
 
-    static get observedAttributes() {
-        return ['label']
+    // Register native custom element
+    if (typeof customElements !== 'undefined') {
+        customElements.define('real-shadow-element', RealShadowElement)
     }
-
-    attributeChangedCallback(name: string, oldVal: string, newVal: string) {
-        if (name === 'label') {
-            const h3 = this.shadow.querySelector('h3')
-            if (h3) h3.textContent = newVal || 'Real Shadow DOM'
-        }
-    }
-}
-
-// Register native custom element
-if (typeof customElements !== 'undefined') {
-    customElements.define('real-shadow-element', RealShadowElement)
 }
 
 // Test component
