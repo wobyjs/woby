@@ -43,18 +43,19 @@ Use Tailwind classes for positioning:
 - **Bottom**: `left-0` + `top: '100%'` + `margin-top: 4px`
 - **Right**: `left-full ml-1` + `top: '100%'` (NOT topOffset pixels!)
 
-**CRITICAL**: Always use `top: '100%'` for BOTH bottom and right placement.
-Do NOT use `topOffset` with pixel values — it causes popup to cover the button!
+Use `top: '100%'` for **bottom** placement. For **right** placement use `topOffset` (0 or negative) so the popup aligns with the button top and shifts up when near the viewport bottom.
 
 ```tsx
 class={[
     'absolute z-[9999] bg-white shadow-lg rounded-lg',
-    () => placement === 'bottom' ? 'left-0' : 'left-full ml-1'
+    () => placement === 'bottom' ? 'left-1/2 -translate-x-1/2' : 'left-full'
 ]}
 style={{
-    top: '100%',  // ALWAYS below container — never use topOffset pixels!
+    top: () => placement === 'bottom' ? '100%' : topOffset,
     marginTop: () => placement === 'bottom' ? '4px' : '0px',
-    marginLeft: () => placement === 'right' ? '4px' : '0px'
+    marginLeft: () => placement === 'right' ? '4px' : '0px',
+    maxHeight: () => maxHeight,   // MUST wrap in () => — plain $$(obs) reads once only
+    overflow: 'auto'
 }}
 ```
 
@@ -96,7 +97,7 @@ const updatePopupPlacement = () => {
 ```tsx
 style={{
     top: '100%',
-    maxHeight: $$(popupPlacement).maxHeight,
+    maxHeight: () => $$(popupPlacement).maxHeight,   // () => required for reactivity
     overflow: 'auto'
     // NO width property!
 }}
@@ -198,14 +199,15 @@ function Dropdown({ ...props }) {
             {$$(menu) && (
                 <div
                     ref={modalRef}
-                    class={['absolute z-[9999] bg-white shadow-lg rounded-lg',
-                        () => $$(popupPlacement).placement === 'bottom' ? 'left-0' : 'left-full ml-1'
+                    class={[
+                        'absolute z-[9999] bg-white shadow-lg rounded-lg',
+                        () => $$(popupPlacement).placement === 'bottom' ? 'left-1/2 -translate-x-1/2' : 'left-full'
                     ]}
                     style={{
-                        top: '100%',
+                        top: () => $$(popupPlacement).placement === 'bottom' ? '100%' : $$(popupPlacement).topOffset,
                         marginTop: () => $$(popupPlacement).placement === 'bottom' ? '4px' : '0px',
                         marginLeft: () => $$(popupPlacement).placement === 'right' ? '4px' : '0px',
-                        maxHeight: $$(popupPlacement).maxHeight,
+                        maxHeight: () => $$(popupPlacement).maxHeight,   // () => required
                         overflow: 'auto'
                     }}
                 >

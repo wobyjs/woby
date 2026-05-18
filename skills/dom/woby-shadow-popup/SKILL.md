@@ -235,7 +235,7 @@ const updatePopupPlacement = () => {
         placement = 'bottom'
         maxHeight = spaceBelow
         topOffset = 0
-    } else if (spaceRight >= tableH) {
+    } else if (spaceRight >= tableW) {   // compare horizontal space with popup WIDTH, not height
         placement = 'right'
         // Popup goes to the right of button, need to offset vertically to fit in viewport
         const availableHeight = vpH - 8
@@ -256,19 +256,24 @@ const updatePopupPlacement = () => {
 ```typescript
 <div
     ref={modalRef}
-    class={['absolute z-[9999] bg-white shadow-lg rounded-lg',
-        () => $$(popupPlacement).placement === 'bottom' ? 'left-0' : 'left-full ml-1'
+    class={[
+        'absolute z-[9999] bg-white shadow-lg rounded-lg',
+        // reactive class — switches horizontal alignment based on placement
+        () => $$(popupPlacement).placement === 'bottom' ? 'left-1/2 -translate-x-1/2' : 'left-full'
     ]}
     style={{
         top: () => $$(popupPlacement).placement === 'bottom' ? '100%' : $$(popupPlacement).topOffset,
         marginTop: () => $$(popupPlacement).placement === 'bottom' ? '4px' : '0px',
-        maxHeight: $$(popupPlacement).maxHeight,
+        marginLeft: () => $$(popupPlacement).placement === 'right' ? '4px' : '0px',
+        maxHeight: () => $$(popupPlacement).maxHeight,   // MUST be () => — plain $$() reads once
         overflow: 'auto'
     }}
 >
 ```
 
 **Key insight:** `topOffset` is negative when popup needs to shift UP to fit in viewport. This happens when button is near bottom and popup shows on right side.
+
+**Key insight:** For 'right' placement the popup is to the SIDE of the button (left-full), so `top: topOffset` where `topOffset=0` aligns the popup top with the button top — it does NOT cover the button. The "always use top:100%" rule only applies to bottom placement.
 
 ## CSS Relative Positioning (Preferred)
 
@@ -283,13 +288,15 @@ const updatePopupPlacement = () => {
     {() => $$(menu) && (
         <div
             ref={modalRef}
-            class={['absolute z-[9999] bg-white shadow-lg rounded-lg',
-                () => $$(popupPlacement).placement === 'bottom' ? 'left-0' : 'left-full ml-1'
+            class={[
+                'absolute z-[9999] bg-white shadow-lg rounded-lg',
+                () => $$(popupPlacement).placement === 'bottom' ? 'left-1/2 -translate-x-1/2' : 'left-full'
             ]}
             style={{
                 top: () => $$(popupPlacement).placement === 'bottom' ? '100%' : $$(popupPlacement).topOffset,
                 marginTop: () => $$(popupPlacement).placement === 'bottom' ? '4px' : '0px',
-                maxHeight: $$(popupPlacement).maxHeight,
+                marginLeft: () => $$(popupPlacement).placement === 'right' ? '4px' : '0px',
+                maxHeight: () => $$(popupPlacement).maxHeight,   // () => required
                 overflow: 'auto'
             }}
         >
@@ -383,6 +390,66 @@ import { useViewportSize } from '@woby/use'
 const viewport = useViewportSize()
 const vpW = $$(viewport.width)
 const vpH = $$(viewport.height)
+```
+
+### Non-Reactive Style Properties (CRITICAL Woby Gotcha)
+**Problem:** Style properties using `$$(obs)` read the value once at render time and never update reactively.
+
+**Symptom:** `maxHeight` or `top` doesn't change when placement changes after viewport resize.
+
+**Fix:** Always wrap observable reads in style with `() =>`:
+```typescript
+// WRONG — reads once, never updates
+style={{
+    maxHeight: $$(popupPlacement).maxHeight,
+    top: $$(popupPlacement).topOffset
+}}
+
+// CORRECT — reactive, updates when observable changes
+style={{
+    maxHeight: () => $$(popupPlacement).maxHeight,
+    top: () => $$(popupPlacement).topOffset
+}}
+```
+
+This applies to ALL style properties sourced from observables. Class arrays that use `() =>` already work reactively — the same rule applies to style objects.
+
+### Wrong Dimension in 'right' Placement Check
+**Problem:** Comparing horizontal available space (`spaceRight`) against table HEIGHT (`tableH`) instead of WIDTH (`tableW`).
+
+**Symptom:** 'right' placement triggers at the wrong threshold — e.g., popup switches to right when there's enough width but not height.
+
+**Fix:** Always match the axis — compare horizontal space with popup width:
+```typescript
+// WRONG
+} else if (spaceRight >= tableH) {
+
+// CORRECT
+} else if (spaceRight >= tableW) {
+```
+
+### agent-browser: Clicking Inside Shadow DOM
+**Problem:** `document.querySelector('sy-element').click()` clicks the host element, not the button inside shadow DOM.
+
+**Fix:** Always traverse into `shadowRoot` first:
+```bash
+agent-browser eval "document.querySelector('sy-element').shadowRoot.querySelector('button').click()"
+```
+
+Then verify popup computed style and content:
+```bash
+agent-browser eval "(() => {
+  const el = document.querySelector('sy-element')
+  const popup = el.shadowRoot.querySelector('[class*=absolute]')
+  if (!popup) return { open: false }
+  const cs = getComputedStyle(popup)
+  const r = popup.getBoundingClientRect()
+  return {
+    open: true,
+    top: cs.top, maxHeight: cs.maxHeight, overflow: cs.overflow,
+    rect: { top: r.top, left: r.left, bottom: r.bottom, right: r.right }
+  }
+})()"
 ```
 
 ---

@@ -6,29 +6,30 @@ tags: [woby, dropdown, popup, positioning, viewport, useViewportSize, debugging]
 
 # Woby Popup Debugging
 
-## Critical: Always Use `top: 100%` to Avoid Covering Button
+## `top` Rule: Bottom vs Right Placement
 
-The popup should ALWAYS be positioned below the container using `top: 100%`, NEVER using calculated top offsets.
+`top: 100%` means "start below the container bottom". This is correct for **bottom** placement only.
 
-### Problem
-When using calculated `topOffset` for 'right' placement:
+For **right** placement the popup is to the SIDE of the button (`left-full`). Use `topOffset` to align the popup top with the button top and shift it up if the button is near the viewport bottom:
+
 ```tsx
-// WRONG - topOffset can = 0, covering button
-top: () => placement === 'bottom' ? '100%' : topOffset
-```
-
-This causes popup to cover the button when `topOffset = 0`.
-
-### Solution
-Always use `top: 100%` for both placements:
-```tsx
+// CORRECT pattern for both placements
 style={{
-    top: '100%',
-    marginTop: '4px',
+    top: () => placement === 'bottom' ? '100%' : topOffset,
+    marginTop: () => placement === 'bottom' ? '4px' : '0px',
     marginLeft: () => placement === 'right' ? '4px' : '0px',
-    maxHeight: maxHeight,
+    maxHeight: () => maxHeight,   // MUST use () => for reactivity
     overflow: 'auto'
 }}
+```
+
+`topOffset = 0` for right placement aligns the popup top with the button container top — it does NOT cover the button because the popup is at `left: 100%` (to the right). Negative `topOffset` shifts the popup upward so it fits inside the viewport when the button is near the bottom edge.
+
+### Old Wrong Advice (DO NOT USE)
+```tsx
+// WRONG — forces popup below button even for right placement
+top: '100%'   // for right placement this puts popup BELOW-right, not beside button
+```
 ```
 
 ## Verification: Always Check Computed Styles

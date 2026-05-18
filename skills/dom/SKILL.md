@@ -103,6 +103,89 @@ agent-browser open http://localhost:3000  # Headless by default
 agent-browser open --headed=false http://localhost:3000
 ```
 
+## Daemon Lifecycle Rules (CRITICAL)
+
+agent-browser runs a **persistent daemon**. Understanding this prevents hard-to-debug failures.
+
+### Always Use `--session`
+**MANDATORY**: Every `open` / `eval` / `close` must use `--session <name>`. Without it you share the default session and lose isolation.
+
+```bash
+# ✅ CORRECT — named session persists across calls
+agent-browser --session my-component open --headed http://127.0.0.1:5178/page.html
+agent-browser --session my-component eval "document.title"
+agent-browser --session my-component close
+
+# ❌ WRONG — no session name, shares daemon default
+agent-browser open --headed http://localhost:5178/page.html
+```
+
+### Use `127.0.0.1` not `localhost`
+After closing and restarting the daemon, `localhost` can fail with `ERR_NAME_NOT_RESOLVED`. Always use `127.0.0.1`:
+
+```bash
+# ✅ CORRECT
+agent-browser --session s open --headed "http://127.0.0.1:5178/page.html"
+
+# ❌ RISKY — fails after daemon restart on some systems
+agent-browser --session s open --headed "http://localhost:5178/page.html"
+```
+
+### `--viewport` and `--headed` are Daemon-Level
+These flags are **ignored** if the daemon is already running. To change them you must close ALL sessions and the daemon first:
+
+```bash
+# Step 1: close named sessions
+agent-browser --session my-component close
+
+# Step 2: close daemon
+agent-browser close
+
+# Step 3: reopen with new daemon options
+agent-browser --session my-component open --headed --viewport 900x220 "http://127.0.0.1:5178/page.html"
+```
+
+### `window.resizeTo()` Does NOT Work
+Browser security blocks programmatic window resize. Use the spacer+scroll trick instead to simulate a button near the viewport bottom:
+
+```bash
+agent-browser --session s eval "(() => {
+  // Inject spacer above content so button is pushed near viewport bottom when scrolled
+  const spacer = document.createElement('div')
+  spacer.style.height = (visualViewport.height - 80) + 'px'
+  document.body.insertBefore(spacer, document.body.firstChild)
+
+  // Scroll to put button ~60px from viewport bottom
+  const btn = document.querySelector('sy-element').shadowRoot.querySelector('button')
+  const btnTop = btn.getBoundingClientRect().top + window.scrollY
+  window.scrollTo(0, btnTop - visualViewport.height + 60)
+
+  return {
+    vpH: visualViewport.height,
+    btnTopInVp: Math.round(btn.getBoundingClientRect().top),
+    spaceBelow: Math.round(visualViewport.height - btn.getBoundingClientRect().bottom - 4)
+  }
+})()"
+```
+
+### Async Reactive Eval (Woby / Observable updates)
+After clicking a button or calling `setAttribute()`, Woby's reactive updates are async. Always use a Promise with `setTimeout` to read state after the update settles:
+
+```bash
+agent-browser --session s eval "(() => {
+  const el = document.querySelector('sy-element')
+  el.setAttribute('value', '丙子')
+  return new Promise(resolve => setTimeout(() => {
+    const btn = el.shadowRoot.querySelector('button')
+    const spans = btn.querySelectorAll('span')
+    resolve({
+      span0: { text: spans[0]?.textContent, color: getComputedStyle(spans[0]).color },
+      span1: { text: spans[1]?.textContent, color: getComputedStyle(spans[1]).color }
+    })
+  }, 100))  // 100ms is enough for most Woby reactive updates
+})()"
+```
+
 ## Sub-Skills Architecture
 
 The DOM ecosystem consists of specialized skills that work together:
@@ -386,17 +469,22 @@ agent-browser close
 
 ### Test Responsive Design
 ```bash
-# Open in mobile viewport (DEFAULT: --headed to see the browser)
-agent-browser open --headed --viewport 375x667 http://localhost:3000
+# Open in mobile viewport — --viewport is DAEMON-LEVEL: only works on fresh daemon start
+# Close all sessions first: agent-browser --session <name> close && agent-browser close
+agent-browser --session mobile-test open --headed --viewport 375x667 http://127.0.0.1:3000
 
 # Check element visibility
-agent-browser eval "document.querySelector('.mobile-menu').offsetWidth > 0"
+agent-browser --session mobile-test eval "document.querySelector('.mobile-menu').offsetWidth > 0"
 
-# Resize to desktop
-agent-browser eval "window.resizeTo(1920, 1080)"
+# ❌ window.resizeTo() does NOT work — browser security blocks it
+# agent-browser eval "window.resizeTo(1920, 1080)"  ← WRONG, always ignored
+
+# ✅ To test a different viewport: close daemon and reopen with new --viewport
+# agent-browser --session mobile-test close && agent-browser close
+# agent-browser --session desktop-test open --headed --viewport 1920x1080 http://127.0.0.1:3000
 
 # Check desktop layout
-agent-browser eval "document.querySelector('.sidebar').offsetWidth"
+agent-browser --session mobile-test eval "document.querySelector('.sidebar').offsetWidth"
 
 agent-browser close
 ```
