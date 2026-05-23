@@ -348,6 +348,26 @@ The DOM ecosystem consists of specialized skills that work together:
 
 **CRITICAL**: Use this sub-skill when testing CustomElements to catch bugs where attributes are set but don't appear in components due to missing $() in defaults().
 
+### 9. `/dom-portal` - Portal Patterns
+**Purpose**: Comprehensive Portal patterns for modals, dropdowns, sidebars, and nested components
+**Capabilities**:
+- Basic Modal Portal (single-layer)
+- Dual-Layer Portal (Sidebar + Overlay)
+- Bottom Sheet Portal (Wheeler-style)
+- Nested Popup with cancelOnBlur
+- Conditional Visibility with Portal
+- Z-index hierarchy strategy
+- Portal vs CSS positioning tradeoffs
+
+**Workflow**:
+1. Identify if Portal is needed (escaping overflow, z-index stacking)
+2. Choose Portal pattern based on use case
+3. Apply z-index hierarchy
+4. Handle nested component dismissal (cancelOnBlur)
+5. Verify with agent-browser
+
+**CRITICAL**: Use this sub-skill when creating modals, dropdowns, sidebars, or any component that needs to escape its DOM hierarchy.
+
 ## Professional Design Workflow
 
 All sub-skills follow this professional workflow:
@@ -1019,6 +1039,7 @@ IF desktop-only optimization → /dom-desktop
 IF cross-device → /dom-mobile-desktop
 IF CustomElement/Web Component testing → /dom-customelement
 IF attribute reactivity issues → /dom-customelement
+IF Portal/modal/sidebar/dropdown → /dom-portal
 IF multiple concerns → combine sub-skills
 ```
 
@@ -1221,6 +1242,71 @@ If you need a value not in Tailwind's defaults:
 
 **NEVER use inline styles** - these approaches keep your code maintainable.
 
+## TSX Component Class Contract (cls Override, class Append)
+
+When developing Woby components with TSX, follow this contract for the `cls` and `class` props:
+
+| Prop | Purpose | Behavior |
+|------|---------|----------|
+| `cls` | Consumer's override classes | **Replaces** default styles when provided |
+| `class` | Consumer's append classes | **Added to** default styles |
+
+### Pattern for Component Development
+
+```tsx
+// Inside component implementation
+const MyComponent = defaults(() => ({
+    cls: $('') as ObservableMaybe<string>,   // Override
+    class: $('') as ObservableMaybe<string>,  // Append
+}), (props) => {
+    const { cls, class: className, children } = props
+    
+    // CORRECT: cls overrides defaults, class appends
+    return (
+        <div class={[() => $$(cls) ?? 'default-base p-4', className]}>
+            {children}
+        </div>
+    )
+})
+```
+
+### Usage by Consumers
+
+```tsx
+// Override default styles completely
+<MyComponent cls="custom-override bg-red-500">
+// Result: "custom-override bg-red-500" (no defaults)
+
+// Append to default styles
+<MyComponent class="custom-addon shadow-lg">
+// Result: "default-base p-4 custom-addon shadow-lg"
+
+// Both together
+<MyComponent cls="full-override" class="addon-class">
+// Result: "full-override addon-class"
+```
+
+### Common Mistakes to Avoid
+
+```tsx
+// ❌ WRONG: Both append (cls doesn't override)
+<div class={['default', cls, className]}>
+// If cls="custom", result: "default custom className"
+
+// ❌ WRONG: Non-reactive cls check
+<div class={['default', cls]}>
+// cls might be Observable, not string!
+
+// ✅ CORRECT: Reactive with fallback
+<div class={[() => $$(cls) ?? 'default', className]}>
+```
+
+### Why This Contract Matters
+
+- **`cls`**: Consumer wants full control → replace default completely
+- **`class`**: Consumer wants to extend → add without removing defaults
+- Both props MUST be declared in `defaults()` for reactive HTML attribute support
+
 ## Concurrent Browser Agent Debugging/Verification
 
 **CRITICAL**: For heavy sites or when you need to test multiple pages simultaneously, use **separate browser sessions** to spawn multiple independent browser windows.
@@ -1409,3 +1495,84 @@ When you invoke this master skill, it will:
 5. Produce production-ready output
 
 Just describe what you need, and the DOM ecosystem will handle the rest!
+
+---
+
+## WUI Component Patterns
+
+Patterns extracted from the wui component library for reference.
+
+### Focus Blur Handling with Timeout
+
+When handling focus loss in custom elements, use setTimeout to allow focus transfer:
+
+```tsx
+const handleBlur = (e?: FocusEvent) => {
+    setTimeout(() => {
+        const nextFocusedElement = e?.relatedTarget as Node;
+        const containerEl = $$(container);
+
+        const isFocusStillInside =
+            (containerEl && containerEl.contains(document.activeElement)) ||
+            (containerEl && containerEl.contains(nextFocusedElement));
+
+        if (!isFocusStillInside) {
+            isEditing(false);
+        }
+    }, 50);
+};
+```
+
+### MouseDown to Prevent Focus Loss
+
+Use onMouseDown with preventDefault() to keep focus on editor when interacting with dropdowns:
+
+```tsx
+<div
+    onMouseDown={(e) => {
+        e.stopPropagation();
+        e.preventDefault();  // Prevents editor from losing focus
+    }}
+>
+    {/* dropdown content */}
+</div>
+```
+
+### Event StopImmediatePropagation for Toggle Buttons
+
+For toggle buttons with checked state:
+
+```tsx
+onClick={(e) => {
+    if (onClick) onClick(e);
+    e.stopImmediatePropagation();  // Prevents other handlers + bubbling
+    if (isObservable(checked)) {
+        checked(!$$(checked));
+    }
+}}
+```
+
+### Viewport Handling with useViewportSize
+
+Always use `useViewportSize` from `@woby/use` for reactive viewport dimensions:
+
+```tsx
+import { useViewportSize } from '@woby/use';
+
+const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot } = useViewportSize();
+
+// Use $$(vh) and $$(vw) in reactive contexts
+```
+
+### Z-Index Layers (WUI Standard)
+
+```
+z-5     - Background overlay (behind modals)
+z-10    - Secondary overlays, masks
+z-50    - Standard popups, tooltips
+z-100   - Standard modals
+z-200   - Bottom sheets, drawers (Wheeler)
+z-1000  - App bars, fixed navigation
+z-[150] - Wheeler widget container
+z-[200] - Wheeler content
+```

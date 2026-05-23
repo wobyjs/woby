@@ -415,8 +415,345 @@ SSR:          ssr.*  createDocument  isServer  renderToString
 3. `if (ctx > 0)` — comparing observable function to number. Use `if ($$(ctx) > 0)`.
 4. Forgetting `$()` in `defaults()` — HTML attributes won't update the component.
 5. Forgetting `HtmlNumber` — number attributes arrive as strings, comparisons fail.
-6. Using `use()` — not exported. Use `useMemo()`.
+6. Using `use()` — not exported from woby. Use `useMemo()`.
 7. Event double-firing — missing `e.stopPropagation()` in custom element event handlers.
 8. Pattern 2 event props — `typeof onClick === 'function'` is always true; must unwrap with `(onClick as any)?.()` first.
 9. `useContext()` returns observable — don't compare or use in logic without `$$()` unwrap.
 10. No key prop needed — woby tracks list items automatically; adding `key` does nothing useful.
+11. **`class` prop not forwarded into shadow DOM component** — `class` (and any other prop) is only reactive if it's declared as `$()` in `defaults()`. If it's missing from defaults, `attributeChangedCallback` assigns a plain string to `this.props.class` (non-reactive) AFTER the component has already rendered. Fix: add `class: $('')` to `defaults()`.
+
+---
+
+## cls Override, class Append Contract
+
+Every Woby component MUST follow this contract for the `cls` and `class` props:
+
+| Prop | Purpose | Behavior |
+|------|---------|----------|
+| `cls` | Consumer's override classes | **Replaces** default styles when provided |
+| `class` | Consumer's append classes | **Added to** default styles |
+
+```tsx
+// CORRECT: cls overrides defaults, class appends
+<div class={[() => $$(cls) ?? 'default-styles', class]}>
+
+// WRONG: Both append (confuses consumer expectations)
+<div class={['default-styles', cls]}>
+```
+
+**Usage:**
+```tsx
+<Comp cls="custom-override" class="custom-addon">
+{/* Result: "custom-override custom-addon" */}
+/* cls replaces defaults, class adds on top */
+```
+
+### Required in defaults() for Custom Elements
+
+Both `cls` and `class` MUST be declared in `defaults()` for reactive HTML attribute support:
+
+```typescript
+const def = () => ({
+    cls: $('') as ObservableMaybe<string>,   // Override (replaces defaults)
+    class: $('') as ObservableMaybe<string>,  // Append (adds to defaults)
+    // ... other props
+})
+
+const MyElement = defaults(def, (props) => {
+    const { cls, class: className, children, ...rest } = props
+    
+    return (
+        <div class={[() => $$(cls) ?? 'base-component', className]} {...rest}>
+            {children}
+        </div>
+    )
+})
+```
+
+### Why This Contract Matters
+
+- **`cls`**: Consumer wants full control → replace default completely
+- **`class`**: Consumer wants to extend → add without removing defaults
+
+### Testing Your Component
+
+Verify the class contract:
+
+```tsx
+// Test cls overrides defaults
+expect(element.classList).toContain('custom-override')
+
+// Test class appends to defaults
+expect(element.classList).toContain('base-component')
+expect(element.classList).toContain('user-addon')
+
+// Test both together
+<Comp cls="full-override" class="addon-class">
+// Result: "full-override addon-class" (no defaults!)
+```
+
+---
+
+## Forwarding `class` from Custom Element Host into Shadow DOM
+
+When a custom element is used with a class attribute (`<my-el class="...">`) and the component renders an inner element that should carry those classes, the class must be wired reactively through `defaults()`.
+
+### Why it fails without `$()` in defaults
+
+Woby's `customElement` reads `Object.keys(this.props)` at construction time to determine which props are observable. If `class` is NOT in `defaults()`, then:
+- `class` is not in the observable prop list
+- `attributeChangedCallback1` finds `this.props['class']` is undefined (not observable) and does plain `obj['class'] = value` — a one-time assignment
+- The component already rendered (in the constructor, before `connectedCallback`) with `cls = undefined`
+- No reactive update fires
+
+### The fix
+
+```tsx
+const MyElementDefaults = () => ({
+    // ... other props ...
+    class: $(''),   // ← must be here so Woby tracks class as an observable prop
+})
+
+const MyElement = defaults(MyElementDefaults, (props) => {
+    const { class: cls } = props
+    // cls is now an Observable<string> — reactive when HTML attribute changes
+    return <div class={[cls]}>...</div>
+})
+```
+
+### How it works
+
+1. `class: $('')` in defaults → Woby includes `class` in `observedAttributes` and treats it as reactive
+2. In `connectedCallback`, `attributeChangedCallback1('class', undefined, 'foo bar')` calls `this.props.class('foo bar')` — updates the observable
+3. The inner element's `class={[cls, ...]}` is inside a `useRenderEffect` (Woby's class array handling is always reactive)
+4. The effect re-runs and applies the new class string to the inner element
+
+### CSS cascade via `[&_td]:*` into shadow DOM
+
+Tailwind's `[&_td]:p-2` generates `.[\&_td\]:p-2 td { padding: 0.5rem }` — a descendant selector.
+
+When the inner `<table class="[&_td]:p-2">` is inside a Woby shadow DOM:
+- Woby adopts all document stylesheets into the shadow DOM via `adoptedStyleSheets`
+- The adopted Tailwind CSS contains the `.[\&_td\]:p-2 td` rule
+- The `td` elements inside the shadow DOM are descendants of the inner table → selector matches ✓
+
+**The class must be on the inner element (inside shadow DOM), not on the host.** The host's class only affects light DOM.
+
+```tsx
+// ✅ class on inner table — selectors like [&_td]:p-2 reach the shadow DOM td elements
+return <table class={[cls]}>
+    <tbody>...</tbody>
+</table>
+
+// ❌ class only on host — Tailwind [&_td]:p-2 won't pierce shadow DOM boundary
+// (setting class on host via HTML attribute without forwarding to inner element)
+```
+
+---
+
+## WUI Component Patterns
+
+Additional patterns from the wui component library.
+
+### untrack() - Prevent Infinite Loops
+
+Use `untrack()` to read observable values without creating dependencies:
+
+```tsx
+import { untrack } from 'woby';
+
+useEffect(() => {
+    const val = $$(modDate);
+    const parsed = parseDate(val);
+
+    if (parsed) {
+        // CRITICAL: untrack() prevents infinite loop
+        // Without it, updating selectedYear would cause this effect to re-run
+        if (untrack(selectedYear) !== parsed.getFullYear())
+            selectedYear(parsed.getFullYear());
+    }
+});
+```
+
+### pick() - Composing Defaults
+
+Use `pick()` to inherit defaults from parent components:
+
+```tsx
+import { pick } from 'woby';
+
+const def = () => {
+    // Get base defaults from parent
+    const baseDefaults = parentDef();
+
+    // Pick specific keys to inherit
+    const inheritedKeys = ['cls', 'bottom', 'visible', 'mask'] as const;
+    const inheritedDefaults = pick(baseDefaults, inheritedKeys);
+
+    return {
+        // Component-specific defaults
+        options: $([]),
+        value: $(null),
+        // Inherited defaults
+        ...inheritedDefaults
+    };
+};
+```
+
+### Static Property Pattern for Component Identification
+
+Attach static properties to component functions for runtime detection:
+
+```tsx
+const StartAdornment = defaults(defStart, (props) => { /* ... */ });
+StartAdornment.adornmentType = 'start';  // Static property
+
+const EndAdornment = defaults(defEnd, (props) => { /* ... */ });
+EndAdornment.adornmentType = 'end';  // Static property
+
+// Usage: detect type at runtime
+const getAdornmentType = (child: any) => child?.adornmentType || null;
+```
+
+### use() Hook from @woby/use
+
+The `use()` hook from `@woby/use` provides observable values with fallback defaults:
+
+```tsx
+import { use } from '@woby/use';
+
+const type = use(mode);  // Get observable value
+const yearRange = use(yearRangeProp, { start: 1900, end: 2100 });  // With fallback
+```
+
+### Conditional Rendering with Function Return
+
+Always return a function for reactive conditional rendering:
+
+```tsx
+return () => {
+    return $$(isVisible) === false ? null : renderContent();
+};
+```
+
+### Slot Element Handling
+
+Handle both TSX children and HTML slot content:
+
+```tsx
+useEffect(() => {
+    const childValue = $$(children);
+
+    if (childValue instanceof HTMLSlotElement) {
+        // HTML mode: extract text from slot
+        const slot = childValue as HTMLSlotElement;
+        const updateText = () => {
+            const assignedNodes = slot.assignedNodes();
+            const textContent = assignedNodes.map(n => n.textContent).join('');
+            displayText(textContent);
+        };
+        slot.addEventListener('slotchange', updateText);
+        return () => slot.removeEventListener('slotchange', updateText);
+    } else {
+        // TSX mode: children is already text
+        displayText(String(childValue || ''));
+    }
+});
+```
+
+### Shadow DOM Light DOM Child Migration
+
+Custom elements with Shadow DOM need to migrate light DOM children:
+
+```tsx
+useEffect(() => {
+    const mainDiv = $$(mainRef);
+    const contentDiv = $$(contentRef);
+    if (!mainDiv || !contentDiv) return;
+
+    const rootNode = mainDiv.getRootNode();
+    const isShadow = rootNode instanceof ShadowRoot;
+
+    if (isShadow) {
+        const host = (rootNode as ShadowRoot).host as HTMLElement;
+        const lightChildren = Array.from(host.children);
+
+        lightChildren.forEach(node => {
+            if (node.tagName.toLowerCase() === 'wui-tab') {
+                contentDiv.appendChild(node);  // Moves node to shadow DOM
+            }
+        });
+    }
+});
+```
+
+---
+
+## Build & TypeScript Compatibility — Agent Pitfalls
+
+**These mistakes were made by AI agents and caused hours of debugging. Never repeat them.**
+
+### ❌ NEVER create a `declare module 'woby'` augmentation file
+
+```ts
+// FORBIDDEN — DO NOT CREATE THIS FILE IN ANY PROJECT
+declare module 'woby' {
+  export { something } from '...'  // This shadows ALL real woby exports
+}
+```
+
+A `declare module 'woby'` block — in ANY `.d.ts` file anywhere in the project — **completely replaces woby's real module declaration**. TypeScript will see only what's in the augmentation and nothing from the real `dist/types/index.d.ts`. The symptom is `Module '"woby"' has no exported member '$'` (and every other woby export) across every file.
+
+**Diagnosis:** When you see `Module '"woby"' has no exported member X` for multiple different exports simultaneously, the FIRST thing to do is:
+```
+grep -r "declare module 'woby'" src/
+```
+If any `.d.ts` file has this, delete it immediately. Do NOT blame woby's types or TypeScript version first.
+
+The correct way to add IntrinsicElements declarations is scoped — no module redeclaration:
+```ts
+// ✅ correct — extends the existing module
+declare module 'woby' {
+  namespace JSX {
+    interface IntrinsicElements {
+      'my-element': ElementAttributes<typeof MyComponent>
+    }
+  }
+}
+```
+Even this is only needed for IntrinsicElements. Never re-export or redefine existing woby exports.
+
+### TypeScript 6 upgrade checklist for tsconfig
+
+When upgrading a woby-consuming package from TypeScript 5 to 6, update `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "noEmitOnError": false
+  }
+}
+```
+
+And make the declaration step non-blocking in `package.json`:
+```json
+"declaration": "tsc --declaration --emitDeclarationOnly --declarationMap || true"
+```
+
+### woby build chain (no fix-declarations)
+
+The `fix-declarations.js` post-build script has been removed from woby. The correct build chain is:
+```
+run-s clean build:only declaration bump
+```
+
+`dist/types/jsx/types.d.ts` naturally generates with `export {};` — that is correct. The `declare global { namespace JSX { ... } }` inside it is sufficient for JSX type-checking without a UMD `export as namespace JSX;` declaration.
+
+### Tailwind oxide native binding after pnpm reinstall
+
+After running `pnpm install --no-frozen-lockfile`, the optional platform-specific binary `@tailwindcss/oxide-win32-x64-msvc` may be lost. Symptom:
+```
+Error: Cannot find native binding. npm has a bug related to optional dependencies
+```
+Fix: run `pnpm install` (no flags) at the workspace root. Do NOT delete `node_modules` or `pnpm-lock.yaml`.
