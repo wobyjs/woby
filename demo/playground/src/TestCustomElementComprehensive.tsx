@@ -10,7 +10,7 @@
  * - Type conversion and serialization
  * - Style and attribute handling
  */
-import { $, $$, customElement, defaults, createContext, useContext, HtmlString, HtmlNumber, HtmlBoolean, HtmlDate, type JSX } from 'woby'
+import { $, $$, customElement, defaults, createContext, useContext, HtmlString, HtmlNumber, HtmlBoolean, HtmlDate, ObservableMaybe, HtmlClass, type JSX } from 'woby'
 
 // Contexts for testing
 const AppContext = createContext('default-app')
@@ -21,7 +21,8 @@ const useApp = () => useContext(AppContext)
 const useUser = () => useContext(UserContext)
 const useTheme = () => useContext(ThemeContext)
 
-// Comprehensive custom element
+// Comprehensive custom element with cls/class contract
+// cls = override (replaces defaults), class = append (adds to defaults)
 const ComprehensiveElement = defaults(() => ({
     // Basic props with different types
     title: $('Comprehensive Element', HtmlString),
@@ -33,7 +34,9 @@ const ComprehensiveElement = defaults(() => ({
         fromHtml: (str) => JSON.parse(str)
     }),
 
-    // Style props
+    // Style props with cls/class contract
+    cls: $('') as ObservableMaybe<string>,
+    class: $('') as ObservableMaybe<string>,
     backgroundColor: $('white'),
     borderColor: $('black'),
 
@@ -42,18 +45,15 @@ const ComprehensiveElement = defaults(() => ({
         debug: $(false, HtmlBoolean),
         timeout: $(5000, HtmlNumber)
     }
-}), ({ title, count, enabled, created, userData, backgroundColor, borderColor, config, children }) => {
+}), ({ title, count, enabled, created, userData, cls, class: className, backgroundColor, borderColor, config, children }) => {
     const appContext = useApp()
     const userContext = useUser()
     const themeContext = useTheme()
 
     return (
-        <div style={{
-            border: `2px solid ${$$(borderColor)}`,
-            backgroundColor: $$(backgroundColor),
-            padding: '15px',
-            margin: '10px',
-            borderRadius: '5px'
+        <div class={[() => $$(cls) || 'border-2 p-4 m-2 rounded', className]} style={{
+            borderColor: $$(borderColor),
+            backgroundColor: $$(backgroundColor)
         }}>
             <h3 style={{
                 color: $$(themeContext) === 'dark' ? 'white' : 'black',
@@ -83,17 +83,12 @@ const ComprehensiveElement = defaults(() => ({
                 </div>
             </div>
 
-            <div style={{
-                marginTop: '10px',
-                padding: '10px',
-                backgroundColor: '#f0f0f0',
-                border: '1px dashed #999'
-            }}>
+            <div class="mt-2 p-2 bg-gray-100 border border-dashed border-gray-400">
                 <h4>Slot Content:</h4>
                 {children ? children : <p style={{ color: 'gray' }}>No slot content provided</p>}
             </div>
 
-            <div style={{ marginTop: '10px' }}>
+            <div class="mt-2">
                 <h4>Config:</h4>
                 <p>Debug: {$$($$(config).debug) ? 'Enabled' : 'Disabled'}</p>
                 <p>Timeout: {$$($$(config).timeout)}ms</p>
@@ -207,6 +202,24 @@ const TestCustomElementComprehensive = () => {
                         >
                             <p>TSX-provided slot content</p>
                             <button>Slot Button</button>
+                        </ComprehensiveElement>
+
+                        {/* TSX with cls override */}
+                        <ComprehensiveElement
+                            title="cls Override Example"
+                            count={50}
+                            cls="bg-blue-100 border-blue-500 border-4 p-6 shadow-lg"
+                        >
+                            <p>Custom override styles applied via cls prop</p>
+                        </ComprehensiveElement>
+
+                        {/* TSX with class append */}
+                        <ComprehensiveElement
+                            title="class Append Example"
+                            count={25}
+                            class="ring-2 ring-purple-500 transform scale-105"
+                        >
+                            <p>Appended styles via class prop</p>
                         </ComprehensiveElement>
 
                         {/* HTML usage */}

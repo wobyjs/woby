@@ -7,15 +7,17 @@
  * Note: This is an alternative approach. The recommended approach is to use
  * adoptedStyleSheets without @import (see TestTailwindNoImport.tsx).
  */
-import { $, $$, customElement, defaults, renderToString, type ElementAttributes, HtmlString, HtmlNumber, type JSX } from 'woby'
+import { $, $$, customElement, defaults, renderToString, type ElementAttributes, HtmlString, HtmlNumber, ObservableMaybe, HtmlClass, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
-// Define a custom element with Tailwind classes and ignoreStyle=false (default)
-// This will adopt stylesheets including any @import'd styles
+// Define a custom element with Tailwind classes and cls/class contract
+// cls = override (replaces defaults), class = append (adds to defaults)
 const TailwindButton = defaults(() => ({
     label: $('Click Me', HtmlString),
-    variant: $('primary')
-}), ({ label, variant }) => {
+    variant: $('primary'),
+    cls: $('') as ObservableMaybe<string>,
+    class: $('') as ObservableMaybe<string>
+}), ({ label, variant, cls, class: className }) => {
     // Dynamic class based on variant
     const variantClasses = () => {
         switch ($$(variant)) {
@@ -29,7 +31,7 @@ const TailwindButton = defaults(() => ({
     }
 
     return (
-        <button class={`px-4 py-2 rounded font-medium transition-colors ${variantClasses()}`}>
+        <button class={[() => $$(cls) || `px-4 py-2 rounded font-medium transition-colors ${variantClasses()}`, className]}>
             {label}
         </button>
     )
@@ -171,6 +173,11 @@ const TestTailwindWithImportBasic = (): JSX.Element => {
                 <TailwindButton label="Primary" variant="primary" />
                 <TailwindButton label="Secondary" variant="secondary" />
                 <TailwindButton label="Danger" variant="danger" />
+            </div>
+            {/* Example with cls override: */}
+            <div class="mt-4 space-x-2">
+                <TailwindButton label="Custom Override" cls="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3" />
+                <TailwindButton label="Append Style" variant="primary" class="font-bold text-lg" />
             </div>
         </div>
     )

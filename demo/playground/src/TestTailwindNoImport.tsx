@@ -7,16 +7,19 @@
  * This follows the recommended approach from:
  * https://meefik.dev/2025/03/19/tailwindcss-and-shadow-dom/
  */
-import { $, $$, customElement, defaults, renderToString, ObservableMaybe, type ElementAttributes, HtmlString, HtmlNumber, type JSX } from 'woby'
+import { $, $$, customElement, defaults, renderToString, ObservableMaybe, type ElementAttributes, HtmlString, HtmlNumber, HtmlClass, type JSX } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
 
-// Define a custom element with Tailwind classes
+// Define a custom element with Tailwind classes and cls/class contract
+// cls = override (replaces defaults), class = append (adds to defaults)
 const TailwindCard = defaults(() => ({
     title: $('Tailwind Card', HtmlString),
-    count: $(0, HtmlNumber)
-}), ({ title, count, children }) => {
+    count: $(0, HtmlNumber),
+    cls: $('') as ObservableMaybe<string>,
+    class: $('') as ObservableMaybe<string>
+}), ({ title, count, cls, class: className, children }) => {
     return (
-        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div class={[() => $$(cls) || 'bg-white rounded-lg shadow-md p-6 border border-gray-200', className]}>
             <h2 class="text-2xl font-semibold text-gray-800 mb-4">{title}</h2>
             <p class="text-gray-600 mb-2">Count: {count}</p>
             <div class="mt-4">{children}</div>
@@ -161,6 +164,14 @@ const TestTailwindNoImportTSX = (): JSX.Element => {
             <h2 class="text-xl font-bold mb-4">1. TSX Usage (No @import)</h2>
             <TailwindCard title={title} count={count}>
                 <p class="text-sm text-blue-600">This content uses Tailwind classes</p>
+            </TailwindCard>
+            {/* Example with cls override: */}
+            <TailwindCard title="Override Styles" count={99} cls="bg-blue-50 p-4 rounded">
+                <p class="text-xs text-purple-600">Card with custom override styles</p>
+            </TailwindCard>
+            {/* Example with class append: */}
+            <TailwindCard title="Append Styles" count={88} class="border-2 border-blue-300">
+                <p class="text-sm text-green-600">Card with appended styles</p>
             </TailwindCard>
         </div>
     )
