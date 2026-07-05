@@ -229,7 +229,15 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
                 if (props) {
                     if (!!ce) {
-                        const { children, ...np } = props as any //children already initialized in new ce(props)
+                        const { children: propsChildren, ...np } = props as any
+                        // For custom elements, the constructor's JSX merge skips 'children',
+                        // so we need to set children explicitly via setChild if it was in props.
+                        // This handles two cases:
+                        // 1. JSX with children in props object (unusual, but valid)
+                        // 2. HTML→JSX handoff where HTML custom element passes slot to JSX child
+                        if (propsChildren !== undefined && !hasChildren) {
+                            setChild(child, propsChildren, FragmentUtils.make(), stack)
+                        }
                         setProps(child, np, stack)
                     }
                     else
