@@ -13,11 +13,12 @@ import { isObject, isString } from '../utils/lang'
 import { SYMBOL_CLONE, SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
 import { customElements as ces } from '../ssr/custom_elements'
 import { wobyCustomElements } from '../methods/custom_element_registry'
-import { useEnvironment, showEnvLog } from '../components/environment_context'
+import { useEnvironment } from '../components/environment_context'
 
 const wrapJsx = <P>(props: P) => {
   if (props[SYMBOL_JSX]) return props
   props[SYMBOL_JSX] = true
+  // SYMBOL_JSX was set in wrapJsx
   return props
 }
 
@@ -51,7 +52,8 @@ function getProps<P extends {} = { key?: string; children?: Child }>(component: 
   }
   if (!props) props = {} as any
 
-  return wrapJsx(props)
+  const result = wrapJsx(props)
+  return result
 }
 
 
@@ -76,9 +78,6 @@ export function jsx<P extends {} = { key?: string; children?: Child }>(component
   if (typeof children === 'string') // React 16, key
     Object.assign(props as any, { children })
 
-  if (showEnvLog)
-    console.log('ENV jsx: ', useEnvironment())
-
   return wrapCloneElement(createElement<P>(component as any, props, (props as any)?.key as string), component, props)
 }
 
@@ -90,9 +89,6 @@ export const jsxDEV = <P extends {} = {}>(component: Component<P>, props: P | nu
 
   if (key)
     Object.assign(props, { key })
-
-  if (showEnvLog)
-    console.log('ENV jsxDEV: ', useEnvironment())
 
   return wrapCloneElement(createElement<P>(component as any, props), component, props)
 }

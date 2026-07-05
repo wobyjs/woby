@@ -8,6 +8,7 @@
 
 import { isObservable, Observable } from "soby"
 import { SYMBOL_DEFAULT, SYMBOL_JSX } from "../constants"
+
 import { assign } from './assign'
 import type { ObservableMaybe, Observant } from '../types'
 import { $ } from './soby'
@@ -156,8 +157,10 @@ export const defaults = <P extends Record<string, any>>(
         return d
     }
     // const compFactory = Object.assign((props: Observant<P>) => component(merge(props, defFactory()) as unknown as P),
-    const compFactory = Object.assign((props: P & { children?: CustomElementChildren } & StyleEncapsulationProps) =>
-        component(isJsxProp(props) ? merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any : props),
+    const compFactory = Object.assign((props: P & { children?: CustomElementChildren } & StyleEncapsulationProps) => {
+        const result = component(isJsxProp(props) ? merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any : props)
+        return result
+    },
         {
             [SYMBOL_DEFAULT]: defFactory
         })

@@ -106,3 +106,5 @@ export class WobyCustomElementsRegistry {
 
 /** Singleton woby registry – one per bundler chunk / module graph. */
 export const wobyCustomElements = new WobyCustomElementsRegistry()
+// registryId is set for debugging — keep the unique ID but don't log
+;(wobyCustomElements as any).__registry_id__ = Math.random().toString(36).slice(2)

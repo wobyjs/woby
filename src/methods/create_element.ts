@@ -8,7 +8,7 @@
  * @module createElement
  */
 
-import { untrack, $$ } from '../methods/soby'
+import { untrack, $$, isObservable } from '../methods/soby'
 import { wrapElement } from '../methods/wrap_element'
 import { createComment as createCommentDOM, createHTMLNode as createHTMLNodeDOM, createSVGNode as createSVGNodeDOM, createText as createTextDOM } from '../utils/creators'
 import { createHTMLNode as createHTMLNodeSSR, createSVGNode as createSVGNodeSSR, createComment as createCommentSSR, createText as createTextSSR } from '../ssr'
@@ -175,6 +175,9 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
     const props = _props ?? {}
 
     if (isFunction(component)) {
+        if (isObservable(component)) {
+            return component as any // Already a rendered element observable — return directly
+        }
         return wrapElement(() => {
 
             return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
@@ -201,7 +204,13 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
             // owned by other libraries.
             const ce = isSSR ? ces.get(component) : wobyCustomElements.get(component)
 
-            const child = !!ce ? new ce(props as any) : create(component) as HTMLElement
+            let child: any
+            try {
+                child = !!ce ? new ce(props as any) : create(component) as HTMLElement
+            } catch (e: any) {
+                console.error(`[createElement] CRASH during new ce("${component}"):`, e.message, e.stack)
+                child = create(component) as HTMLElement
+            }
 
             // if (!!ce)
             //     (child as InstanceType<ReturnType<typeof customElement>>).props = { ...props }

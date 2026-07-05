@@ -5,7 +5,7 @@ import { $$ } from '../methods/soby'
 import { isArray, isFunction, isString, isProxy, fixBigInt, toArray } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { createText, createComment, createHTMLNode } from '../utils/creators.via'
-import { IgnoreSymbols } from 'via.js'
+import { IgnoreSymbols } from 'via.js/controller'
 import { Stack } from '../soby'
 
 const HTMLValue = Symbol('HtmlValue')

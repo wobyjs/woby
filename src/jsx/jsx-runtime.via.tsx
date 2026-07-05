@@ -9,15 +9,8 @@ import 'via.js'
 import { SYMBOL_CLONE } from '../constants'
 /* MAIN */
 
-const debugHTML = (p: HTMLElement, name: string) => {
-    if (p)
-        (async () => {
-            const nn = await get(p.nodeName)
-            const nt = await get(p.nodeType)
-            console.log(name + "; ")
-            // const html = await get(p.outerHTML)
-            console.log(name, p, nn, nt/* , html */)
-        })()
+const debugHTML = (_p: HTMLElement, _name: string) => {
+    // noop — debug logging disabled for production
 }
 
 // React 16

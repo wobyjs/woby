@@ -383,7 +383,6 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
     let next = FragmentUtils.getChildren(fragmentNext)
     let nextLength = next instanceof Array ? next.length : 1
 
-    // Special case: first-time render with content - directly append to parent
     if (prevLength === 0 && nextLength > 0 && !fragmentOnly) {
         if (next instanceof Array) {
             for (const node of next) {
@@ -485,7 +484,6 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
 export const setChild = (parent: HTMLElement | Node, child: Child, fragment: Fragment = FragmentUtils.make(), stack: Stack = callStack()!): void => {
     const cd = child
-
     resolveChild(cd, (child, dynamic, stack) => {
         return setChildStatic(parent, fragment, false, child, dynamic, cd as any, stack)
     }, false, stack)

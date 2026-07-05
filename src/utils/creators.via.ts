@@ -1,9 +1,10 @@
 
+import 'via.js/controller'
+import type { ViaClass } from 'via.js/controller'
 import type { ComponentIntrinsicElement, FN } from '../types'
-import 'via.js'
 
-if (typeof via !== 'undefined')
-    var document = via.document
+const via = (globalThis as any).via as ViaClass
+const document = (via as any).document
 
 export const createComment = document.createComment as any as FN<[any], Comment>
 export const createHTMLNode = document.createElement as any as FN<[ComponentIntrinsicElement], HTMLElement>

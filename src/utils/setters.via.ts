@@ -2,8 +2,7 @@ import { DIRECTIVES, SYMBOLS_DIRECTIVES, SYMBOL_UNCACHED } from '../constants'
 import { useMicrotask } from '../hooks/use_microtask'
 import { useRenderEffect } from '../hooks/use_render_effect'
 import { isStore } from '../methods/soby'
-import { $$ } from '../methods/soby'
-import { store } from '../methods/soby'
+import { $$, store } from '../methods/soby'
 import { untrack } from '../methods/soby'
 import { context, with as _with, isObservable, SYMBOL_OBSERVABLE_WRITABLE } from 'soby'
 import { SYMBOL_STORE_OBSERVABLE } from 'soby'
@@ -14,7 +13,7 @@ import { FragmentUtils } from '../utils/fragment'
 import { castArray, flatten, isArray, isBoolean, isFunction, isFunctionReactive, isNil, isString, isSVG, isTemplateAccessor, isVoidChild } from '../utils/lang'
 import { resolveChild, resolveClass, resolveStyle } from '../utils/resolvers.via'
 import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMaybe, ObservableMaybe, Ref, TemplateActionProxy } from '../types'
-import { __ArgsSymbol } from 'via.js'
+import { __ArgsSymbol } from 'via.js/controller'
 import { IsSvgSymbol } from '../methods/create_element.via'
 import { Stack, callStack } from '../soby'
 
@@ -22,14 +21,8 @@ import { Stack, callStack } from '../soby'
 // import createElement from '../methods/create_element.via'
 
 
-export const debugHTML = (p: HTMLElement, name: string) => {
-    if (p)
-        (async () => {
-            const nn = await get(p.nodeName)
-            const nt = await get(p.nodeType)
-            const html = await get(p.outerHTML)
-            console.log(name, p, nn, nt, html)
-        })()
+export const debugHTML = (_p: HTMLElement, _name: string) => {
+    // noop — debug logging disabled for production
 }
 
 export const setAttributeStatic = (() => {

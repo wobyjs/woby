@@ -25,18 +25,13 @@ export const render = (child: JSX.Child) => {
     let disposer
     let unmount = useRoot((dispose) => {
         setChild(fragment as any, child, FragmentUtils.make())
-        // fragment.appendChild(child);
 
         renderDiv.append(fragment)
-        console.log('f', fragment.outerHTML)
-        console.log('c', (fragment.children[0] as any).outerHTML)
 
         return disposer = (): void => {
             dispose()
             fragment.textContent = ''
             fragment.remove()
-
-            console.log('dispose')
         }
     })
     document.body.append(renderDiv)

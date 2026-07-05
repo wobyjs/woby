@@ -49,7 +49,21 @@ export const resolveChild = <T>(value: ObservableMaybe<T>, setter: ((value: T | 
 
       const newValue = value()
 
-      resolveChild(newValue, setter, _dynamic, stack)
+      // Track depth of function chain resolution
+      let newFnValue = newValue
+      let fnDepth = 0
+      while (typeof newFnValue === 'function' && !isFunctionReactive(newFnValue) && fnDepth < 20) {
+        const inner = newFnValue()
+        fnDepth++
+        if (inner === newFnValue) break
+        newFnValue = inner
+      }
+
+      if (fnDepth > 0) {
+        resolveChild(newFnValue, setter, _dynamic, stack)
+      } else {
+        resolveChild(newValue, setter, _dynamic, stack)
+      }
 
     } else {
 
@@ -184,6 +198,24 @@ export const resolveArraysAndStatics = (() => {
         if (resolved !== DUMMY_RESOLVED) resolved.push(value)
 
         hasObservables = true
+
+      } else if (type === 'function') { // Non-observable function (e.g. wrapElement'd) — call and resolve
+
+        if (resolved === DUMMY_RESOLVED) resolved = values.slice(0, i)
+
+        let fnResult = value()
+        let depth = 0
+        while (typeof fnResult === 'function' && !isObservable(fnResult) && depth < 20) {
+          fnResult = fnResult()
+          depth++
+        }
+        if (isArray(fnResult)) {
+          hasObservables = resolveArraysAndStaticsInner(fnResult, resolved, hasObservables)[1]
+        } else if (fnResult != null) {
+          resolved.push(fnResult)
+        } else {
+          resolved.push(createText(''))
+        }
 
       } else { // Something else
 

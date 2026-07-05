@@ -176,9 +176,21 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             super()
 
             this.props = !!props ? props : defaultPropsFn() || {} as P
-            C.observedAttributes = Object.keys(this.props)
 
             if (!isJsx(this.props)) {
+
+                // CRITICAL: Sync attributes from HTML to observables before rendering.
+                // This ensures that when custom elements are created via raw HTML parsing,
+                // the attributes are available to reactive expressions during the initial render.
+                // Without this, the constructor uses default values and attributes are only synced
+                // later in connectedCallback, causing a timing mismatch where some expressions
+                // evaluate with stale default values.
+                if (this.attributes) {
+                    for (const attr of this.attributes as any) {
+                        const propName = kebabToCamelCase(attr.name)
+                        setObservableValue(this.props, propName, attr.value)
+                    }
+                }
 
                 // Check if we're inside a Canvas3D or other context provider
                 // by looking for SYMBOL_CONTEXT_WRAP on ancestors BEFORE creating shadow DOM
@@ -225,6 +237,15 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
 
                     context({ [ps.symbol]: ps.value }, () => {
                         const componentResult = createElement(component as any, this.props)
+                        if (typeof componentResult === 'function') {
+                            let resolved = componentResult()
+                            let depth = 0
+                            while (typeof resolved === 'function' && depth < 10) {
+                                const next = resolved()
+                                depth++
+                                resolved = next
+                            }
+                        }
                         if (shadowRoot) {
                             setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
                         } else {
@@ -240,6 +261,15 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     const renderInto = (wrapFn?: (fn: () => void) => void) => {
                         const doRender = () => {
                             const componentResult = createElement(component as any, this.props)
+                            if (typeof componentResult === 'function') {
+                                let resolved = componentResult()
+                                let depth = 0
+                                while (typeof resolved === 'function' && depth < 10) {
+                                    const next = resolved()
+                                    depth++
+                                    resolved = next
+                                }
+                            }
                             if (shadowRoot) {
                                 setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
                             } else {
@@ -286,9 +316,17 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
 
             rKeys.forEach(k => this.removeAttribute(k))
 
-            for (const k of aKeys as any)
+            for (const k of aKeys as any) {
+                // When isJsx, skip complex object props that would stringify to [object Object]
+                // and cannot be meaningfully converted back from an HTML attribute.
+                // Only set primitive-typed observable values as HTML attributes.
+                if (isJsx(p)) {
+                    const val = $$(p[k])
+                    if (isObject(val) && !(val instanceof Date)) continue
+                }
                 if (!this.attributes[this.propDict[k]] || isJsx(p))
                     setProp(this, this.propDict[k], p[k], callStack('connectedCallback'))
+            }
 
             for (const attr of this.attributes as any) {
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
@@ -324,6 +362,15 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             if (newValue === '[object Object]') return
 
             const { props } = this
+            const propName = kebabToCamelCase(name)
+            // Guard: if the observable already holds a non-primitive value (object/function),
+            // don't overwrite it with a stringified attribute. This protects complex objects
+            // passed via JSX props from being clobbered by HTML attribute sync.
+            if (isObservable(props[propName])) {
+                const currentVal = $$(props[propName])
+                if (isObject(currentVal) && !(currentVal instanceof Date) && typeof newValue === 'string') return
+            }
+
             if (name.includes('$') || name.includes('.')) {
                 const normalizedPath = normalizePropertyPath(name)
                 setNestedProperty(this, normalizedPath, newValue)
@@ -658,9 +705,11 @@ const getNestedProperty = (obj: any, path: string) => {
  * ```
  */
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P> | ContextProvider<any>): void => {
-    createSSRCustomElement(tagName, component)
-
+    // Browser must be registered first so it wins the native slot.
+    // SSR is the fallback for environments without a DOM.
     if (globalThis.window && globalThis.document) {
         createBrowserCustomElement(tagName, component)
+    } else {
+        createSSRCustomElement(tagName, component)
     }
 }
