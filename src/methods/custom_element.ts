@@ -23,7 +23,7 @@
  */
 
 import { $$, isObservable } from "./soby"
-import { SYMBOL_DEFAULT } from '../constants'
+import { SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
 import { setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
@@ -175,7 +175,25 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         constructor(props?: P) {
             super()
 
-            this.props = !!props ? props : defaultPropsFn() || {} as P
+            // Always call defaultPropsFn() to create the default observables.
+            // When JSX provides props, merge the JSX values into the default observables
+            // instead of using JSX props directly. This ensures defaults() detects
+            // isJsxProp and skips re-creating defaults on every render.
+            const defaultProps = defaultPropsFn() || {} as P
+            if (props && isJsx(props)) {
+                // Merge JSX-provided values into default observables
+                for (const key in props) {
+                    if (key === 'children') continue
+                    if (key in defaultProps && isObservableWritable(defaultProps[key])) {
+                        const value = props[key]
+                        ;(defaultProps[key] as Observable<any>)(value)
+                    }
+                }
+                ;(defaultProps as any)[SYMBOL_JSX] = true
+                this.props = defaultProps
+            } else {
+                this.props = !!props ? props : defaultProps
+            }
 
             if (!isJsx(this.props)) {
 

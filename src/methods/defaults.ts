@@ -158,7 +158,14 @@ export const defaults = <P extends Record<string, any>>(
     }
     // const compFactory = Object.assign((props: Observant<P>) => component(merge(props, defFactory()) as unknown as P),
     const compFactory = Object.assign((props: P & { children?: CustomElementChildren } & StyleEncapsulationProps) => {
-        const result = component(isJsxProp(props) ? merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any : props)
+        // Always merge defaults so function-call syntax also gets default values.
+        // The isJsxProp distinction only matters for how SYMBOL_JSX flag is set;
+        // defaults like boolean flags ($true, $false) must be applied either way.
+        const merged = merge(make(props, { inplace: true, convertFunction: false }), defFactory()) as any
+        if (isJsxProp(props)) {
+            ;(merged as any)[SYMBOL_JSX] = true
+        }
+        const result = component(merged)
         return result
     },
         {
