@@ -1,4 +1,4 @@
-import { $, $$, lazy, Suspense, type JSX, renderToString, type JSX } from 'woby'
+import { $, $$, lazy, Suspense, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
 
 const name = 'TestLazy'

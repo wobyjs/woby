@@ -41,6 +41,7 @@ export {
     SYMBOL_STACK,
     setPendingContextWrap,
     consumePendingContextWrap,
+    registerContextRef,
 } from './methods'
 
 // Export SSR utilities for Portal and other components that need mock document creation

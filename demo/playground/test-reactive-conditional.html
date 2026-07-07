@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test - Reactive Conditional Pattern</title>
+</head>
+<body>
+    <h1>Test: Reactive Conditional Pattern</h1>
+
+    <h2>Test 1: With key="a"</h2>
+    <reactive-conditional key="a" id="test1"></reactive-conditional>
+
+    <h2>Test 2: No key attribute</h2>
+    <reactive-conditional id="test2"></reactive-conditional>
+
+    <h2>Test 3: Dynamic attribute change</h2>
+    <reactive-conditional key="b" id="test3"></reactive-conditional>
+    <button id="changeBtn">Change to key="c"</button>
+
+    <div id="results"></div>
+
+    <script type="module">
+        import './src/TestReactiveConditional'
+
+        function checkElement(selector) {
+            const el = document.querySelector(selector)
+            const sr = el.shadowRoot
+            const html = sr ? sr.innerHTML : ''
+
+            return {
+                selector,
+                hasElement: !!el,
+                hasShadow: !!sr,
+                htmlLength: html.length,
+                hasPlaceholder: html.includes('Please set key'),
+                hasData: html.includes('Data'),
+                preview: html.substring(0, 150)
+            }
+        }
+
+        setTimeout(() => {
+            console.log('Test 1 (key="a"):', checkElement('#test1'))
+            console.log('Test 2 (no key):', checkElement('#test2'))
+            console.log('Test 3 (key="b"):', checkElement('#test3'))
+
+            document.querySelector('#changeBtn').addEventListener('click', () => {
+                document.querySelector('#test3').setAttribute('key', 'c')
+                setTimeout(() => {
+                    console.log('Test 3 (after change to "c"):', checkElement('#test3'))
+                }, 100)
+            })
+        }, 500)
+    </script>
+</body>
+</html>

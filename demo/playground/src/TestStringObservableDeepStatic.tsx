@@ -1,5 +1,4 @@
-import { $, $$, renderToString, type JSX } from 'woby'
-import { useMemo, type JSX } from 'woby'
+import { $, $$, useMemo, renderToString, type JSX } from 'woby'
 import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
 
 const name = 'TestStringObservableDeepStatic'

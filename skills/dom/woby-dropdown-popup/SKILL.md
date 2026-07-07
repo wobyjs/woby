@@ -236,3 +236,4 @@ function Dropdown({ ...props }) {
 - `useViewportSize` from `@woby/use`
 - `useClickAway` from `@woby/use`
 - Shadow DOM event retargeting
+- `/dom-portal` for nested popup patterns with `cancelOnBlur`

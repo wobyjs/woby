@@ -41,6 +41,7 @@ import { customElements as ces, SSRCustomElement, SSRShadowRoot, SSRSlotElement 
 import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP } from '../constants'
 import { context } from '../soby'
 import { WobyCustomElementsRegistry, wobyCustomElements } from './custom_element_registry'
+import { resolveContextRef, isContextRef } from './context_ref'
 export { WobyCustomElementsRegistry, wobyCustomElements }
 
 
@@ -126,6 +127,23 @@ export const consumePendingContextWrap = (): ((fn: () => void) => void) | undefi
 }
 
 /**
+ * Compose a provider's own context-wrap onto the pending wrap.
+ *
+ * Called by the invisible JSX Context.Provider path (create_context.tsx) while a
+ * custom element renders. Multiple nested providers within a single custom element
+ * (e.g. Theme -> Counter -> Nested) each compose here so the element ends up storing
+ * ONE composed SYMBOL_CONTEXT_WRAP that re-establishes the whole chain for slotted
+ * descendants living in separate soby roots.
+ *
+ * Composition keeps the EARLIER (outer JSX) provider OUTER and the later (deeper)
+ * provider INNER, mirroring the JSX nesting: prev(() => self(fn)).
+ */
+export const composePendingContextWrap = (selfWrap: (fn: () => void) => void): void => {
+    const prev = _pendingContextWrapGlobal
+    _pendingContextWrapGlobal = prev ? (fn: () => void) => prev(() => selfWrap(fn)) : selfWrap
+}
+
+/**
  * Traverses DOM ancestors (crossing shadow boundaries via assignedSlot/host)
  * and collects SYMBOL_CONTEXT_WRAP functions stored by provider custom elements,
  * returning a composed wrap function that re-establishes the full soby context chain.
@@ -181,13 +199,51 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             // isJsxProp and skips re-creating defaults on every render.
             const defaultProps = defaultPropsFn() || {} as P
             if (props && isJsx(props)) {
-                // Merge JSX-provided values into default observables
+                // Merge JSX-provided values into the default observables.
+                //
+                // CRITICAL: soby's writable observable treats a *function* argument as a
+                // functional updater (callable.js writableFunction -> this.update(fn) ->
+                // fn(currentValue)). So calling `defaultObs(incoming)` when `incoming` is
+                // itself an observable (or any function) INVOKES `incoming` with the
+                // default observable's current value, corrupting the incoming value.
+                // In the HTML->JSX provider handoff this wiped the parent custom element's
+                // slot/children observable to `undefined`, so context-provider read
+                // `$$(children) === undefined` during render and crashed at
+                // `Object.assign(context(...), { symbol })`.
+                //
+                // To merge safely: snapshot observable values via $$ before setting, and
+                // store plain functions through an updater so they become the value rather
+                // than mutate the source. Plain (non-function) values pass straight through
+                // exactly as before, so previously-working props are unaffected.
+                const mergeInto = (key: string, incoming: any) => {
+                    const obs = defaultProps[key] as Observable<any>
+                    if (isObservable(incoming)) obs($$(incoming))
+                    else if (typeof incoming === 'function') obs(() => incoming)
+                    // A JSX attribute written as a string literal (e.g. count="100") arrives
+                    // as a raw string even when the target observable is typed (HtmlNumber /
+                    // HtmlBoolean / …). Setting the string straight into a typed observable
+                    // makes soby throw "Expected value of type 'number', but received 'string'".
+                    // Route strings through setObservableValue so the observable's own type
+                    // converter (fromHtml / Number / BigInt / …) runs — exactly like the raw
+                    // HTML-attribute sync path does. Untyped observables just receive the string.
+                    else if (typeof incoming === 'string') setObservableValue(defaultProps, key, incoming, this)
+                    else obs(incoming)
+                }
                 for (const key in props) {
                     if (key === 'children') continue
                     if (key in defaultProps && isObservableWritable(defaultProps[key])) {
-                        const value = props[key]
-                        ;(defaultProps[key] as Observable<any>)(value)
+                        mergeInto(key, (props as any)[key])
                     }
+                }
+                // Populate the children observable from JSX props when it is writable.
+                // Provider-style components (e.g. context-provider) read $$(children)
+                // synchronously while rendering, so the slot/children must be available
+                // BEFORE the component runs. Deferring to createElement's post-construction
+                // setChild is too late and leaves children undefined during the initial
+                // render (which makes resolve($$(children)) return undefined and crashes
+                // callers like context-provider's Object.assign(context(...), ...)).
+                if ('children' in props && isObservableWritable(defaultProps['children'])) {
+                    mergeInto('children', (props as any).children)
                 }
                 ;(defaultProps as any)[SYMBOL_JSX] = true
                 this.props = defaultProps
@@ -206,7 +262,7 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 if (this.attributes) {
                     for (const attr of this.attributes as any) {
                         const propName = kebabToCamelCase(attr.name)
-                        setObservableValue(this.props, propName, attr.value)
+                        setObservableValue(this.props, propName, attr.value, this)
                     }
                 }
 
@@ -229,7 +285,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     this.props.children[SYMBOL_ISSLOT] = true
                     this.props.children(this.slots)
                 }
-
                 const ignoreStyle = (this.props as any).ignoreStyle === true
                 if (!ignoreStyle) {
                     // Force refresh the cache to ensure we get the latest styles
@@ -248,12 +303,22 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
 
                 const ps = this.props as any as { symbol: symbol, value: any }
                 if (SYMBOL_CONTEXT in this.props) {
+                    // The `symbol` prop is run through defaults()/make(), which wraps the
+                    // raw Symbol in an observable ($()). useContext(), however, looks the
+                    // context value up by the RAW symbol stored in CONTEXTS_DATA. So we must
+                    // unwrap ps.symbol with $$ before using it as the soby context key — using
+                    // the observable directly stringifies the function into a bogus key and
+                    // the reader never finds the value.
+                    const sym = $$(ps.symbol) as symbol
                     // Store a context-replay function on this element so descendant custom
                     // elements can re-establish the soby context chain.
-                    const selfWrap = (fn: () => void) => context({ [ps.symbol]: ps.value }, fn);
+                    const selfWrap = (fn: () => void) => context({ [sym]: ps.value }, fn);
                     (this as any)[SYMBOL_CONTEXT_WRAP] = selfWrap
 
-                    context({ [ps.symbol]: ps.value }, () => {
+                    context({ [sym]: ps.value }, () => {
+                        // Clear stale pending wrap; selfWrap above is our baseline and is
+                        // only overridden below if THIS render sets a fresh composed wrap.
+                        consumePendingContextWrap()
                         const componentResult = createElement(component as any, this.props)
                         if (typeof componentResult === 'function') {
                             let resolved = componentResult()
@@ -278,6 +343,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     // Render the component, then capture any pending context wrap it set.
                     const renderInto = (wrapFn?: (fn: () => void) => void) => {
                         const doRender = () => {
+                            // Clear any stale pending wrap so we only capture wraps set by
+                            // THIS element's own internal JSX providers during the render
+                            // below — not one leaked from an ancestor/sibling provider.
+                            // This is what keeps soby's normal JSX context path isolated:
+                            // an unrelated custom element never inherits a dangling wrap.
+                            consumePendingContextWrap()
                             const componentResult = createElement(component as any, this.props)
                             if (typeof componentResult === 'function') {
                                 let resolved = componentResult()
@@ -342,7 +413,15 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     const val = $$(p[k])
                     if (isObject(val) && !(val instanceof Date)) continue
                 }
-                if (!this.attributes[this.propDict[k]] || isJsx(p))
+                // Only reflect the observable value onto the host attribute when the
+                // attribute is ABSENT (i.e. populate defaults for props the author did
+                // not write). In JSX mode createElement's setProps already wrote every
+                // authored attribute as the original string (e.g. active="true"); forcing
+                // reflection here re-derives it from the typed observable and LOSES
+                // information — HtmlBoolean.toHtml(true) === '' would clobber active="true"
+                // into active="". Reactive observable props keep their binding via the
+                // setProps call in createElement, so skipping present attributes is safe.
+                if (!this.attributes[this.propDict[k]])
                     setProp(this, this.propDict[k], p[k], callStack('connectedCallback'))
             }
 
@@ -381,6 +460,14 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
 
             const { props } = this
             const propName = kebabToCamelCase(name)
+
+            // If the attribute is an @-prefixed context reference, skip re-processing
+            // in attributeChangedCallback. The JSX constructor path (mergeInto) already
+            // resolved it synchronously inside the provider's context scope. Re-processing
+            // here would happen outside that scope and return a default/fallback value,
+            // overwriting the correct resolved value.
+            if (isContextRef(newValue)) return
+
             // Guard: if the observable already holds a non-primitive value (object/function),
             // don't overwrite it with a stringified attribute. This protects complex objects
             // passed via JSX props from being clobbered by HTML attribute sync.
@@ -393,10 +480,10 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 const normalizedPath = normalizePropertyPath(name)
                 setNestedProperty(this, normalizedPath, newValue)
                 const propName = kebabToCamelCase(name.replace(/\$/g, '.').replace(/\./g, '.'))
-                setObservableValue(props, propName, newValue)
+                setObservableValue(props, propName, newValue, this)
             } else {
                 const propName = kebabToCamelCase(name)
-                setObservableValue(this.props, propName, newValue)
+                setObservableValue(this.props, propName, newValue, this)
             }
         }
     }
@@ -483,7 +570,22 @@ type ElementAttributePattern<P> =
 * @param key - The property key to set
 * @param value - The string value to set on the property
 */
-const setObservableValue = (obj: any, key: string, value: string) => {
+const setObservableValue = (obj: any, key: string, value: string, element?: Element) => {
+    // @-prefix context reference resolution
+    if (typeof value === 'string') {
+        if (value.startsWith('@@')) {
+            value = value.slice(1)  // escape: "@@literal" → "@literal"
+        } else if (isContextRef(value)) {
+            if (isObservable(obj[key]) && isObservableWritable(obj[key])) {
+                const resolved = resolveContextRef(value, element)
+                if (resolved !== undefined) {
+                    obj[key](resolved)
+                    return
+                }
+            }
+        }
+    }
+
     if (isObservable(obj[key])) {
         if (!isObservableWritable(obj[key])) return
         // Cast value according to observable options type
@@ -605,13 +707,13 @@ const setNestedProperty = (obj: HTMLElement, path: string, value: any) => {
 
         // Set the final property using the observable value setter
         if (lastKey) {
-            setObservableValue(target, lastKey, value)
+            setObservableValue(target, lastKey, value, obj)
         }
         return
     }
 
     // For simple properties, convert to camelCase and set them using the observable value setter
-    setObservableValue((obj as any), kebabToCamelCase(path), value)
+    setObservableValue((obj as any), kebabToCamelCase(path), value, obj as Element)
 }
 
 /**

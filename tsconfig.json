@@ -8,7 +8,7 @@
     "declaration": true,
     "declarationDir": "./dist/types",
     "disableSizeLimit": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     // "importsNotUsedAsValues": "error",
     "inlineSourceMap": false,
@@ -22,7 +22,7 @@
       "WebWorker"
     ],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "newLine": "lf",
     "noEmitOnError": false,
     "noImplicitThis": true,
@@ -44,7 +44,6 @@
     "noImplicitAny": false,
     "noUncheckedIndexedAccess": false,
     "preserveSymlinks": true,
-    "baseUrl": ".",
     "rootDir": "./src",
     "typeRoots": [
       "types",

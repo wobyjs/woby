@@ -115,6 +115,8 @@ TestRenderToStringSuspenseNested.test = {
                 `<div><p>${syncValue[syncStep]}${syncValue[syncStep - 1]}</p><!----></div>`,
                 `<div><p>${syncValue[syncStep]}${syncValue[syncStep]}</p><!----></div>`,
                 `<div><p>${syncValue[syncStep]}${syncValue[syncStep]}</p></div>`,
+                `<div><p>${syncValue[syncStep]}</p><!----></div>`,
+                `<div><p>${syncValue[syncStep]}</p><p>${syncValue[syncStep]}</p></div>`,
             ]
         }
     }

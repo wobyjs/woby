@@ -189,7 +189,7 @@ const TestTailwindWithImportBasic = (): JSX.Element => {
 TestTailwindWithImportBasic.test = {
     static: true,
     expect: () => {
-        const expected = '<div><h2 class="text-xl font-bold mb-4">1. Button Variants (With @import)</h2><div class="space-x-2"><button class="px-4 py-2 rounded font-medium transition-colors bg-blue-500 hover:bg-blue-600 text-white">Primary</button><button class="px-4 py-2 rounded font-medium transition-colors bg-gray-500 hover:bg-gray-600 text-white">Secondary</button><button class="px-4 py-2 rounded font-medium transition-colors bg-red-500 hover:bg-red-600 text-white">Danger</button></div></div>'
+        const expected = '<div><h2 class="text-xl font-bold mb-4">1. Button Variants (With @import)</h2><div class="space-x-2"><button class="px-4 py-2 rounded font-medium transition-colors bg-blue-500 hover:bg-blue-600 text-white">Primary</button><button class="px-4 py-2 rounded font-medium transition-colors bg-gray-500 hover:bg-gray-600 text-white">Secondary</button><button class="px-4 py-2 rounded font-medium transition-colors bg-red-500 hover:bg-red-600 text-white">Danger</button></div><div class="mt-4 space-x-2"><button class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3">Custom Override</button><button class="px-4 py-2 rounded font-medium transition-colors bg-blue-500 hover:bg-blue-600 text-white font-bold text-lg">Append Style</button></div></div>'
 
         const ssrComponent = testObservables[`${name1}_ssr`]
         const ssrResult = renderToString(ssrComponent)
@@ -231,17 +231,20 @@ if (typeof window === 'undefined') {
 TestTailwindWithImportHTML.test = {
     static: true,
     expect: () => {
-        const expected = '<div><h2 class="text-xl font-bold mb-4">2. HTML Custom Element (With @import)</h2><tailwind-button label="HTML Button" variant="primary"><button class="px-4 py-2 rounded font-medium transition-colors bg-blue-500 hover:bg-blue-600 text-white">HTML Button</button></tailwind-button></div>'
+        // SSR: custom elements render with light DOM children only (empty for self-closing tags)
+        const expectedSSR = '<div><h2 class="text-xl font-bold mb-4">2. HTML Custom Element (With @import)</h2><tailwind-button label="HTML Button" variant="primary"></tailwind-button></div>'
+        // DOM: custom elements render with inline children (no shadow root)
+        const expectedDOM = '<div><h2 class="text-xl font-bold mb-4">2. HTML Custom Element (With @import)</h2><tailwind-button label="HTML Button" variant="primary" cls=""><button class="px-4 py-2 rounded font-medium transition-colors bg-blue-500 hover:bg-blue-600 text-white">HTML Button</button></tailwind-button></div>'
 
         const ssrComponent = testObservables[`${name2}_ssr`]
         const ssrResult = renderToString(ssrComponent)
-        if (ssrResult !== expected) {
-            assert(false, `[${name2}] SSR mismatch: got \n${ssrResult}, expected \n${expected}`)
+        if (ssrResult !== expectedSSR) {
+            assert(false, `[${name2}] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
         } else {
             console.log(`✅ [${name2}] SSR test passed`)
         }
 
-        return expected
+        return expectedDOM
     }
 }
 

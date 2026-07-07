@@ -1,6 +1,5 @@
-import { $, $$, If, renderToString, type JSX } from 'woby'
+import { $, $$, If, renderToString, useEffect, type JSX } from 'woby'
 import { TestSnapshots, random, registerTestObservable, testObservables, useInterval, TEST_INTERVAL, assert } from './util'
-import { useEffect, type JSX } from 'woby'
 
 const name = 'TestIfChildrenFunction'
 const TestIfChildrenFunction = (): JSX.Element => {

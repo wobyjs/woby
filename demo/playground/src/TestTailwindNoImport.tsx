@@ -194,7 +194,7 @@ if (typeof window === 'undefined') {
 TestTailwindNoImportTSX.test = {
     static: true,
     expect: () => {
-        const expected = '<div><h2 class="text-xl font-bold mb-4">1. TSX Usage (No @import)</h2><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">My Card</h2><p class="text-gray-600 mb-2">Count: 42</p><div class="mt-4"><p class="text-sm text-blue-600">This content uses Tailwind classes</p></div></div></div>'
+        const expected = '<div><h2 class="text-xl font-bold mb-4">1. TSX Usage (No @import)</h2><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">My Card</h2><p class="text-gray-600 mb-2">Count: 42</p><div class="mt-4"><p class="text-sm text-blue-600">This content uses Tailwind classes</p></div></div><div class="bg-blue-50 p-4 rounded"><h2 class="text-2xl font-semibold text-gray-800 mb-4">Override Styles</h2><p class="text-gray-600 mb-2">Count: 99</p><div class="mt-4"><p class="text-xs text-purple-600">Card with custom override styles</p></div></div><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200 border-2 border-blue-300"><h2 class="text-2xl font-semibold text-gray-800 mb-4">Append Styles</h2><p class="text-gray-600 mb-2">Count: 88</p><div class="mt-4"><p class="text-sm text-green-600">Card with appended styles</p></div></div></div>'
 
         const ssrComponent = testObservables[`${name1}_ssr`]
         const ssrResult = renderToString(ssrComponent)
@@ -241,17 +241,20 @@ if (typeof window === 'undefined') {
 TestTailwindNoImportHTML.test = {
     static: true,
     expect: () => {
-        const expected = '<div><h2 class="text-xl font-bold mb-4">2. Custom Element Usage (No @import)</h2><tailwind-card title="HTML Card" count="100"><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">HTML Card</h2><p class="text-gray-600 mb-2">Count: 100</p><div class="mt-4"><p class="text-sm text-green-600">Content from HTML custom element</p></div></div></tailwind-card></div>'
+        // SSR: custom elements render with light DOM children only, no inline shadow DOM
+        const expectedSSR = '<div><h2 class="text-xl font-bold mb-4">2. Custom Element Usage (No @import)</h2><tailwind-card title="HTML Card" count="100"><p class="text-sm text-green-600">Content from HTML custom element</p></tailwind-card></div>'
+        // DOM: custom elements render with inline children (no shadow root)
+        const expectedDOM = '<div><h2 class="text-xl font-bold mb-4">2. Custom Element Usage (No @import)</h2><tailwind-card title="HTML Card" count="100" cls=""><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">HTML Card</h2><p class="text-gray-600 mb-2">Count: 100</p><div class="mt-4"><p class="text-sm text-green-600">Content from HTML custom element</p></div></div></tailwind-card></div>'
 
         const ssrComponent = testObservables[`${name2}_ssr`]
         const ssrResult = renderToString(ssrComponent)
-        if (ssrResult !== expected) {
-            assert(false, `[${name2}] SSR mismatch: got \n${ssrResult}, expected \n${expected}`)
+        if (ssrResult !== expectedSSR) {
+            assert(false, `[${name2}] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
         } else {
             console.log(`✅ [${name2}] SSR test passed`)
         }
 
-        return expected
+        return expectedDOM
     }
 }
 
@@ -287,17 +290,20 @@ if (typeof window === 'undefined') {
 TestTailwindNoImportNested.test = {
     static: true,
     expect: () => {
-        const expected = '<div class="space-y-4"><h2 class="text-xl font-bold mb-4">3. Nested Custom Elements (No @import)</h2><tailwind-card title="Outer Card" count="1"><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">Outer Card</h2><p class="text-gray-600 mb-2">Count: 1</p><div class="mt-4"><tailwind-card title="Inner Card" count="2"><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">Inner Card</h2><p class="text-gray-600 mb-2">Count: 2</p><div class="mt-4"><p class="text-xs text-purple-600">Deeply nested content</p></div></div></tailwind-card></div></div></tailwind-card></div>'
+        // SSR: custom elements render with light DOM children only, no inline shadow DOM
+        const expectedSSR = '<div class="space-y-4"><h2 class="text-xl font-bold mb-4">3. Nested Custom Elements (No @import)</h2><tailwind-card title="Outer Card" count="1"><tailwind-card title="Inner Card" count="2"><p class="text-xs text-purple-600">Deeply nested content</p></tailwind-card></tailwind-card></div>'
+        // DOM: custom elements render with inline children (no shadow root)
+        const expectedDOM = '<div class="space-y-4"><h2 class="text-xl font-bold mb-4">3. Nested Custom Elements (No @import)</h2><tailwind-card title="Outer Card" count="1" cls=""><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">Outer Card</h2><p class="text-gray-600 mb-2">Count: 1</p><div class="mt-4"><tailwind-card title="Inner Card" count="2" cls=""><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">Inner Card</h2><p class="text-gray-600 mb-2">Count: 2</p><div class="mt-4"><p class="text-xs text-purple-600">Deeply nested content</p></div></div></tailwind-card></div></div></tailwind-card></div>'
 
         const ssrComponent = testObservables[`${name3}_ssr`]
         const ssrResult = renderToString(ssrComponent)
-        if (ssrResult !== expected) {
-            assert(false, `[${name3}] SSR mismatch: got \n${ssrResult}, expected \n${expected}`)
+        if (ssrResult !== expectedSSR) {
+            assert(false, `[${name3}] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
         } else {
             console.log(`✅ [${name3}] SSR test passed`)
         }
 
-        return expected
+        return expectedDOM
     }
 }
 

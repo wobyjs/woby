@@ -1,6 +1,5 @@
-import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
+import { $, $$, For, ObservableReadonly, renderToString, useEffect, type JSX } from 'woby'
 import { TestSnapshots, useInterval, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
-import { useEffect, type JSX } from 'woby'
 
 const name = 'TestForUnkeyedRandom'
 const TestForUnkeyedRandom = (): JSX.Element => {

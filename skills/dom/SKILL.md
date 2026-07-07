@@ -1,11 +1,145 @@
 ---
 name: dom
-description: 'Master DOM skill using agent-browser for professional-grade DOM design, debugging, theming, print layout, and responsive development. Use agent-browser eval/execute for all browser interactions instead of Chrome DevTools MCP. Multiple browser sessions become multiple tabs in agent-browser. Automatically routes to appropriate sub-skills - dom-design for layout and UX design, dom-debug for debugging issues, dom-theme for color/font theming, dom-print for print media, dom-mobile for mobile-specific, dom-desktop for desktop-specific, dom-mobile-desktop for cross-device optimization. All sub-skills follow professional design workflow with verification and self-check to production level.'
+description: 'Master DOM skill using @missbjs/dv CLI for professional-grade DOM design, debugging, theming, print layout, and responsive development. Use @missbjs/dv CLI for all browser interactions including console log/error/assert reading. Uses dv CLI built-in profiles (profile-1 through profile-6, ports 9230-9235) - run `dv profiles` to see available profiles. Always open HEADED mode for user inspection. Profile profile-1 is pinned for OAuth persistence. Automatically routes to appropriate sub-skills - dom-design for layout and UX design, dom-debug for debugging issues, dom-theme for color/font theming, dom-print for print media, dom-mobile for mobile-specific, dom-desktop for desktop-specific, dom-mobile-desktop for cross-device optimization. All sub-skills follow professional design workflow with verification and self-check to production level. **CRITICAL: Each agent must use a unique Chrome profile to avoid conflicts with other parallel agents. DO NOT use default port 9230 without checking availability. DO NOT close Chrome instances launched by other agents.**'
 ---
 
-# DOM Master Skill (agent-browser)
+# DOM Master Skill (@missbjs/dv CLI)
 
-Orchestrates specialized DOM sub-skills for professional-grade web development using agent-browser.
+Orchestrates specialized DOM sub-skills for professional-grade web development using @missbjs/dv CLI.
+
+## ⚠️ CRITICAL: Parallel Agent Profile Management
+
+**If you are running alongside other agents using this skill, you MUST coordinate Chrome profile usage to avoid conflicts.**
+
+### Step 1: Determine Which Profile to Use
+
+**Decision Tree - Answer these questions before launching Chrome:**
+
+```
+Q1: Is this task OAuth/authentication related?
+    YES → Use profile-1 (port 9230) - preserves login state
+    NO  → Continue to Q2
+
+Q2: Are other agents currently using Chrome profiles?
+    How to check:
+    - Look for running Chrome processes with remote debugging
+    - Check ports 9230-9235 for active connections
+    - Review any coordination notes from other agents
+    
+    IF unsure → Assume other agents are using profiles 1-3, use profiles 4-6
+    
+Q3: Which profiles are available?
+    Check each port sequentially using @missbjs/dv status:
+    - Port 9230: dv status --profile profile-1
+    - Port 9231: dv status --profile profile-2
+    - ... through port 9235
+
+    IF command lists pages → Profile is IN USE by another agent
+    IF command fails/no Chrome running → Profile is AVAILABLE
+    
+Q4: Select the first available profile:
+    - Priority order: profile-2 → profile-3 → profile-4 → profile-5 → profile-6
+    - (Skip profile-1 unless OAuth needed)
+    
+Q5: Document your profile choice:
+    Tell the user: "Using Chrome profile-X on port 923X"
+    This helps other agents know which profiles are taken
+```
+
+### Step 2: Check Port Availability BEFORE Launching
+
+**MANDATORY: Check if the port is already in use before launching Chrome.**
+
+```bash
+# Use @missbjs/dv status to check if Chrome is running
+dv status --profile profile-1  # For profile 1
+dv status --profile profile-2  # For profile 2
+# ... etc for ports 9232-9235
+
+# IF the command lists pages → Chrome is running on this port (IN USE)
+# IF the command shows "Chrome is not running" → Port is AVAILABLE
+```
+
+**What to do if port is in use:**
+
+1. **DO NOT close the existing Chrome instance** - it belongs to another agent
+2. **DO NOT kill the process** - you will break the other agent's work
+3. **Choose a different profile** - try the next port in sequence
+4. **If all ports are in use** - inform the user and wait, or coordinate with other agents
+
+### Step 3: Launch Chrome with Your Chosen Profile
+
+**Once you've verified the port is available, launch Chrome using @missbjs/dv:**
+
+```bash
+# Install @missbjs/dv globally (if not already installed)
+npm install -g @missbjs/dv
+
+# Example for Profile 3 (port 9232)
+dv start --profile profile-2 --headed
+
+# Example for Profile 1 (port 9230) - OAuth
+dv start --profile profile-2 --headed
+```
+
+**Verify Chrome started successfully:**
+
+```bash
+# Check Chrome status
+dv status --profile profile-3
+
+# Should list open pages
+```
+
+### Step 4: Use the Correct Port for All Commands
+
+**Each profile uses a specific port for all @missbjs/dv commands:**
+
+| Profile | Port | Purpose |
+|---------|------|---------|
+| profile-1 | 9230 | General use |
+| profile-2 | 9231 | Parallel testing |
+| profile-3 | 9232 | Parallel testing |
+| profile-4 | 9233 | Parallel testing |
+| profile-5 | 9234 | Parallel testing |
+| profile-6 | 9235 | Parallel testing |
+
+**All @missbjs/dv commands require --profile parameter to prevent agent collisions.**
+
+### Absolute Rules for Parallel Agents
+
+1. **✅ DO** check port availability before launching Chrome
+2. **✅ DO** use a unique profile not used by other agents
+3. **✅ DO** tell the user which profile you're using
+4. **✅ DO** coordinate with other agents if all ports are busy
+5. **❌ DO NOT** use port 9230 by default without checking
+6. **❌ DO NOT** close Chrome instances launched by other agents
+7. **❌ DO NOT** kill Chrome processes that are using other ports
+8. **❌ DO NOT** assume profile-1 is available - it may be used for OAuth
+9. **❌ DO NOT** create new profile names - use ONLY profile-1 through profile-6
+
+### Parallel Agent Coordination Example
+
+```
+Agent A: "I need to test OAuth login. Checking port 9230..."
+         [Checks port 9230 - available]
+         "Using Chrome profile-1 on port 9230 for OAuth testing"
+         [Launches Chrome on 9230]
+
+Agent B: "I need to debug a layout issue. Checking ports..."
+         [Checks port 9230 - IN USE by Agent A]
+         [Checks port 9231 - available]
+         "Using Chrome profile-2 on port 9231 for debugging"
+         [Launches Chrome on 9231]
+
+Agent C: "I need to test responsive design. Checking ports..."
+         [Checks ports 9230, 9231 - IN USE]
+         [Checks port 9232 - available]
+         "Using Chrome profile-3 on port 9232"
+         [Launches Chrome on 9232]
+```
+
+**All three agents work simultaneously without conflicts!**
 
 ## When to Use
 
@@ -26,18 +160,97 @@ Use this master skill when you need comprehensive DOM work that includes:
 - Event simulation and DOM evaluation
 - Production-level quality with verification
 - **TSX component and CustomElement testing with attribute reactivity verification**
+- **Console log/error/assert reading via MCP tools**
 
-## agent-browser Setup
+## Chrome DevTools CLI Setup
 
-**CRITICAL**: agent-browser is already installed and ready to use. No MCP configuration needed!
+**CRITICAL**: @missbjs/dv CLI requires Chrome to be launched with remote debugging enabled.
 
-### Why agent-browser over Chrome DevTools MCP
+### Hardcoded Chrome Profiles (CRITICAL - DO NOT CHANGE)
 
-- ✅ **Stable**: No connection timeouts or MCP server issues
-- ✅ **Fast**: Native Rust CLI, not Node.js wrapper
-- ✅ **Simple**: No remote debugging port setup required
-- ✅ **Multi-session**: Multiple browser sessions = multiple tabs (not separate Chrome instances)
-- ✅ **Reliable**: Works consistently without configuration changes
+**MANDATORY**: Use ONLY these 6 hardcoded Chrome profiles. DO NOT create new profiles or use arbitrary names.
+
+```bash
+const CHROME_PROFILES = {
+  profile__1: 'profile-1',  // General use (preserve login state)
+  profile__2: 'profile-2',  // Parallel testing profile
+  profile__3: 'profile-3',  // Parallel testing profile
+  profile__4: 'profile-4',  // Parallel testing profile
+  profile__5: 'profile-5',  // Parallel testing profile
+  profile__6: 'profile-6',  // Parallel testing profile
+}
+```
+
+**Rules**:
+1. **ALWAYS use one of these 6 profile names** when configuring Chrome DevTools MCP
+2. **profile-1 is pinned for OAuth** - preserve login state, DO NOT clear cookies/session
+3. **Use profile-2 through profile-6 for parallel testing** - these can be cleared/reset
+4. **DO NOT create new profile names** - agents will be blamed if they use profiles not in this list
+5. **This saves disk space** and prevents profile proliferation
+6. **Each agent must use a unique profile** to avoid conflicts with parallel agents
+
+### Port Mapping (MEMORIZE THIS)
+
+```
+Profile          Port    Purpose
+─────────────────────────────────────────────
+profile-1   9230    OAuth pinned (preserve login state)
+profile-2   9231    Parallel testing
+profile-3   9232    Parallel testing
+profile-4   9233    Parallel testing
+profile-5   9234    Parallel testing
+profile-6   9235    Parallel testing
+```
+
+### Launch Chrome with Remote Debugging
+
+**MANDATORY**: Before using @missbjs/dv CLI, launch Chrome with remote debugging and a specific profile:
+
+```bash
+# Install @missbjs/dv globally (if not already installed)
+npm install -g @missbjs/dv
+
+# Profile 1 (general use) - port 9230
+dv start --profile profile-1 --headed
+
+# Profile 2 (parallel testing) - port 9231
+dv start --profile profile-2 --headed
+
+# Profile 3 (parallel testing) - port 9232
+dv start --profile profile-3 --headed
+
+# Profile 4 (parallel testing) - port 9233
+dv start --profile profile-4 --headed
+
+# Profile 5 (parallel testing) - port 9234
+dv start --profile profile-5 --headed
+
+# Profile 6 (parallel testing) - port 9235
+dv start --profile profile-6 --headed
+```
+
+### Why @missbjs/dv CLI over agent-browser
+
+- ✅ **Console Access**: Native console command to read log/error/assert messages
+- ✅ **CLI Integration**: Command-line tool, no MCP server setup required
+- ✅ **Debugging Power**: Full access to Runtime, Console, Network, and other CDP domains
+- ✅ **Official Protocol**: Uses Chrome's official debugging protocol
+- ✅ **Profile Management**: Built-in profile system for consistent testing
+- ✅ **Parallel Agent Support**: Each profile can be used independently without conflicts
+- ✅ **Mandatory Port Parameter**: Prevents agent collisions by requiring explicit port
+
+### ALWAYS Open in HEADED Mode
+
+**CRITICAL**: Always open Chrome in headed mode (visible browser window) for user inspection.
+
+```bash
+// When navigating pages, ALWAYS use headed mode
+navigate_page({ url: "http://localhost:3000", headed: true })
+
+// User will randomly inspect browsers - keep them visible
+```
+
+**NO headless mode** - user needs to see and inspect browsers at any time.
 
 ### CRITICAL: Use Tailwind CSS Classes in HTML, NOT Inline Styles
 
@@ -54,136 +267,98 @@ Use this master skill when you need comprehensive DOM work that includes:
 </div>
 
 <!-- ❌ WRONG: Never use inline style attributes -->
-<div style="position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);">
-  <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1); width: 100%; max-width: 42rem; max-height: 90vh; overflow: auto;">
-    <div style="padding: 1.5rem;">
-      Content
-    </div>
-  </div>
+<div style="position: fixed; inset: 0; z-index: 50; ...">
+  Content
 </div>
 ```
 
-**Why Tailwind classes over inline styles**:
-- ✅ **Maintainable**: Consistent design system across components
-- ✅ **Responsive**: Easy to add responsive variants (`md:flex`, `lg:p-8`)
-- ✅ **Performance**: Purged CSS, smaller bundle size
-- ✅ **Developer Experience**: No need to write custom CSS
-- ✅ **Design Tokens**: Uses predefined color palette, spacing scale
-- ✅ **State Variants**: Hover, focus, active states built-in (`hover:bg-blue-600`)
-- ✅ **Simple**: No need to create separate CSS files or class names
+## @missbjs/dv CLI Commands
 
-**Keep it simple**: Just use Tailwind classes directly in your HTML elements. No need to extract to CSS files unless you have a specific reason.
+The @missbjs/dv CLI provides these commands:
 
-### Basic Usage
-
-**DEFAULT: Always use `--headed` to see the browser window.** Only use headless mode when explicitly instructed.
-
+### Navigation & Page Management
 ```bash
-# Open a page (DEFAULT: ALWAYS use --headed for visible browser window)
-agent-browser open --headed http://localhost:3000
+# List all pages
+dv pages --profile profile-1
 
-# Execute JavaScript
-agent-browser eval "document.title"
+# Select page by URL (via pages command)
+dv pages --profile profile-1
 
-# Read console logs
-agent-browser eval "console.log output"
+# Navigate to URL (ALWAYS headed)
+dv navigate --profile profile-1 --url http://localhost:3000/page
 
-# Click elements using eval
-agent-browser eval "document.querySelector('button').click()"
+# Create new page
+dv new --profile profile-1 --url http://localhost:3000
 
-# Close browser
-agent-browser close
+# Check Chrome status
+dv status --profile profile-1
+
+# Close page
+dv close --profile profile-1 --page-id <page-id>
 ```
 
-**Headless mode (only when explicitly instructed):**
+### Console Reading (CRITICAL)
+
+**MANDATORY**: Use dv console command for reading console.log, console.error, and console.assert messages.
+
 ```bash
-# Use --headed=false or omit --headed flag for headless (invisible browser)
-agent-browser open http://localhost:3000  # Headless by default
-# OR explicitly
-agent-browser open --headed=false http://localhost:3000
+# List all console messages
+dv console --profile profile-1
+
+# Filter by type
+dv console --profile profile-1 --type error
+dv console --profile profile-1 --type log
+dv console --profile profile-1 --type warn
+
+# JSON output for programmatic access
+dv console --profile profile-1 --json
 ```
 
-## Daemon Lifecycle Rules (CRITICAL)
+**Why dv console over eval script**:
+- ✅ **Native Integration**: Direct access to Chrome's Console domain
+- ✅ **No Script Injection**: Doesn't pollute page context
+- ✅ **All Message Types**: Captures log, error, warn, assert automatically
+- ✅ **Timestamped**: Provides precise timing information
+- ✅ **Source Location**: Shows file URL and line number
 
-agent-browser runs a **persistent daemon**. Understanding this prevents hard-to-debug failures.
-
-### Always Use `--session`
-**MANDATORY**: Every `open` / `eval` / `close` must use `--session <name>`. Without it you share the default session and lose isolation.
-
+### Inspection & Evaluation
 ```bash
-# ✅ CORRECT — named session persists across calls
-agent-browser --session my-component open --headed http://127.0.0.1:5178/page.html
-agent-browser --session my-component eval "document.title"
-agent-browser --session my-component close
+# Execute JavaScript (for DOM inspection, NOT console reading)
+dv eval --profile profile-1 --script "document.title"
 
-# ❌ WRONG — no session name, shares daemon default
-agent-browser open --headed http://localhost:5178/page.html
-```
-
-### Use `127.0.0.1` not `localhost`
-After closing and restarting the daemon, `localhost` can fail with `ERR_NAME_NOT_RESOLVED`. Always use `127.0.0.1`:
-
-```bash
-# ✅ CORRECT
-agent-browser --session s open --headed "http://127.0.0.1:5178/page.html"
-
-# ❌ RISKY — fails after daemon restart on some systems
-agent-browser --session s open --headed "http://localhost:5178/page.html"
-```
-
-### `--viewport` and `--headed` are Daemon-Level
-These flags are **ignored** if the daemon is already running. To change them you must close ALL sessions and the daemon first:
-
-```bash
-# Step 1: close named sessions
-agent-browser --session my-component close
-
-# Step 2: close daemon
-agent-browser close
-
-# Step 3: reopen with new daemon options
-agent-browser --session my-component open --headed --viewport 900x220 "http://127.0.0.1:5178/page.html"
-```
-
-### `window.resizeTo()` Does NOT Work
-Browser security blocks programmatic window resize. Use the spacer+scroll trick instead to simulate a button near the viewport bottom:
-
-```bash
-agent-browser --session s eval "(() => {
-  // Inject spacer above content so button is pushed near viewport bottom when scrolled
-  const spacer = document.createElement('div')
-  spacer.style.height = (visualViewport.height - 80) + 'px'
-  document.body.insertBefore(spacer, document.body.firstChild)
-
-  // Scroll to put button ~60px from viewport bottom
-  const btn = document.querySelector('sy-element').shadowRoot.querySelector('button')
-  const btnTop = btn.getBoundingClientRect().top + window.scrollY
-  window.scrollTo(0, btnTop - visualViewport.height + 60)
-
+# Check styles
+dv eval --profile profile-1 --script "
+(() => {
+  const el = document.querySelector('.target');
+  const styles = getComputedStyle(el);
   return {
-    vpH: visualViewport.height,
-    btnTopInVp: Math.round(btn.getBoundingClientRect().top),
-    spaceBelow: Math.round(visualViewport.height - btn.getBoundingClientRect().bottom - 4)
-  }
-})()"
+    display: styles.display,
+    position: styles.position,
+    zIndex: styles.zIndex
+  };
+})()
+"
+
+# Take snapshot (text-based accessibility tree)
+dv snapshot --profile profile-1
+
+# Take screenshot (visual inspection)
+dv screenshot --profile profile-1 --output screenshot.png
 ```
 
-### Async Reactive Eval (Woby / Observable updates)
-After clicking a button or calling `setAttribute()`, Woby's reactive updates are async. Always use a Promise with `setTimeout` to read state after the update settles:
-
+### Interaction
 ```bash
-agent-browser --session s eval "(() => {
-  const el = document.querySelector('sy-element')
-  el.setAttribute('value', '丙子')
-  return new Promise(resolve => setTimeout(() => {
-    const btn = el.shadowRoot.querySelector('button')
-    const spans = btn.querySelectorAll('span')
-    resolve({
-      span0: { text: spans[0]?.textContent, color: getComputedStyle(spans[0]).color },
-      span1: { text: spans[1]?.textContent, color: getComputedStyle(spans[1]).color }
-    })
-  }, 100))  // 100ms is enough for most Woby reactive updates
-})()"
+# Click element by selector
+dv click --profile profile-1 --selector "#button"
+
+# Fill input
+dv fill --profile profile-1 --selector "#email" --value "test@example.com"
+
+# Type text
+dv type --profile profile-1 --selector "#input" --value "typing content"
+
+# Press key
+dv key --profile profile-1 --key Enter
 ```
 
 ## Sub-Skills Architecture
@@ -216,21 +391,24 @@ The DOM ecosystem consists of specialized skills that work together:
 - Style debugging (CSS conflicts, specificity)
 - Performance debugging (layout thrashing, reflows)
 - Cross-browser debugging
-- **agent-browser integration (MANDATORY)**
+- **Console log/error/assert reading via MCP tools**
+- **Chrome DevTools MCP integration (MANDATORY)**
 
 **Workflow**:
-1. **Open page with agent-browser**: `agent-browser open <url>`
-2. **Read console logs**: `agent-browser eval "console.log output"` or check console.error
-3. **Inspect element**: `agent-browser eval "getComputedStyle(element)"`
-4. **Compare intended vs actual** behavior
-5. **Identify root cause** from actual runtime data
-6. **Propose fix with approval**
-7. **Apply and verify** using agent-browser again
-8. **Document solution**
+1. **Choose unique profile** - check port availability, avoid conflicts with other agents
+2. **Launch Chrome with @missbjs/dv**: Use dv start --profile profile-X --headed
+3. **Open page HEADED**: `dv navigate --profile profile-X --url <url>`
+4. **Read console logs**: `dv console --profile profile-X --type error`
+5. **Inspect element**: `dv eval --profile profile-X --script "..."` with `getComputedStyle(element)`
+6. **Compare intended vs actual** behavior
+7. **Identify root cause** from actual runtime data
+8. **Propose fix with approval**
+9. **Apply and verify** using @missbjs/dv commands again
+10. **Document solution**
 
-**CRITICAL**: Do NOT guess or assume. Always use agent-browser to:
-- Read console.log and console.error messages
-- Check actual DOM state
+**CRITICAL**: Do NOT guess or assume. Always use @missbjs/dv CLI to:
+- Read console.log and console.error messages via dv console
+- Check actual DOM state with dv eval
 - Inspect computed styles
 - Verify event listeners
 - Test fixes in real browser context
@@ -364,7 +542,7 @@ The DOM ecosystem consists of specialized skills that work together:
 2. Choose Portal pattern based on use case
 3. Apply z-index hierarchy
 4. Handle nested component dismissal (cancelOnBlur)
-5. Verify with agent-browser
+5. Verify with Chrome DevTools MCP
 
 **CRITICAL**: Use this sub-skill when creating modals, dropdowns, sidebars, or any component that needs to escape its DOM hierarchy.
 
@@ -402,138 +580,22 @@ All sub-skills follow this professional workflow:
 - Note edge cases
 - Create maintenance guide
 
-## agent-browser Commands Reference
-
-### Navigation
-```bash
-agent-browser open --headed <url>    # Open URL (DEFAULT: ALWAYS use --headed)
-agent-browser close                  # Close browser
-agent-browser tab new <url>          # New tab
-agent-browser tab <id>               # Switch tab
-agent-browser tab close <id>         # Close tab
-```
-
-**Note**: `--headed` is the default recommendation. Use headless mode only when explicitly instructed by the user.
-
-### Inspection
-```bash
-agent-browser eval "script"        # Execute JavaScript
-agent-browser eval "console.log(...)"  # Read console logs
-agent-browser get text @e1         # Get element text
-agent-browser get html @e1         # Get innerHTML
-agent-browser get url              # Get current URL
-```
-
-### Interaction
-```bash
-agent-browser eval "document.querySelector('button').click()"  # Click element
-agent-browser eval "element.click()"  # Click using eval
-agent-browser fill @e1 "text"      # Fill input
-agent-browser press Enter          # Press key
-agent-browser scroll down 500      # Scroll page
-```
-
-### Debugging
-```bash
-agent-browser eval "console.log(...)"  # Check console
-agent-browser eval "getComputedStyle(el)"  # Check styles
-agent-browser eval "el.getBoundingClientRect()"  # Check layout
-```
-
 ## Common Workflows
 
 ### Debug a Layout Issue
 ```bash
-# 1. Open the page (DEFAULT: use --headed to see the browser)
-agent-browser open --headed http://localhost:3000/page
+# 1. Launch Chrome with unique profile (HEADED mode)
+dv start --profile profile-2 --headed
 
-# 2. Inspect the element
-agent-browser eval "(() => {
-  const el = document.querySelector('.problem-element');
-  return {
-    display: getComputedStyle(el).display,
-    position: getComputedStyle(el).position,
-    zIndex: getComputedStyle(el).zIndex,
-    rect: el.getBoundingClientRect()
-  };
-})()"
+# 2. Navigate to page
+dv navigate --profile profile-2 --url http://localhost:3000/page
 
-# 3. Fix the issue in code
-# 4. Verify the fix
-agent-browser eval "getComputedStyle(document.querySelector('.problem-element'))"
+# 3. Read console messages
+dv console --profile profile-2 --type error
 
-# 5. Close
-agent-browser close
-```
-
-### Enumerate All Colors
-```bash
-agent-browser open --headed http://localhost:3000  # DEFAULT: --headed to see browser
-agent-browser eval "(() => {
-  const colors = { text: [], bg: [], all: new Set() };
-  document.querySelectorAll('*').forEach(el => {
-    const c = getComputedStyle(el);
-    if (c.color && c.color !== 'rgba(0, 0, 0, 0)') {
-      colors.text.push(c.color);
-      colors.all.add(c.color);
-    }
-    if (c.backgroundColor && c.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-      colors.bg.push(c.backgroundColor);
-      colors.all.add(c.backgroundColor);
-    }
-  });
-  return Array.from(colors.all);
-})()"
-agent-browser close
-```
-
-### Test Responsive Design
-```bash
-# Open in mobile viewport — --viewport is DAEMON-LEVEL: only works on fresh daemon start
-# Close all sessions first: agent-browser --session <name> close && agent-browser close
-agent-browser --session mobile-test open --headed --viewport 375x667 http://127.0.0.1:3000
-
-# Check element visibility
-agent-browser --session mobile-test eval "document.querySelector('.mobile-menu').offsetWidth > 0"
-
-# ❌ window.resizeTo() does NOT work — browser security blocks it
-# agent-browser eval "window.resizeTo(1920, 1080)"  ← WRONG, always ignored
-
-# ✅ To test a different viewport: close daemon and reopen with new --viewport
-# agent-browser --session mobile-test close && agent-browser close
-# agent-browser --session desktop-test open --headed --viewport 1920x1080 http://127.0.0.1:3000
-
-# Check desktop layout
-agent-browser --session mobile-test eval "document.querySelector('.sidebar').offsetWidth"
-
-agent-browser close
-```
-
-## Iterative Debugging Loop
-
-The debugging process is iterative: you diagnose, fix, verify, and repeat until the issue is resolved. Use `agent-browser eval` to check computed styles at each iteration.
-
-### The Fix → Debug → Verify Loop
-
-**Phase 1: Initial Diagnosis**
-```bash
-# Open the page (DEFAULT: use --headed for visible browser window)
-agent-browser open --headed http://localhost:3000
-
-# Check console for errors
-agent-browser eval "(() => {
-  // Capture console errors
-  const errors = [];
-  const originalError = console.error;
-  console.error = function(...args) {
-    errors.push(args.join(' '));
-    originalError.apply(console, args);
-  };
-  return 'Monitoring console errors...';
-})()"
-
-# Inspect the problematic element's computed styles
-agent-browser eval "(() => {
+# 4. Inspect the element
+dv eval --profile profile-2 --script "
+(() => {
   const el = document.querySelector('.problem-element');
   const styles = getComputedStyle(el);
   return {
@@ -544,598 +606,158 @@ agent-browser eval "(() => {
       position: styles.position,
       width: styles.width,
       height: styles.height,
-      margin: styles.margin,
-      padding: styles.padding,
-      border: styles.border,
       zIndex: styles.zIndex,
-      overflow: styles.overflow,
-      visibility: styles.visibility,
-      opacity: styles.opacity
+      overflow: styles.overflow
     },
-    boundingRect: el.getBoundingClientRect(),
-    parentStyles: el.parentElement ? getComputedStyle(el.parentElement) : null
+    boundingRect: el.getBoundingClientRect()
   };
-})()"
+})()
+"
+
+# 5. Fix the issue in code
+# 6. Verify the fix (navigate again or reload)
+dv navigate --profile profile-2 --url http://localhost:3000/page
+
+# 7. Check console for errors after fix
+dv console --profile profile-2 --type error
+```
+
+### Capture All Console Errors
+```bash
+# Launch Chrome and navigate
+dv start --profile profile-2 --headed
+dv navigate --profile profile-2 --url http://localhost:3000
+
+# List all console messages
+dv console --profile profile-2
+
+# Filter by type (error, log, warn)
+dv console --profile profile-2 --type error
+dv console --profile profile-2 --type log
+dv console --profile profile-2 --type warn
+
+# JSON output for parsing
+dv console --profile profile-2 --json
+```
+
+### Enumerate All Colors
+```bash
+dv start --profile profile-2 --headed
+dv navigate --profile profile-2 --url http://localhost:3000
+
+dv eval --profile profile-2 --script "
+(() => {
+  const colors = { all: new Set() };
+  document.querySelectorAll('*').forEach(el => {
+    const c = getComputedStyle(el);
+    if (c.color && c.color !== 'rgba(0, 0, 0, 0)') colors.all.add(c.color);
+    if (c.backgroundColor && c.backgroundColor !== 'rgba(0, 0, 0, 0)') colors.all.add(c.backgroundColor);
+  });
+  return Array.from(colors.all);
+})()
+"
+```
+
+### Test Responsive Design
+```bash
+# Launch Chrome and navigate
+dv start --profile profile-2 --headed
+dv navigate --profile profile-2 --url http://localhost:3000
+
+# Resize to mobile viewport
+dv resize --profile profile-2 --width 375 --height 667
+
+# Check element visibility
+dv eval --profile profile-2 --script "
+(() => {
+  return {
+    mobileMenuVisible: document.querySelector('.mobile-menu').offsetWidth > 0,
+    sidebarWidth: document.querySelector('.sidebar').offsetWidth
+  };
+})()
+"
+```
+
+## Iterative Debugging Loop
+
+The debugging process is iterative: diagnose, fix, verify, repeat until the issue is resolved.
+
+### The Fix → Debug → Verify Loop
+
+**Phase 1: Initial Diagnosis**
+```bash
+// Navigate to page (HEADED, hardcoded profile)
+navigate_page({ url: "http://localhost:3000", headed: true })
+
+// Read console messages via MCP tools
+const consoleMessages = list_console_messages()
+console.log("Console messages:", consoleMessages)
+
+// Inspect element
+evaluate_script({
+  script: `
+    (() => {
+      const el = document.querySelector('.problem-element');
+      const styles = getComputedStyle(el);
+      return {
+        element: el.tagName,
+        classes: el.className,
+        computedStyles: {
+          display: styles.display,
+          position: styles.position,
+          width: styles.width,
+          height: styles.height,
+          zIndex: styles.zIndex,
+          overflow: styles.overflow
+        },
+        boundingRect: el.getBoundingClientRect()
+      };
+    })()
+  `
+})
 ```
 
 **Phase 2: Apply Fix**
-- **ALWAYS use Tailwind CSS classes directly in HTML, NOT inline `style` attributes**
-- Add Tailwind utility classes to HTML elements (e.g., `class="flex items-center justify-center"`)
+- **ALWAYS use Tailwind classes directly in HTML, NOT inline `style` attributes**
 - Save changes to source files
-- If using hot reload, wait for page to update
-- If no hot reload, refresh: `agent-browser eval "location.reload()"`
-
-**Example - Correct Approach**:
-```html
-<!-- ✅ CORRECT: Tailwind classes inline in HTML -->
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto p-6">
-    Content
-  </div>
-</div>
-
-<!-- ❌ WRONG: Don't use inline styles -->
-<div style="position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);">
-  <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1); width: 100%; max-width: 42rem; max-height: 90vh; overflow: auto; padding: 1.5rem;">
-    Content
-  </div>
-</div>
-```
+- Reload: `navigate_page({ url: "http://localhost:3000", headed: true })`
 
 **Phase 2.5: Verify Console After Reload (MANDATORY)**
-**CRITICAL: After reloading the page, ALWAYS check the console to confirm the previous fix is working correctly.**
+**After reloading the page, ALWAYS check the console via MCP tools.**
 
 ```bash
-# Check console for errors after reload
-agent-browser eval "console.log output"
+// List console messages via MCP
+const newConsoleMessages = list_console_messages()
 
-# Check for JavaScript errors
-agent-browser eval "(() => {
-  // Check if page loaded successfully
-  return {
-    hasErrors: false,
-    consoleMessages: 'Page loaded successfully',
-    // Check if fix is working
-    fixApplied: document.querySelector('.problem-element') !== null
-  };
-})()"
+// Filter errors
+const errors = newConsoleMessages.filter(msg => msg.type === "error")
 
-# If console shows errors, analyze them before proceeding
-agent-browser eval "(() => {
-  // Capture any new errors that appeared after reload
-  const errors = [];
-  // Check window.onerror
-  if (window.onerror) {
-    errors.push('Window onerror detected');
-  }
-  // Check for common error patterns
-  const bodyText = document.body.innerText;
-  const hasErrorText = bodyText.includes('Error') || bodyText.includes('Exception');
-  return {
-    hasErrors: hasErrorText,
-    errorCount: errors.length,
-    errors: errors
-  };
-})()"
+// Check if fix applied
+evaluate_script({
+  script: `
+    (() => {
+      return {
+        hasErrors: ${errors.length} > 0,
+        fixApplied: document.querySelector('.problem-element') !== null
+      };
+    })()
+  `
+})
 ```
-
-**Why this step is mandatory**:
-- ✅ **Confirms fix is working**: Verifies no new errors introduced
-- ✅ **Prevents cascading issues**: Catch errors before they compound
-- ✅ **Saves debugging time**: Don't proceed with broken state
-- ✅ **Validates assumptions**: Ensure fix actually resolved the issue
-
-**If console shows errors after reload**:
-1. **STOP immediately** - Do not proceed to Phase 3
-2. **Analyze the error** - Read the console message carefully
-3. **Fix the new error** - Address the error before continuing
-4. **Reload again** - Apply fix and reload
-5. **Check console again** - Repeat until console is clean
 
 **Phase 3: Verify Fix**
 ```bash
-# Re-check computed styles after fix
-agent-browser eval "(() => {
-  const el = document.querySelector('.problem-element');
-  const styles = getComputedStyle(el);
-  return {
-    // Check the specific properties you modified
-    [property you fixed]: styles[property you fixed],
-    // Compare to expected values
-    matchesExpected: styles.width === 'expected value',
-    // Check if issue is resolved
-    isVisible: el.offsetWidth > 0 && el.offsetHeight > 0,
-    isPositionedCorrectly: el.getBoundingClientRect().top > 0
-  };
-})()"
-
-# Check console again for new errors
-agent-browser eval "(() => {
-  // Check if any new errors appeared
-  return window.__lastConsoleErrors || [];
-})()"
-```
-
-**Phase 4: Iterate if Not Fixed**
-
-If the verification shows the issue persists:
-1. **Analyze why the fix didn't work**: Use `agent-browser eval` to check if CSS is being overridden
-   ```bash
-   agent-browser eval "(() => {
-     const el = document.querySelector('.problem-element');
-     // Check CSS specificity and overrides
-     const styles = getComputedStyle(el);
-     const matchedCSSRules = window.getMatchedCSSRules(el);
-     return {
-       inlineStyles: el.style.cssText,
-       computedValue: styles[property],
-       matchedRules: matchedCSSRules ? matchedCSSRules.map(r => r.selectorText + ' { ' + r.style.cssText + ' }') : 'N/A'
-     };
-   })()"
-   ```
-
-2. **Try alternative fix**: Apply different CSS approach
-3. **Verify again**: Re-run Phase 3 verification
-4. **Repeat until resolved**: Continue loop until computed styles match expectations
-
-### Example: Debugging a Hidden Element
-
-**Problem**: Element `.my-button` is not visible
-
-**Iteration 1 - Diagnosis**:
-```bash
-agent-browser open --headed http://localhost:3000
-agent-browser eval "(() => {
-  const btn = document.querySelector('.my-button');
-  const styles = getComputedStyle(btn);
-  return {
-    display: styles.display,
-    visibility: styles.visibility,
-    opacity: styles.opacity,
-    width: btn.offsetWidth,
-    height: btn.offsetHeight,
-    zIndex: styles.zIndex,
-    position: styles.position,
-    parentOverflow: btn.parentElement ? getComputedStyle(btn.parentElement).overflow : null
-  };
-})()"
-# Result: { display: 'block', visibility: 'hidden', opacity: '1', ... }
-```
-
-**Iteration 1 - Fix**: Add Tailwind class `visible` (or remove `invisible` class)
-```html
-<!-- ✅ CORRECT: Use Tailwind classes -->
-<button class="my-button visible">Click me</button>
-
-<!-- ❌ WRONG: Don't use inline styles -->
-<button class="my-button" style="visibility: visible">Click me</button>
-```
-
-**Iteration 1 - Verify Console After Reload**:
-```bash
-# Check console after applying fix and reloading
-agent-browser eval "console.log output"
-
-# Verify no errors and fix is applied
-agent-browser eval "(() => {
-  const btn = document.querySelector('.my-button');
-  return {
-    hasErrors: false,
-    elementExists: btn !== null,
-    fixApplied: btn.classList.contains('visible')
-  };
-})()"
-# Result: { hasErrors: false, elementExists: true, fixApplied: true }
-# ✅ Console is clean, proceed to verify fix
-```
-
-**Iteration 1 - Verify Fix**:
-```bash
-agent-browser eval "(() => {
-  const btn = document.querySelector('.my-button');
-  return {
-    visibility: getComputedStyle(btn).visibility,
-    isVisible: btn.offsetWidth > 0 && btn.offsetHeight > 0
-  };
-})()"
-# Result: { visibility: 'visible', isVisible: true }
-# ✅ Issue resolved!
-```
-
-### Example: Debugging Layout Overflow
-
-**Problem**: Content is cut off
-
-**Iteration 1 - Diagnosis**:
-```bash
-agent-browser eval "(() => {
-  const container = document.querySelector('.container');
-  const content = document.querySelector('.content');
-  return {
-    containerOverflow: getComputedStyle(container).overflow,
-    containerHeight: getComputedStyle(container).height,
-    contentHeight: content.scrollHeight,
-    isOverflowing: content.scrollHeight > container.clientHeight
-  };
-})()"
-# Result: { containerOverflow: 'hidden', contentHeight: '800px', containerHeight: '400px', isOverflowing: true }
-```
-
-**Iteration 1 - Fix**: Add Tailwind class `overflow-auto` (or change `overflow-hidden` to `overflow-auto`)
-```html
-<!-- ✅ CORRECT: Use Tailwind classes -->
-<div class="container overflow-auto h-96">
-  Content
-</div>
-
-<!-- ❌ WRONG: Don't use inline styles -->
-<div class="container" style="overflow: auto; height: 24rem;">
-  Content
-</div>
-```
-
-**Iteration 1 - Verify Console After Reload**:
-```bash
-# Check console after applying fix and reloading
-agent-browser eval "console.log output"
-
-# Verify no errors and fix is applied
-agent-browser eval "(() => {
-  const container = document.querySelector('.container');
-  return {
-    hasErrors: false,
-    elementExists: container !== null,
-    fixApplied: container.classList.contains('overflow-auto')
-  };
-})()"
-# Result: { hasErrors: false, elementExists: true, fixApplied: true }
-# ✅ Console is clean, proceed to verify fix
-```
-
-**Iteration 1 - Verify Fix**:
-```bash
-agent-browser eval "(() => {
-  const container = document.querySelector('.container');
-  return {
-    overflow: getComputedStyle(container).overflow,
-    hasScrollbar: container.scrollHeight > container.clientHeight
-  };
-})()"
-# Result: { overflow: 'auto', hasScrollbar: true }
-# ✅ Scrollbar now available!
-```
-
-### Example: Debugging Modal Dialog Sizing
-
-**Problem**: Modal dialog size doesn't fit content - content is cut off or too much empty space
-
-**Iteration 1 - Diagnosis**:
-```bash
-agent-browser open --headed http://localhost:3000
-agent-browser eval "(() => {
-  const modal = document.querySelector('.modal-dialog');
-  const content = document.querySelector('.modal-content');
-  const styles = getComputedStyle(modal);
-  return {
-    // Modal dimensions
-    modalWidth: styles.width,
-    modalHeight: styles.height,
-    modalMaxWidth: styles.maxWidth,
-    modalMaxHeight: styles.maxHeight,
-
-    // Content dimensions
-    contentScrollHeight: content.scrollHeight,
-    contentScrollWidth: content.scrollWidth,
-    contentClientHeight: content.clientHeight,
-    contentClientWidth: content.clientWidth,
-
-    // Overflow behavior
-    modalOverflow: styles.overflow,
-    contentOverflow: getComputedStyle(content).overflow,
-
-    // Positioning
-    modalPosition: styles.position,
-
-    // Is content overflowing?
-    isContentOverflowing: content.scrollHeight > modal.clientHeight || content.scrollWidth > modal.clientWidth,
-
-    // Is modal too large?
-    hasExcessiveSpace: modal.clientHeight > content.scrollHeight * 1.5
-  };
-})()"
-# Result: { modalWidth: '500px', modalHeight: '400px', contentScrollHeight: '800px', isContentOverflowing: true }
-```
-
-**Iteration 1 - Fix**: Adjust modal sizing with Tailwind classes
-```html
-<!-- ✅ CORRECT: Use Tailwind classes for flexible sizing -->
-<div class="modal-dialog w-full max-w-2xl max-h-[90vh] overflow-auto">
-  <div class="modal-content p-6">
-    <!-- Content -->
-  </div>
-</div>
-
-<!-- ❌ WRONG: Fixed dimensions with inline styles -->
-<div class="modal-dialog" style="width: 500px; height: 400px; overflow: hidden;">
-  <div class="modal-content">
-    <!-- Content -->
-  </div>
-</div>
-```
-
-**Iteration 1 - Verify Console After Reload**:
-```bash
-# Check console after applying fix and reloading
-agent-browser eval "console.log output"
-
-# Verify no errors and fix is applied
-agent-browser eval "(() => {
-  const modal = document.querySelector('.modal-dialog');
-  return {
-    hasErrors: false,
-    elementExists: modal !== null,
-    fixApplied: modal.classList.contains('max-h-[90vh]') && modal.classList.contains('overflow-auto')
-  };
-})()"
-# Result: { hasErrors: false, elementExists: true, fixApplied: true }
-# ✅ Console is clean, proceed to verify fix
-```
-
-**Iteration 1 - Verify Fix**:
-```bash
-agent-browser eval "(() => {
-  const modal = document.querySelector('.modal-dialog');
-  const content = document.querySelector('.modal-content');
-  return {
-    modalHeight: getComputedStyle(modal).height,
-    modalMaxHeight: getComputedStyle(modal).maxHeight,
-    contentFits: content.scrollHeight <= modal.clientHeight,
-    hasScrollbar: content.scrollHeight > modal.clientHeight
-  };
-})()"
-# Result: { modalHeight: '90vh', contentFits: true, hasScrollbar: true }
-# ✅ Modal now adapts to content with scroll!
-```
-
-### Common Modal Sizing Issues
-
-**Issue 1: Fixed height cutting off content**
-- **Problem**: `h-96` (fixed 24rem height) cuts off content
-- **Fix**: Use `max-h-[90vh] overflow-auto` for responsive max height with scroll
-
-**Issue 2: Modal too small for content**
-- **Problem**: `max-w-sm` (max-width: 24rem) too narrow for wide content
-- **Fix**: Use `max-w-2xl` or `max-w-4xl` for wider modals, or `max-w-[90vw]` for viewport-relative
-
-**Issue 3: No scroll when content exceeds modal**
-- **Problem**: Content hidden when taller than modal
-- **Fix**: Add `overflow-auto` to modal body, not the overlay
-
-**Issue 4: Modal not centered**
-- **Problem**: Modal appears at top-left instead of center
-- **Fix**: Use flexbox centering: `fixed inset-0 flex items-center justify-center`
-
-**Issue 5: Modal overlay not covering viewport**
-- **Problem**: Background interaction possible through gaps
-- **Fix**: Use `fixed inset-0` for overlay, `z-50` for proper stacking
-
-### Tailwind Modal Patterns
-
-**Basic Modal**:
-```html
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-auto">
-    <div class="p-6">
-      <!-- Content -->
-    </div>
-  </div>
-</div>
-```
-
-**Responsive Modal**:
-```html
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-lg md:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-auto">
-    <div class="p-4 md:p-6 lg:p-8">
-      <!-- Content -->
-    </div>
-  </div>
-</div>
-```
-
-**Scrollable Modal with Header/Footer**:
-```html
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-    <!-- Header (fixed) -->
-    <div class="p-4 border-b flex items-center justify-between">
-      <h2 class="text-xl font-bold">Title</h2>
-      <button class="text-gray-500 hover:text-gray-700">✕</button>
-    </div>
-
-    <!-- Body (scrollable) -->
-    <div class="p-6 overflow-auto flex-1">
-      <!-- Content -->
-    </div>
-
-    <!-- Footer (fixed) -->
-    <div class="p-4 border-t flex justify-end gap-2">
-      <button class="btn-secondary">Cancel</button>
-      <button class="btn-primary">Save</button>
-    </div>
-  </div>
-</div>
-```
-
-### Key Principles for Iterative Debugging
-
-1. **Always verify with agent-browser eval**: Don't assume the fix worked - check computed styles
-2. **ALWAYS use Tailwind classes in HTML**: Never use inline `style` attributes - put Tailwind utility classes directly in HTML elements
-3. **MANDATORY: Check console after each reload**: After applying a fix and reloading, ALWAYS check the console to confirm the fix is working before proceeding to verification
-4. **Check multiple properties**: Sometimes fixing one property affects others
-5. **Monitor console errors**: New errors may appear after changes - check console after EVERY reload
-6. **Compare parent and child**: Layout issues often involve parent containers
-7. **Use specific selectors**: Be precise about which element you're checking
-8. **Document each iteration**: Note what you tried and what the result was
-9. **Know when to stop**: If 3+ iterations don't resolve it, reassess the approach
-10. **Stop if console shows errors**: If console has errors after reload, STOP and fix them before continuing
-
-### Verification Checklist
-
-After each fix, verify these critical aspects:
-
-```bash
-agent-browser eval "(() => {
-  const el = document.querySelector('.your-element');
-  const styles = getComputedStyle(el);
-  const rect = el.getBoundingClientRect();
-  
-  return {
-    // Visibility
-    isVisible: el.offsetWidth > 0 && el.offsetHeight > 0,
-    display: styles.display,
-    visibility: styles.visibility,
-    opacity: styles.opacity,
-    
-    // Positioning
-    position: styles.position,
-    top: styles.top,
-    left: styles.left,
-    zIndex: styles.zIndex,
-    
-    // Dimensions
-    width: styles.width,
-    height: styles.height,
-    boundingRect: rect,
-    
-    // Layout
-    margin: styles.margin,
-    padding: styles.padding,
-    overflow: styles.overflow,
-    
-    // Interactivity
-    pointerEvents: styles.pointerEvents,
-    cursor: styles.cursor,
-    
-    // Parent context
-    parentDisplay: el.parentElement ? getComputedStyle(el.parentElement).display : null,
-    parentOverflow: el.parentElement ? getComputedStyle(el.parentElement).overflow : null
-  };
-})()"
-```
-
-## Automatic Skill Routing
-
-The master skill automatically routes to appropriate sub-skills based on context:
-
-**Routing Logic**:
-```
-IF designing new layout → /dom-design
-IF debugging existing issue → /dom-debug
-IF theming/styling → /dom-theme
-IF print media → /dom-print
-IF mobile-only optimization → /dom-mobile
-IF desktop-only optimization → /dom-desktop
-IF cross-device → /dom-mobile-desktop
-IF CustomElement/Web Component testing → /dom-customelement
-IF attribute reactivity issues → /dom-customelement
-IF Portal/modal/sidebar/dropdown → /dom-portal
-IF multiple concerns → combine sub-skills
-```
-
-## Production-Level Standards
-
-All sub-skills ensure:
-
-**Accessibility**:
-- WCAG 2.1 AA compliance
-- Keyboard navigation
-- Screen reader support
-- Color contrast verification
-- Semantic HTML
-
-**Performance**:
-- No layout thrashing
-- Optimized reflows
-- Efficient selectors
-- Lazy loading
-- Performance budgets
-
-**Cross-Browser**:
-- Chrome, Firefox, Safari, Edge
-- Mobile browsers
-- Progressive enhancement
-- Fallback strategies
-
-**Code Quality**:
-- Semantic HTML
-- Maintainable CSS
-- Reusable components
-- Design tokens
-- Documentation
-
-**Responsive**:
-- Mobile-first approach
-- Fluid layouts
-- Touch-friendly
-- Device-agnostic
-- Viewport optimization
-
-## Integration with GSD Ecosystem
-
-The DOM skills integrate with GSD (Guided Software Development):
-
-**Design Phase**: Use `/dom-design` with `/gsd-plan-phase`
-**Implementation Phase**: Use sub-skills with `/gsd-execute-phase`
-**Testing Phase**: Verify with `/gsd-validate-phase`
-**Production**: Deploy with `/gsd-ship`
-
-## Example Usage
-
-**Scenario**: "Create a responsive navigation with print optimization"
-
-**Master skill routing**:
-1. `/dom-design` - Design navigation layout
-2. `/dom-mobile-desktop` - Make responsive
-3. `/dom-print` - Optimize for print
-4. `/dom-debug` - Debug any issues
-5. `/dom-theme` - Apply theme colors
-
-**Each sub-skill**:
-- Follows professional workflow
-- Performs self-checks
-- Ensures production quality
-- Documents decisions
-
-## Output Format
-
-Each sub-skill produces:
-
-```markdown
-# [Sub-Skill] Report
-
-## Design Decisions
-- [Decision 1 with rationale]
-- [Decision 2 with rationale]
-
-## Implementation
-- [Code changes]
-- [Files modified]
-
-## Verification Results
-- ✅ Accessibility: [details]
-- ✅ Performance: [metrics]
-- ✅ Cross-browser: [results]
-- ✅ Responsive: [breakpoints]
-
-## Self-Check
-- ✅ Meets requirements
-- ✅ Follows design principles
-- ✅ Production-ready
-
-## Documentation
-- [Usage guide]
-- [Maintenance notes]
+evaluate_script({
+  script: `
+    (() => {
+      const el = document.querySelector('.problem-element');
+      return {
+        isVisible: el.offsetWidth > 0 && el.offsetHeight > 0,
+        rect: el.getBoundingClientRect()
+      };
+    })()
+  `
+})
 ```
 
 ## TailwindCSS Integration
@@ -1195,14 +817,8 @@ All sub-skills are TailwindCSS-aware:
 **Visibility & Display**:
 - `hidden` → `display: none`
 - `visible` → `visibility: visible`
-- `invisible` → `visibility: hidden`
 - `block` → `display: block`
 - `inline` → `display: inline`
-
-**Overflow**:
-- `overflow-auto` → `overflow: auto`
-- `overflow-hidden` → `overflow: hidden`
-- `overflow-scroll` → `overflow: scroll`
 
 **Positioning**:
 - `relative` → `position: relative`
@@ -1211,57 +827,29 @@ All sub-skills are TailwindCSS-aware:
 - `top-0 left-0` → `top: 0; left: 0`
 - `z-10` → `z-index: 10`
 
-### When Tailwind Doesn't Have a Utility
+## Styling Components: cls and class Props
 
-If you need a value not in Tailwind's defaults:
+**No inline styles.** Woby components are styled exclusively via `cls` and `class` props (Tailwind classes only). Never pass a `style` attribute or object to a Woby component.
 
-1. **Use arbitrary values** (Tailwind JIT):
-   ```html
-   <div class="top-[117px] bg-[#1da1f2]">
-   ```
-
-2. **Extend in tailwind.config.js**:
-   ```js
-   module.exports = {
-     theme: {
-       extend: {
-         colors: {
-           'brand-blue': '#1da1f2'
-         }
-       }
-     }
-   }
-   ```
-
-3. **Use @apply in CSS**:
-   ```css
-   .custom-component {
-     @apply flex items-center p-4 bg-blue-500;
-   }
-   ```
-
-**NEVER use inline styles** - these approaches keep your code maintainable.
-
-## TSX Component Class Contract (cls Override, class Append)
-
-When developing Woby components with TSX, follow this contract for the `cls` and `class` props:
+### cls vs class Contract
 
 | Prop | Purpose | Behavior |
 |------|---------|----------|
-| `cls` | Consumer's override classes | **Replaces** default styles when provided |
-| `class` | Consumer's append classes | **Added to** default styles |
+| `cls` | Consumer's override classes | **Replaces** the component's built-in default classes |
+| `class` | Consumer's append classes | **Added on top of** the component's built-in default classes |
 
-### Pattern for Component Development
+Both props must be declared as `$()` in `defaults()` so HTML attribute changes stay reactive.
+
+### Component Implementation Pattern
 
 ```tsx
-// Inside component implementation
 const MyComponent = defaults(() => ({
-    cls: $('') as ObservableMaybe<string>,   // Override
-    class: $('') as ObservableMaybe<string>,  // Append
+    cls: $('') as ObservableMaybe<string>,   // override — replaces defaults
+    class: $('') as ObservableMaybe<string>,  // append — adds to defaults
 }), (props) => {
     const { cls, class: className, children } = props
-    
-    // CORRECT: cls overrides defaults, class appends
+
+    // cls ?? 'defaults' means: use cls if truthy, else keep built-in classes
     return (
         <div class={[() => $$(cls) ?? 'default-base p-4', className]}>
             {children}
@@ -1270,229 +858,72 @@ const MyComponent = defaults(() => ({
 })
 ```
 
-### Usage by Consumers
+### Consumer Usage
 
 ```tsx
-// Override default styles completely
-<MyComponent cls="custom-override bg-red-500">
-// Result: "custom-override bg-red-500" (no defaults)
+// cls overrides built-in classes entirely
+<my-comp cls="bg-red-100 p-4" />
+// Result: "bg-red-100 p-4"  (no "default-base p-4")
 
-// Append to default styles
-<MyComponent class="custom-addon shadow-lg">
-// Result: "default-base p-4 custom-addon shadow-lg"
+// class appends to built-in classes
+<my-comp class="mt-4 shadow-lg" />
+// Result: "default-base p-4 mt-4 shadow-lg"
 
 // Both together
-<MyComponent cls="full-override" class="addon-class">
+<my-comp cls="full-override" class="addon-class" />
 // Result: "full-override addon-class"
 ```
 
-### Common Mistakes to Avoid
+### Targeting Child Elements via Tailwind Arbitrary Selectors
+
+Use Tailwind's `[&_tag]` / `[&>tag]` syntax inside `class` or `cls` to style descendant or direct-child elements — no need for separate CSS rules.
+
+| Selector | Targets | Example |
+|----------|---------|---------|
+| `[&_tag]` | All descendants matching `tag` | `[&_td]:p-2` — all `<td>` inside |
+| `[&>tag]` | Direct children matching `tag` | `[&>tr]:hover:bg-amber-50` — direct `<tr>` children |
 
 ```tsx
-// ❌ WRONG: Both append (cls doesn't override)
-<div class={['default', cls, className]}>
-// If cls="custom", result: "default custom className"
+// Style table internals from outside the component
+<my-table class="[&_td]:border [&_td]:border-gray-400 [&>thead]:bg-gray-50" />
 
-// ❌ WRONG: Non-reactive cls check
-<div class={['default', cls]}>
-// cls might be Observable, not string!
-
-// ✅ CORRECT: Reactive with fallback
-<div class={[() => $$(cls) ?? 'default', className]}>
+// Override + style children
+<my-table cls="[&_td]:p-2 [&>tr]:hover:bg-amber-50" />
 ```
 
-### Why This Contract Matters
+**Shadow DOM note:** The selector classes must be on the **inner element** (inside shadow DOM), not just on the host. Woby adopts document stylesheets into shadow DOM via `adoptedStyleSheets`, so `[&_td]:p-2` on an inner `<table>` correctly reaches `<td>` elements inside the shadow root.
 
-- **`cls`**: Consumer wants full control → replace default completely
-- **`class`**: Consumer wants to extend → add without removing defaults
-- Both props MUST be declared in `defaults()` for reactive HTML attribute support
+## Automatic Skill Routing
 
-## Concurrent Browser Agent Debugging/Verification
+The master skill automatically routes to appropriate sub-skills based on context:
 
-**CRITICAL**: For heavy sites or when you need to test multiple pages simultaneously, use **separate browser sessions** to spawn multiple independent browser windows.
-
-### Architecture: Sessions = Windows (NOT Tabs)
-
-Each `--session` flag creates a **separate browser window**, not a tab:
-
+**Routing Logic**:
 ```
-Agent 1 → Session "agent_1" → Browser Window 1 → yahoo.com
-Agent 2 → Session "agent_2" → Browser Window 2 → microsoft.com
-Agent 3 → Session "agent_3" → Browser Window 3 → oracle.com
-Agent 4 → Session "agent_4" → Browser Window 4 → amazon.com
-Agent 5 → Session "agent_5" → Browser Window 5 → apple.com
+IF designing new layout → /dom-design
+IF debugging existing issue → /dom-debug
+IF theming/styling → /dom-theme
+IF print media → /dom-print
+IF mobile-only optimization → /dom-mobile
+IF desktop-only optimization → /dom-desktop
+IF cross-device → /dom-mobile-desktop
+IF CustomElement/Web Component testing → /dom-customelement
+IF attribute reactivity issues → /dom-customelement
+IF Portal/modal/sidebar/dropdown → /dom-portal
+IF multiple concerns → combine sub-skills
 ```
-
-### Why Separate Sessions/Windows?
-
-1. **True concurrency** - Each window runs independently
-2. **No interference** - Heavy sites don't compete for resources in same window
-3. **Better isolation** - Each agent has its own browser state
-4. **Parallel execution** - All browsers load simultaneously
-
-### Alternative: Multiple Tabs in One Window (NOT Recommended for Heavy Sites)
-
-```bash
-agent-browser open yahoo.com
-agent-browser tab new microsoft.com
-agent-browser tab new oracle.com
-# All tabs in ONE browser window - resources shared
-```
-
-### Recommended: Multiple Sessions = Multiple Windows
-
-```bash
-# DEFAULT: Always use --headed to see browser windows
-agent-browser --session agent_1 open --headed yahoo.com  # Window 1
-agent-browser --session agent_2 open --headed microsoft.com  # Window 2
-agent-browser --session agent_3 open --headed oracle.com  # Window 3
-# Separate browser windows - true parallel execution
-```
-
-**Note**: `--headed` is the default. All browser windows will be visible. Use headless mode only when explicitly instructed.
-
-### Use Cases
-
-**When to use concurrent sessions:**
-- Testing multiple heavy sites simultaneously (yahoo.com, microsoft.com, oracle.com)
-- Comparing DOM behavior across different pages
-- Performance testing with isolated browser instances
-- Parallel debugging of multiple pages
-- Load testing with separate browser contexts
-
-**When to use tabs instead:**
-- Light pages with minimal resources
-- Sequential navigation within same site
-- When you need shared browser state
-
-### Session Naming Convention for TSX Component Testing
-
-When testing multiple TSX components concurrently, use descriptive session names that identify the component and file:
-
-**Format**: `component-file` where:
-- `component` = Component name (e.g., `Button`, `Modal`, `Card`)
-- `file` = TSX filename without extension (e.g., `app`, `index`, `components`)
-
-**Examples**:
-```bash
-# Testing Button component in App.tsx
-agent-browser --session Button-App open --headed http://localhost:3000
-
-# Testing Modal component in index.tsx
-agent-browser --session Modal-index open --headed http://localhost:3000
-
-# Testing Card component in components.tsx
-agent-browser --session Card-components open --headed http://localhost:3000
-```
-
-**Why this naming convention**:
-- **Unique identification**: Each agent/session has a distinct name
-- **Easy tracking**: Know which component is being tested in which file
-- **Avoid conflicts**: No session name collisions when running multiple tests
-- **Better debugging**: Clear which browser window is testing what
-
-**Example: Parallel TSX Component Testing**:
-```bash
-# Spawn multiple agents to test different components concurrently
-agent-browser --session Button-App open --headed http://localhost:3000 &
-agent-browser --session Modal-Dialog open --headed http://localhost:3000 &
-agent-browser --session Card-List open --headed http://localhost:3000 &
-
-# Each agent tests its component in isolation
-agent-browser --session Button-App eval "document.querySelector('button').click()"
-agent-browser --session Modal-Dialog eval "document.querySelector('.modal').classList.contains('open')"
-agent-browser --session Card-List eval "document.querySelectorAll('.card').length"
-
-# Close all sessions
-agent-browser --session Button-App close
-agent-browser --session Modal-Dialog close
-agent-browser --session Card-List close
-```
-
-**For CustomElement/Web Component Testing**:
-```bash
-# Testing my-counter component in counter.tsx
-agent-browser --session my-counter-counter open --headed http://localhost:3000
-
-# Testing user-profile component in profile.tsx
-agent-browser --session user-profile-profile open --headed http://localhost:3000
-```
-
-### Example: Concurrent DOM Evaluation
-
-```bash
-# Spawn 5 browser windows simultaneously (DEFAULT: --headed to see all windows)
-agent-browser --session agent_1 open --headed yahoo.com &
-agent-browser --session agent_2 open --headed microsoft.com &
-agent-browser --session agent_3 open --headed oracle.com &
-agent-browser --session agent_4 open --headed amazon.com &
-agent-browser --session agent_5 open --headed apple.com &
-
-# Wait for all to load
-sleep 5
-
-# Evaluate DOM in each window concurrently
-agent-browser --session agent_1 eval "document.querySelectorAll('*').length"
-agent-browser --session agent_2 eval "document.querySelectorAll('*').length"
-agent-browser --session agent_3 eval "document.querySelectorAll('*').length"
-agent-browser --session agent_4 eval "document.querySelectorAll('*').length"
-agent-browser --session agent_5 eval "document.querySelectorAll('*').length"
-
-# Close all browsers
-agent-browser --session agent_1 close
-agent-browser --session agent_2 close
-agent-browser --session agent_3 close
-agent-browser --session agent_4 close
-agent-browser --session agent_5 close
-```
-
-### Programmatic Concurrent Execution
-
-For automated concurrent evaluation, use a script that spawns multiple sessions:
-
-```javascript
-// Node.js example: concurrent_browser_eval.js
-const { exec } = require('child_process');
-const sites = [
-  'https://yahoo.com',
-  'https://microsoft.com',
-  'https://oracle.com',
-];
-
-// Run all evaluations in parallel (DEFAULT: --headed to see browser windows)
-Promise.all(sites.map((url, i) => {
-  const session = `agent_${i + 1}`;
-  return new Promise((resolve) => {
-    exec(`agent-browser --session ${session} open --headed "${url}"`, (err) => {
-      if (!err) {
-        // Wait for page load
-        setTimeout(() => {
-          exec(`agent-browser --session ${session} eval "document.title"`, (err, stdout) => {
-            console.log(`[${session}] ${url}: ${stdout.trim()}`);
-            exec(`agent-browser --session ${session} close`);
-            resolve();
-          });
-        }, 3000);
-      }
-    });
-  });
-}));
-```
-
-**Key Points:**
-- Each `--session` creates an isolated browser window
-- Sessions run in parallel without interference
-- Perfect for heavy sites that need dedicated resources
-- Use `--headed` to see all browser windows simultaneously
 
 ## Getting Started
 
 When you invoke this master skill, it will:
-1. Analyze your request
-2. Route to appropriate sub-skills
-3. Execute professional workflow
-4. Verify and self-check
-5. Produce production-ready output
+1. **Check for parallel agents** and choose a unique profile
+2. **Verify port availability** before launching Chrome
+3. **Launch Chrome** with the chosen profile
+4. **Connect via MCP** using the correct server
+5. Analyze your request
+6. Route to appropriate sub-skills
+7. Execute professional workflow
+8. Verify and self-check
+9. Produce production-ready output
 
 Just describe what you need, and the DOM ecosystem will handle the rest!
 

@@ -6,8 +6,9 @@
 import * as woby from 'woby';
 import {Dynamic, ErrorBoundary, For, If, KeepAlive, Portal, Suspense, Switch, Ternary} from 'woby';
 import {useContext, useEffect, useInterval, useMemo, usePromise, useResource, useTimeout} from 'woby';
-import {$, $$, createContext, createDirective, createElement, h, hmr, html, lazy, render, renderToString, store, template,  untrack} from 'woby';
+import {$, $$, createContext, createDirective, createElement, defaults, h, hmr, html, lazy, render, renderToString, store, template,  untrack} from 'woby';
 import type {Observable, ObservableReadonly} from 'woby';
+import {TestWobyOnClick} from './TestWobyOnClick';
 
 globalThis.woby = woby;
 
@@ -7013,6 +7014,7 @@ const Test = (): JSX.Element => {
       <TestSnapshots Component={TestNestedIfs} />
       <TestSnapshots Component={TestNestedIfsLazy} />
       <TestSnapshots Component={TestHMRFor} />
+      <TestWobyOnClick />
       <hr />
     </>
   );

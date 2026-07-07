@@ -60,7 +60,7 @@ TestPortalMountObservable.test = {
     expect: () => {
         // Define expected values for both main test and SSR test
         const expectedFull = '<h3>Portal - Mount Observable</h3><div id="portal-container"></div>'  // For SSR comparison (portal renders as comment)
-        const expected = '<!---->'   // For main DOM test comparison
+        const expected = ''   // For main DOM test comparison (Portal renders nothing at its position)
 
         // SSR test - create isolated document context and shared container
         const ssrComponent = testObservables[`${name}_ssr`]

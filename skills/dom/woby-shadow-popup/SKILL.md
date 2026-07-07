@@ -452,6 +452,48 @@ agent-browser eval "(() => {
 })()"
 ```
 
+## Nested Popup: cancelOnBlur Pattern
+
+When nesting popups (e.g., DateTime picker with nested Wheelers), disable inner click-away to let parent handle dismissal:
+
+```tsx
+const DateTimeWheeler = ({ value, onClose }) => {
+    const cancelOnBlur = $(true);
+
+    useClickAway(containerRef, () => {
+        if ($$(cancelOnBlur)) onClose();
+    });
+
+    return (
+        <Portal mount={document.body}>
+            {/* Year Wheeler - disable its click-away */}
+            <Wheeler
+                options={yearOptions}
+                value={year}
+                cancelOnBlur={false}  // CRITICAL: Let parent handle it
+                onChange={(v) => year(v)}
+            />
+
+            {/* Month Wheeler */}
+            <Wheeler
+                options={monthOptions}
+                value={month}
+                cancelOnBlur={false}
+                onChange={(v) => month(v)}
+            />
+        </Portal>
+    );
+};
+```
+
+**Why this matters:**
+- Inner Wheelers have their own `useClickAway` detection
+- Without `cancelOnBlur={false}`, clicking the Month Wheeler would trigger Year Wheeler's click-away first
+- Parent container's `useClickAway` handles the actual close
+
+**Default behavior:** `cancelOnBlur={true}` (Wheeler closes on outside click)
+**For nested:** Set to `false` when parent manages dismissal
+
 ---
 
 ## Related Skills

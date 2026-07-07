@@ -9,7 +9,7 @@ import { defaults } from './defaults'
 import { HtmlChild } from '../html/html-child'
 import { SYMBOL_CONTEXT } from '../constants'
 import { jsx } from '../jsx-runtime'
-import { customElement, ElementAttributes } from './custom_element'
+import { customElement, ElementAttributes, composePendingContextWrap } from './custom_element'
 import { HtmlHidden } from '../html/html-hidden'
 
 /* MAIN */
@@ -32,7 +32,6 @@ const ContextProvider = defaults(
   }),
   ({ children, symbol, value }: ContextProviderProps) => {
     return Object.assign(context({ [$$(symbol) as symbol]: value }, () => {
-      // console.log('[context]', /* symbol, */ $$(context($$(symbol))), $$(value))
       return resolve($$(children))
     }), { symbol })
   })
@@ -81,12 +80,32 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
         return jsx('context-provider', { ref, value, symbol, children })
       }
 
-      // Default JSX behavior: invisible provider, context propagated via Soby
+      // Default JSX behavior: invisible provider, context propagated via Soby.
+      //
+      // ALSO expose a DOM-discoverable context-replay wrap. When this provider is
+      // rendered INSIDE a custom element, that element's slotted descendants live in
+      // SEPARATE soby roots (natively-upgraded custom elements) and cannot see this
+      // ambient soby context. composePendingContextWrap registers a replay function
+      // that the enclosing custom element captures (via consumePendingContextWrap)
+      // and stores as SYMBOL_CONTEXT_WRAP, so collectAncestorContextWrap can re-establish
+      // the chain for those descendants. Nested providers compose so the whole chain
+      // (Theme -> Counter -> Nested) is preserved.
+      //
+      // Pure-JSX usage (no enclosing custom element) is unaffected: the wrap is cleared
+      // before any unrelated custom element renders, and JSX-created custom elements
+      // already inherit this context ambiently via synchronous construction.
+      composePendingContextWrap((fn: () => void) => context({ [symbol]: value }, fn))
       return context({ [symbol]: value }, () => resolve($$(children as any)))
     }
   )
 
   const Context = { Provider, symbol/* , value */ }
+
+  // Set CONTEXTS_DATA so that registerContextRef() can discover the symbol
+  // and default even before any Provider renders. The isStatic flag (which is
+  // only known at Provider render-time from the isStatic prop) is updated
+  // inside the Provider component when it first renders.
+  CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic: false })
 
   return Context
 

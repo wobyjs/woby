@@ -20,6 +20,7 @@ import { FragmentUtils } from '../utils/fragment'
 import { Stack } from 'soby'
 import { customElements as ces } from '../ssr/custom_elements'
 import { wobyCustomElements } from './custom_element_registry'
+import { isJsx } from '../jsx-runtime'
 // import { isSSR } from '../constants'
 import { useEnvironment, showEnvLog } from '../components/environment_context'
 
@@ -204,13 +205,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
             // owned by other libraries.
             const ce = isSSR ? ces.get(component) : wobyCustomElements.get(component)
 
-            let child: any
-            try {
-                child = !!ce ? new ce(props as any) : create(component) as HTMLElement
-            } catch (e: any) {
-                console.error(`[createElement] CRASH during new ce("${component}"):`, e.message, e.stack)
-                child = create(component) as HTMLElement
-            }
+            const child: any = !!ce ? new ce(props as any) : create(component) as HTMLElement
 
             // if (!!ce)
             //     (child as InstanceType<ReturnType<typeof customElement>>).props = { ...props }
@@ -230,12 +225,15 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
                 if (props) {
                     if (!!ce) {
                         const { children: propsChildren, ...np } = props as any
-                        // For custom elements, the constructor's JSX merge skips 'children',
-                        // so we need to set children explicitly via setChild if it was in props.
-                        // This handles two cases:
-                        // 1. JSX with children in props object (unusual, but valid)
-                        // 2. HTML→JSX handoff where HTML custom element passes slot to JSX child
-                        if (propsChildren !== undefined && !hasChildren) {
+                        // For custom elements the constructor already handled children:
+                        // when props are JSX (isJsx), defaults() auto-injected a writable
+                        // `children` observable and the constructor merged propsChildren into
+                        // it, so the component rendered them internally. Setting them again
+                        // here would append a DUPLICATE copy into the host's light DOM.
+                        // Only set children explicitly for the non-JSX handoff (HTML custom
+                        // element passing a slot to a JSX child), where the constructor's
+                        // native-slot path expects real light-DOM children on the host.
+                        if (propsChildren !== undefined && !hasChildren && !isJsx(props)) {
                             setChild(child, propsChildren, FragmentUtils.make(), stack)
                         }
                         setProps(child, np, stack)

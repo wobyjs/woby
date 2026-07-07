@@ -25,6 +25,10 @@ import { $, isObservable } from "./soby"
  */
 export const make = <T,>(obj: T, options: { inplace?: boolean, convertFunction?: boolean } = { inplace: false, convertFunction: false }): Observant<T> => {
     const { inplace = false, convertFunction = false } = options
+    // Handle null/undefined input - return empty object to prevent Object.keys error
+    if (!obj) {
+        return {} as Observant<T>
+    }
     const o = inplace ? obj : { ...obj }
     Object.keys(o).forEach((k) => {
         // If already an observable, ignore

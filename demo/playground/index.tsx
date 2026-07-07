@@ -34,6 +34,8 @@ globalThis.Switch = Switch
 globalThis.renderToString = renderToString
 
 // Import all existing test components
+import TestWobyOnClick from './src/TestWobyOnClick'
+import TestShadowOnClick from './src/TestShadowOnClick'
 import TestABCD from './src/TestABCD'
 import TestAttributeBooleanStatic from './src/TestAttributeBooleanStatic'
 import TestAttributeFunction from './src/TestAttributeFunction'
@@ -104,6 +106,7 @@ import TestContextComponents from './src/TestContextComponents'
 import TestContextDynamicContext from './src/TestContextDynamicContext'
 import TestContextHook from './src/TestContextHook'
 import TestContextHookHtml from './src/TestContextHook.html'
+import TestContextRef from './src/TestContextRef'
 import TestDirective from './src/TestDirective'
 import TestDirectiveRef from './src/TestDirectiveRef'
 import TestDirectiveRegisterLocal from './src/TestDirectiveRegisterLocal'
@@ -342,6 +345,7 @@ import TestTailwindNoImport from './src/TestTailwindNoImport'
 import TestTailwindWithImport from './src/TestTailwindWithImport'
 import TestTailwindNoImportHTML from './src/TestTailwindNoImportHTML'
 import TestTailwindWithImportHTML from './src/TestTailwindWithImportHTML'
+import TestHtmlOnClick from './src/TestHtmlOnClick.html'
 
 // globalThis.Woby = Woby
 
@@ -682,6 +686,9 @@ const tests = [
     TestCustomElementNested,
     TestCustomElementComprehensive,
     TestNativeCustomElementSource,
+
+    // @-prefix Context Reference Test
+    TestContextRef,
 
     // Tailwind CSS Tests (Shadow DOM Compatibility)
     TestTailwindNoImport,

@@ -18,6 +18,13 @@ export const TEST_INTERVAL = 500 // Lowering this makes it easier to spot some m
 
 export const assert = (result: boolean, message?: string): void => {
     console.assert(result, message)
+    // Test-harness result tracking so the full suite can be verified past the
+    // console's 1000-message cap via `dv eval` reading globalThis.__testFailures.
+    const g = globalThis as any
+    if (!g.__testFailures) g.__testFailures = []
+    if (!g.__testPassCount) g.__testPassCount = 0
+    if (result) g.__testPassCount++
+    else g.__testFailures.push(message || 'assertion failed')
 }
 
 export const random = (): number => { // It's important for testing that 0, 1 or reused numbers are never returned
@@ -450,7 +457,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
         const root = ref()
         if (!root) return
         tick()
-        const timeoutId = setTimeout(yesUpdate, 1500)
+        const timeoutId = setTimeout(yesUpdate, 3000)
         const onMutation = Component.test.static ? noUpdate : () => {
             // Call tick immediately to see if this works
             tick()

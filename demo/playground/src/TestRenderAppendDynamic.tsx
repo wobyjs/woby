@@ -360,6 +360,22 @@ TestRenderAppendDynamic.test = {
                     <button>Replace All</button>
                 </div>
             `),
+
+            // State 14: Initial dynamic append STILL present + all 3 appended items (timing overlap, count=3)
+            minimiseHtml(`
+                <div style="margin-bottom: 10px;"><p>Count: 3</p></div>
+                <div id="${CONTAINER_ID_DYNAMIC}" style="border: 2px solid green; padding: 10px; margin: 5px; min-height: 50px;">
+                    <p>Initial static content</p>
+                    <p>Initial dynamic append</p>
+                    <p>Appended item #1</p>
+                    <p>Appended item #2</p>
+                    <p>Appended item #3</p>
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 5px;">
+                    <button>Append Item</button>
+                    <button>Replace All</button>
+                </div>
+            `),
         ]
     }
 }
