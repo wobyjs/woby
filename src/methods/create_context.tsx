@@ -3,7 +3,7 @@
 
 import { CONTEXTS_DATA, SYMBOL_CONTEXT_WRAP, SYMBOL_JSX, SYMBOL_DEFAULT } from '../constants'
 // import {resolve} from '../utils/resolve';
-import { $, $$, context, resolve } from './soby'
+import { $, $$, context, isObservable, resolve } from './soby'
 import type { Child, Context, ObservableMaybe, ContextWithDefault } from '../types'
 import { defaults } from './defaults'
 import { HtmlChild } from '../html/html-child'
@@ -50,7 +50,7 @@ export function createContext<T>(defaultValue: T): ContextWithDefault<T>
 export function createContext<T>(defaultValue?: T): Context<T>
 export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Context<T> {
 
-  const symbol = Symbol()
+  const symbol = Symbol(`ctx:${String(defaultValue ?? '').slice(0, 20)}`)
   // const isStatic = $(false)
 
   // Create provider component - React-like invisible context provider
@@ -94,7 +94,10 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
       // Pure-JSX usage (no enclosing custom element) is unaffected: the wrap is cleared
       // before any unrelated custom element renders, and JSX-created custom elements
       // already inherit this context ambiently via synchronous construction.
-      composePendingContextWrap((fn: () => void) => context({ [symbol]: value }, fn))
+      composePendingContextWrap((fn: () => void) => {
+    console.log(`[Provider] composePendingContextWrap symbol=${String(symbol)}, value type=${typeof value}, isObs=${isObservable(value)}`)
+    return context({ [symbol]: value }, fn)
+})
       return context({ [symbol]: value }, () => resolve($$(children as any)))
     }
   )

@@ -26,6 +26,7 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **Built-in Class Management**: Woby includes powerful built-in class management that supports complex class expressions similar to `classnames` and `clsx` libraries, with full reactive observable support.
 - **Web Components Support**: First-class support for creating and using custom elements with reactive properties.
 - **Advanced Context API**: Powerful context system that works seamlessly with both JSX components and custom elements.
+- **`@`-Prefix Context Resolution**: Reference context values directly in HTML attributes — no `useContext()` needed inside the component. Use `@scope.field` syntax with `registerContextRef()`.
 - **Advanced Nested Property Support**: Unique feature allowing deeply nested properties to be set directly through HTML attributes using both `$` and `.` notation - a capability not available in React or SolidJS.
 
 ## 📚 Documentation
@@ -74,6 +75,38 @@ const ThemedElement = defaults(() => ({}), () => {
 
 customElement('themed-element', ThemedElement)
 ```
+
+[Learn more about the Context API](./doc/CONTEXT_API.md)
+
+#### `@`-Prefix Context Resolution in HTML Attributes
+
+Woby's unique `@`-prefix feature lets you reference context values directly in HTML attributes — no `useContext()` needed inside the component:
+
+```tsx
+import { createContext, registerContextRef } from 'woby'
+
+// Create and register a context for @-resolution
+const AppCounterCtx = createContext(0)
+registerContextRef('app.count', AppCounterCtx)
+
+// Now any custom element can consume it via HTML attributes:
+// <my-element count="@app.count" />
+
+// The provider works as usual:
+<AppCounterCtx.Provider value={42}>
+  <my-element count="@app.count" />
+  {/* → my-element receives count=42 */}
+</AppCounterCtx.Provider>
+```
+
+Key behaviors:
+
+| Pattern | Behavior |
+|---------|----------|
+| `@scope.field` | Resolves from nearest ancestor provider of the registered context |
+| `@@literal` | Escape: produces literal `@literal` (no resolution) |
+| `@unregistered.ref` | Console warning, passes `undefined` |
+| Nested providers | Each consumer walks up from its own DOM position — nearest ancestor wins |
 
 [Learn more about the Context API](./doc/CONTEXT_API.md)
 
@@ -462,18 +495,18 @@ customElement('styled-counter', Counter)
 | [`isServer`](#isserver)           | [`Tary`](#ternary)     | [`useEventListener`](#useeventlistener) |                                |                          |
 | [`isStore`](#isstore)             |                           | [`useFetch`](#usefetch)           |                                    |                          |
 | [`lazy`](#lazy)                   |                           | [`useIdleCallback`](#useidlecallback) |                                |                          |
-| [`render`](#render)               |                           | [`useIdleLoop`](#useidleloop)     |                                    |                          |
-| [`renderToString`](#rendertostring) |                         | [`useInterval`](#useinterval)     |                                    |                          |
-| [`resolve`](#resolve)             |                           | [`useMemo`](#usememo)             |                                    |                          |
-| [`store`](#store)                 |                           | [`useMicrotask`](#usemicrotask)   |                                    |                          |
-| [`template`](#template)           |                           | [`usePromise`](#usepromise)       |                                    |                          |
-| [`untrack`](#untrack)             |                           | [`useReaction`](#usereaction)     |                                    |                          |
-                                    |                           | [`useReadonly`](#usereadonly)     |                                    |                          |
-                                    |                           | [`useResolved`](#useresolved)     |                                    |                          |
-                                    |                           | [`useResource`](#useresource)     |                                    |                          |
-                                    |                           | [`useRoot`](#useroot)             |                                    |                          |
-                                    |                           | [`useSelector`](#useselector)     |                                    |                          |
-                                    |                           | [`useTimeout`](#usetimeout)       |                                    |                          |
+| [`registerContextRef`](#registercontextref) |                   | [`useIdleLoop`](#useidleloop)     |                                    |                          |
+| [`render`](#render)               |                           | [`useInterval`](#useinterval)     |                                    |                          |
+| [`renderToString`](#rendertostring) |                         | [`useMemo`](#usememo)             |                                    |                          |
+| [`resolve`](#resolve)             |                           | [`useMicrotask`](#usemicrotask)   |                                    |                          |
+| [`store`](#store)                 |                           | [`usePromise`](#usepromise)       |                                    |                          |
+| [`template`](#template)           |                           | [`useReaction`](#usereaction)     |                                    |                          |
+| [`untrack`](#untrack)             |                           | [`useReadonly`](#usereadonly)     |                                    |                          |
+|                                    |                           | [`useResolved`](#useresolved)     |                                    |                          |
+|                                    |                           | [`useResource`](#useresource)     |                                    |                          |
+|                                    |                           | [`useRoot`](#useroot)             |                                    |                          |
+|                                    |                           | [`useSelector`](#useselector)     |                                    |                          |
+|                                    |                           | [`useTimeout`](#usetimeout)       |                                    |                          |
 ## Usage
 
 Woby serves as a view layer built on top of the Observable library [`soby`](https://github.com/wobyjs/soby). Understanding how soby works is essential for effectively using Woby.

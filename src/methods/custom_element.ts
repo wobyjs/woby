@@ -127,6 +127,17 @@ export const consumePendingContextWrap = (): ((fn: () => void) => void) | undefi
 }
 
 /**
+ * Peek at the pending context wrap without consuming it.
+ * Used by resolveContextRef as a fallback when no DOM-discoverable wrap exists
+ * (invisible JSX providers with no enclosing custom element).
+ * The wrap is NOT consumed because it may still be needed by a downstream
+ * custom element's consumePendingContextWrap in the normal lifecycle.
+ */
+export const peekPendingContextWrap = (): ((fn: () => void) => void) | undefined => {
+    return _pendingContextWrapGlobal
+}
+
+/**
  * Compose a provider's own context-wrap onto the pending wrap.
  *
  * Called by the invisible JSX Context.Provider path (create_context.tsx) while a
@@ -426,6 +437,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             }
 
             for (const attr of this.attributes as any) {
+                // For JSX-created elements, @-prefixed context refs were already
+                // resolved in the constructor (via ambient soby context). Re-resolving
+                // here in connectedCallback would fail: ambient context is gone and the
+                // DOM walk (collectAncestorContextWrap) cannot find invisible JSX providers
+                // (<Context.Provider>) since they have no DOM node. Skip @-refs for JSX.
+                if (isJsx(p) && isContextRef(attr.value)) continue
                 this.attributeChangedCallback1(attr.name, undefined, attr.value)
             }
 
@@ -461,12 +478,15 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             const { props } = this
             const propName = kebabToCamelCase(name)
 
-            // If the attribute is an @-prefixed context reference, skip re-processing
-            // in attributeChangedCallback. The JSX constructor path (mergeInto) already
-            // resolved it synchronously inside the provider's context scope. Re-processing
-            // here would happen outside that scope and return a default/fallback value,
-            // overwriting the correct resolved value.
-            if (isContextRef(newValue)) return
+            // If the attribute is an @-prefixed context reference, let it flow
+            // through to setObservableValue which calls resolveContextRef.
+            // For JSX-created elements the constructor already resolved it, but
+            // re-resolving in connectedCallback is harmless (DOM walk finds the
+            // same provider). For HTML-created elements (innerHTML), the constructor
+            // cannot resolve @-refs because parentNode is null, so resolution must
+            // happen here in connectedCallback where the DOM ancestor walk
+            // (collectAncestorContextWrap) can find the provider.
+            //
 
             // Guard: if the observable already holds a non-primitive value (object/function),
             // don't overwrite it with a stringified attribute. This protects complex objects
@@ -579,7 +599,19 @@ const setObservableValue = (obj: any, key: string, value: string, element?: Elem
             if (isObservable(obj[key]) && isObservableWritable(obj[key])) {
                 const resolved = resolveContextRef(value, element)
                 if (resolved !== undefined) {
-                    obj[key](resolved)
+                    // Apply type conversion from the target observable's options
+                    const options = (obj[key][SYMBOL_OBSERVABLE_WRITABLE]).options as ObservableOptions<any> | undefined
+                    const { type, fromHtml } = options ?? {}
+                    if (type && fromHtml) {
+                        // Use fromHtml if available (e.g., HtmlNumber → String → Number)
+                        const converted = fromHtml(resolved)
+                        obj[key](converted)
+                    } else if (type === 'boolean') {
+                        const lowerValue = String(resolved)?.toLowerCase()
+                        obj[key](lowerValue === 'true' || lowerValue === '1' || lowerValue === '')
+                    } else {
+                        obj[key](resolved)
+                    }
                     return
                 }
             }

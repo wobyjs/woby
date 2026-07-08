@@ -8,9 +8,10 @@
  * - Scoped isolation between multiple providers
  * - Type coercion (HtmlNumber, HtmlBoolean, HtmlString) with @ refs
  */
-import { $, $$, customElement, defaults, createContext, useContext, HtmlString, HtmlNumber, HtmlBoolean, type JSX, useEffect, renderToString, type ElementAttributes } from 'woby'
+import { $, $$, customElement, defaults, useContext, HtmlString, HtmlNumber, HtmlBoolean, type JSX, useEffect, renderToString, type ElementAttributes } from 'woby'
 import { registerContextRef } from 'woby'
 import { TestSnapshots, registerTestObservable, testObservables, assert, minimiseHtml, useTimeout, TEST_INTERVAL } from './util'
+import { AppCounterCtx, AppTextCtx, AppFlagCtx, ScopedCtx } from './TestContextRef.shared'
 
 // TypeScript type augmentation for custom elements
 declare module 'woby' {
@@ -24,13 +25,9 @@ declare module 'woby' {
     }
 }
 
-// Create contexts
-const AppCounterCtx = createContext(0)
-const AppTextCtx = createContext('default-text')
-const AppFlagCtx = createContext(false)
-const ScopedCtx = createContext(100)
-
-// Register them for @-resolution
+// Register them for @-resolution (must happen after import, not createContext)
+// Note: only call registerContextRef HERE, not in TestContextRef.html.tsx,
+// to prevent symbol identity clashes in the registry.
 registerContextRef('app.count', AppCounterCtx)
 registerContextRef('app.text', AppTextCtx)
 registerContextRef('app.flag', AppFlagCtx)
@@ -137,8 +134,15 @@ const TestContextRef = (): JSX.Element => {
     // resolution happens synchronously in connectedCallback, so no
     // post-render mutation occurs naturally.
     useTimeout(() => {
-        const el = document.querySelector('[data-test="ctx-ref-consumer"]')
-        if (el) el.setAttribute('data-mutated', '1')
+        // Scope to our test: find our h1 heading, then query within its parent
+        const allH1s = document.querySelectorAll('h1')
+        for (const h1 of allH1s) {
+            if (h1.textContent === '@-prefix Context Reference Test') {
+                const el = h1.parentElement!.querySelector('[data-test="ctx-ref-consumer"]')
+                if (el) el.setAttribute('data-mutated', '1')
+                break
+            }
+        }
     }, TEST_INTERVAL)
 
     const ret: JSX.Element = () => (

@@ -17,13 +17,10 @@
  */
 
 import { context, isObservable } from './soby'
-import { $$ } from './soby'
-import { CONTEXTS_DATA } from '../constants'
+import { OWNER } from 'soby'
+import { CONTEXTS_DATA, SYMBOL_CONTEXT_WRAP } from '../constants'
+import { peekPendingContextWrap } from './custom_element'
 import type { Context } from '../types'
-
-// Re-import collectAncestorContextWrap from custom_element at runtime to avoid circular deps.
-// We import the symbol it uses and do our own DOM walk instead.
-import { SYMBOL_CONTEXT_WRAP } from '../constants'
 
 interface ContextRefEntry {
     symbol: symbol
@@ -83,9 +80,7 @@ const collectAncestorContextWrap = (el: Element): ((fn: () => void) => void) | u
     let cur: any = (el as HTMLElement).parentNode
     while (cur) {
         const w = cur[SYMBOL_CONTEXT_WRAP]
-        if (w) {
-            wraps.unshift(w)
-        }
+        if (w) wraps.unshift(w)
         cur = cur.assignedSlot ?? cur.parentNode ?? cur.host ?? null
     }
     if (!wraps.length) return undefined
@@ -128,6 +123,7 @@ const parseContextRef = (ref: string): string | null => {
  */
 export const resolveContextRef = (ref: string, element?: Element): any => {
     const refKey = parseContextRef(ref)
+    console.log(`[resolveContextRef] ref="${ref}", refKey=`, refKey, `element=`, element?.tagName)
     if (!refKey) {
         console.warn(`[woby] @context-ref "${ref}" is not registered. Use registerContextRef() to register it.`)
         return undefined
@@ -141,7 +137,39 @@ export const resolveContextRef = (ref: string, element?: Element): any => {
         return defaultValue
     }
 
-    // Walk DOM ancestors to find SYMBOL_CONTEXT_WRAP and resolve context
+    // Step 1: Try the ambient soby context FIRST.
+    // Pure JSX providers (invisible <Context.Provider> with no enclosing
+    // custom element) establish context via soby's context() function at
+    // render time, NOT via DOM-visible SYMBOL_CONTEXT_WRAP. The ambient
+    // context is available as long as we're inside the soby ownership tree
+    // created by the Provider's context({ [symbol]: value }, fn) call.
+    const ambient = context(symbol)
+    if (ambient !== undefined) {
+        return isObservable(ambient) ? ambient() : ambient
+    }
+
+    // Step 1.5: Try the pending context wrap global (_pendingContextWrapGlobal).
+    // Invisible JSX providers (no enclosing custom element) store their context
+    // replay function in a global via composePendingContextWrap(). When no
+    // custom element consumes it (consumePendingContextWrap), the wrap remains
+    // available. This fallback invokes the wrap and tries context(symbol) inside.
+    const pendingWrap = peekPendingContextWrap()
+    if (pendingWrap) {
+        let resolved: any = undefined
+        pendingWrap(() => {
+            resolved = context(symbol)
+        })
+        if (resolved !== undefined) {
+            return isObservable(resolved) ? resolved() : resolved
+        }
+    }
+
+    // Step 2: Walk DOM ancestors to find SYMBOL_CONTEXT_WRAP and resolve context.
+    // This handles providers that ARE visible custom elements (e.g. <ctx-ref-provider>
+    // wrapping slotted children in raw HTML). These providers store a context-replay
+    // function on their DOM node, which collectAncestorContextWalk discovers.
+    // The DOM walk is only needed when the element is connected (parentNode !== null),
+    // which is true in connectedCallback but NOT in the constructor.
     const ancestorWrap = collectAncestorContextWrap(element)
 
     if (ancestorWrap) {
@@ -149,32 +177,11 @@ export const resolveContextRef = (ref: string, element?: Element): any => {
         ancestorWrap(() => {
             resolved = context(symbol)
         })
-        // resolved is the value from the soby context scope.
-        // If the provider set an observable as value, resolved IS that observable.
-        // If it's a static value, it's the static value.
         if (resolved !== undefined) {
-            // context(symbol) may return the observable itself (when the provider
-            // value is reactive) or a plain value. For observables, we unwrap with
-            // $$() because soby's writable treats function arguments as updaters.
-            return isObservable(resolved) ? $$(resolved) : resolved
+            const isObs = isObservable(resolved)
+            if (isObs) return resolved()
+            return resolved
         }
-    }
-
-    // If the DOM walk found no provider, try the ambient soby context.
-    // JSX-created custom elements are constructed synchronously inside the
-    // provider's context({ [symbol]: value }, fn) scope, so context(symbol)
-    // will resolve without any DOM walk.
-    //
-    // context(symbol) returns the observable stored by the Provider
-    // (e.g. $(42)), but we can't pass that observable to obj[key](obs)
-    // because soby's writable treats function arguments as updaters:
-    //   obj[key](obsFn) → obsFn(currentValue) → $(42)(0) → 0
-    // So we unwrap with $$() to get the plain current value.
-    // This means @-resolution is a snapshot at construction time,
-    // not a reactive subscription. For full reactivity, use useContext().
-    const ambient = context(symbol)
-    if (ambient !== undefined) {
-        return $$(ambient)
     }
 
     // No provider found — return default value
