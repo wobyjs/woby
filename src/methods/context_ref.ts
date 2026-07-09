@@ -123,7 +123,6 @@ const parseContextRef = (ref: string): string | null => {
  */
 export const resolveContextRef = (ref: string, element?: Element): any => {
     const refKey = parseContextRef(ref)
-    console.log(`[resolveContextRef] ref="${ref}", refKey=`, refKey, `element=`, element?.tagName)
     if (!refKey) {
         console.warn(`[woby] @context-ref "${ref}" is not registered. Use registerContextRef() to register it.`)
         return undefined

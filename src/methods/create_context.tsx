@@ -94,10 +94,7 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
       // Pure-JSX usage (no enclosing custom element) is unaffected: the wrap is cleared
       // before any unrelated custom element renders, and JSX-created custom elements
       // already inherit this context ambiently via synchronous construction.
-      composePendingContextWrap((fn: () => void) => {
-    console.log(`[Provider] composePendingContextWrap symbol=${String(symbol)}, value type=${typeof value}, isObs=${isObservable(value)}`)
-    return context({ [symbol]: value }, fn)
-})
+      composePendingContextWrap((fn: () => void) => context({ [symbol]: value }, fn))
       return context({ [symbol]: value }, () => resolve($$(children as any)))
     }
   )

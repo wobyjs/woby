@@ -895,6 +895,34 @@ The output of context usage in JSX looks like:
 
 Note that `<Counter>` components cannot be used directly in HTML, only custom elements can be used in HTML.
 
+### `@`-Prefix Context Resolution
+
+Custom elements can consume context values directly through HTML attributes using the `@`-prefix syntax — no `useContext()` call inside the component needed.
+
+**Setup** (typically done once at app initialization):
+
+```typescript
+import { createContext, registerContextRef } from 'woby'
+
+const ThemeCtx = createContext('light')
+registerContextRef('theme', ThemeCtx)
+```
+
+**Usage in HTML**:
+
+```html
+<!-- The custom element receives the provider's current value -->
+<theme-context-provider value="dark">
+  <my-element color="@theme"></my-element>
+</theme-context-provider>
+```
+
+**How it works**: When a custom element attribute value starts with `@` (but not `@@`), Woby's `setObservableValue` function intercepts it, looks up the registered context symbol by the dotted name, walks the DOM ancestors to find the nearest provider, and returns the provider's reactive observable. The consumer's prop updates automatically when the provider's value changes.
+
+**Escape syntax**: `@@` produces a literal `@` value (e.g. `@@literal` → `"@literal"`).
+
+For full documentation, see the [Context API `@`-Prefix Section](./CONTEXT_API.md#-prefix-context-resolution-in-html-attributes).
+
 ## HTML Attribute Serialization
 
 Custom elements support custom serialization of observable values to and from HTML attributes using the `toHtml` and `fromHtml` options:

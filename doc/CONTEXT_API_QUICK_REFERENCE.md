@@ -125,6 +125,32 @@ return () => (
 })}
 ```
 
+### Pattern 6: `@`-Prefix Context Resolution in HTML Attributes
+
+Reference context values directly in HTML attributes — no `useContext()` needed:
+
+```typescript
+import { createContext, registerContextRef } from 'woby'
+
+// 1. Create context as usual
+const ThemeCtx = createContext('light')
+
+// 2. Register for @-prefix resolution
+registerContextRef('theme', ThemeCtx)
+
+// 3. Use @-prefix in HTML attributes on any custom element
+// <my-element color="@theme" />
+// → my-element receives color = "light" (or the provider's current value)
+
+// Full example:
+<ThemeCtx.Provider value="dark">
+  <my-element color="@theme" />
+  {/* → color = "dark", reactive updates when provider changes */}
+</ThemeCtx.Provider>
+```
+
+**Escape syntax**: `@@literal` → `"@literal"` (passes through normal type conversion).
+
 ## Migration Checklist
 
 **Note:** This migration has been completed. Checklist kept for historical reference.

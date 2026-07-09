@@ -281,3 +281,138 @@ customElement('value-display', ValueDisplay)
 ### Context in Shadow DOM
 
 For custom elements using Shadow DOM, the context lookup traverses through shadow boundaries and slots to find the nearest context provider in the light DOM.
+
+## `@`-Prefix Context Resolution in HTML Attributes
+
+Woby's `@`-prefix feature lets you reference context values directly in HTML attributes — no `useContext()` needed inside the component. This is especially useful for **generic UI components** that receive their configuration from context without needing `useContext()` boilerplate.
+
+### Basic Usage
+
+```typescript
+import { createContext, registerContextRef } from 'woby'
+
+// Create a context with a default value
+const AppCounterCtx = createContext(0)
+
+// Register it for @-prefix resolution — the name is arbitrary,
+// use dotted names like "scope.field" for organization
+registerContextRef('app.count', AppCounterCtx)
+
+// Now ANY custom element below a provider can consume it via HTML attributes:
+// <my-element count="@app.count" />
+
+// Use the provider as usual:
+<AppCounterCtx.Provider value={42}>
+  <my-element count="@app.count" />
+  {/* my-element receives count=42 */}
+</AppCounterCtx.Provider>
+```
+
+### How It Works
+
+1. **Registration**: `registerContextRef('scope.key', Context)` stores the context's symbol and default value in a global registry, keyed by the dotted name.
+2. **Interception**: When a custom element's HTML attribute value starts with `@` (but not `@@`), the `setObservableValue` function in `custom_element.ts` intercepts it BEFORE normal type conversion (HtmlNumber, HtmlBoolean, etc.).
+3. **Resolution**: `resolveContextRef()` looks up the registered context by trying progressively shorter dotted-key matches (e.g. `@a.b.c` → tries `a.b.c`, `a.b`, `a`), then walks the element's DOM ancestors to find the nearest provider, and returns the provider's reactive observable.
+4. **Reactivity**: The resolved value IS the provider's observable — so when the provider updates, the consuming element's prop updates reactively. No manual re-render or `useEffect` needed.
+
+### Pattern: Generic UI Components
+
+```tsx
+// counter-element.tsx — generic counter that reads from context via @-prefix
+
+// No import of AppCounterCtx needed — the @-prefix resolves it
+
+const CounterEl = defaults(() => ({
+  count: $(0, HtmlNumber),
+  label: $('Count')
+}), ({ count }) => {
+  return <div>Value: {count}</div>
+})
+
+customElement('counter-element', CounterEl)
+
+// Usage in HTML:
+// <AppCounterCtx.Provider value={42}>
+//   <counter-element count="@app.count"></counter-element>
+// </AppCounterCtx.Provider>
+```
+
+### Escape Syntax: `@@` for Literal `@` Values
+
+If an attribute value genuinely starts with `@`, use `@@` as the escape prefix — the first `@` is stripped and the remainder passes through normal type conversion:
+
+```html
+<!-- "@@literal" → "@literal" → passes through HtmlNumber/HtmlBoolean normally -->
+<my-element text="@@some-text" />
+<!-- → resolves to the string "@some-text" (or HtmlNumber/HtmlBoolean conversion) -->
+```
+
+### Fallback Behavior
+
+| Case | Behavior |
+|------|----------|
+| `@registered.key` with provider in DOM | Returns provider's reactive value (observable) |
+| `@registered.key` without provider | Returns context's registered `defaultValue` |
+| `@unknown.ref` not registered | `console.warn`, returns `undefined` |
+| `@@something` escaped | Strips first `@`, passes through normal type conversion |
+| Non-writable observable prop | Falls through to existing plain-string assignment |
+
+### Multiple Scopes
+
+Each consumer walks up from its own DOM element, so nested providers work naturally — each consumer sees its **nearest ancestor**:
+
+```tsx
+<AppCounterCtx.Provider value={100}>
+  <div>Outer provider</div>
+  <AppCounterCtx.Provider value={200}>
+    <counter-element count="@app.count" label="Inner: " />
+    {/* → count = 200 */}
+  </AppCounterCtx.Provider>
+  <counter-element count="@app.count" label="Outer: " />
+  {/* → count = 100 */}
+</AppCounterCtx.Provider>
+```
+
+### Shadow DOM and Custom Element Boundaries
+
+The `@`-prefix resolution walks the **composed DOM tree** (crossing shadow boundaries via `assignedSlot`, `parentNode`, and `host`) to find the nearest provider. This means:
+
+- **Slotted descendants** inside a custom element's shadow DOM can still resolve context from ancestors in the light DOM.
+- **Nested custom elements** each resolve independently from their own position in the DOM tree.
+- **JSX-only providers** (invisible, no DOM node) work for JSX children but NOT for natively-upgraded slotted descendants — those need a visible provider (`<context-provider>`) or a custom element wrapper.
+
+### API Reference: `registerContextRef`
+
+```typescript
+import { registerContextRef, unregisterContextRef } from 'woby'
+
+interface Context<T> {
+  Provider: ComponentWithDefaults<...>
+  symbol: symbol
+}
+
+registerContextRef(name: string, ctx: Context<any>): void
+```
+
+- **`name`**: Dotted key for `@`-prefix lookup (e.g. `"theme.colors"`, `"app.count"`). Progressively shorter key matching is used during resolution.
+- **`ctx`**: The context object returned by `createContext()`.
+- **`unregisterContextRef(name)`**: Removes a previously registered context ref from the global registry.
+
+**`context_ref` module exports:**
+- `registerContextRef(name, ctx)` — Register context for `@`-prefix resolution
+- `unregisterContextRef(name)` — Remove a registration
+- `resolveContextRef(ref, element?)` — Manually resolve a `@`-prefixed string to a value
+- `isContextRef(value)` — Check if a string starts with `@` (and not `@@`)
+
+### Comparison: `@`-prefix vs `useContext`
+
+| Aspect | `@`-prefix | `useContext()` |
+|--------|-----------|---------------|
+| **Where used** | HTML attributes, raw HTML templates | Inside component functions (JSX/TSX) |
+| **Boilerplate** | Register once, use `@scope.key` anywhere | Import context, call `useContext()` each time |
+| **Reactivity** | Automatic — resolves to provider's observable | Same — returns the observable |
+| **DOM walk** | Required (walks ancestors) | Ambient via soby's ownership tree |
+| **Best for** | Generic HTML components, 3rd-party elements | Application-level components, complex logic |
+| **Setup** | `registerContextRef()` at app init | Import `createContext` + import context |
+
+> **Note**: The `@`-prefix feature does NOT replace `useContext` for JSX components — it complements it. `useContext` remains the recommended way to consume context inside JSX/TSX component logic. The `@`-prefix is designed for the **HTML attribute boundary**, where a component cannot imperatively call `useContext()`.
