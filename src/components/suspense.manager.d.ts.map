@@ -1,0 +1,1 @@
+{"version":3,"file":"suspense.manager.d.ts","sourceRoot":"","sources":["suspense.manager.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,YAAY,EAAE,MAAM,UAAU,CAAA;AAE5C,qBAAa,eAAe;IAI1B,OAAO,CAAC,SAAS,CAAmC;IAIpD,MAAM,GAAI,UAAU,YAAY,EAAE,IAAI,MAAM,KAAG,IAAI,CA2BjD;IAEF,OAAO,QAAO,IAAI,CAchB;IAEF,SAAS,QAAO,IAAI,CAQlB;CAEH"}

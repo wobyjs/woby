@@ -1,11 +1,11 @@
 ---
 name: dom
-description: 'Master DOM skill using @missbjs/dv CLI for professional-grade DOM design, debugging, theming, print layout, and responsive development. Use @missbjs/dv CLI for all browser interactions including console log/error/assert reading. Uses dv CLI built-in profiles (profile-1 through profile-6, ports 9230-9235) - run `dv profiles` to see available profiles. Always open HEADED mode for user inspection. Profile profile-1 is pinned for OAuth persistence. Automatically routes to appropriate sub-skills - dom-design for layout and UX design, dom-debug for debugging issues, dom-theme for color/font theming, dom-print for print media, dom-mobile for mobile-specific, dom-desktop for desktop-specific, dom-mobile-desktop for cross-device optimization. All sub-skills follow professional design workflow with verification and self-check to production level. **CRITICAL: Each agent must use a unique Chrome profile to avoid conflicts with other parallel agents. DO NOT use default port 9230 without checking availability. DO NOT close Chrome instances launched by other agents.**'
+description: 'Master DOM skill using @missbjs/dv1-6 CLI for professional-grade DOM design, debugging, theming, print layout, and responsive development. Use dv1-6 CLI for all browser interactions including console log/error/assert reading. Each dv binary manages its own Chrome profile (dv1-dv6). Always open HEADED mode for user inspection. Vite workflow: `pnpm dev --port <port>` ONCE (HMR, pick port NOT in 5xxx), then dv* navigate to it. If 404 → restart dev. If reload loop → kill all ports spawned under this session. Automatically routes to appropriate sub-skills — dom-design for layout and UX design, dom-debug for debugging issues, dom-theme for color/font theming, dom-print for print media, dom-mobile for mobile-specific, dom-desktop for desktop-specific, dom-mobile-desktop for cross-device optimization. All sub-skills follow professional design workflow with verification and self-check to production level. **CRITICAL: Each agent must use a unique dv binary to avoid conflicts with other parallel agents. DO NOT use default dv1 without checking availability. DO NOT close Chrome instances launched by other agents.**'
 ---
 
-# DOM Master Skill (@missbjs/dv CLI)
+# DOM Master Skill (@missbjs/dv1-6 CLI)
 
-Orchestrates specialized DOM sub-skills for professional-grade web development using @missbjs/dv CLI.
+Orchestrates specialized DOM sub-skills for professional-grade web development using @missbjs/dv1-6 CLI.
 
 ## ⚠️ CRITICAL: Parallel Agent Profile Management
 
@@ -17,129 +17,181 @@ Orchestrates specialized DOM sub-skills for professional-grade web development u
 
 ```
 Q1: Is this task OAuth/authentication related?
-    YES → Use profile-1 (port 9230) - preserves login state
+    YES → Use dv1
     NO  → Continue to Q2
 
 Q2: Are other agents currently using Chrome profiles?
     How to check:
     - Look for running Chrome processes with remote debugging
-    - Check ports 9230-9235 for active connections
     - Review any coordination notes from other agents
     
-    IF unsure → Assume other agents are using profiles 1-3, use profiles 4-6
+    IF unsure → Assume other agents are using dv1-dv3, use dv4-dv6
     
 Q3: Which profiles are available?
-    Check each port sequentially using @missbjs/dv status:
-    - Port 9230: dv status --profile profile-1
-    - Port 9231: dv status --profile profile-2
-    - ... through port 9235
+    Check each sequentially using dv* status:
+    dv1 status
+    dv2 status
+    dv3 status
+    dv4 status
+    dv5 status
+    dv6 status
 
     IF command lists pages → Profile is IN USE by another agent
     IF command fails/no Chrome running → Profile is AVAILABLE
     
 Q4: Select the first available profile:
-    - Priority order: profile-2 → profile-3 → profile-4 → profile-5 → profile-6
-    - (Skip profile-1 unless OAuth needed)
+    - Priority order: dv2 → dv3 → dv4 → dv5 → dv6
+    - (Skip dv1 unless OAuth needed)
     
 Q5: Document your profile choice:
-    Tell the user: "Using Chrome profile-X on port 923X"
+    Tell the user: "Using dvX"
     This helps other agents know which profiles are taken
 ```
 
-### Step 2: Check Port Availability BEFORE Launching
+### Step 2: Check Availability BEFORE Launching
 
-**MANDATORY: Check if the port is already in use before launching Chrome.**
+**MANDATORY: Check if the profile is already in use before launching Chrome.**
 
 ```bash
-# Use @missbjs/dv status to check if Chrome is running
-dv status --profile profile-1  # For profile 1
-dv status --profile profile-2  # For profile 2
-# ... etc for ports 9232-9235
+dv1 status
+dv2 status
+dv3 status
+dv4 status
+dv5 status
+dv6 status
 
-# IF the command lists pages → Chrome is running on this port (IN USE)
-# IF the command shows "Chrome is not running" → Port is AVAILABLE
+# IF the command lists pages → Chrome is running on this profile (IN USE)
+# IF the command shows "Chrome is not running" → Profile is AVAILABLE
 ```
 
-**What to do if port is in use:**
+**What to do if profile is in use:**
 
 1. **DO NOT close the existing Chrome instance** - it belongs to another agent
 2. **DO NOT kill the process** - you will break the other agent's work
-3. **Choose a different profile** - try the next port in sequence
-4. **If all ports are in use** - inform the user and wait, or coordinate with other agents
+3. **Choose a different profile** - try the next one in sequence
+4. **If all profiles are in use** - inform the user and wait, or coordinate with other agents
 
-### Step 3: Launch Chrome with Your Chosen Profile
+### Step 3: Launch Chrome
 
-**Once you've verified the port is available, launch Chrome using @missbjs/dv:**
+**Once you've verified the profile is available, launch Chrome:**
 
 ```bash
-# Install @missbjs/dv globally (if not already installed)
-npm install -g @missbjs/dv
-
-# Example for Profile 3 (port 9232)
-dv start --profile profile-2 --headed
-
-# Example for Profile 1 (port 9230) - OAuth
-dv start --profile profile-2 --headed
+dv2 start --headed
+dv3 start --headed
+dv4 start --headed
+dv5 start --headed
+dv6 start --headed
 ```
 
 **Verify Chrome started successfully:**
 
 ```bash
-# Check Chrome status
-dv status --profile profile-3
+dv2 status
 
 # Should list open pages
 ```
 
-### Step 4: Use the Correct Port for All Commands
+### Step 4: Available Profiles
 
-**Each profile uses a specific port for all @missbjs/dv commands:**
-
-| Profile | Port | Purpose |
-|---------|------|---------|
-| profile-1 | 9230 | General use |
-| profile-2 | 9231 | Parallel testing |
-| profile-3 | 9232 | Parallel testing |
-| profile-4 | 9233 | Parallel testing |
-| profile-5 | 9234 | Parallel testing |
-| profile-6 | 9235 | Parallel testing |
-
-**All @missbjs/dv commands require --profile parameter to prevent agent collisions.**
+| Command | Purpose |
+|---------|---------|
+| dv1 | OAuth/authentication |
+| dv2 | Parallel testing |
+| dv3 | Parallel testing |
+| dv4 | Parallel testing |
+| dv5 | Parallel testing |
+| dv6 | Parallel testing |
 
 ### Absolute Rules for Parallel Agents
 
-1. **✅ DO** check port availability before launching Chrome
+1. **✅ DO** check availability before launching Chrome
 2. **✅ DO** use a unique profile not used by other agents
 3. **✅ DO** tell the user which profile you're using
-4. **✅ DO** coordinate with other agents if all ports are busy
-5. **❌ DO NOT** use port 9230 by default without checking
+4. **✅ DO** coordinate with other agents if all profiles are busy
+5. **❌ DO NOT** use dv1 by default without checking
 6. **❌ DO NOT** close Chrome instances launched by other agents
-7. **❌ DO NOT** kill Chrome processes that are using other ports
-8. **❌ DO NOT** assume profile-1 is available - it may be used for OAuth
-9. **❌ DO NOT** create new profile names - use ONLY profile-1 through profile-6
+7. **❌ DO NOT** kill Chrome processes started by other agents
+8. **❌ DO NOT** assume dv1 is available - it may be in use for OAuth
 
 ### Parallel Agent Coordination Example
 
 ```
-Agent A: "I need to test OAuth login. Checking port 9230..."
-         [Checks port 9230 - available]
-         "Using Chrome profile-1 on port 9230 for OAuth testing"
-         [Launches Chrome on 9230]
+Agent A: "I need to test OAuth login. Checking dv1..."
+         [dv1 status - available]
+         "Using dv1 for OAuth testing"
+         [Launches Chrome: dv1 start --headed]
 
-Agent B: "I need to debug a layout issue. Checking ports..."
-         [Checks port 9230 - IN USE by Agent A]
-         [Checks port 9231 - available]
-         "Using Chrome profile-2 on port 9231 for debugging"
-         [Launches Chrome on 9231]
+Agent B: "I need to debug a layout issue. Checking profiles..."
+         [dv1 - IN USE by Agent A]
+         [dv2 - available]
+         "Using dv2 for debugging"
+         [Launches Chrome: dv2 start --headed]
 
-Agent C: "I need to test responsive design. Checking ports..."
-         [Checks ports 9230, 9231 - IN USE]
-         [Checks port 9232 - available]
-         "Using Chrome profile-3 on port 9232"
-         [Launches Chrome on 9232]
+Agent C: "I need to test responsive design. Checking profiles..."
+         [dv1, dv2 - IN USE]
+         [dv3 - available]
+         "Using dv3"
+         [Launches Chrome: dv3 start --headed]
 ```
 
 **All three agents work simultaneously without conflicts!**
+
+---
+
+## Vite Dev Server Workflow (HMR)
+
+When testing Vite-based projects (JS/TS/Node packages), follow this workflow:
+
+### Start the Dev Server (ONCE per session)
+
+```bash
+# Pick a random port (NOT in 5xxx range — avoid collisions with common ports)
+# e.g. 7214, 8362, 9451. Use the same port for all dv* navigate commands.
+pnpm dev --port 7214
+```
+
+**Rules:**
+- **Start ONCE only** — Vite uses HMR (Hot Module Replacement). After `pnpm dev`, code changes auto-reload the page. No need to restart.
+- **Only restart if:**
+  1. The dev server **crashes** (process exits)
+  2. Chrome shows a **404** when navigating → the dev server wasn't ready or crashed
+- **Do NOT restart** for normal code changes — HMR handles them.
+
+### Navigate with dv*
+
+```bash
+# After pnpm dev is running, point Chrome to it
+# Use the SAME port you started pnpm dev with
+dv3 navigate --url http://localhost:7214
+```
+
+### Handling 404
+
+If `dv* navigate` to the dev server URL results in a 404:
+1. The dev server may have crashed or not started yet
+2. **Run `pnpm dev` again** in the project directory
+3. Wait for the "ready in" message
+4. Navigate again with `dv*`
+
+### Handling Reload Loops
+
+**If Chrome shows a continuous reload loop** (page keeps refreshing without settling):
+
+```bash
+# Kill ALL port spawns under this AI session
+# Find Chrome processes started by this session's dv* instances
+# and kill them by port
+Get-Process -Name chrome | Where-Object { $_.CommandLine -match "remote-debugging-port=(923[0-5])" } | Stop-Process -Force
+```
+
+Then:
+1. Restart the Chrome instances you need (after checking ports are free)
+2. Restart `pnpm dev` if needed
+3. Navigate again
+
+**Why this happens:** Vite's HMR can enter a loop when the WebSocket connection is unstable or the page has a circular module dependency. The Chrome instance gets stuck in a reload cycle. Killing the port frees the Chrome instance so you can start fresh.
+
+---
 
 ## When to Use
 
@@ -149,85 +201,35 @@ Use this master skill when you need comprehensive DOM work that includes:
 - Theme and styling
 - Print media optimization
 - Mobile/desktop responsiveness
-- Viewport and zoom management
-- Unified pointer interactions (mouse/touch)
-- Scroll gesture handling
-- Intelligent blur dismissal
-- Animation and transitions
-- Virtual scrolling and performance optimization
-- Form validation and input handling
-- Drag and drop interactions
-- Event simulation and DOM evaluation
-- Production-level quality with verification
-- **TSX component and CustomElement testing with attribute reactivity verification**
-- **Console log/error/assert reading via MCP tools**
+- TSX component and CustomElement testing with attribute reactivity verification
+- Console log/error/assert reading via dv* commands
+- Vite dev server testing with HMR
+
+---
 
 ## Chrome DevTools CLI Setup
 
 **CRITICAL**: @missbjs/dv CLI requires Chrome to be launched with remote debugging enabled.
 
-### Hardcoded Chrome Profiles (CRITICAL - DO NOT CHANGE)
+### Available Profiles (CRITICAL - DO NOT CHANGE)
 
-**MANDATORY**: Use ONLY these 6 hardcoded Chrome profiles. DO NOT create new profiles or use arbitrary names.
+**Use ONLY these 6 dv profiles. DO NOT create new profiles.**
 
 ```bash
-const CHROME_PROFILES = {
-  profile__1: 'profile-1',  // General use (preserve login state)
-  profile__2: 'profile-2',  // Parallel testing profile
-  profile__3: 'profile-3',  // Parallel testing profile
-  profile__4: 'profile-4',  // Parallel testing profile
-  profile__5: 'profile-5',  // Parallel testing profile
-  profile__6: 'profile-6',  // Parallel testing profile
-}
+dv1  # OAuth/authentication
+dv2  # Parallel testing
+dv3  # Parallel testing
+dv4  # Parallel testing
+dv5  # Parallel testing
+dv6  # Parallel testing
 ```
 
 **Rules**:
-1. **ALWAYS use one of these 6 profile names** when configuring Chrome DevTools MCP
-2. **profile-1 is pinned for OAuth** - preserve login state, DO NOT clear cookies/session
-3. **Use profile-2 through profile-6 for parallel testing** - these can be cleared/reset
-4. **DO NOT create new profile names** - agents will be blamed if they use profiles not in this list
-5. **This saves disk space** and prevents profile proliferation
-6. **Each agent must use a unique profile** to avoid conflicts with parallel agents
-
-### Port Mapping (MEMORIZE THIS)
-
-```
-Profile          Port    Purpose
-─────────────────────────────────────────────
-profile-1   9230    OAuth pinned (preserve login state)
-profile-2   9231    Parallel testing
-profile-3   9232    Parallel testing
-profile-4   9233    Parallel testing
-profile-5   9234    Parallel testing
-profile-6   9235    Parallel testing
-```
-
-### Launch Chrome with Remote Debugging
-
-**MANDATORY**: Before using @missbjs/dv CLI, launch Chrome with remote debugging and a specific profile:
-
-```bash
-# Install @missbjs/dv globally (if not already installed)
-npm install -g @missbjs/dv
-
-# Profile 1 (general use) - port 9230
-dv start --profile profile-1 --headed
-
-# Profile 2 (parallel testing) - port 9231
-dv start --profile profile-2 --headed
-
-# Profile 3 (parallel testing) - port 9232
-dv start --profile profile-3 --headed
-
-# Profile 4 (parallel testing) - port 9233
-dv start --profile profile-4 --headed
-
-# Profile 5 (parallel testing) - port 9234
-dv start --profile profile-5 --headed
-
-# Profile 6 (parallel testing) - port 9235
-dv start --profile profile-6 --headed
-```
+1. **ALWAYS use one of these 6 dv binaries**
+2. **dv1 is for OAuth** - preserve login state, DO NOT clear cookies/session
+3. **Use dv2 through dv6 for parallel testing** - these can be cleared/reset
+4. **DO NOT create new profiles** - agents will be blamed if they use profiles not in this list
+5. **Each agent must use a unique profile** to avoid conflicts with parallel agents
 
 ### Why @missbjs/dv CLI over agent-browser
 
@@ -237,17 +239,18 @@ dv start --profile profile-6 --headed
 - ✅ **Official Protocol**: Uses Chrome's official debugging protocol
 - ✅ **Profile Management**: Built-in profile system for consistent testing
 - ✅ **Parallel Agent Support**: Each profile can be used independently without conflicts
-- ✅ **Mandatory Port Parameter**: Prevents agent collisions by requiring explicit port
+- ✅ **Auto-injected profile**: `dv1`-`dv6` wrappers handle profile management automatically
 
 ### ALWAYS Open in HEADED Mode
 
 **CRITICAL**: Always open Chrome in headed mode (visible browser window) for user inspection.
 
 ```bash
-// When navigating pages, ALWAYS use headed mode
-navigate_page({ url: "http://localhost:3000", headed: true })
+# When navigating pages, ALWAYS use headed mode
+dv3 start --headed
+dv3 navigate --url http://localhost:7214
 
-// User will randomly inspect browsers - keep them visible
+# User will randomly inspect browsers - keep them visible
 ```
 
 **NO headless mode** - user needs to see and inspect browsers at any time.
@@ -272,46 +275,48 @@ navigate_page({ url: "http://localhost:3000", headed: true })
 </div>
 ```
 
+---
+
 ## @missbjs/dv CLI Commands
 
-The @missbjs/dv CLI provides these commands:
+The `dv1`-`dv6` CLI provides these commands. Each binary manages its own profile automatically — just use the right binary name.
 
 ### Navigation & Page Management
 ```bash
 # List all pages
-dv pages --profile profile-1
+dv3 pages
 
-# Select page by URL (via pages command)
-dv pages --profile profile-1
+# Select page by URL
+dv3 pages
 
 # Navigate to URL (ALWAYS headed)
-dv navigate --profile profile-1 --url http://localhost:3000/page
+dv3 navigate --url http://localhost:7214/page
 
 # Create new page
-dv new --profile profile-1 --url http://localhost:3000
+dv3 new --url http://localhost:7214
 
 # Check Chrome status
-dv status --profile profile-1
+dv3 status
 
 # Close page
-dv close --profile profile-1 --page-id <page-id>
+dv3 close --page-id <page-id>
 ```
 
 ### Console Reading (CRITICAL)
 
-**MANDATORY**: Use dv console command for reading console.log, console.error, and console.assert messages.
+**MANDATORY**: Use `dv* console` command for reading console.log, console.error, and console.assert messages.
 
 ```bash
 # List all console messages
-dv console --profile profile-1
+dv3 console
 
 # Filter by type
-dv console --profile profile-1 --type error
-dv console --profile profile-1 --type log
-dv console --profile profile-1 --type warn
+dv3 console --type error
+dv3 console --type log
+dv3 console --type warn
 
 # JSON output for programmatic access
-dv console --profile profile-1 --json
+dv3 console --json
 ```
 
 **Why dv console over eval script**:
@@ -324,10 +329,10 @@ dv console --profile profile-1 --json
 ### Inspection & Evaluation
 ```bash
 # Execute JavaScript (for DOM inspection, NOT console reading)
-dv eval --profile profile-1 --script "document.title"
+dv3 eval --script "document.title"
 
 # Check styles
-dv eval --profile profile-1 --script "
+dv3 eval --script "
 (() => {
   const el = document.querySelector('.target');
   const styles = getComputedStyle(el);
@@ -340,26 +345,68 @@ dv eval --profile profile-1 --script "
 "
 
 # Take snapshot (text-based accessibility tree)
-dv snapshot --profile profile-1
+dv3 snapshot
 
 # Take screenshot (visual inspection)
-dv screenshot --profile profile-1 --output screenshot.png
+dv3 screenshot --output screenshot.png
 ```
 
 ### Interaction
 ```bash
 # Click element by selector
-dv click --profile profile-1 --selector "#button"
+dv3 click --selector "#button"
 
 # Fill input
-dv fill --profile profile-1 --selector "#email" --value "test@example.com"
+dv3 fill --selector "#email" --value "test@example.com"
 
 # Type text
-dv type --profile profile-1 --selector "#input" --value "typing content"
+dv3 type --selector "#input" --value "typing content"
 
 # Press key
-dv key --profile profile-1 --key Enter
+dv3 key --key Enter
 ```
+
+---
+
+## Vite Dev Server + dv* Workflow (Quick Reference)
+
+This is the complete workflow for testing a Vite-based project:
+
+```bash
+# ── Step 1: Start Vite dev server (ONCE per session) ──
+# Pick a random port (NOT in 5xxx range — avoid collisions with common ports)
+# e.g. 7214, 8362, 9451. Use the same port for all dv* navigate commands.
+pnpm dev --port 7214
+
+# ── Step 2: Start Chrome (ONCE per session) ──
+dv2 start --headed
+
+# ── Step 3: Navigate to the dev server (use SAME port as Step 1) ──
+dv2 navigate --url http://localhost:7214
+
+# ── Step 4: Read console output ──
+dv2 console --type error
+dv2 console --type log
+
+# ── Step 5: Make code changes ──
+# HMR auto-reloads. No need to restart dv navigate.
+# Just re-read console after changes:
+dv2 console --type error
+
+# ── Step 6: If 404 ──
+# The dev server may have crashed. Restart it:
+# pnpm dev --port 7214
+# Then navigate again:
+# dv2 navigate --url http://localhost:7214
+
+# ── Step 7: If reload loop ──
+# Kill all Chrome instances spawned by this session:
+# (PowerShell)
+Get-Process -Name chrome | Where-Object { $_.CommandLine -match "remote-debugging-port=(923[0-5])" } | Stop-Process -Force
+# Then restart from Step 2.
+```
+
+---
 
 ## Sub-Skills Architecture
 
@@ -391,24 +438,26 @@ The DOM ecosystem consists of specialized skills that work together:
 - Style debugging (CSS conflicts, specificity)
 - Performance debugging (layout thrashing, reflows)
 - Cross-browser debugging
-- **Console log/error/assert reading via MCP tools**
+- **Console log/error/assert reading via dv* commands**
 - **Chrome DevTools MCP integration (MANDATORY)**
 
 **Workflow**:
-1. **Choose unique profile** - check port availability, avoid conflicts with other agents
-2. **Launch Chrome with @missbjs/dv**: Use dv start --profile profile-X --headed
-3. **Open page HEADED**: `dv navigate --profile profile-X --url <url>`
-4. **Read console logs**: `dv console --profile profile-X --type error`
-5. **Inspect element**: `dv eval --profile profile-X --script "..."` with `getComputedStyle(element)`
-6. **Compare intended vs actual** behavior
-7. **Identify root cause** from actual runtime data
-8. **Propose fix with approval**
-9. **Apply and verify** using @missbjs/dv commands again
-10. **Document solution**
+1. **Choose unique profile** - check availability, avoid conflicts with other agents
+2. **Start Vite dev server** (if not already running): `pnpm dev --port 7214`
+3. **Launch Chrome**: `dv2 start --headed`
+4. **Open page HEADED**: `dv2 navigate --url http://localhost:7214`
+5. **Read console logs**: `dv2 console --type error`
+6. **Inspect element**: `dv2 eval --script "..."` with `getComputedStyle(element)`
+7. **Compare intended vs actual** behavior
+8. **Identify root cause** from actual runtime data
+9. **Propose fix with approval**
+10. **Apply fix** (HMR auto-reloads)
+11. **Verify** using `dv2 console --type error` and `dv2 eval` again
+12. **Document solution**
 
-**CRITICAL**: Do NOT guess or assume. Always use @missbjs/dv CLI to:
-- Read console.log and console.error messages via dv console
-- Check actual DOM state with dv eval
+**CRITICAL**: Do NOT guess or assume. Always use dv* CLI to:
+- Read console.log and console.error messages via `dv* console`
+- Check actual DOM state with `dv* eval`
 - Inspect computed styles
 - Verify event listeners
 - Test fixes in real browser context
@@ -516,13 +565,16 @@ The DOM ecosystem consists of specialized skills that work together:
 - Automated snapshot testing with TestSnapshots
 
 **Workflow**:
-1. Analyze component props and types
-2. Add defaults() wrapper with reactive $()
-3. Register as CustomElement
-4. Test initial attribute values
-5. Verify setAttribute() reactivity
-6. Check type conversions
-7. Validate shadow DOM rendering
+1. Start Vite dev server: `pnpm dev --port 7214`
+2. Launch Chrome: `dv2 start --headed`
+3. Navigate to playground: `dv2 navigate --url http://localhost:7214`
+4. Analyze component props and types
+5. Add defaults() wrapper with reactive $()
+6. Register as CustomElement
+7. Test initial attribute values: `dv2 console --type log`
+8. Verify setAttribute() reactivity: `dv2 eval --script "..."` 
+9. Check type conversions
+10. Validate shadow DOM rendering
 
 **CRITICAL**: Use this sub-skill when testing CustomElements to catch bugs where attributes are set but don't appear in components due to missing $() in defaults().
 
@@ -542,9 +594,11 @@ The DOM ecosystem consists of specialized skills that work together:
 2. Choose Portal pattern based on use case
 3. Apply z-index hierarchy
 4. Handle nested component dismissal (cancelOnBlur)
-5. Verify with Chrome DevTools MCP
+5. Verify with Chrome DevTools
 
 **CRITICAL**: Use this sub-skill when creating modals, dropdowns, sidebars, or any component that needs to escape its DOM hierarchy.
+
+---
 
 ## Professional Design Workflow
 
@@ -580,21 +634,26 @@ All sub-skills follow this professional workflow:
 - Note edge cases
 - Create maintenance guide
 
+---
+
 ## Common Workflows
 
 ### Debug a Layout Issue
 ```bash
-# 1. Launch Chrome with unique profile (HEADED mode)
-dv start --profile profile-2 --headed
+# 1. Start Vite dev server (if not running)
+# pnpm dev --port 7214
 
-# 2. Navigate to page
-dv navigate --profile profile-2 --url http://localhost:3000/page
+# 2. Launch Chrome with unique profile (HEADED mode)
+dv2 start --headed
 
-# 3. Read console messages
-dv console --profile profile-2 --type error
+# 3. Navigate to page
+dv2 navigate --url http://localhost:7214
 
-# 4. Inspect the element
-dv eval --profile profile-2 --script "
+# 4. Read console messages
+dv2 console --type error
+
+# 5. Inspect the element
+dv2 eval --script "
 (() => {
   const el = document.querySelector('.problem-element');
   const styles = getComputedStyle(el);
@@ -614,38 +673,38 @@ dv eval --profile profile-2 --script "
 })()
 "
 
-# 5. Fix the issue in code
-# 6. Verify the fix (navigate again or reload)
-dv navigate --profile profile-2 --url http://localhost:3000/page
+# 6. Fix the issue in code (HMR auto-reloads)
+# 7. Verify the fix
+dv2 navigate --url http://localhost:7214
 
-# 7. Check console for errors after fix
-dv console --profile profile-2 --type error
+# 8. Check console for errors after fix
+dv2 console --type error
 ```
 
 ### Capture All Console Errors
 ```bash
 # Launch Chrome and navigate
-dv start --profile profile-2 --headed
-dv navigate --profile profile-2 --url http://localhost:3000
+dv2 start --headed
+dv2 navigate --url http://localhost:7214
 
 # List all console messages
-dv console --profile profile-2
+dv2 console
 
 # Filter by type (error, log, warn)
-dv console --profile profile-2 --type error
-dv console --profile profile-2 --type log
-dv console --profile profile-2 --type warn
+dv2 console --type error
+dv2 console --type log
+dv2 console --type warn
 
 # JSON output for parsing
-dv console --profile profile-2 --json
+dv2 console --json
 ```
 
 ### Enumerate All Colors
 ```bash
-dv start --profile profile-2 --headed
-dv navigate --profile profile-2 --url http://localhost:3000
+dv2 start --headed
+dv2 navigate --url http://localhost:7214
 
-dv eval --profile profile-2 --script "
+dv2 eval --script "
 (() => {
   const colors = { all: new Set() };
   document.querySelectorAll('*').forEach(el => {
@@ -661,14 +720,14 @@ dv eval --profile profile-2 --script "
 ### Test Responsive Design
 ```bash
 # Launch Chrome and navigate
-dv start --profile profile-2 --headed
-dv navigate --profile profile-2 --url http://localhost:3000
+dv2 start --headed
+dv2 navigate --url http://localhost:7214
 
 # Resize to mobile viewport
-dv resize --profile profile-2 --width 375 --height 667
+dv2 resize --width 375 --height 667
 
 # Check element visibility
-dv eval --profile profile-2 --script "
+dv2 eval --script "
 (() => {
   return {
     mobileMenuVisible: document.querySelector('.mobile-menu').offsetWidth > 0,
@@ -678,6 +737,8 @@ dv eval --profile profile-2 --script "
 "
 ```
 
+---
+
 ## Iterative Debugging Loop
 
 The debugging process is iterative: diagnose, fix, verify, repeat until the issue is resolved.
@@ -686,79 +747,62 @@ The debugging process is iterative: diagnose, fix, verify, repeat until the issu
 
 **Phase 1: Initial Diagnosis**
 ```bash
-// Navigate to page (HEADED, hardcoded profile)
-navigate_page({ url: "http://localhost:3000", headed: true })
+# Navigate to page (HEADED)
+dv2 navigate --url http://localhost:7214
 
-// Read console messages via MCP tools
-const consoleMessages = list_console_messages()
-console.log("Console messages:", consoleMessages)
+# Read console messages
+dv2 console --type error
 
-// Inspect element
-evaluate_script({
-  script: `
-    (() => {
-      const el = document.querySelector('.problem-element');
-      const styles = getComputedStyle(el);
-      return {
-        element: el.tagName,
-        classes: el.className,
-        computedStyles: {
-          display: styles.display,
-          position: styles.position,
-          width: styles.width,
-          height: styles.height,
-          zIndex: styles.zIndex,
-          overflow: styles.overflow
-        },
-        boundingRect: el.getBoundingClientRect()
-      };
-    })()
-  `
-})
+# Inspect element
+dv2 eval --script "
+(() => {
+  const el = document.querySelector('.problem-element');
+  const styles = getComputedStyle(el);
+  return {
+    element: el.tagName,
+    classes: el.className,
+    computedStyles: {
+      display: styles.display,
+      position: styles.position,
+      width: styles.width,
+      height: styles.height,
+      zIndex: styles.zIndex,
+      overflow: styles.overflow
+    },
+    boundingRect: el.getBoundingClientRect()
+  };
+})()
+"
 ```
 
 **Phase 2: Apply Fix**
 - **ALWAYS use Tailwind classes directly in HTML, NOT inline `style` attributes**
 - Save changes to source files
-- Reload: `navigate_page({ url: "http://localhost:3000", headed: true })`
+- HMR auto-reloads the page
+- Wait a moment for HMR to complete, then verify
 
 **Phase 2.5: Verify Console After Reload (MANDATORY)**
-**After reloading the page, ALWAYS check the console via MCP tools.**
+**After the page reloads (via HMR), ALWAYS check the console.**
 
 ```bash
-// List console messages via MCP
-const newConsoleMessages = list_console_messages()
-
-// Filter errors
-const errors = newConsoleMessages.filter(msg => msg.type === "error")
-
-// Check if fix applied
-evaluate_script({
-  script: `
-    (() => {
-      return {
-        hasErrors: ${errors.length} > 0,
-        fixApplied: document.querySelector('.problem-element') !== null
-      };
-    })()
-  `
-})
+# List console messages
+dv2 console --type error
 ```
 
 **Phase 3: Verify Fix**
 ```bash
-evaluate_script({
-  script: `
-    (() => {
-      const el = document.querySelector('.problem-element');
-      return {
-        isVisible: el.offsetWidth > 0 && el.offsetHeight > 0,
-        rect: el.getBoundingClientRect()
-      };
-    })()
-  `
-})
+dv2 eval --script "
+(() => {
+  const el = document.querySelector('.problem-element');
+  return {
+    isVisible: el.offsetWidth > 0 && el.offsetHeight > 0,
+    rect: el.getBoundingClientRect()
+  };
+})()
+"
 ```
+
+---
 
 ## TailwindCSS Integration
 
@@ -827,6 +871,8 @@ All sub-skills are TailwindCSS-aware:
 - `top-0 left-0` → `top: 0; left: 0`
 - `z-10` → `z-index: 10`
 
+---
+
 ## Styling Components: cls and class Props
 
 **No inline styles.** Woby components are styled exclusively via `cls` and `class` props (Tailwind classes only). Never pass a `style` attribute or object to a Woby component.
@@ -893,6 +939,8 @@ Use Tailwind's `[&_tag]` / `[&>tag]` syntax inside `class` or `cls` to style des
 
 **Shadow DOM note:** The selector classes must be on the **inner element** (inside shadow DOM), not just on the host. Woby adopts document stylesheets into shadow DOM via `adoptedStyleSheets`, so `[&_td]:p-2` on an inner `<table>` correctly reaches `<td>` elements inside the shadow root.
 
+---
+
 ## Automatic Skill Routing
 
 The master skill automatically routes to appropriate sub-skills based on context:
@@ -912,13 +960,15 @@ IF Portal/modal/sidebar/dropdown → /dom-portal
 IF multiple concerns → combine sub-skills
 ```
 
+---
+
 ## Getting Started
 
 When you invoke this master skill, it will:
 1. **Check for parallel agents** and choose a unique profile
-2. **Verify port availability** before launching Chrome
-3. **Launch Chrome** with the chosen profile
-4. **Connect via MCP** using the correct server
+2. **Verify availability** before launching Chrome
+3. **Start Vite dev server** (if testing a Vite project) with `pnpm dev --port <port>` (pick a random port, NOT in 5xxx)
+4. **Launch Chrome** with the chosen profile (`dvX start --headed`)
 5. Analyze your request
 6. Route to appropriate sub-skills
 7. Execute professional workflow

@@ -161,6 +161,36 @@ if (ctx > 0) { ... }       // compares function to number — always true!
 
 Always `$$()` unwrap context values in logic: `if ($$(ctx) > 0) { ... }`
 
+### `@`-Prefix Context Resolution
+
+Reference context values directly in HTML attributes — no `useContext()` inside the component:
+
+```typescript
+import { createContext, registerContextRef } from 'woby'
+
+// 1. Create context as usual
+const ThemeCtx = createContext('light')
+
+// 2. Register for @-prefix resolution
+registerContextRef('theme', ThemeCtx)
+
+// 3. Use @-prefix in HTML attributes
+// <my-element color="@theme" />
+// → my-element receives the provider's current value (reactive)
+
+// Full example:
+<ThemeCtx.Provider value="dark">
+  <my-element color="@theme" />
+  {/* → color = "dark", updates when provider value changes */}
+</ThemeCtx.Provider>
+```
+
+**How it works**: When `setObservableValue` sees an attribute value starting with `@`, it resolves the registered context symbol, walks DOM ancestors to find the nearest provider, and returns the provider's reactive observable. The consumer's prop updates automatically.
+
+**`@@` escape**: `@@literal` → `"@literal"` (passes through normal type conversion).
+
+**Key exports**: `registerContextRef(name, ctx)`, `unregisterContextRef(name)`, `resolveContextRef(ref, element?)`, `isContextRef(value)`.
+
 ---
 
 ## Custom Elements (Web Components)
@@ -379,11 +409,11 @@ batch(() => {
 Core:         $  $$  batch  untrack  resolve  tick  store
 Reactivity:   useMemo  useEffect  useCleanup  useError  useRoot  useSelector
 DOM/UI:       render  renderToString  customElement  defaults  assign  make  clone
-Context:      createContext  useContext
+Context:      createContext  useContext  registerContextRef  unregisterContextRef
 Elements:     ElementAttributes  HtmlNumber  HtmlBoolean  HtmlDate  HtmlBigInt  HtmlFunction
 Hooks:        useEventListener  useFetch  useResource  useResolved  useMounted  useContext
 Components:   Dynamic  ErrorBoundary  Fragment  KeepAlive  Portal  Suspense
-Utils:        isObservable  isStore  isFunction  isNode  castArray  mark  noop  setProp
+Utils:        isObservable  isStore  isFunction  isNode  castArray  mark  noop  setProp  resolveContextRef  isContextRef
 SSR:          ssr.*  createDocument  isServer  renderToString
 ```
 
@@ -491,6 +521,40 @@ expect(element.classList).toContain('user-addon')
 <Comp cls="full-override" class="addon-class">
 // Result: "full-override addon-class" (no defaults!)
 ```
+
+### Using `dv1-6` CLI for Live Verification
+
+The `dv1-6` CLI (Chrome DevTools Protocol wrapper) is the **primary tool** for verifying component behavior in a real browser — use it instead of raw WebSocket/CDP scripts:
+
+```powershell
+# Navigate to playground
+dv3 navigate --url http://localhost:7214
+
+# Read console logs (test results, errors)
+dv3 console --type log    # all logs
+dv3 console --type error  # errors only
+dv3 console --json        # machine-readable output
+
+# Inspect DOM state
+dv3 inspect 'counter-element'
+dv3 get-text '.result'
+
+# Take a screenshot for visual verification
+dv3 screenshot --output screenshot.png
+
+# Get accessibility snapshot (useful for SSR verification)
+dv3 snapshot
+
+# Evaluate arbitrary JS in the page
+dv3 eval --script "document.querySelector('counter-element')?.shadowRoot?.innerHTML"
+```
+
+**When to use:**
+- After rebuilding and restarting the dev server, use `dv* console` to check for errors
+- Use `dv* inspect` or `dv* query-all` to verify DOM structure matches expectations
+- Use `dv* screenshot` for visual regression checks
+
+> **Never fall back to raw WebSocket/CDP scripts** (`require('ws')`, `new WebSocket`, `DevToolsAPI`) — `dv1-6` provides structured commands that handle port and page management automatically.
 
 ---
 

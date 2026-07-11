@@ -28,10 +28,11 @@ D:/Developments/tslib/@woby/
 ```powershell
 # Start
 cd D:/Developments/tslib/@woby/woby/demo/playground
-pnpm dev    # → http://localhost:5276/
+# Pick a random port NOT in 5xxx range (avoid collisions with common ports)
+pnpm dev --port 7214
 
 # Kill by port (when server hangs)
-$pid = (Get-NetTCPConnection -LocalPort 5276 -State Listen).OwningProcess
+$pid = (Get-NetTCPConnection -LocalPort 7214 -State Listen).OwningProcess
 Stop-Process -Id $pid -Force
 ```
 
@@ -55,21 +56,29 @@ After rebuilding soby: restart the playground dev server.
 
 ---
 
-## Testing with Playwright
+## Testing with `dv1-6` CLI
 
-The playground auto-runs tests on load and logs results to the browser console. Use Playwright to read them:
+The playground auto-runs tests on load and logs results to the browser console. Use `dv* console` to read them:
 
-```typescript
-// Navigate and check errors
-await page.goto('http://localhost:5276/')
-const msgs = await page.evaluate(() =>
-  window.__playwright_console ?? []
-)
+```powershell
+# 0. Start Vite dev server (if not running) — ONCE per session, HMR handles reloads
+# Pick a random port NOT in 5xxx range (avoid collisions with common ports) e.g. 7214, 8362, 9451
+pnpm dev --port 7214
 
-// Filter for test results
-// ✅ [TestName] SSR test passed: ...
-// ✅ Expect function test passed for TestName
-// ❌ FAIL / [ASSERT] / Error: ...
+# 1. Start Chrome (pick available profile, e.g. dv2)
+dv2 start --headed
+
+# 2. Navigate to playground
+dv2 navigate --url http://localhost:7214
+
+# 3. Read all console logs (test results, component output)
+dv2 console --type log
+
+# 4. Check for errors only (stack overflows, assertion failures, type errors)
+dv2 console --type error
+
+# 5. Machine-readable JSON output
+dv2 console --json
 ```
 
 **Console level meanings:**
@@ -77,14 +86,38 @@ const msgs = await page.evaluate(() =>
 - `[ASSERT]` — test assertion failures (check these first)
 - `[ERROR]` — uncaught errors (stack overflows, type errors, etc.)
 
-### Quick Playwright snippet
+### DOM Inspection
 
-```javascript
-// In browser_evaluate
-const results = performance.getEntriesByType('measure')
-const errors = []
-// listen for errors
-window.addEventListener('error', e => errors.push(e.message))
+```powershell
+# Inspect a specific element
+dv2 inspect 'counter-element'
+
+# Query all matching elements
+dv2 query-all 'counter-element'
+
+# Get text content
+dv2 get-text '.result-container'
+
+# Get full HTML of an element
+dv2 get-html '#app'
+```
+
+### Screenshots & Snapshots
+
+```powershell
+# Visual check
+dv2 screenshot --output screenshot.png
+
+# Accessibility tree snapshot (useful for SSR output verification)
+dv2 snapshot
+```
+
+### Quick JS Evaluation
+
+```powershell
+# Evaluate arbitrary JS in page context
+dv2 eval --script "window.__playwright_console"
+dv2 eval --script "document.querySelector('counter-element').shadowRoot.querySelector('button').click()"
 ```
 
 ---
@@ -189,7 +222,7 @@ This means when a JSX prop like `value={321}` is passed to a custom element, by 
 
 **Cause:** Vite caches transformed module content in memory. The `@fs/` URL Vite uses for the soby dist file is cached from before the rebuild.
 
-**Fix:** Kill the playground dev server process (by port 5276) and restart it. Simple browser hard-refresh is NOT enough.
+**Fix:** Kill the playground dev server process (by port, e.g. 7214) and restart it. Simple browser hard-refresh is NOT enough.
 
 ### Observable function passed as event prop — not called
 
@@ -237,8 +270,9 @@ Each test file exports a component and optionally a `.test` object with `expect(
 
 ## Playground Test Protocol
 
-1. Start or restart dev server
-2. Navigate to `http://localhost:5276/`
-3. Check console: `browser_console_messages(level: 'error')` → should be 0 errors
-4. Check specific tests: `browser_console_messages(level: 'info')` → grep for `✅` / `❌`
-5. For click tests (TestWobyOnClick, TestShadowOnClick): these require DOM — they auto-fire clicks via `button.click()` in `useEffect`
+1. Start or restart dev server (pick port NOT in 5xxx, e.g. 7214)
+2. Navigate: `dv2 navigate --url http://localhost:7214`
+3. Check errors: `dv2 console --type error` → should be 0 errors
+4. Check test results: `dv2 console --type log` → grep for `✅` / `❌`
+5. For click tests (TestWobyOnClick, TestShadowOnClick): these require DOM — they auto-fire clicks via `button.click()` in `useEffect`. Verify with `dv2 inspect` or `dv2 get-text`
+6. Use `--json` flag for machine-readable output to pipe into other tools
