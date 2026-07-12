@@ -95,7 +95,7 @@ const TestContextHook = (): JSX.Element => {
 
             {/* Test isStatic prop - ensures observable values are unwrapped */}
             <h3>isStatic Test</h3>
-            <Context.Provider value={$('observable-value')} isStatic>
+            <Context.Provider value={$('observable-value')} {...{'static': true}}>
                 <IsStaticTestChild />
             </Context.Provider>
         </>

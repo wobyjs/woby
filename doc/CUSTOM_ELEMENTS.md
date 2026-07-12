@@ -917,7 +917,11 @@ registerContextRef('theme', ThemeCtx)
 </theme-context-provider>
 ```
 
-**How it works**: When a custom element attribute value starts with `@` (but not `@@`), Woby's `setObservableValue` function intercepts it, looks up the registered context symbol by the dotted name, walks the DOM ancestors to find the nearest provider, and returns the provider's reactive observable. The consumer's prop updates automatically when the provider's value changes.
+**How it works**: When a custom element attribute value starts with `@` (but not `@@`), Woby's `setObservableValue` function intercepts it, looks up the registered context symbol by the dotted name, resolves the nearest provider, and returns the provider's reactive observable. The consumer's prop updates automatically when the provider's value changes.
+
+**Two-way updates**: For JSX-created elements the resolution happens in the constructor, before the component renders — the consumer's default observable is replaced by the context's observable itself. The prop and the context are the **same instance**, so writing to the prop inside the consumer updates the provider and all other consumers. For HTML-created elements the resolution happens in `connectedCallback` (after the component already rendered), so a one-way `effect()` bridge copies context → prop with the prop's `fromHtml` type conversion; the bridge is disposed in `disconnectedCallback`.
+
+**Static mode**: `<theme-context-provider static value="dark">` (or `<ThemeCtx.Provider static ...>` in JSX) makes consumers receive a one-time snapshot instead of the live observable.
 
 **Escape syntax**: `@@` produces a literal `@` value (e.g. `@@literal` → `"@literal"`).
 

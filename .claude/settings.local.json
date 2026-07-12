@@ -1,4 +1,16 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(pnpm build *)",
+      "Bash(pnpm dev *)",
+      "Bash(npx vite *)",
+      "Bash(dv2 navigate *)",
+      "Bash(dv2 status *)",
+      "Bash(dv2 new *)",
+      "Bash(dv2 console *)",
+      "Bash(dv2 *)"
+    ]
+  },
   "disabledMcpjsonServers": [
     "nodejs-debugger",
     "chrome-devtools",

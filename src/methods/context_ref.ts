@@ -16,7 +16,7 @@
  * @module context_ref
  */
 
-import { context, isObservable } from './soby'
+import { context, isObservable, $$ } from './soby'
 import { OWNER } from 'soby'
 import { CONTEXTS_DATA, SYMBOL_CONTEXT_WRAP } from '../constants'
 import { peekPendingContextWrap } from './custom_element'
@@ -25,6 +25,7 @@ import type { Context } from '../types'
 interface ContextRefEntry {
     symbol: symbol
     defaultValue: any
+    context: Context<any>
 }
 
 const contextRefRegistry = new Map<string, ContextRefEntry>()
@@ -49,6 +50,7 @@ export const registerContextRef = (name: string, ctx: Context<any>): void => {
     contextRefRegistry.set(name, {
         symbol: contextData.symbol,
         defaultValue: contextData.defaultValue,
+        context: ctx,
     })
 }
 
@@ -129,58 +131,120 @@ export const resolveContextRef = (ref: string, element?: Element): any => {
     }
 
     const entry = contextRefRegistry.get(refKey)!
-    const { symbol, defaultValue } = entry
+    const { symbol, defaultValue, context: ctx } = entry
+
+    // Compute isStatic once — shared by all return sites
+    const contextData = CONTEXTS_DATA.get(ctx)
+    const isStatic = contextData ? $$(contextData.isStatic as any) : false
 
     if (!element) {
         // No element to walk from — return default value
         return defaultValue
     }
 
-    // Step 1: Try the ambient soby context FIRST.
-    // Pure JSX providers (invisible <Context.Provider> with no enclosing
-    // custom element) establish context via soby's context() function at
-    // render time, NOT via DOM-visible SYMBOL_CONTEXT_WRAP. The ambient
-    // context is available as long as we're inside the soby ownership tree
-    // created by the Provider's context({ [symbol]: value }, fn) call.
-    const ambient = context(symbol)
-    if (ambient !== undefined) {
-        return isObservable(ambient) ? ambient() : ambient
-    }
+    // Determine if the element is connected to the DOM.
+    // In the constructor (JSX path), element.isConnected is false.
+    // In connectedCallback (HTML path), element.isConnected is true.
+    const isConnected = element.isConnected
 
-    // Step 1.5: Try the pending context wrap global (_pendingContextWrapGlobal).
-    // Invisible JSX providers (no enclosing custom element) store their context
-    // replay function in a global via composePendingContextWrap(). When no
-    // custom element consumes it (consumePendingContextWrap), the wrap remains
-    // available. This fallback invokes the wrap and tries context(symbol) inside.
-    const pendingWrap = peekPendingContextWrap()
-    if (pendingWrap) {
-        let resolved: any = undefined
-        pendingWrap(() => {
-            resolved = context(symbol)
-        })
-        if (resolved !== undefined) {
-            return isObservable(resolved) ? resolved() : resolved
+    // --- Resolution strategy ---
+    //
+    // Priority depends on the element's connection state:
+    //
+    // CONSTRUCTOR path (isConnected === false, JSX-created elements):
+    //   1. peekPendingContextWrap() — the JSX <Provider> sets up a pending
+    //      context wrap before creating children. This is the most reliable
+    //      source for JSX-created elements.
+    //   2. context(symbol) — fallback for when there's no pending wrap.
+    //      NOTE: This returns the LAST provider's value in soby's ownership
+    //      tree, which is wrong when multiple providers of the same context
+    //      exist. Acceptable fallback only when pending wrap is empty.
+    //   DOM walk is skipped — element not connected, no parentNode.
+    //
+    // CONNECTED path (isConnected === true, HTML-created elements):
+    //   1. DOM ancestor walk (collectAncestorContextWrap) — walks the actual
+    //      DOM tree to find the nearest provider with SYMBOL_CONTEXT_WRAP.
+    //      This is reliable for HTML-created elements where providers are
+    //      visible custom elements.
+    //   2. peekPendingContextWrap() — fallback for invisible JSX providers
+    //      in the connected path.
+    //   3. context(symbol) — last resort.
+    //
+    if (isConnected) {
+        // CONNECTED path: DOM walk first, then pending wrap, then context()
+
+        // Step 1: Walk DOM ancestors to find SYMBOL_CONTEXT_WRAP.
+        // This handles HTML-created custom elements where providers are
+        // visible DOM nodes with the context-wrap function stored on them.
+        const ancestorWrap = collectAncestorContextWrap(element)
+        if (ancestorWrap) {
+            let resolved: any = undefined
+            ancestorWrap(() => {
+                resolved = context(symbol)
+            })
+            if (resolved !== undefined) {
+                const isObs = isObservable(resolved)
+                if (isObs) return isStatic ? $$(resolved) : resolved
+                return resolved
+            }
         }
-    }
 
-    // Step 2: Walk DOM ancestors to find SYMBOL_CONTEXT_WRAP and resolve context.
-    // This handles providers that ARE visible custom elements (e.g. <ctx-ref-provider>
-    // wrapping slotted children in raw HTML). These providers store a context-replay
-    // function on their DOM node, which collectAncestorContextWalk discovers.
-    // The DOM walk is only needed when the element is connected (parentNode !== null),
-    // which is true in connectedCallback but NOT in the constructor.
-    const ancestorWrap = collectAncestorContextWrap(element)
-
-    if (ancestorWrap) {
-        let resolved: any = undefined
-        ancestorWrap(() => {
-            resolved = context(symbol)
-        })
-        if (resolved !== undefined) {
-            const isObs = isObservable(resolved)
-            if (isObs) return resolved()
-            return resolved
+        // Step 2: Try the pending context wrap global.
+        // Invisible JSX providers (no enclosing custom element) store their
+        // context replay function in a global via composePendingContextWrap().
+        const pendingWrap = peekPendingContextWrap()
+        if (pendingWrap) {
+            let resolved: any = undefined
+            pendingWrap(() => {
+                resolved = context(symbol)
+            })
+            if (resolved !== undefined) {
+                return isStatic ? (isObservable(resolved) ? $$(resolved) : resolved) : resolved
+            }
         }
+
+        // Step 3: Fall back to ambient soby context.
+        // This is the least reliable for connected elements because
+        // context(symbol) returns the last provider's value in soby's
+        // ownership tree, not the nearest DOM ancestor.
+        const ambient = context(symbol)
+        if (ambient !== undefined) {
+            return isStatic
+                ? (isObservable(ambient) ? $$(ambient) : ambient)
+                : ambient
+        }
+    } else {
+        // CONSTRUCTOR path: ambient context first, then pending wrap, skip DOM walk
+
+        // Step 1: Try the ambient soby context.
+        // JSX-created custom elements construct lazily INSIDE their provider's
+        // context({...}, () => resolve(children)) call, so soby's dynamically
+        // scoped context gives the correct nearest provider — including after
+        // a nested sibling provider has closed (its scope is properly popped).
+        // The pending-wrap global, by contrast, only ever ACCUMULATES nested
+        // provider wraps (they must persist for the enclosing custom element's
+        // consumePendingContextWrap capture), so a sibling constructed after a
+        // nested provider would wrongly see that provider's value through it.
+        const ambient = context(symbol)
+        if (ambient !== undefined) {
+            return isStatic
+                ? (isObservable(ambient) ? $$(ambient) : ambient)
+                : ambient
+        }
+
+        // Step 2: Fall back to the pending context wrap global for elements
+        // constructed outside any provider's synchronous context scope.
+        const pendingWrap = peekPendingContextWrap()
+        if (pendingWrap) {
+            let resolved: any = undefined
+            pendingWrap(() => {
+                resolved = context(symbol)
+            })
+            if (resolved !== undefined) {
+                return isStatic ? (isObservable(resolved) ? $$(resolved) : resolved) : resolved
+            }
+        }
+        // DOM walk skipped — element not connected to DOM.
     }
 
     // No provider found — return default value

@@ -20,6 +20,7 @@ interface ContextProviderProps {
   value?: ObservableMaybe<any>
   children?: ObservableMaybe<Child>
   symbol?: ObservableMaybe<Symbol>
+  'static'?: boolean
   isStatic?: boolean
   visible?: boolean
 }
@@ -61,13 +62,13 @@ export function createContext<T>(defaultValue?: T): ContextWithDefault<T> | Cont
       children: $(undefined, HtmlChild),
       symbol: symbol,
       [SYMBOL_CONTEXT]: Context,
-      isStatic: false
+      'static': false
       // Note: visible is NOT in defaults - it should be undefined by default
       // so JSX providers are invisible unless visible={true} is explicitly passed
-    } as { value: ObservableMaybe<T>, children: Child, isStatic?: boolean, visible?: boolean }),
+    } as { value: ObservableMaybe<T>, children: Child, 'static'?: boolean, visible?: boolean }),
     (props: ContextProviderProps): Child => {
-      // Extract isStatic from props (already wrapped by defaults)
-      const isStaticValue = $$(props?.isStatic as any)
+      // Extract isStatic from props (use 'static' prop, default to false)
+      const isStaticValue = $$((props as any)['static'] as any) ?? false
       CONTEXTS_DATA.set(Context, { symbol, defaultValue, isStatic: /* isStatic */(isStaticValue) })
       
       const { value, children, ref, ...restProps } = props as any

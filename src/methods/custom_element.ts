@@ -27,7 +27,7 @@ import { SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
 import { setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
-import { callStack, isObservableWritable, Observable, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNTRACKED_UNWRAPPED } from "soby"
+import { callStack, effect, isObservableWritable, Observable, root, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNTRACKED_UNWRAPPED } from "soby"
 import type { ObservableOptions } from "soby"
 import { isObject, isPureFunction } from "../utils"
 import { useEffect } from "../hooks"
@@ -462,6 +462,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         }
 
         disconnectedCallback() {
+            // Dispose context ref reactive bindings
+            const disposers = (this as any).__contextRefDisposers
+            if (disposers) {
+                for (const dispose of disposers) dispose()
+                delete (this as any).__contextRefDisposers
+            }
             if (this._attrObserver) {
                 this._attrObserver.disconnect()
                 this._attrObserver = null
@@ -599,18 +605,69 @@ const setObservableValue = (obj: any, key: string, value: string, element?: Elem
             if (isObservable(obj[key]) && isObservableWritable(obj[key])) {
                 const resolved = resolveContextRef(value, element)
                 if (resolved !== undefined) {
-                    // Apply type conversion from the target observable's options
-                    const options = (obj[key][SYMBOL_OBSERVABLE_WRITABLE]).options as ObservableOptions<any> | undefined
-                    const { type, fromHtml } = options ?? {}
-                    if (type && fromHtml) {
-                        // Use fromHtml if available (e.g., HtmlNumber → String → Number)
-                        const converted = fromHtml(resolved)
-                        obj[key](converted)
-                    } else if (type === 'boolean') {
-                        const lowerValue = String(resolved)?.toLowerCase()
-                        obj[key](lowerValue === 'true' || lowerValue === '1' || lowerValue === '')
+                    // Check if the resolved value is an observable (reactive mode)
+                    if (isObservable(resolved)) {
+                        // Reactive mode: the resolved value IS an observable.
+                        //
+                        // When called from the constructor (JSX path, element not yet
+                        // connected), replace the consumer's default observable with the
+                        // context's observable directly — same reference, no copy, full
+                        // reactivity. The component hasn't rendered yet, so the template
+                        // will capture the context's observable and track it directly.
+                        //
+                        // When called from connectedCallback (HTML path, element already
+                        // rendered and connected), the component's template already
+                        // captured the default observable reference, so we use effect()
+                        // to bridge the context's observable to the consumer's observable.
+                        if (element && !element.isConnected) {
+                            // Constructor path: replace the consumer's default observable
+                            // with the context's observable reference directly.
+                            // Warn if type options differ (HtmlNumber vs plain).
+                            const consumerOpts = (obj[key]?.[SYMBOL_OBSERVABLE_WRITABLE] as any)?.options as ObservableOptions<any> | undefined
+                            const providerOpts = (resolved[SYMBOL_OBSERVABLE_WRITABLE] as any)?.options as ObservableOptions<any> | undefined
+                            if (consumerOpts?.type && providerOpts?.type && consumerOpts.type !== providerOpts.type) {
+                                console.warn(`[woby] @ref.val type mismatch: consumer "${key}" expects type "${consumerOpts.type}" but provider context provides type "${providerOpts.type}"`)
+                            }
+                            obj[key] = resolved
+                        } else {
+                            // ConnectedCallback path: element already rendered.
+                            // Bridge the context's observable to the consumer's observable
+                            // via effect() so changes propagate automatically.
+                            const dispose = root(() => effect(() => {
+                                const resolvedValue = $$(resolved)
+                                // Apply type conversion from the target observable's options
+                                const options = (obj[key][SYMBOL_OBSERVABLE_WRITABLE]).options as ObservableOptions<any> | undefined
+                                const { type, fromHtml } = options ?? {}
+                                if (type && fromHtml) {
+                                    obj[key](fromHtml(resolvedValue as any))
+                                } else if (type === 'boolean') {
+                                    const lowerValue = String(resolvedValue)?.toLowerCase()
+                                    obj[key](lowerValue === 'true' || lowerValue === '1' || lowerValue === '')
+                                } else {
+                                    obj[key](resolvedValue)
+                                }
+                            }, { sync: 'init' }))
+                            // Store disposer for cleanup in disconnectedCallback
+                            if (element) {
+                                if (!(element as any).__contextRefDisposers) {
+                                    (element as any).__contextRefDisposers = []
+                                }
+                                (element as any).__contextRefDisposers.push(dispose)
+                            }
+                        }
                     } else {
-                        obj[key](resolved)
+                        // Static mode: one-shot set (current behavior)
+                        const options = (obj[key][SYMBOL_OBSERVABLE_WRITABLE]).options as ObservableOptions<any> | undefined
+                        const { type, fromHtml } = options ?? {}
+                        if (type && fromHtml) {
+                            const converted = fromHtml(resolved)
+                            obj[key](converted)
+                        } else if (type === 'boolean') {
+                            const lowerValue = String(resolved)?.toLowerCase()
+                            obj[key](lowerValue === 'true' || lowerValue === '1' || lowerValue === '')
+                        } else {
+                            obj[key](resolved)
+                        }
                     }
                     return
                 }

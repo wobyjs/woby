@@ -6,6 +6,21 @@ import { useEffect, $, } from 'woby'
 
 globalThis.Woby = Woby
 
+// Count every console.log so the full-suite log volume can be verified past
+// the devtools 1000-message buffer cap, via `dv eval` reading
+// globalThis.__consoleLogCount. Guarded so HMR re-imports don't double-wrap.
+if (!(globalThis as any).__consoleLogPatched) {
+    (globalThis as any).__consoleLogPatched = true;
+    (globalThis as any).__consoleLogCount = 0;
+    (globalThis as any).__passLogCount = 0;
+    const origLog = console.log.bind(console)
+    console.log = (...args: any[]) => {
+        (globalThis as any).__consoleLogCount++
+        if (String(args[0]).includes('✅')) (globalThis as any).__passLogCount++
+        origLog(...args)
+    }
+}
+
 /* TYPE */
 
 type Constructor<T, Args extends unknown[] = unknown[]> = new (...args: Args) => T

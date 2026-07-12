@@ -199,7 +199,13 @@ export const resolveArraysAndStatics = (() => {
 
         hasObservables = true
 
-      } else if (type === 'function') { // Non-observable function (e.g. wrapElement'd) — call and resolve
+      } else if (type === 'function' && isFunctionReactive(value)) { // Reactive function (e.g. () => $$(obs)) — keep dynamic so setChildStatic binds it via resolveChild/useRenderEffect
+
+        if (resolved !== DUMMY_RESOLVED) resolved.push(value)
+
+        hasObservables = true
+
+      } else if (type === 'function') { // Non-reactive function (e.g. wrapElement'd) — call and resolve
 
         if (resolved === DUMMY_RESOLVED) resolved = values.slice(0, i)
 

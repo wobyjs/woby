@@ -151,6 +151,10 @@ registerContextRef('theme', ThemeCtx)
 
 **Escape syntax**: `@@literal` → `"@literal"` (passes through normal type conversion).
 
+**Two-way updates**: for JSX-created elements the `@`-prefixed prop IS the provider's observable (same instance) — writing to the prop inside the consumer updates the provider and all other consumers. HTML-created elements get a one-way `effect()` bridge (context → prop), disposed on disconnect.
+
+**Static mode**: `<ThemeCtx.Provider static value="dark">` — consumers receive a one-time snapshot instead of the live observable; later provider updates do not propagate.
+
 ## Migration Checklist
 
 **Note:** This migration has been completed. Checklist kept for historical reference.

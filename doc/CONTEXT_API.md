@@ -314,6 +314,50 @@ registerContextRef('app.count', AppCounterCtx)
 2. **Interception**: When a custom element's HTML attribute value starts with `@` (but not `@@`), the `setObservableValue` function in `custom_element.ts` intercepts it BEFORE normal type conversion (HtmlNumber, HtmlBoolean, etc.).
 3. **Resolution**: `resolveContextRef()` looks up the registered context by trying progressively shorter dotted-key matches (e.g. `@a.b.c` → tries `a.b.c`, `a.b`, `a`), then walks the element's DOM ancestors to find the nearest provider, and returns the provider's reactive observable.
 4. **Reactivity**: The resolved value IS the provider's observable — so when the provider updates, the consuming element's prop updates reactively. No manual re-render or `useEffect` needed.
+5. **Binding**: How the resolved observable is wired to the consumer's prop depends on how the element was created:
+   - **JSX-created elements** (resolved in the constructor, before the component renders): the consumer's default observable is **replaced by the context's observable** — same instance, no copy. This gives full **two-way** reactivity (see below).
+   - **HTML-created elements** (resolved in `connectedCallback`, after the component has already rendered with its default observable): a disposable `effect()` bridges the context's observable into the consumer's prop observable, applying the prop's `fromHtml`/boolean type conversion. The bridge is disposed automatically in `disconnectedCallback`.
+
+### Resolution Priority
+
+The provider lookup order also depends on the element's connection state:
+
+- **Constructor path** (JSX-created, `element.isConnected === false`): ambient soby context first (the element constructs synchronously inside its provider's scope, so this gives the correct *nearest* provider even with nested/sibling providers), then the pending context-wrap global. The DOM walk is skipped — the element has no `parentNode` yet.
+- **Connected path** (HTML-created, `element.isConnected === true`): DOM ancestor walk first (`SYMBOL_CONTEXT_WRAP` on visible provider elements), then the pending context-wrap global, then ambient context as a last resort.
+
+### Two-Way Updates: `@ref.val` Shares the Provider's Observable
+
+For JSX-created elements, the `@`-prefixed prop is not a copy — it is the **provider's observable itself**. Writing to the prop inside the consumer updates the provider and every other consumer of the same context:
+
+```tsx
+const CounterEl = defaults(() => ({
+  count: $(0, HtmlNumber)
+}), ({ count }) => (
+  <button onClick={() => count($$(count) + 1)}>Value: {count}</button>
+))
+customElement('counter-element', CounterEl)
+
+<AppCounterCtx.Provider value={$(42)}>
+  <h4>(Value: {useContext(AppCounterCtx)})</h4>
+  <counter-element count="@app.count" />
+  {/* Clicking the button updates the h4 too — same observable instance. */}
+</AppCounterCtx.Provider>
+```
+
+This matches JSX prop-passing semantics: `<counter-element count="@app.count">` behaves like `<CounterEl count={theProviderObservable}>`. If the consumer's default observable declares a different `type` than the provider's (e.g. `HtmlNumber` vs plain), a `console.warn` flags the mismatch.
+
+For HTML-created elements, the `effect()` bridge is one-directional (context → prop). To write back to the context from an HTML-created element, use `useContext()` inside the component instead.
+
+### Static Contexts: One-Time Snapshot
+
+Pass `static` on the provider to opt out of reactivity — `@`-prefix consumers then receive a **one-time snapshot** of the provider's current value instead of the live observable:
+
+```tsx
+<AppCounterCtx.Provider static value={42}>
+  <counter-element count="@app.count" />
+  {/* count is set to 42 once; later provider updates do NOT propagate */}
+</AppCounterCtx.Provider>
+```
 
 ### Pattern: Generic UI Components
 
@@ -352,6 +396,7 @@ If an attribute value genuinely starts with `@`, use `@@` as the escape prefix �
 | Case | Behavior |
 |------|----------|
 | `@registered.key` with provider in DOM | Returns provider's reactive value (observable) |
+| `@registered.key` with `static` provider | Returns a one-time snapshot of the provider's value |
 | `@registered.key` without provider | Returns context's registered `defaultValue` |
 | `@unknown.ref` not registered | `console.warn`, returns `undefined` |
 | `@@something` escaped | Strips first `@`, passes through normal type conversion |
