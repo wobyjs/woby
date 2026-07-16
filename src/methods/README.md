@@ -69,10 +69,6 @@ If the property is not an observable, it sets the value directly.
 
 Sets nested properties on an element, handling style properties and nested objects.
 
-### `getNestedProperty(obj, path)`
-
-Retrieves values from nested property paths.
-
 ## Usage Examples
 
 ### Basic Custom Element
