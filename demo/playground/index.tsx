@@ -108,6 +108,7 @@ import TestContextHook from './src/TestContextHook'
 import TestContextHookHtml from './src/TestContextHook.html'
 import TestContextRef from './src/TestContextRef'
 import TestContextRefHtml from './src/TestContextRef.html'
+import TestStyleContextRef from './src/TestStyleContextRef'
 import TestDirective from './src/TestDirective'
 import TestDirectiveRef from './src/TestDirectiveRef'
 import TestDirectiveRegisterLocal from './src/TestDirectiveRegisterLocal'
@@ -694,6 +695,7 @@ const tests = [
 	// Context Ref Tests
 	TestContextRef,
 	TestContextRefHtml,
+	TestStyleContextRef,
 ]
 
 const App = () => (
