@@ -27,10 +27,9 @@ import { SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
 import { setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
-import { callStack, effect, isObservableWritable, Observable, root, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_UNTRACKED_UNWRAPPED } from "soby"
+import { callStack, effect, isObservableWritable, Observable, root, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
 import type { ObservableOptions } from "soby"
 import { isObject, isPureFunction } from "../utils"
-import { useEffect } from "../hooks"
 import { isJsx } from "../jsx-runtime"
 import { camelToKebabCase, kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
@@ -44,15 +43,6 @@ import { WobyCustomElementsRegistry, wobyCustomElements } from './custom_element
 import { resolveContextRef, isContextRef } from './context_ref'
 export { WobyCustomElementsRegistry, wobyCustomElements }
 
-
-// if (isSSR) {
-//     globalThis.customElements = ces as any
-//     globalThis.document = doc as any
-//         // Export the SSRCustomElement class for direct use
-//         ; (globalThis as any).SSRCustomElement = SSRCustomElement
-//         ; (globalThis as any).SSRShadowRoot = SSRShadowRoot
-//         ; (globalThis as any).SSRSlotElement = SSRSlotElement
-// }
 
 /**
  * Creates a mock custom element for SSR environments
@@ -193,7 +183,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
 
     const C = class extends HTMLElement {
         static __component__ = component;
-        static observedAttributes: string[] = []
         public props: P
         public propDict: Record<string, string>
         childs: Node[] = []
@@ -228,8 +217,26 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 // exactly as before, so previously-working props are unaffected.
                 const mergeInto = (key: string, incoming: any) => {
                     const obs = defaultProps[key] as Observable<any>
-                    if (isObservable(incoming)) obs($$(incoming))
-                    else if (typeof incoming === 'function') obs(() => incoming)
+                    if (isObservable(incoming)) {
+                        // Replace the consumer's default observable with the incoming
+                        // observable directly, preserving full reactivity. Snapshotting
+                        // via obs($$(incoming)) would break the reactive chain — the
+                        // consumer would hold a stale snapshot that never updates when
+                        // the provider's observable changes.
+                        //
+                        // Caveat: the incoming observable's ObservableOptions win. The
+                        // default observable may carry a typed converter (HtmlNumber /
+                        // HtmlBoolean / fromHtml) that the incoming (usually untyped)
+                        // observable lacks, so later HTML-attribute syncs on this prop
+                        // store the raw string rather than the converted value. Warn on a
+                        // type mismatch, mirroring the @ref replacement path below.
+                        const consumerOpts = (obs?.[SYMBOL_OBSERVABLE_WRITABLE] as any)?.options as ObservableOptions<any> | undefined
+                        const incomingOpts = (incoming[SYMBOL_OBSERVABLE_WRITABLE] as any)?.options as ObservableOptions<any> | undefined
+                        if (consumerOpts?.type && consumerOpts.type !== incomingOpts?.type) {
+                            console.warn(`[woby] prop "${key}" type mismatch: default observable expects type "${consumerOpts.type}" but the JSX-provided observable has type "${incomingOpts?.type ?? 'none'}". HTML-attribute syncs on this prop will not be type-converted.`)
+                        }
+                        defaultProps[key] = incoming
+                    } else if (typeof incoming === 'function') obs(() => incoming)
                     // A JSX attribute written as a string literal (e.g. count="100") arrives
                     // as a raw string even when the target observable is typed (HtmlNumber /
                     // HtmlBoolean / …). Setting the string straight into a typed observable
@@ -289,8 +296,6 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 if (!isThreeElement && !($$(this.props.children) instanceof HTMLSlotElement)) {
                     this.slots = document.createElement('slot')
 
-                    const { Provider, value } = this.props[SYMBOL_CONTEXT] ?? {}
-                    useEffect(() => { })
                     this.slots[SYMBOL_CONTEXT] = (this.props as any).value
 
                     this.props.children[SYMBOL_ISSLOT] = true
@@ -330,16 +335,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                         // Clear stale pending wrap; selfWrap above is our baseline and is
                         // only overridden below if THIS render sets a fresh composed wrap.
                         consumePendingContextWrap()
+                        // setChild synchronously invokes componentResult (a wrapElement
+                        // closure tagged SYMBOL_UNTRACKED_UNWRAPPED) and fully unwraps any
+                        // nested thunks. Do NOT pre-invoke it here — createElement returns an
+                        // unmemoized closure, so an extra call re-runs the component body,
+                        // duplicating observables/effects and composing provider wraps twice.
                         const componentResult = createElement(component as any, this.props)
-                        if (typeof componentResult === 'function') {
-                            let resolved = componentResult()
-                            let depth = 0
-                            while (typeof resolved === 'function' && depth < 10) {
-                                const next = resolved()
-                                depth++
-                                resolved = next
-                            }
-                        }
                         if (shadowRoot) {
                             setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
                         } else {
@@ -360,16 +361,10 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                             // This is what keeps soby's normal JSX context path isolated:
                             // an unrelated custom element never inherits a dangling wrap.
                             consumePendingContextWrap()
+                            // See the SYMBOL_CONTEXT branch above: setChild is the single
+                            // invocation point. Pre-invoking the unmemoized componentResult
+                            // here would double-run the component body.
                             const componentResult = createElement(component as any, this.props)
-                            if (typeof componentResult === 'function') {
-                                let resolved = componentResult()
-                                let depth = 0
-                                while (typeof resolved === 'function' && depth < 10) {
-                                    const next = resolved()
-                                    depth++
-                                    resolved = next
-                                }
-                            }
                             if (shadowRoot) {
                                 setChild(shadowRoot, componentResult, FragmentUtils.make(), callStack('Custom element'))
                             } else {
@@ -409,12 +404,11 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 this._attrObserver.disconnect()
             }
 
-            const { observedAttributes } = C
             const { props: p } = this
             const aKeys = Object.keys(p).filter(k => k !== 'children' && isObservable(p[k]))
             const rKeys = Object.keys(p).filter(k => isPureFunction(p[k]) || isObject(p[k]))
 
-            rKeys.forEach(k => this.removeAttribute(k))
+            rKeys.forEach(k => this.removeAttribute(this.propDict[k] ?? k))
 
             for (const k of aKeys as any) {
                 // When isJsx, skip complex object props that would stringify to [object Object]
@@ -505,11 +499,8 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             if (name.includes('$') || name.includes('.')) {
                 const normalizedPath = normalizePropertyPath(name)
                 setNestedProperty(this, normalizedPath, newValue)
-                const propName = kebabToCamelCase(name.replace(/\$/g, '.').replace(/\./g, '.'))
-                setObservableValue(props, propName, newValue, this)
             } else {
-                const propName = kebabToCamelCase(name)
-                setObservableValue(this.props, propName, newValue, this)
+                setObservableValue(props, propName, newValue, this)
             }
         }
     }
@@ -541,18 +532,9 @@ export type ElementAttributesPattern<P> =
 
 export type ExtractProps<T> = T extends (props: infer P) => any ? P : never
 
-export type ElementAttributes1<T extends (...args: any) => any> =
-    // {} | { children?: JSX.Child } | 
-    (T extends (props: infer P) => any
-        ? Partial<(JSX.HTMLAttributes<HTMLElement> & ElementAttributesPattern<P>)>
-        : Partial<JSX.HTMLAttributes<HTMLElement>>)
-
 export type ElementAttributes<T extends (...args: any) => any> =
     Partial<JSX.HTMLAttributes<HTMLElement>> &
     Partial<Record<ElementAttributesPattern<ExtractProps<T>>, any>>
-
-// export type ElementAttributes<T extends (props: P) => any, P> =
-//     Partial<(JSX.HTMLAttributes<HTMLElement> & ElementAttributesPattern<P>)>
 
 // Initialize stylesheet observation at module level (run once)
 // This ensures we only have one observer watching for stylesheet changes
@@ -762,6 +744,33 @@ const setNestedProperty = (obj: HTMLElement, path: string, value: any) => {
     if (path.startsWith('style.')) {
         const styleProperty = kebabToCamelCase(path.slice(6)) // Remove 'style.' prefix and convert to camelCase
         if (obj.style) {
+            // Handle @-prefix context references / @@ escaping the same way
+            // setObservableValue does — the style path must not write a literal
+            // "@theme.primary" string into CSS.
+            if (typeof value === 'string') {
+                if (value.startsWith('@@')) {
+                    value = value.slice(1) // escape: "@@literal" → "@literal"
+                } else if (isContextRef(value)) {
+                    const resolved = resolveContextRef(value, obj)
+                    if (resolved !== undefined) {
+                        if (isObservable(resolved)) {
+                            // Reactive mode: bridge the context observable to the CSS
+                            // property via effect so it updates when the provider changes.
+                            const dispose = root(() => effect(() => {
+                                obj.style[styleProperty as any] = $$(resolved) as any
+                            }, { sync: 'init' }))
+                            if (!(obj as any).__contextRefDisposers) {
+                                (obj as any).__contextRefDisposers = []
+                            }
+                            (obj as any).__contextRefDisposers.push(dispose)
+                        } else {
+                            // Static mode: one-shot set.
+                            obj.style[styleProperty as any] = resolved as any
+                        }
+                        return
+                    }
+                }
+            }
             obj.style[styleProperty as any] = value
         }
         return
@@ -804,62 +813,6 @@ const setNestedProperty = (obj: HTMLElement, path: string, value: any) => {
     // For simple properties, convert to camelCase and set them using the observable value setter
     setObservableValue((obj as any), kebabToCamelCase(path), value, obj as Element)
 }
-
-/**
- * Gets nested properties from an element
- * 
- * Retrieves values from nested property paths, handling style properties and nested objects.
- * Style properties are converted from kebab-case to camelCase when accessing.
- * 
- * @param obj - The object to get properties from
- * @param path - The property path (e.g., 'style.font-size' or 'nested.prop.value')
- * @returns The value at the specified path, or undefined if not found
- */
-const getNestedProperty = (obj: any, path: string) => {
-    // For style properties, handle them specially
-    if (path.startsWith('style.')) {
-        const styleProperty = kebabToCamelCase(path.slice(6)) // Remove 'style.' prefix and convert to camelCase
-        if (obj.style) {
-            return obj.style[styleProperty as any]
-        }
-        return undefined
-    }
-
-    // For other properties with dots, navigate nested structure
-    if (path.includes('.')) {
-        const keys = path.split('.').map(key => kebabToCamelCase(key)) // Convert all keys to camelCase
-        let target = obj
-
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i]
-            // For the first key, try target.props[key] if target[key] doesn't exist
-            if (i === 0 && !(key in target) && target.props && key in target.props) {
-                target = target.props[key]
-            } else if (!(key in target)) {
-                return undefined
-            } else {
-                target = target[key]
-            }
-        }
-
-        return target
-    }
-
-    // For simple properties, convert to camelCase and get them directly
-    return (obj as any)[kebabToCamelCase(path)]
-}
-
-
-// const isLightDom = (node: Node): boolean => {
-//     let current: Node | null = node?.parentNode
-//     while (current) {
-//         if ((current as Element)?.shadowRoot) {
-//             return true
-//         }
-//         current = current.parentNode
-//     }
-//     return false
-// }
 
 /**
  * Creates a custom HTML element with reactive properties
