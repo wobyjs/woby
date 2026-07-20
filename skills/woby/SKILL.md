@@ -527,20 +527,24 @@ expect(element.classList).toContain('user-addon')
 The `dv1-6` CLI (Chrome DevTools Protocol wrapper) is the **primary tool** for verifying component behavior in a real browser — use it instead of raw WebSocket/CDP scripts:
 
 ```powershell
-# Navigate to playground
-dv3 navigate --url http://localhost:7214
+# Start Chrome — headed by default (dv* CLI v1.0.0; old --headed flag removed)
+dv3 start
+
+# Navigate to playground (url is POSITIONAL; `goto` is an alias)
+dv3 navigate http://localhost:7214
 
 # Read console logs (test results, errors)
-dv3 console --type log    # all logs
-dv3 console --type error  # errors only
-dv3 console --json        # machine-readable output
+dv3 console --type log            # all logs
+dv3 console --type error          # errors only
+dv3 console --filter "❌"          # scan buffer for a pattern
+dv3 console --json                # machine-readable output
 
-# Inspect DOM state
-dv3 inspect 'counter-element'
-dv3 get-text '.result'
+# Inspect DOM state (selector via -s/--selector)
+dv3 inspect -s 'counter-element'
+dv3 get-text -s '.result'
 
-# Take a screenshot for visual verification
-dv3 screenshot --output screenshot.png
+# Take a screenshot for visual verification (output path POSITIONAL)
+dv3 screenshot screenshot.png
 
 # Get accessibility snapshot (useful for SSR verification)
 dv3 snapshot
@@ -548,6 +552,8 @@ dv3 snapshot
 # Evaluate arbitrary JS in the page
 dv3 eval --script "document.querySelector('counter-element')?.shadowRoot?.innerHTML"
 ```
+
+> **dv* CLI v1.0.0 (upgraded)** — flags became positional: `start` is headed by default (old `--headed` gone; `--headless` hides), `navigate <url>`/`new <url>` (old `--url`), `screenshot <output>` (old `--output`), `inspect|query-all|get-text|get-html` take `-s/--selector`, `click <selector>`/`fill <selector> <value>`/`resize <w> <h>` positional, `pages` → `tabs`, `close <tab-id>` (old `--page-id`). `console --type`, `eval --script`, `key --key` unchanged.
 
 **When to use:**
 - After rebuilding and restarting the dev server, use `dv* console` to check for errors

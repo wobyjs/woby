@@ -65,11 +65,11 @@ The playground auto-runs tests on load and logs results to the browser console. 
 # Pick a random port NOT in 5xxx range (avoid collisions with common ports) e.g. 7214, 8362, 9451
 pnpm dev --port 7214
 
-# 1. Start Chrome (pick available profile, e.g. dv2)
-dv2 start --headed
+# 1. Start Chrome (pick available profile, e.g. dv2). Headed by default; pass --headless to hide.
+dv2 start
 
-# 2. Navigate to playground
-dv2 navigate --url http://localhost:7214
+# 2. Navigate to playground (url is POSITIONAL; `goto` is an alias)
+dv2 navigate http://localhost:7214
 
 # 3. Read all console logs (test results, component output)
 dv2 console --type log
@@ -77,36 +77,49 @@ dv2 console --type log
 # 4. Check for errors only (stack overflows, assertion failures, type errors)
 dv2 console --type error
 
-# 5. Machine-readable JSON output
+# 5. Filter by pattern, or emit machine-readable JSON
+dv2 console --filter "❌"
 dv2 console --json
 ```
 
+> **dv* CLI v1.0.0 (upgraded).** Syntax changed from earlier docs:
+> - `dv2 start` is **headed by default** — use `--headless` to hide (old `--headed` flag removed).
+> - `navigate`/`goto` take the **url as a positional arg** (old `--url <url>` removed).
+> - `console --type` accepts `log|warn|error|info|debug` (no `assert` type); `console --filter <pattern>` scans the buffer.
+> - `inspect|query-all|get-text|get-html|inspect` take the selector via **`-s/--selector`** (old positional selector removed).
+> - `screenshot <output>` takes the output path as a **positional arg** (old `--output` removed).
+
 **Console level meanings:**
 - `[LOG]` — test pass/fail markers, component output
-- `[ASSERT]` — test assertion failures (check these first)
 - `[ERROR]` — uncaught errors (stack overflows, type errors, etc.)
+
+⚠️ **Console 1000-message cap:** `dv2 console` returns only ~1000 buffered messages, so the full suite (>1500 pass logs) is truncated. Read the uncapped global counters `util.tsx` maintains instead:
+```powershell
+dv2 eval --script "JSON.stringify({ pass: globalThis.__passLogCount, total: globalThis.__consoleLogCount, failures: (globalThis.__testFailures||[]).length })"
+```
+Authoritative pass = `__passLogCount` (baseline ~1500+); authoritative fail signal = `__testFailures.length === 0`. See the `woby-test-verification` memory.
 
 ### DOM Inspection
 
 ```powershell
-# Inspect a specific element
-dv2 inspect 'counter-element'
+# Inspect a specific element (selector via -s/--selector)
+dv2 inspect -s 'counter-element'
 
 # Query all matching elements
-dv2 query-all 'counter-element'
+dv2 query-all -s 'counter-element'
 
 # Get text content
-dv2 get-text '.result-container'
+dv2 get-text -s '.result-container'
 
 # Get full HTML of an element
-dv2 get-html '#app'
+dv2 get-html -s '#app'
 ```
 
 ### Screenshots & Snapshots
 
 ```powershell
-# Visual check
-dv2 screenshot --output screenshot.png
+# Visual check (output path is POSITIONAL)
+dv2 screenshot screenshot.png
 
 # Accessibility tree snapshot (useful for SSR output verification)
 dv2 snapshot
@@ -271,8 +284,8 @@ Each test file exports a component and optionally a `.test` object with `expect(
 ## Playground Test Protocol
 
 1. Start or restart dev server (pick port NOT in 5xxx, e.g. 7214)
-2. Navigate: `dv2 navigate --url http://localhost:7214`
-3. Check errors: `dv2 console --type error` → should be 0 errors
-4. Check test results: `dv2 console --type log` → grep for `✅` / `❌`
-5. For click tests (TestWobyOnClick, TestShadowOnClick): these require DOM — they auto-fire clicks via `button.click()` in `useEffect`. Verify with `dv2 inspect` or `dv2 get-text`
+2. Navigate: `dv2 navigate http://localhost:7214`
+3. Check errors: `dv2 console --type error` → should be 0 errors (ignore Vite HMR `WebSocket closed` noise from HMR-port collisions)
+4. Check test results via the uncapped globals (see cap warning above): `dv2 eval --script "globalThis.__passLogCount + '/' + globalThis.__consoleLogCount + ' pass, ' + (globalThis.__testFailures||[]).length + ' fail'"` → expect >1500 pass, 0 fail
+5. For click tests (TestWobyOnClick, TestShadowOnClick): these require DOM — they auto-fire clicks via `button.click()` in `useEffect`. Verify with `dv2 inspect -s` or `dv2 get-text -s`
 6. Use `--json` flag for machine-readable output to pipe into other tools

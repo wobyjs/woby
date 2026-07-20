@@ -76,11 +76,11 @@ dv6 status
 **Once you've verified the profile is available, launch Chrome:**
 
 ```bash
-dv2 start --headed
-dv3 start --headed
-dv4 start --headed
-dv5 start --headed
-dv6 start --headed
+dv2 start
+dv3 start
+dv4 start
+dv5 start
+dv6 start
 ```
 
 **Verify Chrome started successfully:**
@@ -119,19 +119,19 @@ dv2 status
 Agent A: "I need to test OAuth login. Checking dv1..."
          [dv1 status - available]
          "Using dv1 for OAuth testing"
-         [Launches Chrome: dv1 start --headed]
+         [Launches Chrome: dv1 start]
 
 Agent B: "I need to debug a layout issue. Checking profiles..."
          [dv1 - IN USE by Agent A]
          [dv2 - available]
          "Using dv2 for debugging"
-         [Launches Chrome: dv2 start --headed]
+         [Launches Chrome: dv2 start]
 
 Agent C: "I need to test responsive design. Checking profiles..."
          [dv1, dv2 - IN USE]
          [dv3 - available]
          "Using dv3"
-         [Launches Chrome: dv3 start --headed]
+         [Launches Chrome: dv3 start]
 ```
 
 **All three agents work simultaneously without conflicts!**
@@ -162,7 +162,7 @@ pnpm dev --port 7214
 ```bash
 # After pnpm dev is running, point Chrome to it
 # Use the SAME port you started pnpm dev with
-dv3 navigate --url http://localhost:7214
+dv3 navigate http://localhost:7214
 ```
 
 ### Handling 404
@@ -246,14 +246,22 @@ dv6  # Parallel testing
 **CRITICAL**: Always open Chrome in headed mode (visible browser window) for user inspection.
 
 ```bash
-# When navigating pages, ALWAYS use headed mode
-dv3 start --headed
-dv3 navigate --url http://localhost:7214
+# dv* CLI v1.0.0: `start` is HEADED by default — no flag needed.
+dv3 start
+dv3 navigate http://localhost:7214
 
 # User will randomly inspect browsers - keep them visible
 ```
 
-**NO headless mode** - user needs to see and inspect browsers at any time.
+**NO headless mode** - user needs to see and inspect browsers at any time. (The old `--headed` flag was removed; headed is now the default. `--headless` would hide the window — do NOT use it here.)
+
+> **dv* CLI v1.0.0 syntax note (upgraded).** Commands that previously took named flags now take **positional args**:
+> - `start` — headed by default (old `--headed` removed; `--headless` to hide)
+> - `navigate <url>` / `goto <url>`, `new <url>` (old `--url` removed)
+> - `screenshot <output>` (old `--output` removed)
+> - `click <selector>`, `fill <selector> <value>`, `type <selector> <text>`, `resize <width> <height>` (old `--selector`/`--value`/`--width`/`--height` removed)
+> - `close <tab-id>` (old `--page-id` removed); `pages` → **`tabs`**; select a tab with `select -i <index>`
+> - Unchanged: `console --type <log|warn|error|info|debug>` (+ new `--filter <pattern>`, `--json`), `eval --script`, `key --key`, `inspect/query-all/get-text/get-html -s <selector>`
 
 ### CRITICAL: Use Tailwind CSS Classes in HTML, NOT Inline Styles
 
@@ -283,23 +291,23 @@ The `dv1`-`dv6` CLI provides these commands. Each binary manages its own profile
 
 ### Navigation & Page Management
 ```bash
-# List all pages
-dv3 pages
+# List all tabs (renamed from `pages`)
+dv3 tabs
 
-# Select page by URL
-dv3 pages
+# Select a tab (by index or id)
+dv3 select -i 1
 
-# Navigate to URL (ALWAYS headed)
-dv3 navigate --url http://localhost:7214/page
+# Navigate to URL (url is POSITIONAL; ALWAYS headed)
+dv3 navigate http://localhost:7214/page
 
-# Create new page
-dv3 new --url http://localhost:7214
+# Create new tab (url POSITIONAL)
+dv3 new http://localhost:7214
 
 # Check Chrome status
 dv3 status
 
-# Close page
-dv3 close --page-id <page-id>
+# Close tab (tab-id POSITIONAL)
+dv3 close <tab-id>
 ```
 
 ### Console Reading (CRITICAL)
@@ -347,22 +355,22 @@ dv3 eval --script "
 # Take snapshot (text-based accessibility tree)
 dv3 snapshot
 
-# Take screenshot (visual inspection)
-dv3 screenshot --output screenshot.png
+# Take screenshot (output path is POSITIONAL)
+dv3 screenshot screenshot.png
 ```
 
 ### Interaction
 ```bash
-# Click element by selector
-dv3 click --selector "#button"
+# Click element by selector (selector POSITIONAL)
+dv3 click "#button"
 
-# Fill input
-dv3 fill --selector "#email" --value "test@example.com"
+# Fill input (selector + value POSITIONAL)
+dv3 fill "#email" "test@example.com"
 
-# Type text
-dv3 type --selector "#input" --value "typing content"
+# Type text (selector + text POSITIONAL)
+dv3 type "#input" "typing content"
 
-# Press key
+# Press key (-k/--key still a flag)
 dv3 key --key Enter
 ```
 
@@ -379,10 +387,10 @@ This is the complete workflow for testing a Vite-based project:
 pnpm dev --port 7214
 
 # ── Step 2: Start Chrome (ONCE per session) ──
-dv2 start --headed
+dv2 start
 
 # ── Step 3: Navigate to the dev server (use SAME port as Step 1) ──
-dv2 navigate --url http://localhost:7214
+dv2 navigate http://localhost:7214
 
 # ── Step 4: Read console output ──
 dv2 console --type error
@@ -397,7 +405,7 @@ dv2 console --type error
 # The dev server may have crashed. Restart it:
 # pnpm dev --port 7214
 # Then navigate again:
-# dv2 navigate --url http://localhost:7214
+# dv2 navigate http://localhost:7214
 
 # ── Step 7: If reload loop ──
 # Kill all Chrome instances spawned by this session:
@@ -444,8 +452,8 @@ The DOM ecosystem consists of specialized skills that work together:
 **Workflow**:
 1. **Choose unique profile** - check availability, avoid conflicts with other agents
 2. **Start Vite dev server** (if not already running): `pnpm dev --port 7214`
-3. **Launch Chrome**: `dv2 start --headed`
-4. **Open page HEADED**: `dv2 navigate --url http://localhost:7214`
+3. **Launch Chrome**: `dv2 start`
+4. **Open page HEADED**: `dv2 navigate http://localhost:7214`
 5. **Read console logs**: `dv2 console --type error`
 6. **Inspect element**: `dv2 eval --script "..."` with `getComputedStyle(element)`
 7. **Compare intended vs actual** behavior
@@ -566,8 +574,8 @@ The DOM ecosystem consists of specialized skills that work together:
 
 **Workflow**:
 1. Start Vite dev server: `pnpm dev --port 7214`
-2. Launch Chrome: `dv2 start --headed`
-3. Navigate to playground: `dv2 navigate --url http://localhost:7214`
+2. Launch Chrome: `dv2 start`
+3. Navigate to playground: `dv2 navigate http://localhost:7214`
 4. Analyze component props and types
 5. Add defaults() wrapper with reactive $()
 6. Register as CustomElement
@@ -644,10 +652,10 @@ All sub-skills follow this professional workflow:
 # pnpm dev --port 7214
 
 # 2. Launch Chrome with unique profile (HEADED mode)
-dv2 start --headed
+dv2 start
 
 # 3. Navigate to page
-dv2 navigate --url http://localhost:7214
+dv2 navigate http://localhost:7214
 
 # 4. Read console messages
 dv2 console --type error
@@ -675,7 +683,7 @@ dv2 eval --script "
 
 # 6. Fix the issue in code (HMR auto-reloads)
 # 7. Verify the fix
-dv2 navigate --url http://localhost:7214
+dv2 navigate http://localhost:7214
 
 # 8. Check console for errors after fix
 dv2 console --type error
@@ -684,8 +692,8 @@ dv2 console --type error
 ### Capture All Console Errors
 ```bash
 # Launch Chrome and navigate
-dv2 start --headed
-dv2 navigate --url http://localhost:7214
+dv2 start
+dv2 navigate http://localhost:7214
 
 # List all console messages
 dv2 console
@@ -701,8 +709,8 @@ dv2 console --json
 
 ### Enumerate All Colors
 ```bash
-dv2 start --headed
-dv2 navigate --url http://localhost:7214
+dv2 start
+dv2 navigate http://localhost:7214
 
 dv2 eval --script "
 (() => {
@@ -720,11 +728,11 @@ dv2 eval --script "
 ### Test Responsive Design
 ```bash
 # Launch Chrome and navigate
-dv2 start --headed
-dv2 navigate --url http://localhost:7214
+dv2 start
+dv2 navigate http://localhost:7214
 
-# Resize to mobile viewport
-dv2 resize --width 375 --height 667
+# Resize to mobile viewport (width + height POSITIONAL)
+dv2 resize 375 667
 
 # Check element visibility
 dv2 eval --script "
@@ -748,7 +756,7 @@ The debugging process is iterative: diagnose, fix, verify, repeat until the issu
 **Phase 1: Initial Diagnosis**
 ```bash
 # Navigate to page (HEADED)
-dv2 navigate --url http://localhost:7214
+dv2 navigate http://localhost:7214
 
 # Read console messages
 dv2 console --type error
@@ -968,7 +976,7 @@ When you invoke this master skill, it will:
 1. **Check for parallel agents** and choose a unique profile
 2. **Verify availability** before launching Chrome
 3. **Start Vite dev server** (if testing a Vite project) with `pnpm dev --port <port>` (pick a random port, NOT in 5xxx)
-4. **Launch Chrome** with the chosen profile (`dvX start --headed`)
+4. **Launch Chrome** with the chosen profile (`dvX start`)
 5. Analyze your request
 6. Route to appropriate sub-skills
 7. Execute professional workflow
