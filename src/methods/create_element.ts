@@ -17,7 +17,7 @@ import { setChild, setProps } from '../utils/setters'
 import { setChild as setChildSSR, setProps as setPropsSSR } from '../utils/setters'
 import type { Child, Component, Element } from '../types'
 import { FragmentUtils } from '../utils/fragment'
-import { Stack } from 'soby'
+import { callStack } from 'soby'
 import { customElements as ces } from '../ssr/custom_elements'
 import { wobyCustomElements } from './custom_element_registry'
 import { isJsx } from '../jsx-runtime'
@@ -212,7 +212,7 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
 
             if (isSVG) child['isSVG'] = true
 
-            const stack = new Stack()
+            const stack = callStack()
 
             untrack(() => {
 

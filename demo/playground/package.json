@@ -10,7 +10,7 @@
         "test": "tsx --tsconfig tsconfig.json src/test.tsx"
     },
     "dependencies": {
-        "vite": "^4.5.14",
+        "vite": "^8.1.5",
         "woby": "workspace:../.."
     },
     "devDependencies": {

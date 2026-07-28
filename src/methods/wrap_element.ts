@@ -10,7 +10,10 @@ export interface StackTaggedFunction extends Function {
 export const wrapElement = <T extends Function>(element: T): T & StackTaggedFunction => {
 
   element[SYMBOL_UNTRACKED_UNWRAPPED] = true
-  if (DEBUGGER.test)
+  // Stack capture (Error subclass) is expensive; only tag when actively debugging.
+  // SYMBOL_STACK has no readers in woby or chk (chk's consumers are commented out),
+  // so gate on DEBUGGER.debug (matches callStack convention) instead of DEBUGGER.test.
+  if (DEBUGGER.debug)
     element[SYMBOL_STACK] = new Stack("createElement")
 
   return element

@@ -4,7 +4,7 @@ import { useRenderEffect } from '../hooks/use_render_effect'
 import { $$ } from '../methods/soby'
 import { createText as createTextDOM } from '../utils/creators'
 import { createText as createTextSSR } from '../ssr/document'
-import { isArray, isFunction, isFunctionReactive, isString } from '../utils/lang'
+import { isArray, isFunction, isFunctionReactive, isString, isVoidChild } from '../utils/lang'
 import type { Classes, ObservableMaybe, Styles } from '../types'
 import { Observable, Stack } from '../soby'
 import { useEnvironment, EnvironmentContext, showEnvLog } from '../components/environment_context'
@@ -217,11 +217,17 @@ export const resolveArraysAndStatics = (() => {
         }
         if (isArray(fnResult)) {
           hasObservables = resolveArraysAndStaticsInner(fnResult, resolved, hasObservables)[1]
-        } else if (fnResult != null) {
+        } else if (fnResult != null && !isVoidChild(fnResult)) {
           resolved.push(fnResult)
         } else {
           resolved.push(createText(''))
         }
+
+      } else if (isVoidChild(value)) { // Void children (false, null, undefined, boolean) — skip silently
+
+        // Skip void children that come from && patterns (e.g., condition && <Component/>)
+        // These are already handled by setChildStatic's isVoidChild guard, but filtering
+        // them here prevents any upstream code from seeing them
 
       } else { // Something else
 

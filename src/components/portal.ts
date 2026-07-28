@@ -6,7 +6,7 @@ import { createHTMLNode as createHTMLNodeDOM } from '../utils/creators'
 import { createDocument, createHTMLNode as createHTMLNodeSSR } from '../ssr'
 import { assign } from '../utils/lang'
 import type { Child, ChildWithMetadata, FunctionMaybe } from '../types'
-import { useEnvironment } from '../components/environment_context'
+import { useDocument, useEnvironment } from '../components/environment_context'
 import { setChild } from '../utils/setters'
 import { FragmentUtils } from '../utils/fragment'
 
@@ -68,7 +68,32 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
     }
     else {
         // SSR mode: render children directly to parent
-        const parent: any = ($$(mount) as any || createHTMLNode('div'))
+        const ssrDoc = useDocument()
+        let mountNode = $$(mount) as any
+
+        console.log('[Portal SSR]', {
+            hasSsrDoc: !!ssrDoc,
+            mountType: typeof mountNode,
+            mountIsBody: mountNode === globalThis.document?.body,
+            mountIsGlobalBody: mountNode === globalThis.document?.body,
+            globalBodyType: typeof globalThis.document?.body,
+            hasChildren: !!children,
+        })
+
+        // In SSR context with DocumentContext, redirect global document.body to
+        // the context-provided document's body so renderToString can find portal content
+        if (ssrDoc && mountNode === globalThis.document?.body) {
+            mountNode = ssrDoc.body
+            console.log('[Portal SSR] Redirected to ssrDoc.body')
+        }
+
+        const parent: any = mountNode || createHTMLNode('div')
+
+        console.log('[Portal SSR] parent:', {
+            isBody: parent === ssrDoc?.body,
+            parentNodeType: typeof parent.parentNode,
+            hasParentNode: !!parent.parentNode,
+        })
 
         if (wrapper) {
             // If wrapper is provided, use it
@@ -88,12 +113,18 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
             setChild(parent, children, FragmentUtils.make(), stack)
         }
 
+        console.log('[Portal SSR] after setChild, parent innerHTML:', (parent as any).innerHTML)
+
         // Attach the parent to document body so it's included in SSR output
         if (mount && parent.parentNode) {
             // Container already attached to document, no need to re-append
+            console.log('[Portal SSR] parent already has parentNode, skipping append')
         } else if (mount) {
-            const doc = createDocument()
-            doc.body.appendChild(parent)
+            const doc = ssrDoc || createDocument()
+            if (parent !== doc.body) {
+                doc.body.appendChild(parent)
+                console.log('[Portal SSR] appended parent to doc.body')
+            }
         }
     }
 

@@ -34,7 +34,7 @@ import { isJsx } from "../jsx-runtime"
 import { camelToKebabCase, kebabToCamelCase } from "../utils/string"
 import { normalizePropertyPath } from "../utils/nested"
 // Import stylesheet utilities
-import { observeStylesheetChanges, refreshStylesheetCache, registerShadowRoot, unregisterShadowRoot } from "../utils/stylesheets"
+import { observeStylesheetChanges, convertAllDocumentStylesToConstructed, registerShadowRoot, unregisterShadowRoot } from "../utils/stylesheets"
 import { Child, Component, ContextProvider } from "../types"
 import { customElements as ces, SSRCustomElement, SSRShadowRoot, SSRSlotElement } from '../ssr/custom_elements'
 import { SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_CONTEXT_WRAP } from '../constants'
@@ -303,9 +303,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 }
                 const ignoreStyle = (this.props as any).ignoreStyle === true
                 if (!ignoreStyle) {
-                    // Force refresh the cache to ensure we get the latest styles
-                    // This is important for dynamically loaded stylesheets like Tailwind CDN
-                    const allSheets = refreshStylesheetCache()
+                    // Use the CACHED conversion here. The MutationObserver installed by
+                    // observeStylesheetChanges() invalidates the cache whenever a real
+                    // <style>/<link> mutation happens, so dynamically-loaded styles still
+                    // propagate. Calling refreshStylesheetCache() (cache-busting) per element
+                    // connect re-parsed the ENTIRE document CSS N times → O(N × CSS) hang.
+                    const allSheets = convertAllDocumentStylesToConstructed()
 
                     // Use adopted stylesheets (modern approach per Tailwind CSS v4 Shadow DOM guide)
                     // https://meefik.dev/2025/03/19/tailwindcss-and-shadow-dom/

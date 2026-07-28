@@ -211,8 +211,8 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
  * ```
  */
 export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, childComp: Function, stack: Stack): void => {
-    if (!dynamic && isVoidChild(child)) {
-        return // Ignoring static undefined children, avoiding inserting some useless placeholder nodes
+    if (isVoidChild(child)) {
+        return // Ignoring void children (false, null, undefined, boolean) from && patterns, regardless of dynamic flag
     }
 
     const prev = FragmentUtils.getChildren(fragment)
@@ -250,7 +250,13 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
 
             if (!fragmentOnly) {
                 try { parent.insertBefore(node, null) }
-                catch (e) { throw e }
+                catch (e) {
+                    console.error('[DEBUG insertBefore] FAILED node:', node, 'typeof:', typeof node, 'nodeType:', (node as any)?.nodeType, 'constructor:', (node as any)?.constructor?.name, 'toString:', Object.prototype.toString.call(node), 'parent:', parent, 'parent.tagName:', (parent as any)?.tagName)
+                    console.error('[DEBUG insertBefore] child that passed nodeType check:', JSON.stringify((child as any)?.constructor?.name), 'child typeof:', typeof child, 'child nodeType:', typeof (child as Node)?.nodeType)
+                    // Log the full stack trace
+                    console.error('[DEBUG insertBefore] Error stack:', (e as Error)?.stack)
+                    throw e
+                }
             }
 
             FragmentUtils.replaceWithNode(fragment, node)
@@ -316,12 +322,19 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
                 resolvedChildren.push(item)
             }
         }
+
+        // Filter out void children (false, null, undefined, boolean) that come from && patterns
+        // to prevent them from reaching the DOM loop where they'd silently fall through type checks
+        resolvedChildren = resolvedChildren.filter(c => !isVoidChild(c))
     }
 
     for (let i = 0, l = resolvedChildren.length; i < l; i++) {
 
         const child = resolvedChildren[i]
         const type = typeof child
+
+        // Skip void children (false, null, undefined, boolean) in both SSR and DOM modes
+        if (isVoidChild(child)) continue
 
         if (type === 'string' || type === 'number' || type === 'bigint') {
 

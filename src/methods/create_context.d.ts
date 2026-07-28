@@ -4,6 +4,7 @@ interface ContextProviderProps {
     value?: ObservableMaybe<any>;
     children?: ObservableMaybe<Child>;
     symbol?: ObservableMaybe<Symbol>;
+    'static'?: boolean;
     isStatic?: boolean;
     visible?: boolean;
 }

@@ -81,7 +81,6 @@ export declare const createBrowserCustomElement: <P extends {
  */
 export type ElementAttributesPattern<P> = (keyof P extends string ? keyof P : never) | (keyof JSX.HTMLAttributes<HTMLElement> extends string ? keyof JSX.HTMLAttributes<HTMLElement> : never) | `style.${keyof JSX.StyleProperties extends string ? keyof JSX.StyleProperties : never}` | `style$${keyof JSX.StyleProperties extends string ? keyof JSX.StyleProperties : never}`;
 export type ExtractProps<T> = T extends (props: infer P) => any ? P : never;
-export type ElementAttributes1<T extends (...args: any) => any> = (T extends (props: infer P) => any ? Partial<(JSX.HTMLAttributes<HTMLElement> & ElementAttributesPattern<P>)> : Partial<JSX.HTMLAttributes<HTMLElement>>);
 export type ElementAttributes<T extends (...args: any) => any> = Partial<JSX.HTMLAttributes<HTMLElement>> & Partial<Record<ElementAttributesPattern<ExtractProps<T>>, any>>;
 /**
  * Creates a custom HTML element with reactive properties

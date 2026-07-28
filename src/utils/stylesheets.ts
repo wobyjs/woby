@@ -17,6 +17,22 @@ const MAX_LOGGED_ERRORS = 50
 // Registry of shadow roots that need style updates
 const shadowRootRegistry = new Set<ShadowRoot>()
 
+// Coalesce bursts of stylesheet mutations (e.g. Vite/HMR injecting many <style>
+// tags during load) into a single deferred reconvert-and-reapply, instead of one
+// full reconvert per mutation. Without this, page load is O(injections × CSS × roots).
+let updateScheduled = false
+function scheduleStylesheetUpdate(): void {
+    if (updateScheduled) return
+    updateScheduled = true
+    const run = () => {
+        updateScheduled = false
+        cachedConstructedSheets = null
+        updateAllShadowRoots()
+    }
+    if (typeof requestAnimationFrame !== 'undefined') requestAnimationFrame(run)
+    else Promise.resolve().then(run)
+}
+
 /**
  * Extracts @property rules from CSS text and converts them to :host variables
  * 
@@ -210,8 +226,7 @@ export function observeStylesheetChanges(): void {
             return false
         })
         if (!relevant) return
-        cachedConstructedSheets = null
-        updateAllShadowRoots()
+        scheduleStylesheetUpdate()
     })
 
     // Only watch head childList for style/link additions, and characterData for inline <style> edits

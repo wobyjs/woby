@@ -390,6 +390,40 @@ const doubled = useMemo(() => $$(value) * 2)
 
 ---
 
+## `useMemo` Returning JSX as a Child — Reconstruction Trap
+
+Do **not** wrap a JSX subtree in `useMemo` just to "build it once" and drop it in as `{child}`. A memo is an **observable**, and when an observable is a child, woby binds it with a `useRenderEffect` that re-runs whenever the memo notifies **or** whenever any observable read *inside the subtree build* changes. Because element construction (and especially a custom element's `new ce(props)`) is **not** untracked, the reads that fire while the subtree is (re)built become dependencies of that mount effect — so the whole subtree gets torn down and rebuilt on every one of those changes.
+
+```typescript
+// ❌ TRAP — memo-as-child ⇒ re-runnable useRenderEffect that tracks every read
+//    made while building <expensive-grid> (incl. its internal reactive reads).
+//    Each date change → effect re-runs → full <expensive-grid> reconstruction.
+const core = useMemo(() => (
+  <div class="page">
+    <expensive-grid date={date} /* CE reads $$(date) during construction */ />
+  </div>
+))
+return <>{core}</>
+
+// ✅ FIX — a plain const holds the raw element thunk (a NON-reactive function).
+//    resolveChild calls it ONCE, inside the fragment's untracked child-setting.
+//    Built once, never re-entrant. The CE updates in place via its OWN reactivity.
+const core = (
+  <div class="page">
+    <expensive-grid date={date} />
+  </div>
+)
+return <>{core}</>
+```
+
+**Why the two behave differently:** a `<div/>`/`<my-el/>` JSX expression compiles to a marked *wrapElement thunk* — a non-reactive function. As a child it is resolved **once** via the immediate-call path, and if that happens inside an untracked scope (a component's own child-setting is untracked) nothing subscribes to the reads made during the build. A `useMemo(...)` wrapping the same JSX turns it into an observable, which as a child gets the reactive `useRenderEffect` binding instead — the re-runnable path.
+
+**Rule:** `useMemo` for a child is correct only when you *want* it to recompute/rebind on a dependency change. For a build-once static subtree, use a **plain const** (or inline the JSX directly). The reconstruction it prevents is pure waste — a custom element updates its own content in place through its internal reactivity; it never needs to be rebuilt to reflect new prop/observable values.
+
+> Diagnosing it: instrument the memo body (`window.__coreRun++`) and the suspected child (a counter at the top of its component body). If the child's counter climbs on each interaction while the memo counter stays flat, the memo is innocent — the **mount effect** is re-running and tracking the child's internal reads. Switch the memo to a plain const.
+
+---
+
 ## Batching
 
 ```typescript

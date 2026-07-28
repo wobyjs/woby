@@ -29,6 +29,7 @@ export type ContextProvider<T = unknown> = (props: {
     value: ObservableMaybe<T>;
     children: Child;
     ref?: Observable<Node>;
+    'static'?: boolean;
     isStatic?: boolean;
     visible?: boolean;
 }) => Child;

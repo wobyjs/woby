@@ -7,7 +7,7 @@ export declare const assign: {
 };
 export declare const castArray: <T>(value: T[] | T) => T[];
 export declare const castError: (exception: unknown) => Error;
-export declare const flatten: <T>(arr: T[]) => FlatArray<T, 0 | 2 | 1 | -1 | 3 | 9 | 8 | 4 | 5 | 11 | 6 | 7 | 10 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20>[];
+export declare const flatten: <T>(arr: T[]) => FlatArray<T, 0 | 9 | 5 | 13 | 17 | 20 | 2 | 1 | -1 | 3 | 8 | 4 | 11 | 6 | 7 | 10 | 12 | 14 | 15 | 16 | 18 | 19>[];
 export declare const indexOf: <T>(arr: ArrayLike<unknown>, value: T) => number;
 export declare const isArray: <T>(a: any) => a is Array<T>;
 export declare const isBoolean: (value: unknown) => value is boolean;
