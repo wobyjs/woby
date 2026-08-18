@@ -27,7 +27,7 @@ import { SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
 import { setChild, setProp, } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
-import { callStack, effect, isObservableWritable, Observable, root, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
+import { callStack, effect, isObservableWritable, Observable, root, untrack, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
 import type { ObservableOptions } from "soby"
 import { isObject, isPureFunction } from "../utils"
 import { isJsx } from "../jsx-runtime"
@@ -724,7 +724,24 @@ const setObservableValue = (obj: any, key: string, value: string, element?: Elem
                     break
             }
         } else {
-            obj[key](fromHtml ? fromHtml(value) : value)
+            // No type options — infer type from the current observable value.
+            // This prevents HTML attribute reflection (connectedCallback) from
+            // clobbering typed values (e.g. Observable<number>(8) → "8").
+            //
+            // The read MUST be untracked: setObservableValue runs inside
+            // attributeChangedCallback, which is itself reached from the render
+            // effect that wrote the attribute. A tracked read here would make that
+            // effect depend on the observable it is about to write, so it dirties
+            // itself on every run and recurses until the stack blows.
+            const current = untrack(() => observable())
+            if (typeof current === 'number') {
+                obj[key](Number(value))
+            } else if (typeof current === 'boolean') {
+                const lowerValue = value?.toLowerCase()
+                obj[key](lowerValue === 'true' || lowerValue === '1' || lowerValue === '')
+            } else {
+                obj[key](fromHtml ? fromHtml(value) : value)
+            }
         }
     } else {
         obj[key] = value
@@ -872,6 +889,16 @@ const setNestedProperty = (obj: HTMLElement, path: string, value: any) => {
 export const customElement = <P extends { children?: Observable<JSX.Child> }>(tagName: string, component: JSX.Component<P> | ContextProvider<any>): void => {
     // Browser must be registered first so it wins the native slot.
     // SSR is the fallback for environments without a DOM.
+    //
+    // KNOWN LIMITATION: renderToString() renders through the SSR document in EVERY
+    // environment, but in a browser `ces` never learns the tag, so a browser-side
+    // renderToString emits the host tag inert — a <context-provider> rendered that way
+    // does not wrap its children in context(), and nested providers resolve to the OUTER
+    // value. Node, where the SSR branch runs, resolves them correctly. Registering both
+    // here fixes that, but it also makes browser renderToString render every test suite's
+    // custom elements that Node leaves inert (the playground registers them from its
+    // browser-only default export), so the two suites diverge in the other direction.
+    // Fixing this properly means registering custom elements identically in both suites.
     if (globalThis.window && globalThis.document) {
         createBrowserCustomElement(tagName, component)
     } else {

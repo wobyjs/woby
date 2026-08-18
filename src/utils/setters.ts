@@ -211,13 +211,15 @@ export const setChildReplacement = (child: Child, childPrev: Node, stack: Stack)
  * ```
  */
 export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, fragmentOnly: boolean, child: Child, dynamic: boolean, childComp: Function, stack: Stack): void => {
-    if (isVoidChild(child)) {
-        return // Ignoring void children (false, null, undefined, boolean) from && patterns, regardless of dynamic flag
-    }
-
     const prev = FragmentUtils.getChildren(fragment)
     const prevIsArray = (prev instanceof Array)
     const prevLength = prevIsArray ? prev.length : 1
+
+    // NOTE: void children (false, null, undefined, boolean) from `&&` patterns are NOT
+    // short-circuited here. They fall through so the placeholder comment below gets created:
+    // it both holds this fragment's position among the parent's other children and lets a
+    // later non-void value be diffed into place instead of appended at the end.
+
     const prevFirst = prevIsArray ? prev[0] : prev
     const prevLast = prevIsArray ? prev[prevLength - 1] : prev
     const prevSibling = prevLast?.nextSibling || null
@@ -311,13 +313,29 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
             return c
         })
 
-        // Flatten the resolved children - if any resolved child is an array, flatten it into the main array
+        // Flatten the resolved children - if any resolved child is an array, flatten it into the main array.
+        // Items lifted out of a nested array must be resolved too, exactly like the top-level ones
+        // above. Leaving a function in place sends it down the `type === 'function'` branch of the
+        // loop below, which calls setChildStatic with fragmentOnly=false: that inner call appends the
+        // node to `parent` itself, and then the outer fragment flush appends the very same node a
+        // second time. In the DOM appendChild just moves the node so the duplicate is invisible, but
+        // the SSR document keeps both copies — which is how `<div>{$([<p/>,<p/>])}<span/></div>`
+        // rendered its array twice.
+        const resolveDeep = (item: any): any => {
+            let v = item
+            while (typeof v === 'function') v = v()
+            return v
+        }
         resolvedChildren = []
         for (let i = 0; i < tempResolved.length; i++) {
             const item = tempResolved[i]
             if (Array.isArray(item)) {
                 // Flatten arrays into the main children array
-                resolvedChildren.push(...item)
+                for (const sub of item) {
+                    const resolved = resolveDeep(sub)
+                    if (Array.isArray(resolved)) resolvedChildren.push(...resolved.map(resolveDeep))
+                    else resolvedChildren.push(resolved)
+                }
             } else {
                 resolvedChildren.push(item)
             }
@@ -396,6 +414,24 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
     let next = FragmentUtils.getChildren(fragmentNext)
     let nextLength = next instanceof Array ? next.length : 1
 
+    // This fragment resolved to nothing. It still needs a placeholder comment to keep the right
+    // spot in the parent's array of children — created here, before any of the paths below, so
+    // that even the very first render appends it in document order.
+    const nextIsVoid = nextLength === 0
+
+    if (nextIsVoid && prevLength === 1 && prevFirst.nodeType === 8) { // It's a placeholder already, no need to replace it
+        return
+    }
+
+    if (nextIsVoid && (dynamic || prevLength > 0)) { // A statically-void child can never come back, so it needs no anchor
+
+        FragmentUtils.pushNode(fragmentNext, createComment(''))
+
+        next = FragmentUtils.getChildren(fragmentNext)
+        nextLength = next instanceof Array ? next.length : 1
+
+    }
+
     if (prevLength === 0 && nextLength > 0 && !fragmentOnly) {
         if (next instanceof Array) {
             for (const node of next) {
@@ -408,33 +444,13 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
         return
     }
 
-    if (nextLength === 0 && prevLength === 1 && prevFirst.nodeType === 8) { // It's a placeholder already, no need to replace it
-        return
-
-    }
-
-    if (!fragmentOnly && (nextLength === 0 || (prevLength === 1 && prevFirst.nodeType === 8) || children[SYMBOL_UNCACHED])) { // Fast path for removing all children and/or replacing the placeholder
+    if (!fragmentOnly && (nextIsVoid || (prevLength === 1 && prevFirst.nodeType === 8) || children[SYMBOL_UNCACHED])) { // Fast path for removing all children and/or replacing the placeholder
 
         const { childNodes } = parent
 
         if (childNodes.length === prevLength) { // Maybe this fragment doesn't handle all children but only a range of them, checking for that here
 
             parent.textContent = ''
-
-            if (nextLength === 0) { // Placeholder, to keep the right spot in the array of children
-
-                const placeholder = /* childComp[SYMBOL_DOM] = */ createComment('')
-
-                FragmentUtils.pushNode(fragmentNext, placeholder)
-
-                if (next !== fragmentNext.values) {
-
-                    next = placeholder as any
-                    nextLength += 1
-
-                }
-
-            }
 
             if (prevSibling) {
 
@@ -464,21 +480,6 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
             FragmentUtils.replaceWithFragment(fragment, fragmentNext)
 
             return
-
-        }
-
-    }
-
-    if (nextLength === 0) { // Placeholder, to keep the right spot in the array of children
-
-        const placeholder = /* childComp[SYMBOL_DOM] = */ createComment('')
-
-        FragmentUtils.pushNode(fragmentNext, placeholder)
-
-        if (next !== fragmentNext.values) {
-
-            next = placeholder as any
-            nextLength += 1
 
         }
 

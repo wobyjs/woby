@@ -71,29 +71,16 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
         const ssrDoc = useDocument()
         let mountNode = $$(mount) as any
 
-        console.log('[Portal SSR]', {
-            hasSsrDoc: !!ssrDoc,
-            mountType: typeof mountNode,
-            mountIsBody: mountNode === globalThis.document?.body,
-            mountIsGlobalBody: mountNode === globalThis.document?.body,
-            globalBodyType: typeof globalThis.document?.body,
-            hasChildren: !!children,
-        })
-
         // In SSR context with DocumentContext, redirect global document.body to
         // the context-provided document's body so renderToString can find portal content
         if (ssrDoc && mountNode === globalThis.document?.body) {
             mountNode = ssrDoc.body
-            console.log('[Portal SSR] Redirected to ssrDoc.body')
         }
 
-        const parent: any = mountNode || createHTMLNode('div')
-
-        console.log('[Portal SSR] parent:', {
-            isBody: parent === ssrDoc?.body,
-            parentNodeType: typeof parent.parentNode,
-            hasParentNode: !!parent.parentNode,
-        })
+        // Mirroring the DOM branch's `$$(mount) || document.body`: with no explicit mount the
+        // children belong to the document body, otherwise they'd be rendered into an orphan
+        // node and silently dropped from the output.
+        const parent: any = mountNode || (ssrDoc ?? createDocument()).body
 
         if (wrapper) {
             // If wrapper is provided, use it
@@ -113,19 +100,9 @@ export const Portal = ({ when = true, mount, wrapper, children }: { mount?: Chil
             setChild(parent, children, FragmentUtils.make(), stack)
         }
 
-        console.log('[Portal SSR] after setChild, parent innerHTML:', (parent as any).innerHTML)
-
-        // Attach the parent to document body so it's included in SSR output
-        if (mount && parent.parentNode) {
-            // Container already attached to document, no need to re-append
-            console.log('[Portal SSR] parent already has parentNode, skipping append')
-        } else if (mount) {
-            const doc = ssrDoc || createDocument()
-            if (parent !== doc.body) {
-                doc.body.appendChild(parent)
-                console.log('[Portal SSR] appended parent to doc.body')
-            }
-        }
+        // NOTE: an explicitly-provided mount is the caller's own node and is never re-parented
+        // into the document. If it is detached, its content is correctly absent from the
+        // rendered string — same as portalling into a detached container in the DOM renderer.
     }
 
     return assign(() => $$(condition) || children, { metadata: { portal: portal as HTMLElement } })

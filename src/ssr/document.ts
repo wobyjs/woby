@@ -6,7 +6,6 @@ import { BaseNode } from "./base_node"
 import { Comment } from "./comment"
 import { Element } from "./element"
 import type { FN } from "../types"
-import { Style } from "./style"
 
 type EventListenerObject = {
     handleEvent(object: Event): void
@@ -39,10 +38,10 @@ export const createElement = ((tagName: string) => {
 export const createHTMLNode = createElement
 
 class SVGNode extends Element {
-    tagName: string
+    // NOTE: do not re-declare tagName/style/className here. Under standard class-field
+    // semantics a subclass field declaration is *defined* after super() returns, which
+    // would overwrite what Element's constructor just assigned with undefined.
     isSVG: boolean
-    style: Style
-    #className: string
 
     constructor(tagName: string) {
         super(tagName)

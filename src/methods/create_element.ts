@@ -179,9 +179,14 @@ export const createElement = <P = { children?: Child }>(component: Component<P>,
         if (isObservable(component)) {
             return component as any // Already a rendered element observable — return directly
         }
+        // A component only ever reads its children off props, but the classic h(type, props,
+        // ...children) signature — which `html` (htm) compiles to — passes them as rest args.
+        // The guard above already rejects supplying both, so merging here is unambiguous.
+        const componentProps = hasChildren ? { ...props, children } : props
+
         return wrapElement(() => {
 
-            return untrack(() => isClass(component) ? new (component as any)(props) : component.call(component, props as P)) //TSC
+            return untrack(() => isClass(component) ? new (component as any)(componentProps) : component.call(component, componentProps as P)) //TSC
 
         })
 

@@ -78,9 +78,8 @@ export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[
       if (before.parentNode === parent) { // Safety check, since setChildStatic may trigger this
         parent.replaceChild(after, before)
         return
-      } else {
-        //TODO: Optimize this branch too
       }
+      //TODO: Optimize this branch too
     }
     beforeDummyWrapper[0] = before
     before = beforeDummyWrapper
