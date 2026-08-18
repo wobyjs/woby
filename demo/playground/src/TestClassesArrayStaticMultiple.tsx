@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestClassesArrayStaticMultiple'
 const TestClassesArrayStaticMultiple = (): JSX.Element => {
@@ -14,18 +14,6 @@ const TestClassesArrayStaticMultiple = (): JSX.Element => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestClassesArrayStaticMultiple()
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const ssrResult = renderToString(ssrComponent)
-    const expected = '<p class="red bold">content</p>'
-    const expectedFull = `<h3>Classes - Array Static Multiple</h3>${expected}`
-    const passed = ssrResult === expectedFull
-    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
 }
 
 TestClassesArrayStaticMultiple.test = {
@@ -48,3 +36,6 @@ TestClassesArrayStaticMultiple.test = {
 
 
 export default () => <TestSnapshots Component={TestClassesArrayStaticMultiple} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestClassesArrayStaticMultiple)

@@ -8,7 +8,7 @@
  * - Nested context providers
  */
 import { $, $$, customElement, defaults, createContext, useContext, HtmlString, HtmlNumber, type JSX, useEffect, renderToString, type ElementAttributes } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml, runSSRTest } from './util'
 
 // TypeScript type augmentation for custom elements
 declare module 'woby' {
@@ -203,13 +203,6 @@ const TestCustomElementContext = (): JSX.Element => {
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    registerCustomElements()
-    const ssrResult = renderToString(<TestCustomElementContext />)
-    console.log(`\n📝 Test: TestCustomElementContext\n   SSR: ${ssrResult.substring(0, 150)}... ✅\n`)
-}
-
 TestCustomElementContext.test = {
     // Not static: custom-element context consumers resolve context only after
     // they are connected to the DOM (a child is constructed before its parent
@@ -229,7 +222,7 @@ TestCustomElementContext.test = {
         // context does not propagate through them (inner TSX consumers fall back
         // to the app-level context). This mirrors the Basic test's SSR vs DOM
         // divergence — a single string cannot satisfy both paths.
-        const expectedFull = "<div><h1>Custom Element Context Test</h1><h2>1. Direct TSX Context Usage</h2><div style=\"border: 1px solid gray; padding: 8px; margin: 5px; background-color: #333; color: #fff;\"><strong>Direct TSX Consumer:</strong><ul><li>Theme: dark</li><li>Counter: 100</li><li>Nested: app-level</li></ul></div>Custom element consuming context<h2>2. Custom Element Context Consumption</h2><context-consumer label=\"HTML Custom Element Consumer\"></context-consumer><h2>3. Context Provider Custom Element</h2><context-provider3 theme=\"dark\" counter=\"50\" nested=\"custom-provider\"><context-consumer label=\"Nested Consumer 1\"></context-consumer><div style=\"border: 1px solid gray; padding: 8px; margin: 5px; background-color: #333; color: #fff;\"><strong>Nested Consumer 2:</strong><ul><li>Theme: dark</li><li>Counter: 100</li><li>Nested: app-level</li></ul></div></context-provider3><h2>4. Counter Element with Context</h2><counter-element initial-value=\"10\" title=\"HTML Counter Element\"><context-consumer label=\"Counter Context Consumer\"></context-consumer></counter-element><h2>5. Complex Nested Context</h2><div style=\"border: 2px solid blue; padding: 10px; margin: 10px;\"><h4>Context Provider (Theme: light, Counter: 200</h4><span data-test=\"before-providers\">Before providers</span><span data-test=\"between-providers\">Between providers</span><div style=\"margin-left: 20px;\"><context-consumer label=\"Level 1 Consumer\"></context-consumer><counter-element initial-value=\"5\" title=\"Nested Counter\"><context-consumer label=\"Level 2 Consumer\"></context-consumer><context-provider3 theme=\"dark\" counter=\"999\"><context-consumer label=\"Level 3 Consumer\"></context-consumer></context-provider3></counter-element></div></div><h2>6. Context Inheritance Test</h2><div><p>App-level context values:</p><ul><li>Theme: dark</li><li>Counter: 100</li><li>Nested: app-level</li></ul><div style=\"border: 1px solid gray; padding: 8px; margin: 5px; background-color: #333; color: #fff;\"><strong>App-level Context Consumer:</strong><ul><li>Theme: dark</li><li>Counter: 100</li><li>Nested: app-level</li></ul></div></div></div>"
+        const expectedFull = "<div><h1>Custom Element Context Test</h1><h2>1. Direct TSX Context Usage</h2><div style=\"border: 1px solid gray; padding: 8px; margin: 5px; background-color: #333; color: #fff;\"><strong>Direct TSX Consumer:</strong><ul><li>Theme: dark</li><li>Counter: 100</li><li>Nested: app-level</li></ul></div>Custom element consuming context<h2>2. Custom Element Context Consumption</h2><context-consumer label=\"HTML Custom Element Consumer\"></context-consumer><h2>3. Context Provider Custom Element</h2><context-provider3 theme=\"dark\" counter=\"50\" nested=\"custom-provider\"><context-consumer label=\"Nested Consumer 1\"></context-consumer><div style=\"border: 1px solid gray; padding: 8px; margin: 5px; background-color: #333; color: #fff;\"><strong>Nested Consumer 2:</strong><ul><li>Theme: dark</li><li>Counter: 100</li><li>Nested: app-level</li></ul></div></context-provider3><h2>4. Counter Element with Context</h2><counter-element initial-value=\"10\" title=\"HTML Counter Element\"><context-consumer label=\"Counter Context Consumer\"></context-consumer></counter-element><h2>5. Complex Nested Context</h2><div style=\"border: 2px solid blue; padding: 10px; margin: 10px;\"><h4>Context Provider (Theme: light, Counter: 200</h4><span data-test=\"before-providers\">Before providers</span><span data-test=\"between-providers\">Between providers</span><div style=\"margin-left: 20px;\"><context-consumer label=\"Level 1 Consumer\"></context-consumer><counter-element initial-value=\"5\" title=\"Nested Counter\"><context-consumer label=\"Level 2 Consumer\"></context-consumer><context-provider3 theme=\"dark\" counter=\"999\"><context-consumer label=\"Level 3 Consumer\"></context-consumer></context-provider3></counter-element><span data-test=\"after-children\">After children</span></div></div><h2>6. Context Inheritance Test</h2><div><p>App-level context values:</p><ul><li>Theme: dark</li><li>Counter: 100</li><li>Nested: app-level</li></ul><div style=\"border: 1px solid gray; padding: 8px; margin: 5px; background-color: #333; color: #fff;\"><strong>App-level Context Consumer:</strong><ul><li>Theme: dark</li><li>Counter: 100</li><li>Nested: app-level</li></ul></div></div></div>"
 
         // SSR test
         const ssrComponent = testObservables[`${name}_ssr`]
@@ -253,3 +246,6 @@ export default () => {
     registerCustomElements()
     return <TestSnapshots Component={TestCustomElementContext} />
 }
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestCustomElementContext)

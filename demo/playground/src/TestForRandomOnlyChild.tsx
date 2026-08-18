@@ -1,5 +1,5 @@
 import { $, $$, For, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestForRandomOnlyChild'
 const TestForRandomOnlyChild = (): JSX.Element => {
@@ -26,16 +26,6 @@ const TestForRandomOnlyChild = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestForRandomOnlyChild()
-    const ssrComponent = testObservables[`TestForRandomOnlyChild_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestForRandomOnlyChild\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestForRandomOnlyChild.test = {
     static: false,
     compareActualValues: true,
@@ -58,3 +48,6 @@ TestForRandomOnlyChild.test = {
 
 
 export default () => <TestSnapshots Component={TestForRandomOnlyChild} /> // HMR trigger
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestForRandomOnlyChild)

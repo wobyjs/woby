@@ -1,5 +1,5 @@
 import { $, $$, useEffect, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestRef'
 const TestRef = (): JSX.Element => {
@@ -26,16 +26,6 @@ const TestRef = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestRef()
-    const ssrComponent = testObservables[`TestRef_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestRef\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestRef.test = {
     static: false,
@@ -67,3 +57,6 @@ TestRef.test = {
 
 
 export default () => <TestSnapshots Component={TestRef} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestRef)

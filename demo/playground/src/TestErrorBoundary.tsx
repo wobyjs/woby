@@ -1,5 +1,5 @@
 import { $, $$, useMemo, ErrorBoundary, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, useTimeout, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, useTimeout, assert, runSSRTest } from './util'
 
 const name = 'TestErrorBoundary'
 const TestErrorBoundary = (): JSX.Element => {
@@ -26,16 +26,6 @@ const TestErrorBoundary = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestErrorBoundary()
-    const ssrComponent = testObservables[`TestErrorBoundary_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestErrorBoundary\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestErrorBoundary.test = {
     static: true,
     compareActualValues: true,
@@ -58,3 +48,6 @@ TestErrorBoundary.test = {
 
 
 export default () => <TestSnapshots Component={TestErrorBoundary} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestErrorBoundary)

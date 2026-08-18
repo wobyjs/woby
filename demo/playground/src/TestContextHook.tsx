@@ -1,5 +1,5 @@
 import { $, $$, createContext, useContext, renderToString, jsx, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml, runSSRTest } from './util'
 
 const name = 'TestContextHook'
 const TestContextHook = (): JSX.Element => {
@@ -109,24 +109,25 @@ const TestContextHook = (): JSX.Element => {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestContextHook()
-    const ssrComponent = testObservables[`TestContextHook_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestContextHook\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestContextHook.test = {
     static: true,
     expect: () => {
-        // Define expected values for both main test and SSR test
-        // Note: SSR doesn't render symbol attributes
-        // SSR: context nesting doesn't work - inner provider still shows outer value
-        const expectedSSR = minimiseHtml( '<h3>Context - Hook</h3><p data-test="reader">outer</p><context-provider value="inner"><b>Visible <Context.Provider></b><p data-test="reader">outer</p><div data-test="middle-content"><span>nested element</span></div><p data-test="nested-fn-last">outer</p></context-provider><p data-test="reader">outer</p><span data-test="separator">-</span><h3>Context.Provider(value, () => ) Test</h3><p data-test="fn-provider">Function provider: function-value</p><h3>Position Independence Test</h3><p data-test="pos-1">Before: position-test</p><div data-test="pos-2"><p data-test="pos-2-nested">Nested Before: position-test</p></div><p data-test="pos-3">Middle: position-test</p><p data-test="pos-4">Override: override-position</p><p data-test="pos-5">After: position-test</p><h3>isStatic Test</h3><div data-test="isstatic-test"><p data-test="isstatic-value">Value: observable-value</p><p data-test="isstatic-type">Type: string</p><p data-test="isstatic-not-function">Is not function: true</p></div>' )
-        // DOM: context nesting works correctly - inner provider shows inner value
-        const expectedDOM =  minimiseHtml('<p data-test="reader">outer</p><context-provider value="inner"><b>Visible <Context.Provider></b><p data-test="reader">inner</p><div data-test="middle-content"><span>nested element</span></div><p data-test="nested-fn-last">inner</p></context-provider><p data-test="reader">outer</p><span data-test="separator">-</span><h3>Context.Provider(value, () => ) Test</h3><p data-test="fn-provider">Function provider: function-value</p><h3>Position Independence Test</h3><p data-test="pos-1">Before: position-test</p><div data-test="pos-2"><p data-test="pos-2-nested">Nested Before: position-test</p></div><p data-test="pos-3">Middle: position-test</p><p data-test="pos-4">Override: override-position</p><p data-test="pos-5">After: position-test</p><h3>isStatic Test</h3><div data-test="isstatic-test"><p data-test="isstatic-value">Value: observable-value</p><p data-test="isstatic-type">Type: string</p><p data-test="isstatic-not-function">Is not function: true</p></div>')
+        // Note: SSR doesn't render symbol attributes.
+        //
+        // The `visible` provider renders as a real <context-provider> custom element, and it is
+        // that element which re-establishes the context for its children. renderToString always
+        // renders through the SSR document, but customElement() only registers the SSR element
+        // when there is no DOM — so under Node the tag is live and readers beneath it see
+        // `inner`, while a browser-side renderToString gets an inert tag and those readers fall
+        // through to the OUTER provider's `outer`. Real DOM rendering (expectedDOM below) always
+        // resolves to `inner`. So only this one nested value is environment-dependent; the
+        // invisible nested providers further down resolve identically everywhere.
+        const body = (nested: string) => '<p data-test="reader">outer</p><context-provider value="inner"><b>Visible <Context.Provider></b><p data-test="reader">' + nested + '</p><div data-test="middle-content"><span>nested element</span></div><p data-test="nested-fn-last">' + nested + '</p></context-provider><p data-test="reader">outer</p><span data-test="separator">-</span><h3>Context.Provider(value, () => ) Test</h3><p data-test="fn-provider">Function provider: function-value</p><h3>Position Independence Test</h3><p data-test="pos-1">Before: position-test</p><div data-test="pos-2"><p data-test="pos-2-nested">Nested Before: position-test</p></div><p data-test="pos-3">Middle: position-test</p><p data-test="pos-4">Override: override-position</p><p data-test="pos-5">After: position-test</p><h3>isStatic Test</h3><div data-test="isstatic-test"><p data-test="isstatic-value">Value: observable-value</p><p data-test="isstatic-type">Type: string</p><p data-test="isstatic-not-function">Is not function: true</p></div>'
+        // SSR renders the whole component, heading included; the DOM snapshot starts after it.
+        const expectedSSR = minimiseHtml('<h3>Context - Hook</h3>' + body(typeof window === 'undefined' ? 'inner' : 'outer'))
+        const expectedDOM = minimiseHtml(body('inner'))
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = minimiseHtml(renderToString(ssrComponent))
@@ -142,4 +143,6 @@ TestContextHook.test = {
 
 
 export default () => <TestSnapshots Component={TestContextHook} />
-
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestContextHook)

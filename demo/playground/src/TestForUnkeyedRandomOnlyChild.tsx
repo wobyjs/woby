@@ -1,5 +1,5 @@
 import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
-import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, random, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestForUnkeyedRandomOnlyChild'
 const TestForUnkeyedRandomOnlyChild = (): JSX.Element => {
@@ -23,16 +23,6 @@ const TestForUnkeyedRandomOnlyChild = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestForUnkeyedRandomOnlyChild()
-    const ssrComponent = testObservables[`TestForUnkeyedRandomOnlyChild_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestForUnkeyedRandomOnlyChild\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestForUnkeyedRandomOnlyChild.test = {
     static: true,
     expect: () => {
@@ -55,3 +45,6 @@ TestForUnkeyedRandomOnlyChild.test = {
 
 
 export default () => <TestSnapshots Component={TestForUnkeyedRandomOnlyChild} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestForUnkeyedRandomOnlyChild)

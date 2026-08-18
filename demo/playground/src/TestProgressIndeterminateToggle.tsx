@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestProgressIndeterminateToggle'
 const TestProgressIndeterminateToggle = (): JSX.Element => {
@@ -21,16 +21,6 @@ const TestProgressIndeterminateToggle = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestProgressIndeterminateToggle()
-    const ssrComponent = testObservables[`TestProgressIndeterminateToggle_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestProgressIndeterminateToggle\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestProgressIndeterminateToggle.test = {
     static: false,
@@ -55,3 +45,6 @@ TestProgressIndeterminateToggle.test = {
 
 
 export default () => <TestSnapshots Component={TestProgressIndeterminateToggle} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestProgressIndeterminateToggle)

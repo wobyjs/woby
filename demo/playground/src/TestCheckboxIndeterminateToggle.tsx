@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestCheckboxIndeterminateToggle'
 const TestCheckboxIndeterminateToggle = (): JSX.Element => {
@@ -18,17 +18,6 @@ const TestCheckboxIndeterminateToggle = (): JSX.Element => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestCheckboxIndeterminateToggle() // Register the component
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const ssrResult = renderToString(ssrComponent)
-    const expectedFull = `<h3>Checkbox - Indeterminate Toggle</h3><input type="checkbox" /><input type="checkbox" checked="" />`
-    const passed = ssrResult === expectedFull
-    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
 }
 
 TestCheckboxIndeterminateToggle.test = {
@@ -51,3 +40,6 @@ TestCheckboxIndeterminateToggle.test = {
 
 
 export default () => <TestSnapshots Component={TestCheckboxIndeterminateToggle} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestCheckboxIndeterminateToggle)

@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestAttributeFunction'
 const TestAttributeFunction = (): JSX.Element => {
@@ -22,24 +22,7 @@ const TestAttributeFunction = (): JSX.Element => {
 }
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestAttributeFunction() // Register the component
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const ssrResult = renderToString(ssrComponent)
-    const currentValue = $$(testObservables[name])
-    const expectedFull = `<h3>Attribute - Function</h3><p data-color="dark${currentValue}">content</p>`
-    const passed = ssrResult === expectedFull
-    
-    console.log(`\n📝 Test: ${name}`)
-    console.log(`   SSR Output: ${ssrResult}`)
-    console.log(`   Expected:   ${expectedFull}`)
-    console.log(`   Pass:       ${passed ? '✅ YES' : '❌ NO'}\n`)
-    
-    if (!passed) {
-        console.error(`❌ [${name}] SSR test failed`)
-        process.exit(1)
-    }
-}
+
 
 TestAttributeFunction.test = {
     static: false,
@@ -63,3 +46,6 @@ TestAttributeFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestAttributeFunction} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestAttributeFunction)

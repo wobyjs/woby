@@ -1,5 +1,5 @@
 import { $, $$, createDirective, useEffect, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 // Declare the modelLocal directive in JSX namespace
 declare module 'woby' {
@@ -40,16 +40,6 @@ const TestDirectiveRegisterLocal = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestDirectiveRegisterLocal()
-    const ssrComponent = testObservables[`TestDirectiveRegisterLocal_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestDirectiveRegisterLocal\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestDirectiveRegisterLocal.test = {
     static: true,
     expect: () => {
@@ -71,3 +61,6 @@ TestDirectiveRegisterLocal.test = {
 
 
 export default () => <TestSnapshots Component={TestDirectiveRegisterLocal} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestDirectiveRegisterLocal)

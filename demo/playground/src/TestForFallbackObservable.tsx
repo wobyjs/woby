@@ -1,5 +1,5 @@
 import { $, $$, For, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestForFallbackObservable'
 const TestForFallbackObservable = (): JSX.Element => {
@@ -31,16 +31,6 @@ const TestForFallbackObservable = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestForFallbackObservable()
-    const ssrComponent = testObservables[`TestForFallbackObservable_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestForFallbackObservable\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestForFallbackObservable.test = {
     static: true,
     compareActualValues: true,
@@ -63,4 +53,7 @@ TestForFallbackObservable.test = {
 
 export default () => <TestSnapshots Component={TestForFallbackObservable} />
 
-// console.log('TestForFallbackObservable:')
+// console.log('TestForFallbackObservable:')
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestForFallbackObservable)

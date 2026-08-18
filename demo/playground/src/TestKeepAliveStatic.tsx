@@ -1,5 +1,5 @@
 import { $, $$, KeepAlive, renderToString, useEffect, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 let timing = 0
 
@@ -39,16 +39,6 @@ const TestKeepAliveStatic = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestKeepAliveStatic()
-    const ssrComponent = testObservables[`TestKeepAliveStatic_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestKeepAliveStatic\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestKeepAliveStatic.test = {
     static: false,
     enable: () => {
@@ -75,3 +65,6 @@ TestKeepAliveStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestKeepAliveStatic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestKeepAliveStatic)

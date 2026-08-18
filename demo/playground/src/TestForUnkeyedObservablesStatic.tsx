@@ -1,5 +1,5 @@
 import { $, $$, For, ObservableReadonly, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestForUnkeyedObservablesStatic'
 const TestForUnkeyedObservablesStatic = (): JSX.Element => {
@@ -31,16 +31,6 @@ const TestForUnkeyedObservablesStatic = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestForUnkeyedObservablesStatic()
-    const ssrComponent = testObservables[`TestForUnkeyedObservablesStatic_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestForUnkeyedObservablesStatic\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestForUnkeyedObservablesStatic.test = {
     static: true,
     expect: () => {
@@ -62,3 +52,6 @@ TestForUnkeyedObservablesStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestForUnkeyedObservablesStatic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestForUnkeyedObservablesStatic)

@@ -1,5 +1,5 @@
 import { $, $$, createDirective, useEffect, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 // Declare the model directive in JSX namespace
 declare module 'woby' {
@@ -39,16 +39,6 @@ const TestDirectiveRef = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestDirectiveRef()
-    const ssrComponent = testObservables[`TestDirectiveRef_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestDirectiveRef\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestDirectiveRef.test = {
     static: true,
     expect: () => {
@@ -70,3 +60,6 @@ TestDirectiveRef.test = {
 
 
 export default () => <TestSnapshots Component={TestDirectiveRef} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestDirectiveRef)

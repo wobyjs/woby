@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestComponentObservable'
 const TestComponentObservable = (): JSX.Element => {
@@ -20,18 +20,6 @@ const TestComponentObservable = (): JSX.Element => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestComponentObservable()
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const ssrResult = renderToString(ssrComponent)
-    const value = $$(testObservables[name])
-    const expectedFull = `<h3>Component - Observable</h3><p>${value}</p>`
-    const passed = ssrResult === expectedFull
-    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
 }
 
 TestComponentObservable.test = {
@@ -58,3 +46,6 @@ TestComponentObservable.test = {
 
 
 export default () => <TestSnapshots Component={TestComponentObservable} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestComponentObservable)

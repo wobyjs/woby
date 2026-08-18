@@ -1,5 +1,5 @@
 import { $, $$, renderToString, useEnvironment, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestABCD'
 const TestABCD = (): JSX.Element => {
@@ -35,34 +35,7 @@ const TestABCD = (): JSX.Element => {
 }
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestABCD() // Register the component
 
-    // Test all 4 states
-    console.log(`\n📝 Test: ${name}`)
-    let allPassed = true
-    for (let i = 0; i < 4; i++) {
-        ;(testObservables[name] as any)(i)
-        const ssrComponent = testObservables[`${name}_ssr`]
-        const ssrResult = renderToString(ssrComponent)
-        const fullElements = [
-            '<h3>Children - ABCD</h3><p><i>a</i></p>',
-            '<h3>Children - ABCD</h3><p><u>b</u></p>',
-            '<h3>Children - ABCD</h3><p><b>c</b></p>',
-            '<h3>Children - ABCD</h3><p><span>d</span></p>'
-        ]
-        const expectedFull = fullElements[i]
-        const passed = ssrResult === expectedFull
-        if (!passed) allPassed = false
-        console.log(`   State ${i}: ${ssrResult} ${passed ? '✅' : `❌ (expected: ${expectedFull})`}`)
-    }
-    console.log(`   Result: ${allPassed ? '✅ ALL PASSED' : '❌ SOME FAILED'}\n`)
-
-    if (!allPassed) {
-        console.error(`❌ [${name}] SSR test failed`)
-        process.exit(1)
-    }
-}
 
 TestABCD.test = {
     static: false,
@@ -101,3 +74,6 @@ TestABCD.test = {
 
 
 export default () => <TestSnapshots Component={TestABCD} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestABCD)

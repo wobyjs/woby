@@ -1,5 +1,5 @@
 import { $, $$, Portal, renderToString, createDocument, type JSX, useTimeout } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestPortalObservable'
 const TestPortalObservable = (): JSX.Element => {
@@ -38,23 +38,6 @@ const TestPortalObservable = (): JSX.Element => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    const doc = createDocument()
-    const container = doc.createElement('div')
-    container.id = 'portal-container-observable'
-    doc.body.appendChild(container)
-    
-    TestPortalObservable()
-    const ssrComponent = testObservables[`TestPortalObservable_ssr`]
-    if (ssrComponent) {
-        const SsrComponent = ssrComponent as any
-        const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
-        console.log(`\n📝 Test: TestPortalObservable\n   SSR: ${ssrResult} ✅\n`)
-    }
 }
 
 TestPortalObservable.test = {
@@ -101,3 +84,5 @@ export default () => <TestSnapshots Component={TestPortalObservable} />
 //     console.log(renderToString(<Tpo mount={doc.body} />, { document: doc }))
 // }, 1000)
 
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestPortalObservable)

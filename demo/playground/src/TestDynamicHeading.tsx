@@ -1,5 +1,5 @@
 import { $, $$, Dynamic, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestDynamicHeading'
 const TestDynamicHeading = (): JSX.Element => {
@@ -30,16 +30,6 @@ const TestDynamicHeading = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestDynamicHeading()
-    const ssrComponent = testObservables[`TestDynamicHeading_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestDynamicHeading\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestDynamicHeading.test = {
     static: false,
     compareActualValues: true,
@@ -64,3 +54,6 @@ TestDynamicHeading.test = {
 
 
 export default () => <TestSnapshots Component={TestDynamicHeading} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestDynamicHeading)

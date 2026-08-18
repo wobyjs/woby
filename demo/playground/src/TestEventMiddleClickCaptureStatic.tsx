@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestEventMiddleClickCaptureStatic'
 const TestEventMiddleClickCaptureStatic = (): JSX.Element => {
@@ -47,16 +47,6 @@ const TestEventMiddleClickCaptureStatic = (): JSX.Element => {
 
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestEventMiddleClickCaptureStatic()
-    const ssrComponent = testObservables[`TestEventMiddleClickCaptureStatic_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestEventMiddleClickCaptureStatic\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestEventMiddleClickCaptureStatic.test = {
     static: false,
     expect: () => {
@@ -75,7 +65,9 @@ TestEventMiddleClickCaptureStatic.test = {
         }
 
         // Verify the main test expectation with console assertion
-        // Find the button within our specific test component
+        // Find the button within our specific test component (browser only — the SSR
+        // assertion above is the whole test under Node)
+        if (typeof document === 'undefined') return expected
         const allH3 = document.querySelectorAll('h3')
         let buttonElement = null
         for (let h3 of allH3) {
@@ -99,3 +91,6 @@ TestEventMiddleClickCaptureStatic.test = {
 }
 
 export default () => <TestSnapshots Component={TestEventMiddleClickCaptureStatic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestEventMiddleClickCaptureStatic)

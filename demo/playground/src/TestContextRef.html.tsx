@@ -23,7 +23,7 @@
  */
 import { $, $$, customElement, defaults, useContext, HtmlString, HtmlNumber, HtmlBoolean, type JSX, renderToString, type ElementAttributes } from 'woby'
 import { registerContextRef } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert, minimiseHtml, useTimeout, TEST_INTERVAL } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, minimiseHtml, useTimeout, TEST_INTERVAL, runSSRTest } from './util'
 import { AppCounterCtx, AppTextCtx, AppFlagCtx, ScopedCtx, ReactiveCtx, StaticCtx } from './TestContextRef.shared'
 
 // DO NOT createContext() or registerContextRef() here — both are done in
@@ -346,11 +346,7 @@ const TestContextRefHtml = (): JSX.Element => {
 }
 
 // Conditional: SSR tests
-if (typeof window === 'undefined') {
-    registerCustomElements()
-    const ssrResult = renderToString(<TestContextRefHtml />)
-    console.log(`\n📝 Test: TestContextRefHtml\n   SSR: ${ssrResult.substring(0, 150)}... ✅\n`)
-}
+
 
 TestContextRefHtml.test = {
     // Not static: custom-element consumers resolve context only after
@@ -406,3 +402,6 @@ export default () => {
     registerCustomElements()
     return <TestSnapshots Component={TestContextRefHtml} />
 }
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestContextRefHtml)

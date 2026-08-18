@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 let testit = true
 const name = 'TestEventClickStopPropagation'
@@ -76,16 +76,6 @@ const TestEventClickStopPropagation = (): JSX.Element => {
 
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestEventClickStopPropagation()
-    const ssrComponent = testObservables[`TestEventClickStopPropagation_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestEventClickStopPropagation\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestEventClickStopPropagation.test = {
     static: false,
     compareActualValues: true,
@@ -116,3 +106,6 @@ TestEventClickStopPropagation.test = {
 }
 
 export default () => <TestSnapshots Component={TestEventClickStopPropagation} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestEventClickStopPropagation)

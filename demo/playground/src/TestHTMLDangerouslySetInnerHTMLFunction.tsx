@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestHTMLDangerouslySetInnerHTMLFunction'
 const TestHTMLDangerouslySetInnerHTMLFunction = (): JSX.Element => {
@@ -18,16 +18,6 @@ const TestHTMLDangerouslySetInnerHTMLFunction = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestHTMLDangerouslySetInnerHTMLFunction()
-    const ssrComponent = testObservables[`TestHTMLDangerouslySetInnerHTMLFunction_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestHTMLDangerouslySetInnerHTMLFunction\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestHTMLDangerouslySetInnerHTMLFunction.test = {
     static: true,
@@ -50,4 +40,6 @@ TestHTMLDangerouslySetInnerHTMLFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestHTMLDangerouslySetInnerHTMLFunction} />
-
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestHTMLDangerouslySetInnerHTMLFunction)

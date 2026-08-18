@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestComponentStaticProps'
 const TestComponentStaticProps = ({ value }: { value: number }): JSX.Element => {
@@ -17,20 +17,11 @@ const TestComponentStaticProps = ({ value }: { value: number }): JSX.Element => 
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestComponentStaticProps({ value: random() })
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const ssrResult = renderToString(ssrComponent)
-    const propValue = $$(testObservables[name])
-    const expectedFull = `<h3>Component - Static Props</h3><p>${propValue}</p>`
-    const passed = ssrResult === expectedFull
-    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
-}
-
 TestComponentStaticProps.test = {
     static: true,
+    // The Node harness constructs the component itself, so it needs a real prop value —
+    // otherwise `value` is undefined and the rendered <p> is empty.
+    props: { value: random() },
     compareActualValues: true,
     expect: () => {
         const propValue = $$(testObservables[name])
@@ -53,3 +44,6 @@ TestComponentStaticProps.test = {
 
 
 export default () => <TestSnapshots Component={TestComponentStaticProps} props={{ value: random() }} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestComponentStaticProps)

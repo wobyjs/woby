@@ -1,5 +1,5 @@
 import { $, $$, Switch, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestSwitchDefaultFunction'
 const TestSwitchDefaultFunction = (): JSX.Element => {
@@ -27,16 +27,6 @@ const TestSwitchDefaultFunction = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestSwitchDefaultFunction()
-    const ssrComponent = testObservables[`TestSwitchDefaultFunction_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestSwitchDefaultFunction\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestSwitchDefaultFunction.test = {
     static: true,
     expect: () => {
@@ -58,3 +48,6 @@ TestSwitchDefaultFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestSwitchDefaultFunction} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestSwitchDefaultFunction)

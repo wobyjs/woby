@@ -10,7 +10,7 @@
  */
 import { $, $$, customElement, defaults, useContext, HtmlString, HtmlNumber, HtmlBoolean, type JSX, useEffect, renderToString, type ElementAttributes } from 'woby'
 import { registerContextRef } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert, minimiseHtml, useTimeout, TEST_INTERVAL } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, minimiseHtml, useTimeout, TEST_INTERVAL, runSSRTest } from './util'
 import { AppCounterCtx, AppTextCtx, AppFlagCtx, ScopedCtx, ReactiveCtx, StaticCtx } from './TestContextRef.shared'
 
 // TypeScript type augmentation for custom elements
@@ -200,6 +200,8 @@ const TestContextRef = (): JSX.Element => {
     // resolution happens synchronously in connectedCallback, so no
     // post-render mutation occurs naturally.
     useTimeout(() => {
+        // Browser-only: this exists solely to give TestSnapshots a second tick.
+        if (typeof document === 'undefined') return
         // Scope to our test: find our h1 heading, then query within its parent
         const allH1s = document.querySelectorAll('h1')
         for (const h1 of allH1s) {
@@ -335,11 +337,7 @@ const TestContextRef = (): JSX.Element => {
 }
 
 // Conditional: SSR tests
-if (typeof window === 'undefined') {
-    registerCustomElements()
-    const ssrResult = renderToString(<TestContextRef />)
-    console.log(`\n📝 Test: TestContextRef\n   SSR: ${ssrResult.substring(0, 150)}... ✅\n`)
-}
+
 
 TestContextRef.test = {
     // Not static: custom-element consumers resolve context only after
@@ -408,3 +406,6 @@ export default () => {
     registerCustomElements()
     return <TestSnapshots Component={TestContextRef} />
 }
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestContextRef)

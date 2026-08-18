@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestEventClickRemoval'
 const TestEventClickRemoval = (): JSX.Element => {
@@ -17,6 +17,8 @@ const TestEventClickRemoval = (): JSX.Element => {
 
     // Fire click event programmatically 4 times for testing
     setTimeout(() => {
+        // Browser-only driver: fires synthetic clicks, which needs a real DOM.
+        if (typeof window === 'undefined') return
         useInterval(() => {
             const button = ref()
             const testObservables = window.testObservables || {}
@@ -65,14 +67,7 @@ const TestEventClickRemoval = (): JSX.Element => {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestEventClickRemoval()
-    const ssrComponent = testObservables[`TestEventClickRemoval_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestEventClickRemoval\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestEventClickRemoval.test = {
     static: false,
@@ -114,3 +109,6 @@ TestEventClickRemoval.test = {
 }
 
 export default () => <TestSnapshots Component={TestEventClickRemoval} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestEventClickRemoval)

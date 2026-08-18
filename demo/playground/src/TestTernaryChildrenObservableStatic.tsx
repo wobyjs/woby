@@ -1,5 +1,5 @@
 import { $, $$, Ternary, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestTernaryChildrenObservableStatic'
 const TestTernaryChildrenObservableStatic = (): JSX.Element => {
@@ -42,16 +42,6 @@ const TestTernaryChildrenObservableStatic = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestTernaryChildrenObservableStatic()
-    const ssrComponent = testObservables[`TestTernaryChildrenObservableStatic_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestTernaryChildrenObservableStatic\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestTernaryChildrenObservableStatic.test = {
     static: true,
     compareActualValues: true,
@@ -75,3 +65,6 @@ TestTernaryChildrenObservableStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestTernaryChildrenObservableStatic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestTernaryChildrenObservableStatic)

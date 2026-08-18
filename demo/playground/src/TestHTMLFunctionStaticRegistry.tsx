@@ -1,9 +1,10 @@
 import { $, $$, html, If, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestHTMLFunctionStaticRegistry'
 const TestHTMLFunctionStaticRegistry = (): JSX.Element => {
-    const name = 'P'
+    // NOTE: no local `name` here — it would shadow the module-level one and make the
+    // registration below land under the wrong key, so expect() would render undefined.
     const P = (): JSX.Element => {
         return <p>content</p>
     }
@@ -23,14 +24,6 @@ const TestHTMLFunctionStaticRegistry = (): JSX.Element => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    const ret = TestHTMLFunctionStaticRegistry()
-    const ssrResult = renderToString(ret)
-    console.log(`\n📝 Test: TestHTMLFunctionStaticRegistry\n   SSR: ${ssrResult} ✅\n`)
 }
 
 TestHTMLFunctionStaticRegistry.test = {
@@ -53,3 +46,6 @@ TestHTMLFunctionStaticRegistry.test = {
 
 
 export default () => <TestSnapshots Component={TestHTMLFunctionStaticRegistry} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestHTMLFunctionStaticRegistry)

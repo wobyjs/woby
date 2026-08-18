@@ -1,5 +1,5 @@
 import { $, Suspense, useResource, renderToString, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const TEST_INTERVAL = 500
 
@@ -25,16 +25,6 @@ const TestRenderToStringSuspense = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestRenderToStringSuspense()
-    const ssrComponent = testObservables[`TestRenderToStringSuspense_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestRenderToStringSuspense\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestRenderToStringSuspense.test = {
     static: true,
     expect: () => {
@@ -54,3 +44,6 @@ TestRenderToStringSuspense.test = {
 }
 
 export default () => <TestSnapshots Component={TestRenderToStringSuspense} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestRenderToStringSuspense)

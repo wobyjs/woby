@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, random, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestInputLabelFor'
 const TestInputLabelFor = (): JSX.Element => {
@@ -18,16 +18,6 @@ const TestInputLabelFor = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestInputLabelFor()
-    const ssrComponent = testObservables[`TestInputLabelFor_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestInputLabelFor\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestInputLabelFor.test = {
     static: true,
@@ -50,3 +40,6 @@ TestInputLabelFor.test = {
 }
 
 export default () => <TestSnapshots Component={TestInputLabelFor} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestInputLabelFor)

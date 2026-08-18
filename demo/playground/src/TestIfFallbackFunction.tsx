@@ -1,5 +1,5 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
-import { TestSnapshots, random, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, random, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestIfFallbackFunction'
 const TestIfFallbackFunction = (): JSX.Element => {
@@ -20,16 +20,6 @@ const TestIfFallbackFunction = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestIfFallbackFunction()
-    const ssrComponent = testObservables[`TestIfFallbackFunction_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestIfFallbackFunction\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestIfFallbackFunction.test = {
     static: true,
@@ -52,3 +42,6 @@ TestIfFallbackFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestIfFallbackFunction} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestIfFallbackFunction)

@@ -1,5 +1,5 @@
 import { $, $$, For, hmr, render, useTimeout, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestHMRFor'
 const TestHMRFor = () => {
@@ -30,16 +30,6 @@ const TestHMRFor = () => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestHMRFor()
-    const ssrComponent = testObservables[`TestHMRFor_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestHMRFor\n   SSR: ${ssrResult} ✅\n`)
-    }
 }
 
 TestHMRFor.test = {
@@ -211,12 +201,18 @@ const renderApp = () => {
     }
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderApp)
-} else {
-    // Small delay to ensure DOM is fully ready
-    useTimeout(renderApp, 0)
+// Browser-only: renderApp mounts into #app, which the SSR runner has no document for.
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderApp)
+    } else {
+        // Small delay to ensure DOM is fully ready
+        useTimeout(renderApp, 0)
+    }
 }
 
 
 export default () => <TestSnapshots Component={TestHMRFor} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestHMRFor)

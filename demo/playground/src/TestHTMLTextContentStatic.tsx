@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestHTMLTextContentStatic'
 const TestHTMLTextContentStatic = (): JSX.Element => {
@@ -16,16 +16,6 @@ const TestHTMLTextContentStatic = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestHTMLTextContentStatic()
-    const ssrComponent = testObservables[`TestHTMLTextContentStatic_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestHTMLTextContentStatic\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestHTMLTextContentStatic.test = {
     static: true,
@@ -47,3 +37,6 @@ TestHTMLTextContentStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestHTMLTextContentStatic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestHTMLTextContentStatic)

@@ -43,6 +43,20 @@
         "noUncheckedIndexedAccess": false,
         "preserveSymlinks": true,
         "baseUrl": ".",
+        // Mirrors the `resolve.alias` block in vite.config.mts. Without this, `tsx` (the Node
+        // SSR runner) resolves `woby` through package.json exports to dist/, so the Node suite
+        // would test a stale build while the browser suite tests src/ — the two can never agree.
+        "paths": {
+            "woby": [
+                "../../src"
+            ],
+            "woby/jsx-runtime": [
+                "../../src/jsx/runtime"
+            ],
+            "woby/jsx-dev-runtime": [
+                "../../src/jsx/runtime"
+            ]
+        },
         "rootDir": "./src",
         "typeRoots": [
             "types",

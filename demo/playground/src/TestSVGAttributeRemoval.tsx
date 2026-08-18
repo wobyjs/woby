@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestSVGAttributeRemoval'
 const TestSVGAttributeRemoval = (): JSX.Element => {
@@ -23,16 +23,6 @@ const TestSVGAttributeRemoval = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestSVGAttributeRemoval()
-    const ssrComponent = testObservables[`TestSVGAttributeRemoval_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestSVGAttributeRemoval\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestSVGAttributeRemoval.test = {
     static: false,
@@ -60,3 +50,6 @@ TestSVGAttributeRemoval.test = {
 
 
 export default () => <TestSnapshots Component={TestSVGAttributeRemoval} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestSVGAttributeRemoval)

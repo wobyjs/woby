@@ -55,6 +55,9 @@ const TestWobyOnClick = (): JSX.Element => {
 
     // Auto-test: fire click and verify counter increments
     useEffect(() => {
+        // These assertions drive real clicks, so they are browser-only; the Node SSR
+        // runner has no document and the effect would throw after the render check.
+        if (typeof document === 'undefined') return
         const el = document.querySelector('click-btn-external')
         if (!el) {
             console.log(`[${name}] ⚠️ click-btn-external not found`)
@@ -110,7 +113,6 @@ const TestWobyOnClick = (): JSX.Element => {
 // Register component for SSR testing
 registerTestObservable(`${name}_ssr`, TestWobyOnClick)
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
 if (typeof window === 'undefined') {
     const { testObservables } = await import('./util')
     const { renderToString } = await import('woby')

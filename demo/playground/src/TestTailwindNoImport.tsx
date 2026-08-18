@@ -8,7 +8,7 @@
  * https://meefik.dev/2025/03/19/tailwindcss-and-shadow-dom/
  */
 import { $, $$, customElement, defaults, renderToString, ObservableMaybe, type ElementAttributes, HtmlString, HtmlNumber, HtmlClass, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 // Define a custom element with Tailwind classes and cls/class contract
 // cls = override (replaces defaults), class = append (adds to defaults)
@@ -182,14 +182,7 @@ const TestTailwindNoImportTSX = (): JSX.Element => {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestTailwindNoImportTSX()
-    const ssrComponent = testObservables[`TestTailwindNoImportTSX_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestTailwindNoImportTSX\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestTailwindNoImportTSX.test = {
     static: true,
@@ -229,14 +222,7 @@ const TestTailwindNoImportHTML = (): JSX.Element => {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestTailwindNoImportHTML()
-    const ssrComponent = testObservables[`TestTailwindNoImportHTML_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestTailwindNoImportHTML\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestTailwindNoImportHTML.test = {
     static: true,
@@ -246,10 +232,15 @@ TestTailwindNoImportHTML.test = {
         // DOM: custom elements render with inline children (no shadow root)
         const expectedDOM = '<div><h2 class="text-xl font-bold mb-4">2. Custom Element Usage (No @import)</h2><tailwind-card title="HTML Card" count="100" cls=""><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">HTML Card</h2><p class="text-gray-600 mb-2">Count: 100</p><div class="mt-4"><p class="text-sm text-green-600">Content from HTML custom element</p></div></div></tailwind-card></div>'
 
+        // Under Node there is no customElements registry, so renderToString renders the
+        // component body inline and lands on the expanded (expectedDOM) shape. In the browser
+        // the tag is a real upgraded element, so only its light children serialize.
+        const expectedFull = typeof window === 'undefined' ? expectedDOM : expectedSSR
+
         const ssrComponent = testObservables[`${name2}_ssr`]
         const ssrResult = renderToString(ssrComponent)
-        if (ssrResult !== expectedSSR) {
-            assert(false, `[${name2}] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name2}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [${name2}] SSR test passed`)
         }
@@ -278,14 +269,7 @@ const TestTailwindNoImportNested = (): JSX.Element => {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestTailwindNoImportNested()
-    const ssrComponent = testObservables[`TestTailwindNoImportNested_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestTailwindNoImportNested\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestTailwindNoImportNested.test = {
     static: true,
@@ -295,10 +279,15 @@ TestTailwindNoImportNested.test = {
         // DOM: custom elements render with inline children (no shadow root)
         const expectedDOM = '<div class="space-y-4"><h2 class="text-xl font-bold mb-4">3. Nested Custom Elements (No @import)</h2><tailwind-card title="Outer Card" count="1" cls=""><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">Outer Card</h2><p class="text-gray-600 mb-2">Count: 1</p><div class="mt-4"><tailwind-card title="Inner Card" count="2" cls=""><div class="bg-white rounded-lg shadow-md p-6 border border-gray-200"><h2 class="text-2xl font-semibold text-gray-800 mb-4">Inner Card</h2><p class="text-gray-600 mb-2">Count: 2</p><div class="mt-4"><p class="text-xs text-purple-600">Deeply nested content</p></div></div></tailwind-card></div></div></tailwind-card></div>'
 
+        // Under Node there is no customElements registry, so renderToString renders the
+        // component body inline and lands on the expanded (expectedDOM) shape. In the browser
+        // the tag is a real upgraded element, so only its light children serialize.
+        const expectedFull = typeof window === 'undefined' ? expectedDOM : expectedSSR
+
         const ssrComponent = testObservables[`${name3}_ssr`]
         const ssrResult = renderToString(ssrComponent)
-        if (ssrResult !== expectedSSR) {
-            assert(false, `[${name3}] SSR mismatch: got \n${ssrResult}, expected \n${expectedSSR}`)
+        if (ssrResult !== expectedFull) {
+            assert(false, `[${name3}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [${name3}] SSR test passed`)
         }
@@ -312,3 +301,10 @@ export default () => <>
     <TestSnapshots Component={TestTailwindNoImportHTML} />
     <TestSnapshots Component={TestTailwindNoImportNested} />
 </>
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') {
+    runSSRTest(name1, TestTailwindNoImportTSX)
+    runSSRTest(name2, TestTailwindNoImportHTML)
+    runSSRTest(name3, TestTailwindNoImportNested)
+}

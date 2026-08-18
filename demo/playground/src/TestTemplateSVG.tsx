@@ -1,5 +1,5 @@
 import { $, $$, template, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, randomColor, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, randomColor, assert, runSSRTest } from './util'
 
 const name = 'TestTemplateSVG'
 const TestTemplateSVG = (): JSX.Element => {
@@ -31,16 +31,6 @@ const TestTemplateSVG = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestTemplateSVG()
-    const ssrComponent = testObservables[`TestTemplateSVG_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestTemplateSVG\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestTemplateSVG.test = {
     static: false,
     expect: () => {
@@ -63,3 +53,6 @@ TestTemplateSVG.test = {
 
 
 export default () => <TestSnapshots Component={TestTemplateSVG} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestTemplateSVG)

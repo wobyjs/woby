@@ -104,6 +104,9 @@ const TestRealShadowOnClickComponent = (): JSX.Element => {
 
     // Listen for custom event from shadow DOM
     useEffect(() => {
+        // These assertions drive real clicks, so they are browser-only; the Node SSR
+        // runner has no document and the effect would throw after the render check.
+        if (typeof document === 'undefined') return
         if (typeof document === 'undefined') return
         const handler = (e: CustomEvent) => {
             shadowClickCount(e.detail.count)
@@ -116,6 +119,9 @@ const TestRealShadowOnClickComponent = (): JSX.Element => {
 
     // Auto-test
     useEffect(() => {
+        // These assertions drive real clicks, so they are browser-only; the Node SSR
+        // runner has no document and the effect would throw after the render check.
+        if (typeof document === 'undefined') return
         if (typeof document === 'undefined') return
         const el = document.querySelector('real-shadow-element') as any
         if (!el) {
@@ -183,7 +189,6 @@ const TestRealShadowOnClickComponent = (): JSX.Element => {
 // Register component for SSR testing
 registerTestObservable(`${name}_ssr`, TestRealShadowOnClickComponent)
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
 if (typeof window === 'undefined') {
     const { testObservables } = await import('./util')
     const { renderToString } = await import('woby')

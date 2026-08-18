@@ -1,40 +1,16 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 let ins = 0
 export const TestCleanupInner = () => {
     const name = 'TestCleanupInner' + (ins++)
 
-    // Conditional: SSR tests (Node.js environment - tsx mode)
-    // Must run before TestCleanupInner1 to register _ssr observable
-    if (typeof window === 'undefined') {
-        // Create a temporary instance to get the ret component for SSR
-        const tempInstance = (() => {
-            const page = $(true)
-            const togglePage = () => page(prev => !prev)
-            const Page1 = () => (
-                <>
-                    <p>page1</p>
-                    <button onClick={togglePage}>Toggle Page</button>
-                </>
-            )
-            const ret = () => (
-                <>
-                    <h3>Cleanup - Inner</h3>
-                    <Page1 />
-                </>
-            )
-            return ret
-        })()
-
-        registerTestObservable(`${name}_ssr`, tempInstance)
-        const ssrComponent = testObservables[`${name}_ssr`]
-        const ssrResult = renderToString(ssrComponent)
-        const expectedFull = '<h3>Cleanup - Inner</h3><p>page1</p><button>Toggle Page</button>'
-        const passed = ssrResult === expectedFull
-        console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-        if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
-    }
+    // NOTE: this factory used to pre-register `${name}_ssr` from a throwaway clone of the
+    // component here. That only worked while nothing ever rendered TestCleanupInner1 — the
+    // real body registers the same key on its last line, so the moment the component is
+    // actually mounted (TestCleanupInnerPortal renders it through a <Portal>) the two
+    // registrations collided and registerTestObservable threw. runSSRTest already constructs
+    // the component when `${name}_ssr` is missing, so the clone was redundant as well.
 
     const TestCleanupInner1 = (): JSX.Element => {
         const page = $(true)
@@ -109,7 +85,12 @@ export const TestCleanupInner = () => {
 
 export default () => <TestSnapshots Component={TestCleanupInner()} />
 
-// Run SSR test in tsx mode
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+// Key off the component's own name — <TestSnapshots> tallies by Component.name, which is the
+// inner TestCleanupInner1 regardless of how many times the factory has run. Hardcoding the
+// factory's per-instance name ('TestCleanupInner0') made the two suites report different rows
+// for the same test.
 if (typeof window === 'undefined') {
-    TestCleanupInner()
+    const Component = TestCleanupInner()
+    runSSRTest(Component.name, Component)
 }

@@ -1,11 +1,13 @@
 import { $, $$, ErrorBoundary, renderToString, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestErrorBoundaryFallback'
 const TestErrorBoundaryFallback = (): JSX.Element => {
-    const name = 'ErroringComponent'
+    // NOTE: no local `name` here — it would shadow the module-level one and make the
+    // registration below land under the wrong key, so expect() would render undefined.
     const ErroringComponent = (): JSX.Element => {
-        throw new Error()
+        // The message is what the fallback renders, so it has to be non-empty.
+        throw new Error('Error')
     }
 
     const FallbackComponent = ({ error }): JSX.Element => {
@@ -25,14 +27,6 @@ const TestErrorBoundaryFallback = (): JSX.Element => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    const ret = TestErrorBoundaryFallback()
-    const ssrResult = renderToString(ret)
-    console.log(`\n📝 Test: TestErrorBoundaryFallback\n   SSR: ${ssrResult} ✅\n`)
 }
 
 TestErrorBoundaryFallback.test = {
@@ -55,3 +49,6 @@ TestErrorBoundaryFallback.test = {
 }
 
 export default () => <TestSnapshots Component={TestErrorBoundaryFallback} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestErrorBoundaryFallback)

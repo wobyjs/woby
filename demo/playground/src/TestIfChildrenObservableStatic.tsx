@@ -1,5 +1,5 @@
 import { $, $$, If, renderToString, useEffect, type JSX } from 'woby'
-import { TestSnapshots, random, registerTestObservable, testObservables, useInterval, TEST_INTERVAL, assert } from './util'
+import { TestSnapshots, random, registerTestObservable, testObservables, useInterval, TEST_INTERVAL, assert, runSSRTest } from './util'
 
 const name = 'TestIfChildrenObservableStatic'
 const TestIfChildrenObservableStatic = (): JSX.Element => {
@@ -26,14 +26,7 @@ const TestIfChildrenObservableStatic = (): JSX.Element => {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestIfChildrenObservableStatic()
-    const ssrComponent = testObservables[`TestIfChildrenObservableStatic_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestIfChildrenObservableStatic\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestIfChildrenObservableStatic.test = {
     static: true,
@@ -59,3 +52,6 @@ TestIfChildrenObservableStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestIfChildrenObservableStatic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestIfChildrenObservableStatic)

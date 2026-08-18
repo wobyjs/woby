@@ -1,5 +1,5 @@
 import { $, $$, Portal, renderToString, createDocument, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestPortalWrapperStatic'
 const TestPortalWrapperStatic = (): JSX.Element => {
@@ -16,23 +16,6 @@ const TestPortalWrapperStatic = (): JSX.Element => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    const doc = createDocument()
-    const container = doc.createElement('div')
-    container.id = 'portal-container-wrapper-static'
-    doc.body.appendChild(container)
-    
-    TestPortalWrapperStatic()
-    const ssrComponent = testObservables[`TestPortalWrapperStatic_ssr`]
-    if (ssrComponent) {
-        const SsrComponent = ssrComponent as any
-        const ssrResult = renderToString(<SsrComponent mount={doc.body} />, { document: doc })
-        console.log(`\n📝 Test: TestPortalWrapperStatic\n   SSR: ${ssrResult} ✅\n`)
-    }
 }
 
 TestPortalWrapperStatic.test = {
@@ -68,3 +51,6 @@ export default () => <TestSnapshots Component={TestPortalWrapperStatic} />
 // const container = doc.createElement('div')
 // container.id = 'portal-container-wrapper-static'
 // doc.body.appendChild(container)
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestPortalWrapperStatic)

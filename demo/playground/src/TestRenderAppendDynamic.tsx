@@ -1,5 +1,5 @@
 import { $, $$, render, renderToString, useEffect, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, minimiseHtml, runSSRTest } from './util'
 
 const name = 'TestRenderAppendDynamic'
 const CONTAINER_ID_DYNAMIC = 'test-render-append-dynamic-container'
@@ -10,6 +10,8 @@ const TestRenderAppendDynamic = (): JSX.Element => {
     // Static effect to add initial appends
     useEffect(() => {
         setTimeout(() => {
+            // Browser-only driver: appends into a live container the SSR runner has no DOM for.
+            if (typeof document === 'undefined') return
             const container = document.getElementById(CONTAINER_ID_DYNAMIC)
             if (container) {
                 // Static append with dispose tracking
@@ -28,6 +30,8 @@ const TestRenderAppendDynamic = (): JSX.Element => {
     // Auto-click "Append Item" button 3 times with delays
     useEffect(() => {
         setTimeout(() => {
+            // Browser-only driver: clicks a live button the SSR runner has no DOM for.
+            if (typeof document === 'undefined') return
             // Find button by text content
             const buttons = document.querySelectorAll('button')
             const appendButton = Array.from(buttons).find(btn => btn.textContent === 'Append Item') as HTMLButtonElement
@@ -103,14 +107,7 @@ const TestRenderAppendDynamic = (): JSX.Element => {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestRenderAppendDynamic()
-    const ssrComponent = testObservables[`TestRenderAppendDynamic_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestRenderAppendDynamic\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestRenderAppendDynamic.test = {
     static: false,
@@ -382,3 +379,6 @@ TestRenderAppendDynamic.test = {
 
 
 export default () => <TestSnapshots Component={TestRenderAppendDynamic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestRenderAppendDynamic)

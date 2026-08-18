@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestEventClickCaptureRemoval'
 const TestEventClickCaptureRemoval = (): JSX.Element => {
@@ -51,16 +51,6 @@ const TestEventClickCaptureRemoval = (): JSX.Element => {
 
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestEventClickCaptureRemoval()
-    const ssrComponent = testObservables[`TestEventClickCaptureRemoval_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestEventClickCaptureRemoval\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestEventClickCaptureRemoval.test = {
     static: false,
     expect: () => {
@@ -83,3 +73,6 @@ TestEventClickCaptureRemoval.test = {
 }
 
 export default () => <TestSnapshots Component={TestEventClickCaptureRemoval} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestEventClickCaptureRemoval)

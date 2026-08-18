@@ -35,6 +35,9 @@ const TestHtmlOnClick = (): JSX.Element => {
     const log = $([] as string[])
 
     useEffect(() => {
+        // These assertions drive real clicks, so they are browser-only; the Node SSR
+        // runner has no document and the effect would throw after the render check.
+        if (typeof document === 'undefined') return
         if (typeof document === 'undefined') return
         // Test 1: Can HTML onclick access the element?
         const el1 = document.querySelector('#test1') as any
@@ -103,7 +106,6 @@ const TestHtmlOnClick = (): JSX.Element => {
 // Register component for SSR testing
 registerTestObservable(`${name}_ssr`, TestHtmlOnClick)
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
 if (typeof window === 'undefined') {
     const { testObservables } = await import('./util')
     const { renderToString } = await import('woby')

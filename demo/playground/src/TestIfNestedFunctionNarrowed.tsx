@@ -1,5 +1,5 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestIfNestedFunctionNarrowed'
 const TestIfNestedFunctionNarrowed = (): JSX.Element => {
@@ -17,16 +17,6 @@ const TestIfNestedFunctionNarrowed = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestIfNestedFunctionNarrowed()
-    const ssrComponent = testObservables[`TestIfNestedFunctionNarrowed_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestIfNestedFunctionNarrowed\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestIfNestedFunctionNarrowed.test = {
     static: true,
@@ -50,3 +40,6 @@ TestIfNestedFunctionNarrowed.test = {
 
 
 export default () => <TestSnapshots Component={TestIfNestedFunctionNarrowed} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestIfNestedFunctionNarrowed)

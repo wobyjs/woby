@@ -1,5 +1,5 @@
 import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert, useTimeout } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, useTimeout, runSSRTest } from './util'
 
 const TEST_INTERVAL = 500
 let syncStep = 0
@@ -87,14 +87,7 @@ if (ssrResult !== expectedSSR /* && ssrResult !== '<div></div>' */) {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestRenderToStringSuspenseNested()
-    const ssrComponent = testObservables[`TestRenderToStringSuspenseNested_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestRenderToStringSuspenseNested\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestRenderToStringSuspenseNested.test = {
     static: false,
@@ -132,3 +125,6 @@ console.log(renderToString(<TestRenderToStringSuspenseNestedSSR />))
 //<div><p>123456</p><!----></div>
 //<div><p>123123</p><!----></div>
 //<div><p>123123</p></div>
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestRenderToStringSuspenseNested)

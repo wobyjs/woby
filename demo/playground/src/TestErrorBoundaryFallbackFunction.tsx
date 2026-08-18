@@ -1,5 +1,5 @@
 import { $, $$, ErrorBoundary, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestErrorBoundaryFallbackFunction'
 const TestErrorBoundaryFallbackFunction = (): JSX.Element => {
@@ -33,16 +33,6 @@ const TestErrorBoundaryFallbackFunction = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestErrorBoundaryFallbackFunction()
-    const ssrComponent = testObservables[`TestErrorBoundaryFallbackFunction_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestErrorBoundaryFallbackFunction\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestErrorBoundaryFallbackFunction.test = {
     static: true,
     compareActualValues: true,
@@ -67,3 +57,6 @@ TestErrorBoundaryFallbackFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestErrorBoundaryFallbackFunction} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestErrorBoundaryFallbackFunction)

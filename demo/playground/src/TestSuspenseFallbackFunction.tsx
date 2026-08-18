@@ -1,5 +1,5 @@
 import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestSuspenseFallbackFunction'
 const TestSuspenseFallbackFunction = (): JSX.Element => {
@@ -30,16 +30,6 @@ const TestSuspenseFallbackFunction = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestSuspenseFallbackFunction()
-    const ssrComponent = testObservables[`TestSuspenseFallbackFunction_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestSuspenseFallbackFunction\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestSuspenseFallbackFunction.test = {
     static: true,
     compareActualValues: true,
@@ -63,3 +53,6 @@ TestSuspenseFallbackFunction.test = {
 
 
 export default () => <TestSnapshots Component={TestSuspenseFallbackFunction} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestSuspenseFallbackFunction)

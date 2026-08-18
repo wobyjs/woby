@@ -1,5 +1,5 @@
 import { $, $$, store, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 let testit = true  // Track assertion cycles for timing coordination
 const name = 'TestClassesObjectStoreMultiple'
@@ -33,16 +33,6 @@ const TestClassesObjectStoreMultiple = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestClassesObjectStoreMultiple()
-    const ssrComponent = testObservables[`TestClassesObjectStoreMultiple_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestClassesObjectStoreMultiple\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
 
 TestClassesObjectStoreMultiple.test = {
     static: false,
@@ -90,3 +80,6 @@ TestClassesObjectStoreMultiple.test = {
 
 
 export default () => <TestSnapshots Component={TestClassesObjectStoreMultiple} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestClassesObjectStoreMultiple)

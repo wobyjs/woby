@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestClassesArrayNestedStatic'
 const TestClassesArrayNestedStatic = (): JSX.Element => {
@@ -15,17 +15,6 @@ const TestClassesArrayNestedStatic = (): JSX.Element => {
     registerTestObservable(`${name}_ssr`, ret)
 
     return ret
-}
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestClassesArrayNestedStatic() // Register the component
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const ssrResult = renderToString(ssrComponent)
-    const expectedFull = '<h3>Classes - Array Nested Static</h3><p class="red bold italic">content</p>'
-    const passed = ssrResult === expectedFull
-    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
 }
 
 TestClassesArrayNestedStatic.test = {
@@ -48,3 +37,6 @@ TestClassesArrayNestedStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestClassesArrayNestedStatic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestClassesArrayNestedStatic)

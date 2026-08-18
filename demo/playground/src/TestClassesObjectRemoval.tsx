@@ -1,5 +1,5 @@
 import { $, $$, renderToString, useEffect, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestClassesObjectRemoval'
 const TestClassesObjectRemoval = (): JSX.Element => {
@@ -27,26 +27,6 @@ const TestClassesObjectRemoval = (): JSX.Element => {
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestClassesObjectRemoval()
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const ssrResult = renderToString(ssrComponent)
-    const value = $$(testObservables[name])
-    let expectedClass = ''
-    if (value && value.red) expectedClass += 'red '
-    if (value && value.blue) expectedClass += 'blue '
-    const expected = value ?
-        `<p class="${expectedClass.trim()}">content</p>` :
-        '<p class="">content</p>'
-    const expectedFull = value ?
-        `<h3>Classes - Object Removal</h3><p class="${expectedClass.trim()}">content</p>` :
-        '<h3>Classes - Object Removal</h3><p>content</p>'
-    const passed = ssrResult === expectedFull
-    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
-}
-
 TestClassesObjectRemoval.test = {
     static: false,
     compareActualValues: true,
@@ -68,3 +48,6 @@ TestClassesObjectRemoval.test = {
 
 
 export default () => <TestSnapshots Component={TestClassesObjectRemoval} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestClassesObjectRemoval)

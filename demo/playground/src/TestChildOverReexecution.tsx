@@ -1,5 +1,5 @@
 import { $, $$, useEffect, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useTimeout, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestChildOverReexecution'
 const TestChildOverReexecution = (): JSX.Element => {
@@ -37,26 +37,6 @@ const TestChildOverReexecution = (): JSX.Element => {
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestChildOverReexecution() // Register the component
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const ssrResult = renderToString(ssrComponent)
-    // Extract the actual execution count from SSR result
-    const match = ssrResult.match(/<div>(\d+)<\/div>(\d+)/)
-    let passed = false
-    if (match) {
-        const ssrExecutions = parseInt(match[1])
-        const ssrCount = parseInt(match[2])
-        const expectedFull = `<h3>Child - OverReexecution</h3><div>${ssrExecutions}</div>${ssrCount}`
-        passed = ssrResult === expectedFull
-    }
-    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
-    // Exit immediately to stop useEffect interval from keeping process alive
-    process.exit(0)
-}
-
 TestChildOverReexecution.test = {
     static: false,
     expect: () => {
@@ -89,3 +69,6 @@ TestChildOverReexecution.test = {
 
 
 export default () => <TestSnapshots Component={TestChildOverReexecution} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestChildOverReexecution)

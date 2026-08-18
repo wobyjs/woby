@@ -1,5 +1,5 @@
 import { $, $$, Dynamic, store, useEffect, isStore, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 let timing = Math.random()
 const name = 'TestDynamicStoreProps'
@@ -56,16 +56,6 @@ const TestDynamicStoreProps = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestDynamicStoreProps()
-    const ssrComponent = testObservables[`TestDynamicStoreProps_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestDynamicStoreProps\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestDynamicStoreProps.test = {
     static: false,
     enable: () => {
@@ -76,7 +66,9 @@ TestDynamicStoreProps.test = {
     compareActualValues: true,
     expect: () => {
         // Read from actual DOM to avoid timing mismatches with store updates
-        const testDiv = document.querySelector('[data-test="TestDynamicStoreProps-class"]')
+        const testDiv = typeof document === 'undefined'
+            ? null
+            : document.querySelector('[data-test="TestDynamicStoreProps-class"]')
         const className = testDiv?.className || 'red'
         const countObservable: any = testObservables[`${name}_count`]
         const currentCount = $$(countObservable) || 1
@@ -113,3 +105,6 @@ TestDynamicStoreProps.test = {
 
 
 export default () => <TestSnapshots Component={TestDynamicStoreProps} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestDynamicStoreProps)

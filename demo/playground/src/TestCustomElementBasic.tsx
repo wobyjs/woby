@@ -10,7 +10,7 @@
  * - Type conversion
  */
 import { $, $$, customElement, defaults, renderToString, ObservableMaybe, Dynamic, type ElementAttributes, HtmlString, HtmlNumber, HtmlBoolean, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 // Define a simple custom element with basic props
 const BasicElement = defaults(() => ({
@@ -80,15 +80,7 @@ const TestCustomElementBasicTSX = (): JSX.Element => {
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestCustomElementBasicTSX()
-    const ssrComponent = testObservables[`${name}_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestCustomElementBasicTSX\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestCustomElementBasicTSX.test = {
     static: true,
@@ -132,21 +124,19 @@ const TestCustomElementBasicHTML = (): JSX.Element => {
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestCustomElementBasicHTML()
-    const ssrComponent = testObservables[`${nameHtml}_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestCustomElementBasicHTML\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestCustomElementBasicHTML.test = {
     static: true,
     expect: () => {
         // DOM expectation - custom elements render children inline (no shadow root in this build)
-        const expectedFull = '<div><h2>2. Custom Element in TSX</h2><basic-element title="HTML Attribute Title" count="100" active="true" color="red"><p>This is child content from HTML</p></basic-element></div>'
+// renderToString expands a custom element's internals under Node: there is no
+        // customElements registry, so the component body is rendered inline — which is the
+        // whole point of SSR. In the browser the tag is a real upgraded element and its
+        // internals are not part of the host's serialized children.
+        const expectedFull = typeof window === 'undefined'
+            ? '<div><h2>2. Custom Element in TSX</h2><basic-element title="HTML Attribute Title" count="100" active="true" color="red"><div style="border: 2px solid red; padding: 10px; background-color: #e0e0e0;"><h2>HTML Attribute Title</h2><div><p>This is child content from HTML</p></div><p>Count: 100</p><p>Active: Yes</p></div></basic-element></div>'
+            : '<div><h2>2. Custom Element in TSX</h2><basic-element title="HTML Attribute Title" count="100" active="true" color="red"><p>This is child content from HTML</p></basic-element></div>'
         const expected = '<div><h2>2. Custom Element in TSX</h2><basic-element title="HTML Attribute Title" count="100" active="true" color="red" style="margin-top: 20px;"><div style="border: 2px solid red; padding: 10px; background-color: rgb(224, 224, 224);"><h2>HTML Attribute Title</h2><div><p>This is child content from HTML</p></div><p>Count: 100</p><p>Active: Yes</p></div></basic-element></div>'
 
         const ssrComponent = testObservables[`${nameHtml}_ssr`]
@@ -188,15 +178,7 @@ const TestCustomElementBasicMixed = (): JSX.Element => {
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestCustomElementBasicMixed()
-    const ssrComponent = testObservables[`${nameMixed}_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestCustomElementBasicMixed\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestCustomElementBasicMixed.test = {
     static: true,
@@ -204,7 +186,13 @@ TestCustomElementBasicMixed.test = {
         const expected = `<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element title="Mixed TSX" count="0" color="blue"><div style="border: 2px solid blue; padding: 10px; background-color: white;"><h2>Mixed TSX</h2><div><basic-element title="Nested Custom Element" count="50" color="blue"><div style="border: 2px solid blue; padding: 10px; background-color: white;"><h2>Nested Custom Element</h2><div><p>Nested content</p></div><p>Count: 50</p><p>Active: No</p></div></basic-element></div><p>Count: 0</p><p>Active: No</p></div></basic-element></div>`
         const ssrComponent = testObservables[`${nameMixed}_ssr`]
         const ssrResult = renderToString(ssrComponent)
-        const expectedFull = `<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element title="Mixed TSX"><basic-element title="Nested Custom Element" count="50"><p>Nested content</p></basic-element></basic-element></div>`
+// renderToString expands a custom element's internals under Node: there is no
+        // customElements registry, so the component body is rendered inline — which is the
+        // whole point of SSR. In the browser the tag is a real upgraded element and its
+        // internals are not part of the host's serialized children.
+        const expectedFull = typeof window === 'undefined'
+            ? `<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element title="Mixed TSX" count="0" color="blue"><div style="border: 2px solid blue; padding: 10px; background-color: white;"><h2>Mixed TSX</h2><div><basic-element title="Nested Custom Element" count="50" color="blue"><div style="border: 2px solid blue; padding: 10px; background-color: white;"><h2>Nested Custom Element</h2><div><p>Nested content</p></div><p>Count: 50</p><p>Active: No</p></div></basic-element></div><p>Count: 0</p><p>Active: No</p></div></basic-element></div>`
+            : `<div><h2>3. Custom Element in Dynamic (semulated HTML) Usage</h2><basic-element title="Mixed TSX"><basic-element title="Nested Custom Element" count="50"><p>Nested content</p></basic-element></basic-element></div>`
         if (ssrResult !== expectedFull) {
             assert(false, `[${nameMixed}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
@@ -238,22 +226,20 @@ const TestCustomElementBasicPureHTML = (): JSX.Element => {
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestCustomElementBasicPureHTML()
-    const ssrComponent = testObservables[`${namePureHTML}_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestCustomElementBasicPureHTML\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestCustomElementBasicPureHTML.test = {
     static: true,
     expect: () => {
         // DOM expectation - uses rgb() color format
         const expected = '<div><h2>4. Pure HTML Custom Element</h2><basic-element title="Pure HTML Custom Element" count="75" active="true" color="purple"><div style="border: 2px solid purple; padding: 10px; background-color: rgb(224, 224, 224);"><h2>Pure HTML Custom Element</h2><div><p>This is child content from pure HTML custom element</p></div><p>Count: 75</p><p>Active: Yes</p></div></basic-element></div>'
-        const expectedFull = '<div><h2>4. Pure HTML Custom Element</h2><basic-element title="Pure HTML Custom Element" count="75" active="true" color="purple"><p>This is child content from pure HTML custom element</p></basic-element></div>'
+// renderToString expands a custom element's internals under Node: there is no
+        // customElements registry, so the component body is rendered inline — which is the
+        // whole point of SSR. In the browser the tag is a real upgraded element and its
+        // internals are not part of the host's serialized children.
+        const expectedFull = typeof window === 'undefined'
+            ? '<div><h2>4. Pure HTML Custom Element</h2><basic-element title="Pure HTML Custom Element" count="75" active="true" color="purple"><div style="border: 2px solid purple; padding: 10px; background-color: #e0e0e0;"><h2>Pure HTML Custom Element</h2><div><p>This is child content from pure HTML custom element</p></div><p>Count: 75</p><p>Active: Yes</p></div></basic-element></div>'
+            : '<div><h2>4. Pure HTML Custom Element</h2><basic-element title="Pure HTML Custom Element" count="75" active="true" color="purple"><p>This is child content from pure HTML custom element</p></basic-element></div>'
 
         const ssrComponent = testObservables[`${namePureHTML}_ssr`]
         const ssrResult = renderToString(ssrComponent)
@@ -280,3 +266,11 @@ export default () => <>
 //<div><h2>2. Custom Element in TSX</h2><basic-element title="HTML Attribute Title" count="100" active="true" color="red"><p>This is child content from HTML</p></basic-element></div>
 
 // console.log(renderToString(<TestCustomElementBasicMixed />))
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') {
+    runSSRTest(name, TestCustomElementBasicTSX)
+    runSSRTest(nameHtml, TestCustomElementBasicHTML)
+    runSSRTest(nameMixed, TestCustomElementBasicMixed)
+    runSSRTest(namePureHTML, TestCustomElementBasicPureHTML)
+}

@@ -1,5 +1,5 @@
 import { $, $$, createContext, useContext, renderToString, jsx, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml, runSSRTest } from './util'
 
 const name = 'TestContextComponents'
 const TestContextComponents = (): JSX.Element => {
@@ -74,16 +74,6 @@ const TestContextComponents = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestContextComponents()
-    const ssrComponent = testObservables[`TestContextComponents_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestContextComponents\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestContextComponents.test = {
     static: true,
     expect: () => {
@@ -106,4 +96,6 @@ TestContextComponents.test = {
 
 
 export default () => <TestSnapshots Component={TestContextComponents} />
-
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestContextComponents)

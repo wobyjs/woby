@@ -1,5 +1,5 @@
 import { $, $$, render, renderToString, useEffect, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, minimiseHtml, runSSRTest } from './util'
 
 
 
@@ -10,6 +10,8 @@ const TestRenderAppend = (): JSX.Element => {
     const containerId = CONTAINER_ID
 
     setTimeout(() => {
+        // Browser-only driver: appends into a live container the SSR runner has no DOM for.
+        if (typeof document === 'undefined') return
         const container = document.getElementById(containerId)
         if (container) {
             // First static append
@@ -73,16 +75,6 @@ const TestRenderAppend = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestRenderAppend()
-    const ssrComponent = testObservables[`TestRenderAppend_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestRenderAppend\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestRenderAppend.test = {
     static: false, // Not static because of dynamic appends
     compareActualValues: true,
@@ -142,3 +134,6 @@ TestRenderAppend.test = {
 
 
 export default () => <TestSnapshots Component={TestRenderAppend} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestRenderAppend)

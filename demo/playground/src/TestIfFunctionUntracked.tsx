@@ -1,5 +1,5 @@
 import { $, $$, If, renderToString, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestIfFunctionUntracked'
 const TestIfFunctionUntracked = (): JSX.Element => {
@@ -25,16 +25,6 @@ const TestIfFunctionUntracked = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestIfFunctionUntracked()
-    const ssrComponent = testObservables[`TestIfFunctionUntracked_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestIfFunctionUntracked\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestIfFunctionUntracked.test = {
     static: true,
     expect: () => {
@@ -56,3 +46,6 @@ TestIfFunctionUntracked.test = {
 
 
 export default () => <TestSnapshots Component={TestIfFunctionUntracked} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestIfFunctionUntracked)

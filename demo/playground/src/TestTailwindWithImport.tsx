@@ -8,7 +8,7 @@
  * adoptedStyleSheets without @import (see TestTailwindNoImport.tsx).
  */
 import { $, $$, customElement, defaults, renderToString, type ElementAttributes, HtmlString, HtmlNumber, ObservableMaybe, HtmlClass, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 // Define a custom element with Tailwind classes and cls/class contract
 // cls = override (replaces defaults), class = append (adds to defaults)
@@ -219,22 +219,20 @@ const TestTailwindWithImportHTML = (): JSX.Element => {
 
 
 // Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestTailwindWithImportHTML()
-    const ssrComponent = testObservables[`TestTailwindWithImportHTML_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestTailwindWithImportHTML\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
+
 
 TestTailwindWithImportHTML.test = {
     static: true,
     expect: () => {
-        // SSR: custom elements render with light DOM children only (empty for self-closing tags)
-        const expectedSSR = '<div><h2 class="text-xl font-bold mb-4">2. HTML Custom Element (With @import)</h2><tailwind-button label="HTML Button" variant="primary"></tailwind-button></div>'
         // DOM: custom elements render with inline children (no shadow root)
         const expectedDOM = '<div><h2 class="text-xl font-bold mb-4">2. HTML Custom Element (With @import)</h2><tailwind-button label="HTML Button" variant="primary" cls=""><button class="px-4 py-2 rounded font-medium transition-colors bg-blue-500 hover:bg-blue-600 text-white">HTML Button</button></tailwind-button></div>'
+        // renderToString always goes through the SSR document, but customElement() registers the
+        // SSR element only when there is no DOM. Under Node the <tailwind-button> tag is therefore
+        // live and expands exactly like the real DOM; in the browser it is inert and renders as a
+        // bare tag with light-DOM children only. Same environment split as TestContextHook.
+        const expectedSSR = typeof window === 'undefined'
+            ? expectedDOM
+            : '<div><h2 class="text-xl font-bold mb-4">2. HTML Custom Element (With @import)</h2><tailwind-button label="HTML Button" variant="primary"></tailwind-button></div>'
 
         const ssrComponent = testObservables[`${name2}_ssr`]
         const ssrResult = renderToString(ssrComponent)
@@ -288,3 +286,12 @@ export default () => <>
     <TestSnapshots Component={TestTailwindWithImportHTML} />
     <TestSnapshots Component={TestTailwindWithImportMixed} />
 </>
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+// One call per component, under the same names <TestSnapshots> tallies them by above, so the
+// per-test breakdown lines up with the browser's instead of collapsing all three into one row.
+if (typeof window === 'undefined') {
+    runSSRTest(name1, TestTailwindWithImportBasic)
+    runSSRTest(name2, TestTailwindWithImportHTML)
+    runSSRTest(name3, TestTailwindWithImportMixed)
+}

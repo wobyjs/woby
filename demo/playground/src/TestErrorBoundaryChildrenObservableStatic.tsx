@@ -1,5 +1,5 @@
 import { $, $$, ErrorBoundary, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, random, assert, runSSRTest } from './util'
 
 const name = 'TestErrorBoundaryChildrenObservableStatic'
 const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
@@ -34,16 +34,6 @@ const TestErrorBoundaryChildrenObservableStatic = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestErrorBoundaryChildrenObservableStatic()
-    const ssrComponent = testObservables[`TestErrorBoundaryChildrenObservableStatic_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestErrorBoundaryChildrenObservableStatic\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestErrorBoundaryChildrenObservableStatic.test = {
     static: true,
     compareActualValues: true,
@@ -68,3 +58,6 @@ TestErrorBoundaryChildrenObservableStatic.test = {
 
 
 export default () => <TestSnapshots Component={TestErrorBoundaryChildrenObservableStatic} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestErrorBoundaryChildrenObservableStatic)

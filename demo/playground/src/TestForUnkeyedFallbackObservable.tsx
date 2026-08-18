@@ -1,5 +1,5 @@
 import { $, $$, renderToString, type JSX, For, ObservableReadonly } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestForUnkeyedFallbackObservable'
 const TestForUnkeyedFallbackObservable = (): JSX.Element => {
@@ -33,17 +33,6 @@ const TestForUnkeyedFallbackObservable = (): JSX.Element => {
     return ret
 }
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestForUnkeyedFallbackObservable()
-    const ssrComponent = testObservables[`TestForUnkeyedFallbackObservable_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestForUnkeyedFallbackObservable\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestForUnkeyedFallbackObservable.test = {
     static: false,
     compareActualValues: true,
@@ -68,3 +57,6 @@ TestForUnkeyedFallbackObservable.test = {
 
 
 export default () => <TestSnapshots Component={TestForUnkeyedFallbackObservable} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestForUnkeyedFallbackObservable)

@@ -61,6 +61,9 @@ const TestShadowOnClick = (): JSX.Element => {
     }
 
     useEffect(() => {
+        // These assertions drive real clicks, so they are browser-only; the Node SSR
+        // runner has no document and the effect would throw after the render check.
+        if (typeof document === 'undefined') return
         if (testRan) return
         testRan = true
 
@@ -101,7 +104,6 @@ const TestShadowOnClick = (): JSX.Element => {
 // Register component for SSR testing
 registerTestObservable(`${name}_ssr`, TestShadowOnClick)
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
 if (typeof window === 'undefined') {
     const { testObservables } = await import('./util')
     const { renderToString } = await import('woby')

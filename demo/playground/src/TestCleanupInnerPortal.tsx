@@ -1,5 +1,5 @@
 import { $, $$, jsx, Portal, renderToString, createDocument, useEnvironment, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 import { TestCleanupInner } from './TestCleanupInner'
 
 const name = 'TestCleanupInnerPortal'
@@ -35,22 +35,6 @@ const TestCleanupInnerPortal = (): JSX.Element => {
     return ret
 }
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestCleanupInnerPortal()
-    const ssrComponent = testObservables[`${name}_ssr`]
-    const doc = createDocument()
-    const container = doc.createElement('div')
-    container.id = 'portal-container-cleanup-inner'
-    doc.body.appendChild(container)
-    const ssrResult = renderToString(ssrComponent, { document: doc })
-    const expectedFull = doc.body.innerHTML
-    const expected = '<div id="portal-container-cleanup-inner"></div>'
-    const passed = ssrResult === expected
-    console.log(`\n📝 Test: ${name}\n   SSR: ${ssrResult} ${passed ? '✅' : '❌'}\n`)
-    if (!passed) { console.error(`❌ [${name}] failed`); process.exit(1) }
-}
-
 TestCleanupInnerPortal.test = {
     static: true,
     compareActualValues: true,
@@ -76,3 +60,6 @@ TestCleanupInnerPortal.test = {
 
 
 export default () => <TestSnapshots Component={TestCleanupInnerPortal} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestCleanupInnerPortal)

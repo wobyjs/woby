@@ -1,5 +1,5 @@
 import { $, $$, Suspense, useResource, Ternary, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestSuspenseCleanup'
 const TestSuspenseCleanup = (): JSX.Element => {
@@ -22,16 +22,6 @@ const TestSuspenseCleanup = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestSuspenseCleanup()
-    const ssrComponent = testObservables[`TestSuspenseCleanup_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestSuspenseCleanup\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestSuspenseCleanup.test = {
     static: true,
     expect: () => {
@@ -53,3 +43,6 @@ TestSuspenseCleanup.test = {
 
 
 export default () => <TestSnapshots Component={TestSuspenseCleanup} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestSuspenseCleanup)

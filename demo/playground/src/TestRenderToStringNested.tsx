@@ -1,5 +1,5 @@
 import { $, $$, Suspense, useResource, renderToString, type JSX } from 'woby'
-import { TestSnapshots, registerTestObservable, testObservables, assert } from './util'
+import { TestSnapshots, registerTestObservable, testObservables, assert, runSSRTest } from './util'
 
 const name = 'TestRenderToStringNested'
 const TestRenderToStringNested = (): JSX.Element => {
@@ -26,16 +26,6 @@ const TestRenderToStringNested = (): JSX.Element => {
 }
 
 
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestRenderToStringNested()
-    const ssrComponent = testObservables[`TestRenderToStringNested_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestRenderToStringNested\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestRenderToStringNested.test = {
     static: true,
     expect: () => {
@@ -56,3 +46,6 @@ TestRenderToStringNested.test = {
 }
 
 export default () => <TestSnapshots Component={TestRenderToStringNested} />
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestRenderToStringNested)

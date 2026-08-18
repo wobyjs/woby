@@ -8,7 +8,7 @@
  * - Slot content distribution
  */
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, renderToString, type JSX } from 'woby'
-import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, getInnerHTML, minimiseHtml } from './util'
+import { TestSnapshots, useInterval, TEST_INTERVAL, registerTestObservable, testObservables, assert, getInnerHTML, minimiseHtml, runSSRTest } from './util'
 
 
 // Define a simple custom element with basic props
@@ -180,17 +180,6 @@ const a = <>
     </div>
 </>
 
-
-// Conditional: SSR tests (Node.js environment - tsx mode)
-if (typeof window === 'undefined') {
-    TestCustomElementSlotsWithSSR()
-    const ssrComponent = testObservables[`${name}_ssr`]
-    if (ssrComponent) {
-        const ssrResult = renderToString(ssrComponent)
-        console.log(`\n📝 Test: TestCustomElementSlotsWithSSR\n   SSR: ${ssrResult} ✅\n`)
-    }
-}
-
 TestCustomElementSlotsWithSSR.test = {
     static: true,
     expect: () => {
@@ -254,3 +243,6 @@ export default () => <TestSnapshots Component={TestCustomElementSlotsWithSSR} />
 // export default () => null
 
 // console.log(renderToString(<TestCustomElementSlotsWithSSR />))
+
+// SSR assertions, driven on the same schedule the browser's <TestSnapshots> uses.
+if (typeof window === 'undefined') runSSRTest(name, TestCustomElementSlotsWithSSR)
