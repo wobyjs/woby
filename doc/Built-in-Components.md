@@ -12,6 +12,24 @@ Woby provides several built-in components that handle common UI patterns efficie
 
 ## Control Flow
 
+Any child that resolves to nothing - `false`, `null`, `undefined`, a boolean from an `&&` pattern, or
+a control-flow component whose branch is empty - leaves an empty comment node behind:
+
+```tsx
+const show = $(false)
+
+<p>{() => $$(show) && <b>hi</b>}</p>
+// DOM innerHTML          -> '<p><!----></p>'
+// renderToString() output -> '<p></p>'
+```
+
+That anchor is not noise: it holds the child's position among its siblings, so when the value later
+becomes non-void the new node is diffed into the right slot instead of being appended at the end.
+
+Note the asymmetry - the SSR document serializes a comment node as its (empty) data, so the anchor
+is present in the tree but invisible in the rendered string. Assertions on `innerHTML` must include
+`<!---->`; assertions on `renderToString()` must not.
+
 ### If
 
 Conditionally renders content based on a boolean condition.
@@ -384,10 +402,18 @@ Renders content into a different part of the DOM tree.
 **Signature:**
 ```typescript
 interface PortalProps {
-  mount?: Element
-  children: JSX.Element
+  mount?: FunctionMaybe<Element>   // defaults to document.body
+  when?: FunctionMaybe<boolean>    // defaults to true; false renders children in place
+  wrapper?: FunctionMaybe<Element> // container to render into; defaults to a fresh <div>
+  children?: JSX.Element
 }
 ```
+
+**Server-side rendering:** under `renderToString()` a Portal renders its children straight into
+`mount`. With no `mount` that is the document body, so the content appears in the output. An
+explicit `mount` is treated as the caller's own node and is **never re-parented** into the document
+— if that node is detached, its content is legitimately absent from the rendered string, exactly as
+portalling into a detached container behaves in the DOM renderer.
 
 **Usage:**
 ```typescript

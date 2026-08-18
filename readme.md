@@ -1067,6 +1067,20 @@ import {createElement} from 'woby';
 const element = createElement ( 'div', { class: 'foo' }, 'child' ); // => () => HTMLDivElement
 ```
 
+When `component` is a component function rather than a tag name, children passed as rest arguments
+are merged into its props as `children`, so hyperscript and JSX hand a component the same shape:
+
+```tsx
+const Box = ({ children }) => <div class="box">{children}</div>;
+
+createElement ( Box, { id: 'a' }, 'hello' ); // Box receives { id: 'a', children: 'hello' }
+<Box id="a">hello</Box>;                     // identical
+```
+
+Passing children both ways at once - `createElement ( Box, { children: 'a' }, 'b' )` - is an error,
+so the merge is never ambiguous. This is what lets `html` (which compiles to the classic
+`h(type, props, ...children)` signature) render components that read `props.children`.
+
 #### `h`
 
 This function is just an alias for the `createElement` function, it's more convenient to use if you want to use Woby in hyperscript mode just because it has a much shorter name.

@@ -424,6 +424,39 @@ return <>{core}</>
 
 ---
 
+## `Context.Provider` Inside a Reactive Child — Infinite Remount Loop
+
+This is the **more severe sibling** of the reconstruction trap above. There, a re-runnable `{child}` *rebuilds* a subtree once per external change (wasteful, but finite). When the thing being mounted inside the re-runnable child is a **`Context.Provider`** (or a custom element that wraps one, e.g. `<sy-document-ctx>`), the rebuild becomes **self-sustaining and infinite** — it pegs the main thread and freezes the page.
+
+```typescript
+// ❌ TRAP — Provider mount gated by a reactive thunk ⇒ infinite remount loop.
+//    The {() => …} child compiles to a useRenderEffect. Mounting the Provider
+//    READS *and* WRITES woby's internal context observable during its own run,
+//    so that observable becomes a dependency of the enclosing effect AND is
+//    dirtied by it → the effect re-dirties itself → dispose+remount the Provider
+//    → read+write again → … forever. Thread pegged, UI frozen.
+{() => $$(有效)
+  ? <ThemeCtx.Provider value="dark"><heavy-panel /></ThemeCtx.Provider>
+  : null}
+
+// ✅ FIX — mount the Provider ONCE in the static tree; gate its VISIBILITY
+//    (not its mount) with a reactive class. Toggling display never disposes
+//    or re-mounts the Provider, so the read→write→re-dirty cycle can't form.
+<ThemeCtx.Provider value="dark">
+  <div class={() => $$(有效) ? '' : 'hidden'}>   {/* Tailwind hidden = display:none */}
+    <heavy-panel />
+  </div>
+</ThemeCtx.Provider>
+```
+
+**Why a Provider is uniquely dangerous here:** a plain `<div>`/`<my-el/>` in a re-runnable child only *rebuilds* — its construction reads may be tracked, but it does not feed its own dirtiness. A Provider's mount, by contrast, both reads and writes the internal context observable, so mounting it *inside* the effect that tracks that observable closes a self-re-dirty loop (soby `Observer.update`, observer.js). Finite reconstruction becomes an unbounded loop.
+
+**Rule:** Never **mount-gate** a `Context.Provider` behind a reactive `{() => cond ? <Provider/> : null}` thunk. Mount it **once** in the static JSX and gate **visibility** with `class={() => cond ? '' : 'hidden'}` (or `style` `display`). Reactive thunks are fine around *leaf* content (text, tables, plain elements) — the hazard is specifically the Provider (and CEs wrapping one). If several heavy panels share the gate, give each its own toggle so at most one expensive fold mounts per interaction.
+
+> Symptom signature: an unclosable dialog / fully frozen page (not a slow one) the instant a Provider-bearing branch flips visible; a CPU profile shows the renderer pegged in mount/dispose churn rather than idle. See also the memo-as-child trap above — same `useRenderEffect` mechanism, escalated by the Provider's write-back.
+
+---
+
 ## Batching
 
 ```typescript
@@ -861,3 +894,120 @@ After running `pnpm install --no-frozen-lockfile`, the optional platform-specifi
 Error: Cannot find native binding. npm has a bug related to optional dependencies
 ```
 Fix: run `pnpm install` (no flags) at the workspace root. Do NOT delete `node_modules` or `pnpm-lock.yaml`.
+
+---
+
+## `defaults()` and Callback Props — Unwrap With `$$(x, false)`
+
+`defaults()` wraps every default into an observable, **including `null` callback
+defaults**. So a prop declared as `onChange: null` arrives inside the component as
+`observable(null)` — a *function* — not as `null`. Calling it directly silently
+does nothing useful, and `if (props.onChange)` is always true.
+
+```tsx
+const def = () => ({ onCommit: null as ((v: string) => void) | null })
+
+const Editor = defaults(def, (props) => {
+    // ❌ always truthy — this is the observable wrapper, not your callback
+    if (props.onCommit) props.onCommit(value)
+
+    // ❌ plain $$ calls the observable AND would call a function value
+    const cb = $$(props.onCommit)
+
+    // ✅ second arg `false` disables function-invocation, so a function *value*
+    //    comes back as itself and a null default comes back as null
+    const cb = $$(props.onCommit, false)
+    if (typeof cb === 'function') cb(value)
+})
+```
+
+The rule: **any prop whose value may legitimately BE a function must be unwrapped
+with `$$(x, false)`.** With the default `$$(x)`, woby treats the function as a
+thunk and calls it, so you get the *result* of your callback (usually `undefined`)
+instead of the callback. Applies to `onChange`, `onCommit`, `render`, `format`,
+and every other function-valued prop.
+
+## SSR vs. Browser Serialization — Do Not Reconcile Them
+
+`renderToString` and a live-DOM serializer legitimately disagree. Write **two**
+expectations; never "fix" one to match the other.
+
+| | `renderToString` (Node) | Live DOM (browser) |
+| --- | --- | --- |
+| void elements | self-closing — `<input … />` | `<input …>` |
+| `checked` / `disabled` | reflected as an attribute — `checked=""` | stays a **property**; never appears as an attribute |
+| custom elements | connect lifecycle never runs → near-empty tag, no context | fully upgraded, context propagates |
+
+Two more traps:
+
+- **Non-deterministic values must be pinned.** Auto-generated ids, dates, and
+  random seeds make SSR and the browser disagree on every run. Fix them to
+  constants inside test components.
+- **Attribute order follows source order in both**, so don't sort — a diff in
+  order is a real regression, not serializer noise.
+
+## Two-Suite Snapshot Modules (the `@woby/wui` pattern)
+
+One module per component drives **both** a Node `renderToString` run and a live
+browser run from a single set of expectations. Structure:
+
+```tsx
+const name = 'TestButton'
+
+const TestButton = (): JSX.Element => {
+    const index = $(0)
+    registerTestObservable(name, index)              // lets a runner drive the state
+    useInterval(() => index(p => (p + 1) % 4), TEST_INTERVAL)
+    const ret: JSX.Element = () => <Button {...states[index()]}>Go</Button>
+    registerTestObservable(`${name}_ssr`, ret)       // lets renderToString re-render it
+    return ret
+}
+
+// Node-only. Gate on a global the SSR runner sets — NOT on `typeof window`,
+// which is also undefined in some bundler/worker contexts.
+if (typeof globalThis.__isSSRTest__ !== 'undefined') {
+    TestButton()
+    for (let i = 0; i < fullElements.length; i++) {
+        ;(testObservables[name] as any)(i)
+        const ssr = renderToString(testObservables[`${name}_ssr`])
+        console.log(`   State ${i}: ${ssr} ${ssr === fullElements[i] ? '✅' : `❌ (expected: ${fullElements[i]})`}`)
+    }
+    // Record, don't exit — see below.
+    if (!allPassed) ((globalThis as any).__ssrFailures ??= []).push(name)
+}
+
+TestButton.test = { static: false, stateCount: 4, compareActualValues: true, expect: () => /* … */ }
+export default () => <TestSnapshots Component={TestButton} />
+```
+
+Rules that keep the suite honest:
+
+- **Record failures, never `process.exit` in a module.** The runner imports every
+  module, so exiting on the spot destroys the actual/expected output of every
+  module after yours. Push onto `globalThis.__ssrFailures` and let the runner exit
+  non-zero once everything has run.
+- **Always log actual *and* expected.** A bare "failed" costs a debugging round
+  trip; the concrete diff names the attribute that drifted.
+- **A branch that passes silently reports zero passes.** If the pass path only
+  `console.log`s, an assertion counter stays at 0 and a green suite looks empty.
+  Call `assert(true, …)` on success too.
+- **Show it on the page, not only the console.** Devtools buffers cap around 1000
+  messages, so a 20-module suite can lose its head. Publish each module's
+  actual/expected pair into an observable and render it next to the component,
+  plus one summary banner (modules / passed / failed / assertions).
+- **One flat array is the registration point.** Keep a `tests` array in a single
+  module and have the page map over it; hand-listing `<TestX />` tags in the app
+  guarantees a module gets imported but never rendered.
+
+## Portal Components Are Not Document-Centric — Exclude Them
+
+`Portal`-based components (pickers, bottom sheets, wheelers, floating dialogs)
+render **outside** their parent subtree. Any host that assumes "my children are my
+DOM" — a document-centric rich-text editor, a serializing snapshot harness, a
+drag-and-drop canvas — must **filter them out of its component registry**, not try
+to make them work inside it.
+
+Symptoms of getting this wrong: recursion when the host walks its own subtree,
+selection/caret logic that loses the node, snapshots that come back empty, and
+"fixes" that special-case the editor internals. The fix is always upstream —
+exclude the Portal components from the registry — never downstream in the host.

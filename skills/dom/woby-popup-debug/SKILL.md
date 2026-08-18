@@ -34,7 +34,19 @@ top: '100%'   // for right placement this puts popup BELOW-right, not beside but
 
 ## Verification: Always Check Computed Styles
 
-After positioning, verify with browser console:
+After positioning, verify with the dv CLI. Prefer `query >>>` over a hand-rolled `shadowRoot.querySelector` eval — `>>>` pierces the shadow root for you:
+
+```bash
+# Popup computed styles inside the shadow root (no traversal by hand):
+dv3 query "sy-component >>> [style*=overflow]" --computed-style --props top,maxHeight,overflow --json
+dv3 query "sy-component >>> [style*=overflow]" --exists
+```
+
+`query --computed-style` gives you the CSS values (top/maxHeight/overflow). For the actual **viewport geometry** comparison (popup box vs button box) there is no `>>>`-aware dv command yet — `inspect` uses plain `DOM.querySelector` and won't pierce shadow roots — so use the raw eval below for the `getBoundingClientRect()` check.
+
+**Expected**: the popup's `top` `>=` the button's `bottom` — popup sits below the button, not covering it.
+
+<details><summary>Raw-eval form for the bounding-box geometry check</summary>
 
 ```js
 const btn = document.querySelector('sy-component')?.shadowRoot?.querySelector('button');
@@ -46,8 +58,7 @@ const css = getComputedStyle(pop);
 ' | popup: top=' + popR?.top + ', bottom=' + popR?.bottom +
 ' | maxHeight=' + css.maxHeight + ' | vpH=' + visualViewport.height
 ```
-
-**Expected**: `popR.top >= btnR.bottom` (popup below button, not covering it)
+</details>
 
 ## Dev Server Caching Issue
 

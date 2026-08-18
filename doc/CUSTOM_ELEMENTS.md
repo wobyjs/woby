@@ -5,6 +5,7 @@ Woby provides a powerful API for creating custom HTML elements that integrate se
 ## Table of Contents
 
 - [customElement](#customelement)
+  - [Server-Side Rendering](#server-side-rendering)
   - [Observed Attributes](#observed-attributes)
 - [ElementAttributes](#elementattributes)
   - [Benefits of ElementAttributes](#benefits-of-elementattributes)
@@ -16,6 +17,7 @@ Woby provides a powerful API for creating custom HTML elements that integrate se
   - [Advanced Type Augmentation Example](#advanced-type-augmentation-example)
 - [Attribute to Prop Mapping](#attribute-to-prop-mapping)
 - [Type Conversion](#type-conversion)
+  - [Inferred Types (No `type` Option)](#inferred-types-no-type-option)
 - [Nested Properties](#nested-properties)
 - [Style Properties](#style-properties)
 - [Shadow DOM](#shadow-dom)
@@ -53,6 +55,35 @@ const CustomElementClass = customElement(tagName, component)
 - Component must have default props defined using the `defaults` helper
 - Component props that are observables will be updated with type conversion
 - Tag name must contain a hyphen (per HTML custom element specification)
+
+### Server-Side Rendering
+
+`customElement()` registers **one** of two implementations, picked from the environment at call time:
+
+- **With a DOM** (browser) — a real `customElements.define()` registration, so the browser upgrades the tag natively.
+- **Without a DOM** (Node) — an SSR-only registration, used by `renderToString()`.
+
+`renderToString()` always renders through the SSR document, but it can only expand tags the SSR
+registry knows about. Under Node that registry is populated, so the tag expands to its rendered
+content. In a browser the registration went to `customElements` instead, so the very same
+`renderToString()` call emits the host tag **inert** — attributes and light-DOM children only, with
+no component body:
+
+```tsx
+customElement('tailwind-button', TailwindButton)
+
+// Node
+renderToString(<tailwind-button label="Go" />)
+// → '<tailwind-button label="Go" cls=""><button class="...">Go</button></tailwind-button>'
+
+// Browser
+renderToString(<tailwind-button label="Go" />)
+// → '<tailwind-button label="Go"></tailwind-button>'
+```
+
+Assert against the environment you are actually rendering in; a snapshot compared across both needs
+two expectations. The same split applies to `<context-provider>` — a browser-side `renderToString()`
+does not wrap children in `context()`, so nested providers there resolve to the **outer** value.
 
 ### Observed Attributes
 
@@ -470,6 +501,31 @@ customElement('toggle-element', Toggle)
 - `object`: Parsed using `JSON.parse()`, falls back to string on error
 - `symbol`: Created using `Symbol()`
 - Other types: Treated as strings
+
+### Inferred Types (No `type` Option)
+
+When a prop's observable carries no `type` option, the conversion is inferred from that observable's
+**current value** at the moment the attribute changes:
+
+- current value is a `number` → `Number(value)`
+- current value is a `boolean` → `true` for `"true"`, `"1"` or `""` (case-insensitive), `false` otherwise
+- anything else → the raw string, or `fromHtml(value)` when the observable declares one
+
+```tsx
+const Counter = defaults(() => ({
+  value: $(8) // no `type` option - inferred as number from the initial 8
+}), ({ value }) => <div>Count: {value}</div>)
+
+customElement('counter-element', Counter)
+
+// <counter-element value="42"></counter-element>
+// value() === 42 - a number, not the string "42"
+```
+
+This matters on mount as much as on update: `connectedCallback` reflects every attribute already
+present in the HTML back into props, so without inference a `$(8)` prop would be clobbered with the
+string `"8"` the first time the element connects. Declare `type` explicitly whenever the initial
+value does not represent the type you want - for example `$(null, { type: 'number' } as const)`.
 
 ## HTML Utility Types
 

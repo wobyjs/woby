@@ -1,6 +1,6 @@
 ---
 name: dom
-description: 'Master DOM skill using @missbjs/dv1-6 CLI for professional-grade DOM design, debugging, theming, print layout, and responsive development. Use dv1-6 CLI for all browser interactions including console log/error/assert reading. Each dv binary manages its own Chrome profile (dv1-dv6). Always open HEADED mode for user inspection. Vite workflow: `pnpm dev --port <port>` ONCE (HMR, pick port NOT in 5xxx), then dv* navigate to it. If 404 → restart dev. If reload loop → kill all ports spawned under this session. Automatically routes to appropriate sub-skills — dom-design for layout and UX design, dom-debug for debugging issues, dom-theme for color/font theming, dom-print for print media, dom-mobile for mobile-specific, dom-desktop for desktop-specific, dom-mobile-desktop for cross-device optimization. All sub-skills follow professional design workflow with verification and self-check to production level. **CRITICAL: Each agent must use a unique dv binary to avoid conflicts with other parallel agents. DO NOT use default dv1 without checking availability. DO NOT close Chrome instances launched by other agents.**'
+description: 'Master DOM skill using @missbjs/dv1-6 CLI for professional-grade DOM design, debugging, theming, print layout, and responsive development. Use dv1-6 CLI for all browser interactions including console log/error/assert reading. Each dv binary manages its own Chrome profile (dv1-dv6). Always open HEADED mode for user inspection. Vite workflow: `pnpm dev --port <port>` ONCE (HMR, pick port NOT in 5xxx), then dv* navigate to it. If 404 → restart dev. If reload loop → stop only the instance you started (`dv* stop`, or taskkill by PID); NEVER kill by image name. Automatically routes to appropriate sub-skills — dom-design for layout and UX design, dom-debug for debugging issues, dom-theme for color/font theming, dom-print for print media, dom-mobile for mobile-specific, dom-desktop for desktop-specific, dom-mobile-desktop for cross-device optimization. All sub-skills follow professional design workflow with verification and self-check to production level. **CRITICAL: Each agent must use a unique dv binary to avoid conflicts with other parallel agents. DO NOT use default dv1 without checking availability. DO NOT close Chrome instances launched by other agents.**'
 ---
 
 # DOM Master Skill (@missbjs/dv1-6 CLI)
@@ -177,12 +177,37 @@ If `dv* navigate` to the dev server URL results in a 404:
 
 **If Chrome shows a continuous reload loop** (page keeps refreshing without settling):
 
+> ### ⛔ NEVER kill by image name
+>
+> `Get-Process -Name chrome | Stop-Process`, `taskkill /IM chrome.exe`, and every
+> variant of them are **forbidden**. They kill the user's own browser and every
+> other agent's instance — work outside this session that you did not start and
+> cannot restore. This has actually happened.
+>
+> Kill **only by PID**, and only a PID you have traced back to a process *you*
+> started in this session. If you cannot prove you started it, leave it running
+> and use a different port.
+
+Resolve the PID from the port you own, confirm it is yours, then stop that one PID:
+
 ```bash
-# Kill ALL port spawns under this AI session
-# Find Chrome processes started by this session's dv* instances
-# and kill them by port
-Get-Process -Name chrome | Where-Object { $_.CommandLine -match "remote-debugging-port=(923[0-5])" } | Stop-Process -Force
+# 1. Which PID is listening on the port my dv instance uses?
+netstat -ano | grep ":9233 "        # last column is the PID
+
+# 2. Confirm it is the process this session started (check the command line).
+#    If the command line does not contain your profile dir / debugging port, STOP.
+wmic process where "ProcessId=<pid>" get CommandLine
+
+# 3. Only then:
+taskkill /PID <pid> /F
 ```
+
+Cleaner still: `dv4 stop` shuts down only the Chrome instance that `dv4` started,
+by profile. Prefer it over any manual kill.
+
+Stray listeners on other ports are **not yours to clean up**. Pick a free port and
+move on — vite auto-increments (5173 → 5174 → …) and prints the port it settled on;
+read that line rather than assuming.
 
 Then:
 1. Restart the Chrome instances you need (after checking ports are free)
@@ -263,6 +288,13 @@ dv3 navigate http://localhost:7214
 > - `close <tab-id>` (old `--page-id` removed); `pages` → **`tabs`**; select a tab with `select -i <index>`
 > - Unchanged: `console --type <log|warn|error|info|debug>` (+ new `--filter <pattern>`, `--json`), `eval --script`, `key --key`, `inspect/query-all/get-text/get-html -s <selector>`
 
+> **dv* CLI — newer capabilities (prefer these over `eval`).**
+> - **`>>>` shadow-pierce selector.** Reaches into Shadow DOM: `dv3 click "sy-comp >>> button"`, `dv3 query "sy-comp >>> tr" --count`, `dv3 get-text -s "sy-comp >>> .title"`. Compiles to `element.shadowRoot.querySelector()` chains — no hand-rolled traversal. Supported by `query`, `read`, `get-text`/`get-html`, and the interaction commands `click`/`hover`/`focus`/`drag`/`upload`/`highlight`/`scroll`/`wait`. Nest it for deeper roots: `"outer >>> inner >>> .leaf"`. (Note: `inspect`/`query-all` use plain `DOM.querySelector` and do NOT pierce `>>>`.)
+>   Selector form: `query`/`read` and the interaction commands take a **positional** selector; `get-text`/`get-html`/`inspect` take `-s/--selector`.
+> - **`query`** replaces most one-off `eval` snippets: `--count`, `--exists`, `--text`, `--html`, `--attr <name>`, and `--computed-style [--props a,b,c]` (returns computed CSS as an object; `null` if not found).
+> - **`--json` / `--yaml` everywhere.** Every data-returning command (`console`, `query`, `inspect`, `snapshot`, `network`, `cookies`, `get-text`, `get-html`, `read`, `find`, `diff`, `perf`, …) takes both; human-readable stays the default.
+> - **`read --html` / `read --dom`** dumps full-page HTML, or a single element's `outerHTML` with a selector (`read --html "sy-comp >>> .card"`).
+
 ### CRITICAL: Use Tailwind CSS Classes in HTML, NOT Inline Styles
 
 **ALWAYS use Tailwind CSS utility classes directly in HTML elements, NOT inline `style` attributes.**
@@ -339,18 +371,13 @@ dv3 console --json
 # Execute JavaScript (for DOM inspection, NOT console reading)
 dv3 eval --script "document.title"
 
-# Check styles
-dv3 eval --script "
-(() => {
-  const el = document.querySelector('.target');
-  const styles = getComputedStyle(el);
-  return {
-    display: styles.display,
-    position: styles.position,
-    zIndex: styles.zIndex
-  };
-})()
-"
+# Check styles — PREFER `query --computed-style` over a hand-rolled getComputedStyle eval:
+dv3 query ".target" --computed-style --props display,position,zIndex --json
+# ...works inside Shadow DOM too, no traversal needed:
+dv3 query "sy-comp >>> .target" --computed-style --props display,position,zIndex --json
+
+# The old eval form still works, but is rarely needed now:
+dv3 eval --script "getComputedStyle(document.querySelector('.target')).display"
 
 # Take snapshot (text-based accessibility tree)
 dv3 snapshot
@@ -358,6 +385,28 @@ dv3 snapshot
 # Take screenshot (output path is POSITIONAL)
 dv3 screenshot screenshot.png
 ```
+
+### Querying Elements (prefer over `eval`)
+
+Most one-off DOM `eval` snippets have a shorter, Shadow-DOM-aware `query` form. Use `>>>` to pierce shadow roots — no `.shadowRoot.querySelector()` chains by hand.
+
+```bash
+dv3 query "sy-users >>> tr" --count                 # count rows inside a shadow root
+dv3 query ".modal" --exists                          # boolean existence check
+dv3 query "sy-comp >>> .title" --text                # textContent
+dv3 query "sy-comp >>> .card" --html                 # outerHTML
+dv3 query "sy-comp >>> input" --attr placeholder     # attribute value
+dv3 query "sy-comp >>> .popup" --computed-style --json          # all computed styles
+dv3 query "sy-comp >>> .popup" --computed-style --props top,maxHeight,overflow --json
+
+# Element / page HTML and text (get-text/get-html need -s/--selector; >>> supported):
+dv3 get-text -s "sy-comp >>> .title"                 # add --json/--yaml if you want structured
+dv3 get-html -s "sy-comp >>> .card" --json
+dv3 read --html                                      # full document HTML (positional selector)
+dv3 read --html "sy-comp >>> .card"                  # one element's outerHTML
+```
+
+Every command above (and `console`, `snapshot`, `network`, `cookies`, `inspect`, `find`, `diff`, `perf`, …) accepts `--json` and `--yaml`; human-readable is the default.
 
 ### Interaction
 ```bash
@@ -1065,3 +1114,55 @@ z-1000  - App bars, fixed navigation
 z-[150] - Wheeler widget container
 z-[200] - Wheeler content
 ```
+---
+
+## Verifying a Browser Test Suite Through dv*
+
+When the page under inspection *is* a test suite (a demo-cum-test landing page),
+don't read pass/fail by eye or by scrolling console output.
+
+### Read the counters, not the log
+
+Devtools buffers roughly 1000 console messages, so a 20-module suite can silently
+lose its head. Have the page expose counters on `globalThis` and read them in one
+call:
+
+```bash
+dv4 eval -s "JSON.stringify({ \
+  logs:  globalThis.__consoleLogCount, \
+  pass:  globalThis.__testPassCount, \
+  fails: (globalThis.__testFailures || []).length \
+})"
+```
+
+`fails: 0` with `pass: 0` is a **failing** result, not a passing one — it means no
+assertion ever ran (usually a pass branch that only `console.log`s without calling
+`assert(true, …)`). Always check both numbers.
+
+### Prefer on-page results over console results
+
+The most reliable version puts each module's actual/expected pair in the DOM, so
+`dv4 eval` / `dv4 query` can read it directly and a human can see it without
+devtools:
+
+```bash
+# summary banner + how many result panels rendered
+dv4 eval -s "JSON.stringify({ \
+  panels: document.querySelectorAll('details > summary').length, \
+  banner: (document.body.innerText.match(/Summary[\s\S]{0,200}/) || [''])[0] \
+})"
+
+# expand everything, then read one module's actual/expect
+dv4 eval -s "(()=>{[...document.querySelectorAll('details')].forEach(d=>d.open=true); \
+  return document.body.innerText.match(/TestButton[\s\S]{0,600}/)[0]})()"
+```
+
+A count mismatch (panels rendered < modules that exist) is its own bug: a module
+that is imported but never rendered passes nothing and reports nothing. Compare the
+rendered count against the module list before trusting a green banner.
+
+### Port discipline
+
+`pnpm dev` auto-increments past occupied ports and prints the one it settled on.
+Read that line from the dev-server output and navigate there — never assume 5173,
+and never free a port by killing whatever holds it (see the PID rule above).

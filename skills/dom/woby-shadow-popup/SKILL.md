@@ -170,10 +170,16 @@ Without `stopPropagation()`, onClick fires twice (bubbling + woby's delegation).
 onClick={(e) => { e.stopPropagation(); yourHandler() }}
 ```
 
-### Playwright/browser_click Doesn't Trigger Woby's Shadow DOM Delegation
-`browser_click` or `agent-browser eval "document.querySelector().click()"` doesn't trigger woby's delegated onClick on shadow DOM elements.
+### Clicking the Host Doesn't Trigger Woby's Shadow DOM Delegation
+Clicking the custom element host (`document.querySelector('my-element').click()`) does NOT trigger woby's delegated onClick — you must click the actual button *inside* the shadow root.
 
-**Fix:** Use `element.click()` via JS eval:
+**Fix (preferred):** use `dv click` with a `>>>` shadow-pierce selector. It resolves the inner button's node and dispatches a real CDP input click, which fires woby's delegation correctly:
+```bash
+dv3 click "my-element >>> button"
+```
+
+<details><summary>Old raw-eval forms (still work if you can't use dv)</summary>
+
 ```typescript
 // WRONG - won't trigger woby's onClick delegation
 agent-browser eval "document.querySelector('my-element').click()"
@@ -183,6 +189,7 @@ agent-browser eval "document.querySelector('my-element').shadowRoot.querySelecto
 // OR
 agent-browser eval "document.querySelector('my-element').shadowRoot.querySelector('button').dispatchEvent(new MouseEvent('click', {bubbles: true}))"
 ```
+</details>
 
 ### Module-Level Handler Ref Pattern
 For passing functions to child components without prop drilling:
@@ -428,16 +435,26 @@ This applies to ALL style properties sourced from observables. Class arrays that
 } else if (spaceRight >= tableW) {
 ```
 
-### agent-browser: Clicking Inside Shadow DOM
+### Clicking Inside Shadow DOM
 **Problem:** `document.querySelector('sy-element').click()` clicks the host element, not the button inside shadow DOM.
 
-**Fix:** Always traverse into `shadowRoot` first:
+**Fix (preferred):** use `dv click` with `>>>` — it pierces the shadow root and dispatches a real click:
 ```bash
-agent-browser eval "document.querySelector('sy-element').shadowRoot.querySelector('button').click()"
+dv3 click "sy-element >>> button"
 ```
 
-Then verify popup computed style and content:
+Then verify the popup exists and its computed style — Shadow-DOM-aware, no traversal by hand:
 ```bash
+dv3 query "sy-element >>> [class*=absolute]" --exists
+dv3 query "sy-element >>> [class*=absolute]" --computed-style --props top,maxHeight,overflow --json
+```
+
+For the actual bounding box (`getBoundingClientRect` top/left/bottom/right) there is no `>>>`-aware dv command — `inspect` uses plain `DOM.querySelector` and won't pierce shadow roots — so use the raw eval below for geometry.
+
+<details><summary>Raw-eval form for the bounding-box geometry check</summary>
+
+```bash
+agent-browser eval "document.querySelector('sy-element').shadowRoot.querySelector('button').click()"
 agent-browser eval "(() => {
   const el = document.querySelector('sy-element')
   const popup = el.shadowRoot.querySelector('[class*=absolute]')
@@ -451,6 +468,7 @@ agent-browser eval "(() => {
   }
 })()"
 ```
+</details>
 
 ## Nested Popup: cancelOnBlur Pattern
 
