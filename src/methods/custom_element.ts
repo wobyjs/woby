@@ -189,6 +189,11 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         public slots: HTMLSlotElement
         public placeHolder: Comment
         private _attrObserver: MutationObserver | null = null
+        // Snapshot of each writable prop's value before any attribute was applied, so
+        // removeAttribute() can put the prop back to its declared default. The default
+        // observables are mutated in place, so nothing else retains what they held at
+        // construction.
+        private _propDefaults: Record<string, any> = {}
 
         constructor(props?: P) {
             super()
@@ -267,6 +272,18 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 this.props = defaultProps
             } else {
                 this.props = !!props ? props : defaultProps
+            }
+
+            // Record the pre-attribute value of every writable prop. This runs after the
+            // JSX merge (so a JSX-supplied value counts as the default for that element)
+            // but before the HTML attribute sync below, which is the first thing that can
+            // overwrite a declared default. untrack: the constructor can run inside a
+            // parent's render effect, and a tracked read here would make that effect
+            // depend on props it is about to write.
+            for (const key in this.props) {
+                const obs = (this.props as any)[key]
+                if (isObservable(obs) && isObservableWritable(obs))
+                    this._propDefaults[key] = untrack(() => obs())
             }
 
             if (!isJsx(this.props)) {
@@ -450,7 +467,15 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                         const name = m.attributeName
                         const newValue = this.getAttribute(name)
                         const oldValue = m.oldValue
-                        this.attributeChangedCallback1(name, oldValue, newValue)
+                        // Contain the failure to this one attribute. A throw here escapes
+                        // the forEach, so every remaining mutation in the same batch would
+                        // be dropped too, and it surfaces detached from the setAttribute /
+                        // removeAttribute frame that caused it.
+                        try {
+                            this.attributeChangedCallback1(name, oldValue, newValue)
+                        } catch (e) {
+                            console.warn(`[woby] <${tagName}> failed to sync attribute "${name}" to its prop:`, e)
+                        }
                     }
                 })
             })
@@ -502,6 +527,36 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
             if (name.includes('$') || name.includes('.')) {
                 const normalizedPath = normalizePropertyPath(name)
                 setNestedProperty(this, normalizedPath, newValue)
+            } else if (newValue === null) {
+                // Attribute removed. The platform treats a removed attribute as "unset", so
+                // put the prop back to the value it had before any attribute was applied
+                // rather than forwarding `null` — a typed observable rejects null outright
+                // (soby's set(): "Expected value of type 'string', but received 'object'")
+                // and an untyped one would store a meaningless null.
+                const obs = props[propName]
+                if (isObservable(obs) && isObservableWritable(obs)) {
+                    let restored = false
+                    if (propName in this._propDefaults) {
+                        const d = this._propDefaults[propName]
+                        try {
+                            // soby reads a function argument as a functional updater, so a
+                            // default that is itself a function has to be stored through one.
+                            if (typeof d === 'function') obs(() => d)
+                            else obs(d)
+                            restored = true
+                        } catch {
+                            // The declared default is not assignable under the prop's own
+                            // type. This is normal: `$(undefined, HtmlClass)` declares a
+                            // String-typed prop with no initial value, and soby's set()
+                            // accepts undefined at construction but rejects it afterwards.
+                            // Fall through to the type's empty value.
+                        }
+                    }
+                    if (!restored) {
+                        const empty = emptyValueFor(obs)
+                        if (empty.ok) obs(empty.value)
+                    }
+                }
             } else {
                 setObservableValue(props, propName, newValue, this)
             }
@@ -581,7 +636,32 @@ type ElementAttributePattern<P> =
 * @param key - The property key to set
 * @param value - The string value to set on the property
 */
-const setObservableValue = (obj: any, key: string, value: string, element?: Element) => {
+/**
+ * The value that means "unset" for a writable observable's declared type.
+ *
+ * soby validates every set() against options.type and throws a TypeError on a mismatch,
+ * so an attribute removal cannot simply be forwarded as null. `ok: false` means the type
+ * has no safe empty value (symbol, function, custom constructor) and the caller should
+ * leave the observable alone instead of guessing.
+ */
+const emptyValueFor = (observable: Observable<any>): { ok: boolean, value?: any } => {
+    const options = (observable[SYMBOL_OBSERVABLE_WRITABLE] as any)?.options as ObservableOptions<any> | undefined
+    const type = options?.type
+    if (type === undefined) return { ok: true, value: undefined }
+    switch (type) {
+        case 'string': case String: return { ok: true, value: '' }
+        case 'number': case Number: return { ok: true, value: 0 }
+        case 'boolean': case Boolean: return { ok: true, value: false }
+        case 'bigint': case BigInt: return { ok: true, value: BigInt(0) }
+        // null, not undefined: soby's object check is `typeof value !== 'object'`, which
+        // undefined fails.
+        case 'object': case Object: return { ok: true, value: null }
+        case 'undefined': return { ok: true, value: undefined }
+        default: return { ok: false }
+    }
+}
+
+const setObservableValue = (obj: any, key: string, value: string | null, element?: Element) => {
     // @-prefix context reference resolution
     if (typeof value === 'string') {
         if (value.startsWith('@@')) {
@@ -666,6 +746,15 @@ const setObservableValue = (obj: any, key: string, value: string, element?: Elem
         const observable = obj[key] as Observable<any>
         const options = (observable[SYMBOL_OBSERVABLE_WRITABLE]).options as ObservableOptions<any> | undefined
         const { type, fromHtml } = options ?? {}
+        // null/undefined means the attribute is absent. Coerce to the type's empty value —
+        // handing it straight to a typed observable makes soby throw. Callers that know the
+        // prop's declared default (attributeChangedCallback1) restore that instead and never
+        // reach here; this is the fallback for every other route in.
+        if (value === null || value === undefined) {
+            const empty = emptyValueFor(observable)
+            if (empty.ok) obj[key](empty.value)
+            return
+        }
         if (type) {
             switch (type) {
                 case 'number':

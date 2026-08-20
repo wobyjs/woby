@@ -348,6 +348,7 @@ import TestTailwindWithImport from './src/TestTailwindWithImport'
 import TestTailwindNoImportHTML from './src/TestTailwindNoImportHTML'
 import TestTailwindWithImportHTML from './src/TestTailwindWithImportHTML'
 import TestHtmlOnClick from './src/TestHtmlOnClick.html'
+import TestAttrRemovalRestoresDefault from './src/TestAttrRemovalRestoresDefault.html'
 
 // globalThis.Woby = Woby
 
@@ -685,6 +686,7 @@ const tests = [
 	TestWobyOnClick,
 	TestShadowOnClick,
 	TestHtmlOnClick,
+	TestAttrRemovalRestoresDefault,
 
 	// Tailwind Tests
 	TestTailwindNoImport,
