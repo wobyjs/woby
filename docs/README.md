@@ -20,12 +20,13 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **No key prop**: developers can map over arrays directly or use the `For` component with an array of unique values, eliminating the need to specify keys explicitly.
 - **No Babel**: this framework works with plain JavaScript (plus JSX support), eliminating the need for Babel transforms. As a result, there are zero transform function bugs since no code transformation is required.
 - **No magic**: Woby follows a transparent approach where your code behaves exactly as written, with no hidden transformations or unexpected behavior.
-- **Client-focused**: this framework is currently focused on client-side rich applications. Server-related features such as hydration, server components, SSR, and streaming are not implemented at this time.
+- **String rendering without a DOM**: `renderToString` is synchronous and runs on a built-in DOM-less node tree, so components render in Node, Deno, Bun, or a worker with no JSDOM. That tree carries the standard traversal, mutation and query API — including a CSS selector engine — so you can inspect what you just rendered. See [Server-Side Rendering](./doc/SSR.md). Hydration, server components, and streaming are still not implemented.
 - **Observable-based**: observables are at the core of the reactivity system. While the approach differs significantly from React-like systems and may require an initial learning investment, it provides substantial benefits in terms of performance and developer experience.
 - **Minimal dependencies**: Woby is designed with a focus on minimal third-party dependencies, providing a streamlined API for developers who prefer a lightweight solution. The framework draws inspiration from [Solid](https://www.solidjs.com) while offering its own unique approach to reactive programming.
 - **Built-in Class Management**: Woby includes powerful built-in class management that supports complex class expressions similar to `classnames` and `clsx` libraries, with full reactive observable support.
 - **Web Components Support**: First-class support for creating and using custom elements with reactive properties.
 - **Advanced Context API**: Powerful context system that works seamlessly with both JSX components and custom elements.
+- **`@`-Prefix Context Resolution**: Reference context values directly in HTML attributes — no `useContext()` needed inside the component. Use `@scope.field` syntax with `registerContextRef()`.
 - **Advanced Nested Property Support**: Unique feature allowing deeply nested properties to be set directly through HTML attributes using both `$` and `.` notation - a capability not available in React or SolidJS.
 
 ## 📚 Documentation
@@ -68,12 +69,44 @@ const ThemedButton = () => {
 
 // Use in custom elements
 const ThemedElement = defaults(() => ({}), () => {
-  const [theme, mount] = useMountedContext(ThemeContext)
-  return <div>{mount}Theme: {theme}</div>
+  const theme = useContext(ThemeContext)
+  return <div>Theme: {theme}</div>
 })
 
 customElement('themed-element', ThemedElement)
 ```
+
+[Learn more about the Context API](./doc/CONTEXT_API.md)
+
+#### `@`-Prefix Context Resolution in HTML Attributes
+
+Woby's unique `@`-prefix feature lets you reference context values directly in HTML attributes — no `useContext()` needed inside the component:
+
+```tsx
+import { createContext, registerContextRef } from 'woby'
+
+// Create and register a context for @-resolution
+const AppCounterCtx = createContext(0)
+registerContextRef('app.count', AppCounterCtx)
+
+// Now any custom element can consume it via HTML attributes:
+// <my-element count="@app.count" />
+
+// The provider works as usual:
+<AppCounterCtx.Provider value={42}>
+  <my-element count="@app.count" />
+  {/* → my-element receives count=42 */}
+</AppCounterCtx.Provider>
+```
+
+Key behaviors:
+
+| Pattern | Behavior |
+|---------|----------|
+| `@scope.field` | Resolves from nearest ancestor provider of the registered context |
+| `@@literal` | Escape: produces literal `@literal` (no resolution) |
+| `@unregistered.ref` | Console warning, passes `undefined` |
+| Nested providers | Each consumer walks up from its own DOM position — nearest ancestor wins |
 
 [Learn more about the Context API](./doc/CONTEXT_API.md)
 
@@ -462,18 +495,18 @@ customElement('styled-counter', Counter)
 | [`isServer`](#isserver)           | [`Tary`](#ternary)     | [`useEventListener`](#useeventlistener) |                                |                          |
 | [`isStore`](#isstore)             |                           | [`useFetch`](#usefetch)           |                                    |                          |
 | [`lazy`](#lazy)                   |                           | [`useIdleCallback`](#useidlecallback) |                                |                          |
-| [`render`](#render)               |                           | [`useIdleLoop`](#useidleloop)     |                                    |                          |
-| [`renderToString`](#rendertostring) |                         | [`useInterval`](#useinterval)     |                                    |                          |
-| [`resolve`](#resolve)             |                           | [`useMemo`](#usememo)             |                                    |                          |
-| [`store`](#store)                 |                           | [`useMicrotask`](#usemicrotask)   |                                    |                          |
-| [`template`](#template)           |                           | [`usePromise`](#usepromise)       |                                    |                          |
-| [`untrack`](#untrack)             |                           | [`useReaction`](#usereaction)     |                                    |                          |
-                                    |                           | [`useReadonly`](#usereadonly)     |                                    |                          |
-                                    |                           | [`useResolved`](#useresolved)     |                                    |                          |
-                                    |                           | [`useResource`](#useresource)     |                                    |                          |
-                                    |                           | [`useRoot`](#useroot)             |                                    |                          |
-                                    |                           | [`useSelector`](#useselector)     |                                    |                          |
-                                    |                           | [`useTimeout`](#usetimeout)       |                                    |                          |
+| [`registerContextRef`](#registercontextref) |                   | [`useIdleLoop`](#useidleloop)     |                                    |                          |
+| [`render`](#render)               |                           | [`useInterval`](#useinterval)     |                                    |                          |
+| [`renderToString`](#rendertostring) |                         | [`useMemo`](#usememo)             |                                    |                          |
+| [`resolve`](#resolve)             |                           | [`useMicrotask`](#usemicrotask)   |                                    |                          |
+| [`store`](#store)                 |                           | [`usePromise`](#usepromise)       |                                    |                          |
+| [`template`](#template)           |                           | [`useReaction`](#usereaction)     |                                    |                          |
+| [`untrack`](#untrack)             |                           | [`useReadonly`](#usereadonly)     |                                    |                          |
+| [`createDocument`](#createdocument) |                           | [`useResolved`](#useresolved)     |                                    |                          |
+|                                    |                           | [`useResource`](#useresource)     |                                    |                          |
+|                                    |                           | [`useRoot`](#useroot)             |                                    |                          |
+|                                    |                           | [`useSelector`](#useselector)     |                                    |                          |
+|                                    |                           | [`useTimeout`](#usetimeout)       |                                    |                          |
 ## Usage
 
 Woby serves as a view layer built on top of the Observable library [`soby`](https://github.com/wobyjs/soby). Understanding how soby works is essential for effectively using Woby.
@@ -753,46 +786,16 @@ const noop = () => {};
 o ( () => noop );
 ```
 
-#### `
-
-This function unwraps a potentially observable value.
-
-[Read upstream documentation](https://github.com/wobyjs/soby#get).
-
-Interface:
-
-```ts
-function $ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
-```
-
-Usage:
-
-```tsx
-import {$} from 'woby';
-
-// Getting the value out of an observable
-
-const o = $(123);
-
-$ ( o ); // => 123
-
-// Getting the value out of a function
-
-$ ( () => 123 ); // => 123
-
-// Getting the value out of an observable but not out of a function
-
-$ ( o, false ); // => 123
-$ ( () => 123, false ); // => () => 123
-
-// Getting the value out of a non-observable and non-function
-
-$ ( 123 ); // => 123
-```
-
 #### `$$`
 
-This function unwraps a potentially observable value. Recent enhancements to Soby (which Woby uses as its reactive core) have added automatic `valueOf()` and `toString()` methods to observable functions, making them behave more naturally in JavaScript contexts where primitives are expected.
+This function **reads** (unwraps) a potentially observable value. It is the counterpart to `$`:
+
+- `$` **creates** an observable: `$(value)` → `Observable<T>`
+- `$$` **reads** a value: `$$(value)` → `T`
+
+For non-observable values (plain arrays, objects, primitives), `$$` returns the value unchanged. This makes it safe to use on any value regardless of whether it is reactive.
+
+> ⚠️ Never use `$` to read a value — `$(plainValue)` creates a **new** observable wrapping that value, it does not return the value itself.
 
 [Read upstream documentation](https://github.com/wobyjs/soby#get).
 
@@ -805,26 +808,23 @@ function $$ <T> ( value: T ): (T extends ObservableReadonly<infer U> ? U : T);
 Usage:
 
 ```tsx
-import {$$} from 'woby';
+import { $, $$ } from 'woby';
 
-// Getting the value out of an observable
+// Reading an observable — use $$ not $
+const o = $( 123 );
+$$ ( o ); // => 123  ✓
+// $ ( o ); // => Observable<Observable<number>>  ✗ creates a new observable wrapping o
 
-const o = $(123);
+// Reading a plain value — $$ passes it through unchanged
+$$ ( 123 );        // => 123
+$$ ( [1, 2, 3] );  // => [1, 2, 3]  (same array reference, not wrapped)
+$$ ( 'hello' );    // => 'hello'
 
-$$ ( o ); // => 123
-
-// Getting the value out of a function
-
+// Reading a function (treated as a reactive computation)
 $$ ( () => 123 ); // => 123
 
-// Getting the value out of an observable but not out of a function
-
-$$ ( o, false ); // => 123
+// Reading a function without calling it
 $$ ( () => 123, false ); // => () => 123
-
-// Getting the value out of a non-observable and non-function
-
-$$ ( 123 ); // => 123
 ```
 
 ##### Enhanced Observable Functions
@@ -1067,6 +1067,20 @@ import {createElement} from 'woby';
 const element = createElement ( 'div', { class: 'foo' }, 'child' ); // => () => HTMLDivElement
 ```
 
+When `component` is a component function rather than a tag name, children passed as rest arguments
+are merged into its props as `children`, so hyperscript and JSX hand a component the same shape:
+
+```tsx
+const Box = ({ children }) => <div class="box">{children}</div>;
+
+createElement ( Box, { id: 'a' }, 'hello' ); // Box receives { id: 'a', children: 'hello' }
+<Box id="a">hello</Box>;                     // identical
+```
+
+Passing children both ways at once - `createElement ( Box, { children: 'a' }, 'b' )` - is an error,
+so the merge is never ambiguous. This is what lets `html` (which compiles to the classic
+`h(type, props, ...children)` signature) render components that read `props.children`.
+
 #### `h`
 
 This function is just an alias for the `createElement` function, it's more convenient to use if you want to use Woby in hyperscript mode just because it has a much shorter name.
@@ -1268,16 +1282,26 @@ dispose (); // Unmounted and all reactivity inside it stopped
 
 #### `renderToString`
 
-This function operates similarly to `render`, but returns a Promise that resolves to the HTML representation of the rendered component.
+This function operates similarly to `render`, but returns the HTML representation of the rendered component as a string. It is **synchronous** — there is no Promise to await.
 
-The current implementation works within browser-like environments. For server-side usage, [JSDOM](https://github.com/jsdom/jsdom) or similar solutions are required.
-
-This function automatically waits for all `Suspense` boundaries to resolve before returning the HTML.
+No browser and no [JSDOM](https://github.com/jsdom/jsdom) are required: the package ships its own DOM-less node tree that the renderer builds into, so this works unchanged in Node, Deno, Bun, or a worker.
 
 Interface:
 
 ```ts
-function renderToString ( child: JSX.Element ): Promise<string>;
+interface RenderToStringOptions {
+    /** Render into an existing SSR document instead of a fresh one. */
+    document?: SSRDocument;
+    /** Return `{ html, document }` so you can inspect what landed in `document.body`. */
+    returnDocument?: boolean;
+    /** Append to existing content instead of replacing it. */
+    append?: boolean;
+}
+
+function renderToString<T extends RenderToStringOptions = RenderToStringOptions> (
+    child: Child,
+    options?: T
+): T extends { returnDocument: true } ? { html: string; document: SSRDocument } : string;
 ```
 
 Usage:
@@ -1287,8 +1311,47 @@ import {renderToString} from 'woby';
 
 const App = () => <p>Hello, World!</p>;
 
-const html = await renderToString ( <App /> );
+const html = renderToString ( <App /> ); // '<p>Hello, World!</p>'
 ```
+
+Portals and anything else that writes to `document.body` do not appear in the returned markup. Ask for the document back to inspect them:
+
+```tsx
+const {html, document: doc} = renderToString ( <App />, {returnDocument: true} );
+
+doc.querySelector ( '.toast' );      // the portalled node
+doc.querySelectorAll ( 'div' );      // a plain array, not a NodeList
+```
+
+For a custom element, only the host tag is emitted (e.g. `<custom-element></custom-element>`), without shadow root or slot content.
+
+See [Server-Side Rendering](./doc/SSR.md) for the full SSR node API, the supported CSS selector grammar, and the deliberate gaps.
+
+#### `createDocument`
+
+This function builds a fresh, isolated SSR document with its own `head` and `body`. Two documents share nothing, so concurrent renders never collide.
+
+Interface:
+
+```ts
+function createDocument (): SSRDocument;
+```
+
+Usage:
+
+```tsx
+import {createDocument, renderToString} from 'woby';
+
+const doc = createDocument ();
+
+renderToString ( <Header />, {document: doc} );
+renderToString ( <Body />, {document: doc, append: true} );
+
+doc.getElementById ( 'title' );
+doc.contains ( doc.body ); // true
+```
+
+The document exposes `querySelector`, `querySelectorAll`, `getElementById` and `contains`. All four search `head` first, then `body`.
 
 #### `resolve`
 

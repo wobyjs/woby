@@ -5,6 +5,7 @@ Woby provides a powerful API for creating custom HTML elements that integrate se
 ## Table of Contents
 
 - [customElement](#customelement)
+  - [Server-Side Rendering](#server-side-rendering)
   - [Observed Attributes](#observed-attributes)
 - [ElementAttributes](#elementattributes)
   - [Benefits of ElementAttributes](#benefits-of-elementattributes)
@@ -16,6 +17,7 @@ Woby provides a powerful API for creating custom HTML elements that integrate se
   - [Advanced Type Augmentation Example](#advanced-type-augmentation-example)
 - [Attribute to Prop Mapping](#attribute-to-prop-mapping)
 - [Type Conversion](#type-conversion)
+  - [Inferred Types (No `type` Option)](#inferred-types-no-type-option)
 - [Nested Properties](#nested-properties)
 - [Style Properties](#style-properties)
 - [Shadow DOM](#shadow-dom)
@@ -53,6 +55,69 @@ const CustomElementClass = customElement(tagName, component)
 - Component must have default props defined using the `defaults` helper
 - Component props that are observables will be updated with type conversion
 - Tag name must contain a hyphen (per HTML custom element specification)
+
+### Server-Side Rendering
+
+`customElement()` registers **one** of two implementations, picked from the environment at call time:
+
+- **With a DOM** (browser) — a real `customElements.define()` registration, so the browser upgrades the tag natively.
+- **Without a DOM** (Node) — an SSR-only registration, used by `renderToString()`.
+
+`renderToString()` always renders through the SSR document, but it can only expand tags the SSR
+registry knows about. Under Node that registry is populated, so the tag expands to its rendered
+content. In a browser the registration went to `customElements` instead, so the very same
+`renderToString()` call emits the host tag **inert** — attributes and light-DOM children only, with
+no component body:
+
+```tsx
+customElement('tailwind-button', TailwindButton)
+
+// Node
+renderToString(<tailwind-button label="Go" />)
+// → '<tailwind-button label="Go" cls=""><button class="...">Go</button></tailwind-button>'
+
+// Browser
+renderToString(<tailwind-button label="Go" />)
+// → '<tailwind-button label="Go"></tailwind-button>'
+```
+
+Assert against the environment you are actually rendering in; a snapshot compared across both needs
+two expectations. The same split applies to `<context-provider>` — a browser-side `renderToString()`
+does not wrap children in `context()`, so nested providers there resolve to the **outer** value.
+
+#### How the branch is chosen
+
+```ts
+if (globalThis.window && globalThis.document && typeof globalThis.HTMLElement === 'function') {
+    createBrowserCustomElement(tagName, component)
+} else {
+    createSSRCustomElement(tagName, component)
+}
+```
+
+The `typeof globalThis.HTMLElement === 'function'` clause is load-bearing. The browser branch's very
+first statement is `class extends HTMLElement`, so a `window` **without** `HTMLElement` is not a
+browser and taking that branch throws `ReferenceError` before anything else runs. Half-shimmed
+environments are real: some Deno polyfills set `globalThis.window = globalThis` and define no DOM
+constructors at all, and any Node test transitively importing one used to crash on the *first*
+`customElement()` call.
+
+The SSR branch also writes into woby's own registry, so "is this tag defined?" answers on both sides:
+
+```tsx
+import { customElement, ssr } from 'woby'
+
+customElement('x-y', C)
+ssr.customElements.get('x-y')   // defined
+```
+
+Under SSR `_native` is null, so `define` touches only the private map — no native side effects.
+
+#### SSR custom-element limits
+
+Props reach an SSR custom element through the **constructor**. There is no upgrade step, no
+`observedAttributes`, and `whenDefined` is a resolved no-op — calling `setAttribute` on a host does
+not reach the component. See [Server-Side Rendering](./SSR.md).
 
 ### Observed Attributes
 
@@ -470,6 +535,31 @@ customElement('toggle-element', Toggle)
 - `object`: Parsed using `JSON.parse()`, falls back to string on error
 - `symbol`: Created using `Symbol()`
 - Other types: Treated as strings
+
+### Inferred Types (No `type` Option)
+
+When a prop's observable carries no `type` option, the conversion is inferred from that observable's
+**current value** at the moment the attribute changes:
+
+- current value is a `number` → `Number(value)`
+- current value is a `boolean` → `true` for `"true"`, `"1"` or `""` (case-insensitive), `false` otherwise
+- anything else → the raw string, or `fromHtml(value)` when the observable declares one
+
+```tsx
+const Counter = defaults(() => ({
+  value: $(8) // no `type` option - inferred as number from the initial 8
+}), ({ value }) => <div>Count: {value}</div>)
+
+customElement('counter-element', Counter)
+
+// <counter-element value="42"></counter-element>
+// value() === 42 - a number, not the string "42"
+```
+
+This matters on mount as much as on update: `connectedCallback` reflects every attribute already
+present in the HTML back into props, so without inference a `$(8)` prop would be clobbered with the
+string `"8"` the first time the element connects. Declare `type` explicitly whenever the initial
+value does not represent the type you want - for example `$(null, { type: 'number' } as const)`.
 
 ## HTML Utility Types
 
@@ -894,6 +984,38 @@ The output of context usage in JSX looks like:
 ```
 
 Note that `<Counter>` components cannot be used directly in HTML, only custom elements can be used in HTML.
+
+### `@`-Prefix Context Resolution
+
+Custom elements can consume context values directly through HTML attributes using the `@`-prefix syntax — no `useContext()` call inside the component needed.
+
+**Setup** (typically done once at app initialization):
+
+```typescript
+import { createContext, registerContextRef } from 'woby'
+
+const ThemeCtx = createContext('light')
+registerContextRef('theme', ThemeCtx)
+```
+
+**Usage in HTML**:
+
+```html
+<!-- The custom element receives the provider's current value -->
+<theme-context-provider value="dark">
+  <my-element color="@theme"></my-element>
+</theme-context-provider>
+```
+
+**How it works**: When a custom element attribute value starts with `@` (but not `@@`), Woby's `setObservableValue` function intercepts it, looks up the registered context symbol by the dotted name, resolves the nearest provider, and returns the provider's reactive observable. The consumer's prop updates automatically when the provider's value changes.
+
+**Two-way updates**: For JSX-created elements the resolution happens in the constructor, before the component renders — the consumer's default observable is replaced by the context's observable itself. The prop and the context are the **same instance**, so writing to the prop inside the consumer updates the provider and all other consumers. For HTML-created elements the resolution happens in `connectedCallback` (after the component already rendered), so a one-way `effect()` bridge copies context → prop with the prop's `fromHtml` type conversion; the bridge is disposed in `disconnectedCallback`.
+
+**Static mode**: `<theme-context-provider static value="dark">` (or `<ThemeCtx.Provider static ...>` in JSX) makes consumers receive a one-time snapshot instead of the live observable.
+
+**Escape syntax**: `@@` produces a literal `@` value (e.g. `@@literal` → `"@literal"`).
+
+For full documentation, see the [Context API `@`-Prefix Section](./CONTEXT_API.md#-prefix-context-resolution-in-html-attributes).
 
 ## HTML Attribute Serialization
 

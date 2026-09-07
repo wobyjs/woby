@@ -5,6 +5,7 @@
 import { BaseNode } from "./base_node"
 import { Comment } from "./comment"
 import { Element } from "./element"
+import { querySelector as 查询, querySelectorAll as 查询全部, getElementById as 按ID查询 } from './selector'
 import type { FN } from "../types"
 
 type EventListenerObject = {
@@ -163,6 +164,10 @@ export interface SSRDocument {
         listener: EventListenerOrEventListenerObject
         options?: boolean | AddEventListenerOptions
     }>
+    querySelector: (selector: string) => any | null
+    querySelectorAll: (selector: string) => any[]
+    getElementById: (id: string) => any | null
+    contains: (node: any) => boolean
 }
 
 /**
@@ -173,6 +178,13 @@ export const createDocument = (): SSRDocument => {
     // Mock body and head elements for SSR - fresh instance per document
     const body = createElement('body')
     const head = createElement('head')
+
+    /**
+     * Mark a node as belonging to this document, so `node.ownerDocument` answers even
+     * while the node is still detached — which is how `整理外框`-style code gets a
+     * factory to build siblings with before it inserts anything.
+     */
+    const 归属 = <T>(node: T): T => { (node as any)._ownerDocument = doc; return node }
 
     const doc = {
         // Map to store event listeners - isolated per document instance
@@ -203,25 +215,44 @@ export const createDocument = (): SSRDocument => {
             return this._eventListeners.get(type) || []
         },
 
-        createComment,
+        // Everything this document hands out is stamped as belonging to it.
+        createComment: ((content: string) => 归属(createComment(content))) as typeof createComment,
         createElement: ((tagName: string) => {
-            return createElement(tagName)
+            return 归属(createElement(tagName))
         }) as typeof createElement,
         createElementNS: ((namespaceURI: string, qualifiedName: string) => {
             if (namespaceURI === 'http://www.w3.org/2000/svg') {
-                return createSVGNode(qualifiedName)
+                return 归属(createSVGNode(qualifiedName))
             }
-            return createElement(qualifiedName)
+            return 归属(createElement(qualifiedName))
         }) as any as FN<[string, string], Element>,
-        createTextNode: createText,
-        createDocumentFragment,
+        createTextNode: ((text: string) => 归属(createText(text))) as typeof createText,
+        createDocumentFragment: (() => 归属(createDocumentFragment())) as typeof createDocumentFragment,
+
+        /**
+         * Tree queries over the document. head and body are searched explicitly rather
+         * than through a `childNodes` array, because this document is a plain object and
+         * giving it real child bookkeeping would put it in the render path's way for no
+         * gain — nothing ever inserts a sibling of <body> here.
+         */
+        querySelector: (selector: string) => 查询(head, selector) ?? 查询(body, selector),
+        querySelectorAll: (selector: string) => [...查询全部(head, selector), ...查询全部(body, selector)],
+        getElementById: (id: string) => 按ID查询(head, id) ?? 按ID查询(body, id),
+        contains: (node: any) => head.contains(node) || body.contains(node),
 
         // Body and head properties for portal component and style injection - isolated per instance
         body,
         head
     };
 
-    (body as any).parentNode = doc
+    // NOTE: deliberately no `nodeType: 9` here. `BaseNode.isConnected` looks for exactly
+    // that to decide a node is in a document, and `methods/context_ref.ts` branches on
+    // isConnected to tell the constructor path from the connectedCallback path. Stamping
+    // the document as a node would silently flip every SSR render onto the other branch.
+    // `_ownerDocument` gives `ownerDocument` its answer without touching that.
+    (body as any).parentNode = doc;
+    (body as any)._ownerDocument = doc;
+    (head as any)._ownerDocument = doc
     return doc
 }
 

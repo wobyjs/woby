@@ -94,6 +94,13 @@ export const createSSRCustomElement = <P extends { children?: Observable<Child> 
 
     // Register the component in our dictionary
     ces.define(tagName, ComponentCustomElement as any)
+
+    // …and in the woby-owned registry, so `wobyCustomElements.get(tag)` is the ONE
+    // lookup that answers in both environments. The browser branch already writes
+    // there; without this line the SSR branch left it empty, so any code asking
+    // "is this tag registered?" had to know which branch had run. In SSR `_native`
+    // is null, so `define` only touches the private Map — no native side effects.
+    wobyCustomElements.define(tagName, ComponentCustomElement as any)
 }
 
 /**
@@ -988,7 +995,16 @@ export const customElement = <P extends { children?: Observable<JSX.Child> }>(ta
     // custom elements that Node leaves inert (the playground registers them from its
     // browser-only default export), so the two suites diverge in the other direction.
     // Fixing this properly means registering custom elements identically in both suites.
-    if (globalThis.window && globalThis.document) {
+    // `HTMLElement` is part of the test, not decoration: the browser branch's very first
+    // statement is `class extends HTMLElement`, so a `window` without it is not a browser
+    // and taking that branch is a guaranteed ReferenceError. Half-shims are real and they
+    // are upstream of us — `@woby/chk` bundles a Deno polyfill that does
+    // `globalThis.window = globalThis` and defines no DOM constructors at all, so any node
+    // test that transitively imports it (anything reaching `@woby/wui`) used to crash here
+    // on the FIRST `customElement()` call, before a single assertion ran. Requiring the one
+    // global the branch actually consumes sends those environments down the SSR path, which
+    // is what they wanted.
+    if (globalThis.window && globalThis.document && typeof globalThis.HTMLElement === 'function') {
         createBrowserCustomElement(tagName, component)
     } else {
         createSSRCustomElement(tagName, component)

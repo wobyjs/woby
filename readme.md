@@ -20,7 +20,7 @@ This works similarly to [Solid](https://www.solidjs.com), but without a custom B
 - **No key prop**: developers can map over arrays directly or use the `For` component with an array of unique values, eliminating the need to specify keys explicitly.
 - **No Babel**: this framework works with plain JavaScript (plus JSX support), eliminating the need for Babel transforms. As a result, there are zero transform function bugs since no code transformation is required.
 - **No magic**: Woby follows a transparent approach where your code behaves exactly as written, with no hidden transformations or unexpected behavior.
-- **Client-focused**: this framework is currently focused on client-side rich applications. Server-related features such as hydration, server components, SSR, and streaming are not implemented at this time.
+- **String rendering without a DOM**: `renderToString` is synchronous and runs on a built-in DOM-less node tree, so components render in Node, Deno, Bun, or a worker with no JSDOM. That tree carries the standard traversal, mutation and query API — including a CSS selector engine — so you can inspect what you just rendered. See [Server-Side Rendering](./doc/SSR.md). Hydration, server components, and streaming are still not implemented.
 - **Observable-based**: observables are at the core of the reactivity system. While the approach differs significantly from React-like systems and may require an initial learning investment, it provides substantial benefits in terms of performance and developer experience.
 - **Minimal dependencies**: Woby is designed with a focus on minimal third-party dependencies, providing a streamlined API for developers who prefer a lightweight solution. The framework draws inspiration from [Solid](https://www.solidjs.com) while offering its own unique approach to reactive programming.
 - **Built-in Class Management**: Woby includes powerful built-in class management that supports complex class expressions similar to `classnames` and `clsx` libraries, with full reactive observable support.
@@ -502,7 +502,7 @@ customElement('styled-counter', Counter)
 | [`store`](#store)                 |                           | [`usePromise`](#usepromise)       |                                    |                          |
 | [`template`](#template)           |                           | [`useReaction`](#usereaction)     |                                    |                          |
 | [`untrack`](#untrack)             |                           | [`useReadonly`](#usereadonly)     |                                    |                          |
-|                                    |                           | [`useResolved`](#useresolved)     |                                    |                          |
+| [`createDocument`](#createdocument) |                           | [`useResolved`](#useresolved)     |                                    |                          |
 |                                    |                           | [`useResource`](#useresource)     |                                    |                          |
 |                                    |                           | [`useRoot`](#useroot)             |                                    |                          |
 |                                    |                           | [`useSelector`](#useselector)     |                                    |                          |
@@ -1282,16 +1282,26 @@ dispose (); // Unmounted and all reactivity inside it stopped
 
 #### `renderToString`
 
-This function operates similarly to `render`, but returns a Promise that resolves to the HTML representation of the rendered component.
+This function operates similarly to `render`, but returns the HTML representation of the rendered component as a string. It is **synchronous** — there is no Promise to await.
 
-The current implementation works within browser-like environments. For server-side usage, [JSDOM](https://github.com/jsdom/jsdom) or similar solutions are required.
-
-This function automatically waits for all `Suspense` boundaries to resolve before returning the HTML.
+No browser and no [JSDOM](https://github.com/jsdom/jsdom) are required: the package ships its own DOM-less node tree that the renderer builds into, so this works unchanged in Node, Deno, Bun, or a worker.
 
 Interface:
 
 ```ts
-function renderToString ( child: JSX.Element ): Promise<string>;
+interface RenderToStringOptions {
+    /** Render into an existing SSR document instead of a fresh one. */
+    document?: SSRDocument;
+    /** Return `{ html, document }` so you can inspect what landed in `document.body`. */
+    returnDocument?: boolean;
+    /** Append to existing content instead of replacing it. */
+    append?: boolean;
+}
+
+function renderToString<T extends RenderToStringOptions = RenderToStringOptions> (
+    child: Child,
+    options?: T
+): T extends { returnDocument: true } ? { html: string; document: SSRDocument } : string;
 ```
 
 Usage:
@@ -1301,8 +1311,47 @@ import {renderToString} from 'woby';
 
 const App = () => <p>Hello, World!</p>;
 
-const html = await renderToString ( <App /> );
+const html = renderToString ( <App /> ); // '<p>Hello, World!</p>'
 ```
+
+Portals and anything else that writes to `document.body` do not appear in the returned markup. Ask for the document back to inspect them:
+
+```tsx
+const {html, document: doc} = renderToString ( <App />, {returnDocument: true} );
+
+doc.querySelector ( '.toast' );      // the portalled node
+doc.querySelectorAll ( 'div' );      // a plain array, not a NodeList
+```
+
+For a custom element, only the host tag is emitted (e.g. `<custom-element></custom-element>`), without shadow root or slot content.
+
+See [Server-Side Rendering](./doc/SSR.md) for the full SSR node API, the supported CSS selector grammar, and the deliberate gaps.
+
+#### `createDocument`
+
+This function builds a fresh, isolated SSR document with its own `head` and `body`. Two documents share nothing, so concurrent renders never collide.
+
+Interface:
+
+```ts
+function createDocument (): SSRDocument;
+```
+
+Usage:
+
+```tsx
+import {createDocument, renderToString} from 'woby';
+
+const doc = createDocument ();
+
+renderToString ( <Header />, {document: doc} );
+renderToString ( <Body />, {document: doc, append: true} );
+
+doc.getElementById ( 'title' );
+doc.contains ( doc.body ); // true
+```
+
+The document exposes `querySelector`, `querySelectorAll`, `getElementById` and `contains`. All four search `head` first, then `body`.
 
 #### `resolve`
 

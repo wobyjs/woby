@@ -4,6 +4,7 @@
 
 import $ from "soby"
 import { SimpleNodeList } from './simple_node_list'
+import { matchesSelector, closestSelector, querySelector, querySelectorAll, descendantElements } from './selector'
 import type { MutationRecord } from './mutation_record'
 import type { MutationObserverInit } from './mutation_observer_init'
 
@@ -12,6 +13,11 @@ export class BaseNode {
     attributes: Record<string, string>
     childNodes: any[]
     parentNode: any | null
+    /**
+     * Stamped by `document.createElement` and friends. Nodes built by the bare
+     * module-level factories carry none and inherit one from an ancestor instead.
+     */
+    _ownerDocument: any = null
     // Observable for tracking mutations
     _mutations$: any
     // List of observers watching this node
@@ -126,6 +132,10 @@ export class BaseNode {
     }
 
     appendChild(child: any) {
+        // A node has exactly one parent. Moving one used to leave it listed under BOTH
+        // parents, so a dragged block stayed inside the frame it had just left.
+        if (child?.parentNode) child.parentNode.removeChild(child)
+
         const previousSibling = this.childNodes.length > 0 ? this.childNodes[this.childNodes.length - 1] : null
 
         // Set the parent node
@@ -161,6 +171,10 @@ export class BaseNode {
         if (referenceNode === null) {
             return this.appendChild(newNode)
         }
+
+        // Detach before indexing: when the node is moving WITHIN this parent, the
+        // reference node's index only settles once the old slot is gone.
+        if (newNode?.parentNode) newNode.parentNode.removeChild(newNode)
 
         const index = this.childNodes.indexOf(referenceNode)
         if (index === -1) {
@@ -437,14 +451,91 @@ export class BaseNode {
         return ''
     }
 
-    // Getter for ownerDocument (returns null as basic implementation)
+    /**
+     * The document this node belongs to: the one it was created by, or failing that the
+     * one an ancestor was created by. A node built off-document still has an owner, which
+     * is what lets code do `node.ownerDocument.createElement(...)` before it is inserted.
+     */
     get ownerDocument(): any | null {
+        if (this._ownerDocument) return this._ownerDocument
+        for (let p: any = this.parentNode; p; p = p.parentNode) {
+            if (p.nodeType === 9) return p
+            if (p._ownerDocument) return p._ownerDocument
+        }
         return null
     }
 
-    // Getter for parentElement (returns parent if it's an element)
+    /** The parent, but only when it is an element — a document or fragment parent gives null. */
     get parentElement(): any | null {
-        return this.parentNode
+        return this.parentNode?.nodeType === 1 ? this.parentNode : null
+    }
+
+    /** Element children only, skipping text and comment nodes. */
+    get children(): any[] {
+        return this.childNodes.filter((c: any) => c?.nodeType === 1)
+    }
+
+    get firstElementChild(): any | null {
+        return this.children[0] ?? null
+    }
+
+    get lastElementChild(): any | null {
+        const els = this.children
+        return els[els.length - 1] ?? null
+    }
+
+    get nextElementSibling(): any | null {
+        const sibs: any[] = this.parentNode?.childNodes ?? []
+        for (let i = sibs.indexOf(this) + 1; i > 0 && i < sibs.length; i++)
+            if (sibs[i]?.nodeType === 1) return sibs[i]
+        return null
+    }
+
+    get previousElementSibling(): any | null {
+        const sibs: any[] = this.parentNode?.childNodes ?? []
+        for (let i = sibs.indexOf(this) - 1; i >= 0; i--)
+            if (sibs[i]?.nodeType === 1) return sibs[i]
+        return null
+    }
+
+    /** Detach this node from its parent. No-op when it has none, exactly like the DOM. */
+    remove(): void {
+        this.parentNode?.removeChild(this)
+    }
+
+    /** Does this node itself match the selector? Always false for non-elements. */
+    matches(selector: string): boolean {
+        return matchesSelector(this, selector)
+    }
+
+    /** Nearest self-or-ancestor matching the selector, or null. */
+    closest(selector: string): any | null {
+        return closestSelector(this, selector)
+    }
+
+    /** First descendant matching the selector, in document order. Shadow trees are not entered. */
+    querySelector(selector: string): any | null {
+        return querySelector(this, selector)
+    }
+
+    /** Every descendant matching the selector, in document order, as a plain array. */
+    querySelectorAll(selector: string): any[] {
+        return querySelectorAll(this, selector)
+    }
+
+    getElementsByTagName(tagName: string): any[] {
+        if (tagName === '*') return [...descendantElements(this)]
+        const want = tagName.toLowerCase()
+        return [...descendantElements(this)].filter((el: any) => el.tagName?.toLowerCase() === want)
+    }
+
+    getElementsByClassName(classNames: string): any[] {
+        const want = classNames.split(/\s+/).filter(Boolean)
+        if (!want.length) return []
+        return [...descendantElements(this)].filter((el: any) => {
+            const have = String(el.attributes?.['class'] ?? '').split(/\s+/)
+            return want.every(c => have.includes(c))
+        })
     }
 
     // // Basic cloneNode implementation
@@ -464,12 +555,22 @@ export class BaseNode {
         return 0
     }
 
+    /** True for self and for any descendant, as the DOM defines it. */
     contains(other: any): boolean {
+        for (let n: any = other; n; n = n.parentNode)
+            if (n === this) return true
         return false
     }
 
+    /**
+     * The topmost node of this node's tree — the document when connected, otherwise the
+     * outermost detached ancestor. (It used to return `ownerDocument`, which is a
+     * different thing entirely once a node can have one while still being detached.)
+     */
     getRootNode(): any {
-        return this.ownerDocument || this
+        let n: any = this
+        while (n.parentNode) n = n.parentNode
+        return n
     }
 
     hasChildNodes(): boolean {

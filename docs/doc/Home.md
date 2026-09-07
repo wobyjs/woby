@@ -19,6 +19,7 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 
 ### Advanced Topics
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
+- **[Server-Side Rendering](./SSR.md)** - `renderToString`, the SSR node tree, and the CSS selector engine
 - **[Custom Elements](./CUSTOM_ELEMENTS.md)** - Creating web components with Woby
 - **[Custom Element Best Practices](./Custom-Element-Best-Practices.md)** - Best practices for custom elements
 - **[Component Defaults](./CUSTOM_ELEMENTS.md#component-defaults-and-two-way-synchronization)** - Two-way synchronization for custom elements
@@ -37,6 +38,7 @@ Welcome to the Woby documentation wiki! This guide covers everything you need to
 | **Examples** | [Examples Gallery](./Examples.md) |
 | **Class Management** | [Class Management](./Class-Management.md) |
 | **Context API** | [Context](./Context.md) |
+| **SSR** | [Server-Side Rendering](./SSR.md) |
 | **Custom Elements** | [Custom Elements](./CUSTOM_ELEMENTS.md) • [Custom Element Best Practices](./Custom-Element-Best-Practices.md) • [Component Defaults](./CUSTOM_ELEMENTS.md#component-defaults-and-two-way-synchronization) |
 | **Demos** | [Counter Demo](./demos/Counter-Demo.md) • [Nested Properties Demo](./demos/Nested-Properties-Demo.md) • [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md) |
 | **Help** | [FAQ](./FAQ.md) • [Contributing](./Contributing.md) |
@@ -55,6 +57,7 @@ Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, pro
 - **No Babel**: Works with plain JavaScript and JSX
 - **Built-in Class Management**: Advanced class handling similar to `classnames`/`clsx`
 - **Custom Elements**: Create standard web components with full two-way synchronization
+- **Server-Side Rendering**: Synchronous `renderToString` with a built-in DOM-less node tree — no JSDOM required
 
 ## 📖 Learning Path
 
@@ -76,6 +79,7 @@ Woby is built upon the [Woby](https://github.com/wobyjs/woby) reactive core, pro
 - [Best Practices](./Best-Practices.md)
 
 ### 4. **Specialized Topics**
+- [Server-Side Rendering](./SSR.md)
 - [Custom Element Best Practices](./Custom-Element-Best-Practices.md)
 - [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md)
 - [Woby vs React](./Woby-vs-React.md)

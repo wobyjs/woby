@@ -19,6 +19,7 @@ export * from './custom_elements'
 export * from './document'
 export * from './comment'
 export * from './element'
+export * from './selector'
 
 
 

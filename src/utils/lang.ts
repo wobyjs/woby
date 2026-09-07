@@ -101,7 +101,12 @@ export const isNil = (value: unknown): value is null | undefined => {
 
 export const isNode = (value: unknown): value is Node => {
 
-  return value instanceof Node
+  // Structural, not `value instanceof Node`: `Node` is a browser global, so the
+  // instanceof form throws ReferenceError under SSR rather than answering false.
+  // Every real DOM node carries a numeric `nodeType`, and so does every node in
+  // woby's own SSR tree, so this one test answers correctly in both environments
+  // (and across realms, which instanceof never did).
+  return !!value && typeof (value as any).nodeType === 'number'
 
 }
 

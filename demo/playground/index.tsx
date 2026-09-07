@@ -349,6 +349,17 @@ import TestTailwindNoImportHTML from './src/TestTailwindNoImportHTML'
 import TestTailwindWithImportHTML from './src/TestTailwindWithImportHTML'
 import TestHtmlOnClick from './src/TestHtmlOnClick.html'
 import TestAttrRemovalRestoresDefault from './src/TestAttrRemovalRestoresDefault.html'
+import TestSsrCustomElement from './src/TestSsrCustomElement'
+import TestSsrDocumentQuery from './src/TestSsrDocumentQuery'
+import TestSsrElement from './src/TestSsrElement'
+import TestSsrIdentity from './src/TestSsrIdentity'
+import TestSsrMutation from './src/TestSsrMutation'
+import TestSsrReactiveChild from './src/TestSsrReactiveChild'
+import TestSsrSelectorMatch from './src/TestSsrSelectorMatch'
+import TestSsrSelectorParse from './src/TestSsrSelectorParse'
+import TestSsrSelectorQuery from './src/TestSsrSelectorQuery'
+import TestSsrSelectorThrows from './src/TestSsrSelectorThrows'
+import TestSsrTraversal from './src/TestSsrTraversal'
 
 // globalThis.Woby = Woby
 
@@ -585,6 +596,18 @@ const tests = [
 	TestSelectStaticOption,
 	TestSelectStaticValue,
 	TestSimpleExpect,
+
+	TestSsrCustomElement,
+	TestSsrDocumentQuery,
+	TestSsrElement,
+	TestSsrIdentity,
+	TestSsrMutation,
+	TestSsrReactiveChild,
+	TestSsrSelectorMatch,
+	TestSsrSelectorParse,
+	TestSsrSelectorQuery,
+	TestSsrSelectorThrows,
+	TestSsrTraversal,
 
 	TestStringFunction,
 	TestStringObservable,

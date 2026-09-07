@@ -11,6 +11,7 @@ This document covers the essential methods and functions provided by Woby for bu
 - [Batching](#batching)
 - [Untracking](#untracking)
 - [Component Rendering](#component-rendering)
+- [String Rendering (renderToString)](#string-rendering-rendertostring)
 - [Context Creation (createContext)](#context-creation-createcontext)
 - [Custom Elements (customElement)](#custom-elements-customelement)
 - [Object Assignment (assign)](#object-assignment-assign)
@@ -323,6 +324,50 @@ const Component = () => {
 - Function expressions (`{() => $$(userName)}`) are automatically tracked and suitable for complex expressions
 - `useMemo` is unnecessary for simple expressions since `() =>` is automatically tracked
 - Avoid `{$$()}` patterns as they only execute once and are not reactive
+
+## String Rendering (renderToString)
+
+Render a component to an HTML string with no browser and no JSDOM. `renderToString` is
+**synchronous** — it returns a `string`, not a `Promise`.
+
+```typescript
+import { renderToString } from 'woby'
+
+const App = () => <p>Hello, World!</p>
+
+const html = renderToString(<App />)
+// '<p>Hello, World!</p>'
+```
+
+Options:
+
+```typescript
+interface RenderToStringOptions {
+  document?: SSRDocument   // render into an existing SSR document
+  returnDocument?: boolean // return { html, document } instead of a bare string
+  append?: boolean         // append instead of replacing
+}
+```
+
+Portals and anything else writing to `document.body` do not appear in the returned markup —
+pass `returnDocument: true` and query the document to inspect them:
+
+```typescript
+import { createDocument, renderToString } from 'woby'
+
+const { html, document: doc } = renderToString(<App />, { returnDocument: true })
+doc.querySelector('.toast')      // the portalled node
+doc.querySelectorAll('div')      // a plain array, not a NodeList
+```
+
+`createDocument()` builds a fresh, isolated document — two documents share nothing, so
+concurrent renders never collide.
+
+The SSR node tree supports the standard traversal, mutation and query API
+(`children`, `closest`, `matches`, `querySelector`, `querySelectorAll`,
+`getElementsByTagName`, `getElementsByClassName`, `getElementById`, `contains`) backed by a
+built-in CSS selector engine. See **[Server-Side Rendering](./SSR.md)** for the full surface,
+the supported selector grammar, and the deliberate gaps.
 
 ## Stores
 

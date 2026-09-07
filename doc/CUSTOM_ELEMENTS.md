@@ -85,6 +85,40 @@ Assert against the environment you are actually rendering in; a snapshot compare
 two expectations. The same split applies to `<context-provider>` — a browser-side `renderToString()`
 does not wrap children in `context()`, so nested providers there resolve to the **outer** value.
 
+#### How the branch is chosen
+
+```ts
+if (globalThis.window && globalThis.document && typeof globalThis.HTMLElement === 'function') {
+    createBrowserCustomElement(tagName, component)
+} else {
+    createSSRCustomElement(tagName, component)
+}
+```
+
+The `typeof globalThis.HTMLElement === 'function'` clause is load-bearing. The browser branch's very
+first statement is `class extends HTMLElement`, so a `window` **without** `HTMLElement` is not a
+browser and taking that branch throws `ReferenceError` before anything else runs. Half-shimmed
+environments are real: some Deno polyfills set `globalThis.window = globalThis` and define no DOM
+constructors at all, and any Node test transitively importing one used to crash on the *first*
+`customElement()` call.
+
+The SSR branch also writes into woby's own registry, so "is this tag defined?" answers on both sides:
+
+```tsx
+import { customElement, ssr } from 'woby'
+
+customElement('x-y', C)
+ssr.customElements.get('x-y')   // defined
+```
+
+Under SSR `_native` is null, so `define` touches only the private map — no native side effects.
+
+#### SSR custom-element limits
+
+Props reach an SSR custom element through the **constructor**. There is no upgrade step, no
+`observedAttributes`, and `whenDefined` is a resolved no-op — calling `setAttribute` on a host does
+not reach the component. See [Server-Side Rendering](./SSR.md).
+
 ### Observed Attributes
 
 When you register a custom element, Woby automatically observes all props defined in your component's `def()` function. This means that HTML attributes corresponding to these props will be automatically synchronized with the component's props. For example:

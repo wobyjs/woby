@@ -36,6 +36,19 @@
 
 import { createComment } from "./creators"
 import type { Comment as CommentSSR } from "../ssr/comment"
+import { BaseNode } from "../ssr/base_node"
+
+// `Node` is a browser global: outside a browser `x instanceof Node` does not return
+// false, it throws ReferenceError — so every reactive child (`{() => cond && <p/>}`)
+// crashed here under SSR before reaching the diff at all. Falling back to woby's own
+// base node is the same trick `fragment.ts` already uses, and it keeps the three
+// `instanceof` tests below meaningful in both environments.
+//
+// It is deliberately NOT named `Node`: shadowing the global would also shadow the DOM
+// `Node` *type*, and every `instanceof` below would then narrow to `BaseNode | Node`
+// and stop assigning to the `Node`-typed parameters it feeds. The cast keeps the
+// narrowing exactly what it was before, while the value stays environment-correct.
+const 节点类 = (globalThis.Node ?? BaseNode) as unknown as typeof globalThis.Node
 
 
 // This is just a slightly customized version of udomdiff: with types, no accessor function and support for diffing unwrapped nodes
@@ -73,8 +86,8 @@ const afterDummyWrapper: [Node | Comment | CommentSSR] = [dummyNode]
  */
 export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[], after: (Node | Node | Comment | CommentSSR)[], nextSibling: Node | null): void => {
   if (before === after) return
-  if (before instanceof Node) {
-    if (after instanceof Node) {
+  if (before instanceof 节点类) {
+    if (after instanceof 节点类) {
       if (before.parentNode === parent) { // Safety check, since setChildStatic may trigger this
         parent.replaceChild(after, before)
         return
@@ -84,7 +97,7 @@ export const diff = (parent: Node, before: (Node | Node | Comment | CommentSSR)[
     beforeDummyWrapper[0] = before
     before = beforeDummyWrapper
   }
-  if (after instanceof Node) {
+  if (after instanceof 节点类) {
     afterDummyWrapper[0] = after
     after = afterDummyWrapper
   }

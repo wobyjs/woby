@@ -93,6 +93,10 @@ export class Element extends BaseNode {
 
     removeAttribute(name: string) {
         delete this.attributes[name]
+        // `className` is mirrored in a private field, so dropping the attribute has to
+        // clear it too — otherwise getAttribute('class') reads null while .className
+        // still reports the old string.
+        if (name === 'class' || name === 'className') this.#className = ''
         super.removeAttribute(name)
     }
 
@@ -273,12 +277,15 @@ export class Element extends BaseNode {
             // Insert new nodes at our position
             for (let i = 0; i < convertedNodes.length; i++) {
                 const node = convertedNodes[i]
+                // `?? null` matters: we already removed ourselves, so when this node was
+                // the LAST child the slot we vacated is now past the end. insertBefore
+                // treats null as "append" but throws on undefined.
                 if (i === 0) {
                     // For the first node, use the original position
-                    parent.insertBefore(node as any, parent.childNodes[index] as any)
+                    parent.insertBefore(node as any, (parent.childNodes[index] ?? null) as any)
                 } else {
                     // For subsequent nodes, insert after the previous one
-                    parent.insertBefore(node as any, parent.childNodes[index + i] as any)
+                    parent.insertBefore(node as any, (parent.childNodes[index + i] ?? null) as any)
                 }
             }
         }

@@ -17,6 +17,8 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 - **[Reactivity System](./Reactivity-System.md)** - Understanding observables
 - **[Class Management](./Class-Management.md)** - Advanced class handling with reactive support
 - **[Context](./Context.md)** - Context API for sharing data between components
+- **[Context API Updates v2.0.32](./CONTEXT_API_UPDATES_v2.0.32.md)** - Latest updates: `visible` prop, `isStatic` handling, and improved provider behavior
+- **[Server-Side Rendering](./SSR.md)** - `renderToString`, the SSR node tree, and the CSS selector engine
 - **[Best Practices](./Best-Practices.md)** - Recommended patterns and practices
 - **[Woby vs React](./Woby-vs-React.md)** - API differences and migration guide
 - **[React to Woby Type Conversion](./React-to-Woby-Type-Conversion.md)** - Type mapping guide for React developers
@@ -45,10 +47,12 @@ This directory contains the comprehensive documentation wiki for the Woby framew
 | **See examples** | [Examples](./Examples.md) |
 | **Manage classes** | [Class Management](./Class-Management.md) |
 | **Share data between components** | [Context](./Context.md) |
+| **Learn about latest Context API updates** | [Context API Updates v2.0.32](./CONTEXT_API_UPDATES_v2.0.32.md) |
 | **Find a specific function** | [Core Methods](./Core-Methods.md) or [Hooks](./Hooks.md) |
 | **Learn best practices** | [Best Practices](./Best-Practices.md) |
 | **Compare with React** | [Woby vs React](./Woby-vs-React.md) |
 | **Convert React types** | [React to Woby Type Conversion](./React-to-Woby-Type-Conversion.md) |
+| **Render to a string without a DOM** | [Server-Side Rendering](./SSR.md) |
 | **Implement custom elements** | [Custom Elements](./CUSTOM_ELEMENTS.md) |
 | **Learn custom element best practices** | [Custom Element Best Practices](./Custom-Element-Best-Practices.md) |
 | **See practical custom element examples** | [Custom Element Practical Guide](./demos/Custom-Element-Practical-Guide.md) |
