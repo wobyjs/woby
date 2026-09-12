@@ -29,6 +29,8 @@ Woby provides a powerful API for creating custom HTML elements that integrate se
 - [Component Defaults and Two-Way Synchronization](#component-defaults-and-two-way-synchronization)
 - [The defaults Function](#the-defaults-function)
 - [How Two-Way Synchronization Works](#how-two-way-synchronization-works)
+  - [Attribute Removal](#attribute-removal)
+  - [Booleans and Self-Removal](#booleans-and-self-removal)
 - [Key Requirements for Synchronization](#key-requirements-for-synchronization)
 - [Handling Different Prop Sources](#handling-different-prop-sources)
 - [Functions and Complex Objects](#functions-and-complex-objects)
@@ -1154,6 +1156,55 @@ When props change programmatically, the corresponding HTML attributes are update
 const count = $(10)
 // When count changes, the HTML attribute is automatically updated
 ```
+
+### Attribute Removal
+
+Removing an attribute is how the platform says "this prop is unset". Woby restores the prop to the
+value it held **before any attribute was applied** — the declared default from `def()`, captured
+when the element was constructed:
+
+```html
+<counter-element label="Overridden"></counter-element>
+```
+
+```typescript
+el.removeAttribute('label')   // label() === 'Default Label' again, not 'Overridden'
+```
+
+`null` is never forwarded into the observable. A typed observable rejects it outright
+(`$('x', HtmlString)` throws on `set(null)`), and because the sync runs inside a `MutationObserver`
+callback, an escaping throw would also drop every remaining mutation in the same batch.
+
+If the recorded default is itself not assignable — `$(undefined, HtmlClass)` is the common case,
+since soby accepts `undefined` at construction but rejects it on every later `set()` — woby falls
+back to the declared type's empty value (`''` for `String`, `0` for `Number`, `false` for
+`Boolean`). Removing an attribute that was never set is a no-op.
+
+### Booleans and Self-Removal
+
+A boolean prop has no "false" attribute form: `HtmlBoolean.toHtml(false)` is `undefined`, so
+reflecting `false` onto the host means **removing** the attribute. The host observes its own
+attributes, so that removal comes straight back as a mutation — indistinguishable, from the record
+alone, from a consumer calling `removeAttribute`.
+
+Woby tells the two apart by provenance: the reflecting side records what it removed, and the
+observing side consumes that record. A removal woby performed is ignored; a removal anyone else
+performed still restores the declared default. Both directions therefore behave as written:
+
+```tsx
+const enabled = $(true, HtmlBoolean)
+
+;<flag-element enabled={enabled} />
+
+enabled(false)   // prop stays false, and the `enabled` attribute is gone
+```
+
+Before this, the reflection loop undid the write — a boolean prop whose construction-time value was
+`true` could never be set to `false`, because every `false` triggered a removal that restored the
+`true` snapshot.
+
+This applies to any prop whose new value reflects to no attribute, not just booleans: `undefined`
+and `null` reflect the same way.
 
 ## Key Requirements for Synchronization
 

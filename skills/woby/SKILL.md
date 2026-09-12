@@ -239,6 +239,35 @@ HTML attributes are always strings — converters handle the coercion:
 | Object/Array | custom | `$({}, { toHtml: JSON.stringify, fromHtml: JSON.parse })` |
 | string | none | `$('')` |
 
+#### Attribute removal and the `false` / `undefined` form
+
+A converter that maps a value to `undefined` has no attribute form — `HtmlBoolean.toHtml(false)` is
+`undefined` — so writing that value **removes** the host attribute rather than setting it. Two rules
+fall out:
+
+```tsx
+const enabled = $(true, HtmlBoolean)
+;<flag-element enabled={enabled} />
+
+enabled(false)   // prop is false, and the `enabled` attribute is gone from the host
+```
+
+1. **Woby's own removal is not an "unset".** The host observes its own attributes, so the reflection
+   above comes straight back as a mutation. Woby records what it removed and ignores it, so a
+   boolean prop starting at `true` can be set to `false` and stays `false`. (Before woby 2.0.169
+   this looped: the write was immediately undone by the declared-default restore.)
+2. **Anyone else's removal restores the declared default** from `defaults()` — not the attribute's
+   last value, and never `null`:
+
+   ```ts
+   el.setAttribute('label', 'Overridden')
+   el.removeAttribute('label')   // label() === the def() default again
+   ```
+
+   If the declared default is itself unassignable — `$(undefined, HtmlClass)` is the usual case,
+   since soby accepts `undefined` at construction but rejects it on later `set()` — woby falls back
+   to the type's empty value (`''`, `0`, `false`).
+
 ### Step 3: Derive Values with `useMemo`
 
 ```typescript

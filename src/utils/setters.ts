@@ -19,6 +19,46 @@ import type { Child, Classes, DirectiveData, EventListener, Fragment, FunctionMa
 import { Stack, callStack } from '../soby'
 import { useEnvironment } from '../components/environment_context'
 
+/**
+ * Attribute removals that woby performed itself, per element, per attribute.
+ *
+ * A woby custom element reflects its props onto its own host attributes and simultaneously
+ * watches those attributes with a MutationObserver, so it sees its own writes. That is
+ * harmless for a set — the value round-trips — but a removal is ambiguous. `removeAttribute`
+ * is how the reflection expresses a nil or `false` value (HtmlBoolean.toHtml(false) is
+ * undefined), and it is also how a consumer says "unset this prop, put its declared default
+ * back". The mutation record alone cannot tell the two apart, so the reflecting side records
+ * what it did and the observing side consumes that record.
+ *
+ * Only elements that install the map opt in, so nothing is allocated for ordinary DOM nodes.
+ * Counts rather than a flag: a batch delivers one observer callback per mutation record, so
+ * two self-removals of the same attribute must suppress two restores.
+ */
+export const SYMBOL_SELF_REMOVED_ATTRIBUTES = Symbol('woby.selfRemovedAttributes')
+
+/** Opt `element` in. Until this runs, self-removals on it are not recorded at all. */
+export const trackSelfRemovedAttributes = (element: HTMLElement): Map<string, number> =>
+    (element as any)[SYMBOL_SELF_REMOVED_ATTRIBUTES] ??= new Map<string, number>()
+
+const markSelfRemovedAttribute = (element: HTMLElement, key: string): void => {
+    const pending: Map<string, number> | undefined = (element as any)[SYMBOL_SELF_REMOVED_ATTRIBUTES]
+    // hasAttribute is what keeps the count honest: removing an attribute that is already
+    // absent produces no mutation record, so recording it would leave a count behind for a
+    // later *user* removal to consume — silently swallowing a legitimate restore.
+    if (!pending || !element.hasAttribute(key)) return
+    pending.set(key, (pending.get(key) ?? 0) + 1)
+}
+
+/** True when this removal was woby's own reflection. Consumes the record. */
+export const consumeSelfRemovedAttribute = (element: HTMLElement, key: string): boolean => {
+    const pending: Map<string, number> | undefined = (element as any)[SYMBOL_SELF_REMOVED_ATTRIBUTES]
+    const count = pending?.get(key)
+    if (!count) return false
+    if (count > 1) pending.set(key, count - 1)
+    else pending.delete(key)
+    return true
+}
+
 export const setAttributeStatic = (() => {
 
     const attributesBoolean = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls', 'default', 'disabled', 'formnovalidate', 'hidden', 'indeterminate', 'ismap', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open', 'playsinline', 'readonly', 'required', 'reversed', 'seamless', 'selected'])
@@ -65,6 +105,7 @@ export const setAttributeStatic = (() => {
 
             if (isNil(value) || value === false) {
 
+                markSelfRemovedAttribute(element, normalizedKey)
                 element.removeAttribute(normalizedKey)
 
             } else if (value === true && attributesBoolean.has(normalizedKey)) {

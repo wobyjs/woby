@@ -349,6 +349,7 @@ import TestTailwindNoImportHTML from './src/TestTailwindNoImportHTML'
 import TestTailwindWithImportHTML from './src/TestTailwindWithImportHTML'
 import TestHtmlOnClick from './src/TestHtmlOnClick.html'
 import TestAttrRemovalRestoresDefault from './src/TestAttrRemovalRestoresDefault.html'
+import TestCeBooleanPropWriteback from './src/TestCeBooleanPropWriteback.html'
 import TestSsrCustomElement from './src/TestSsrCustomElement'
 import TestSsrDocumentQuery from './src/TestSsrDocumentQuery'
 import TestSsrElement from './src/TestSsrElement'
@@ -710,6 +711,7 @@ const tests = [
 	TestShadowOnClick,
 	TestHtmlOnClick,
 	TestAttrRemovalRestoresDefault,
+	TestCeBooleanPropWriteback,
 
 	// Tailwind Tests
 	TestTailwindNoImport,

@@ -24,10 +24,10 @@
 
 import { $$, isObservable } from "./soby"
 import { SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
-import { setChild, setProp, } from "../utils/setters"
+import { setChild, setProp, trackSelfRemovedAttributes, consumeSelfRemovedAttribute } from "../utils/setters"
 import { createElement } from "./create_element"
 import { FragmentUtils } from "../utils/fragment"
-import { callStack, effect, isObservableWritable, Observable, root, untrack, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
+import { callStack, effect, isObservableWritable, Observable, root, untrack, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE } from "soby"
 import type { ObservableOptions } from "soby"
 import { isObject, isPureFunction } from "../utils"
 import { isJsx } from "../jsx-runtime"
@@ -205,6 +205,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
         constructor(props?: P) {
             super()
 
+            // Opt this host into self-removal recording. Reflecting a prop whose value is nil
+            // or `false` removes the attribute, and the observer installed in
+            // connectedCallback would otherwise read that back as a consumer's "unset this
+            // prop" and restore _propDefaults over the value that caused the removal.
+            trackSelfRemovedAttributes(this)
+
             // Always call defaultPropsFn() to create the default observables.
             // When JSX provides props, merge the JSX values into the default observables
             // instead of using JSX props directly. This ensures defaults() detects
@@ -243,7 +249,10 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                         // store the raw string rather than the converted value. Warn on a
                         // type mismatch, mirroring the @ref replacement path below.
                         const consumerOpts = (obs?.[SYMBOL_OBSERVABLE_WRITABLE] as any)?.options as ObservableOptions<any> | undefined
-                        const incomingOpts = (incoming[SYMBOL_OBSERVABLE_WRITABLE] as any)?.options as ObservableOptions<any> | undefined
+                        // A readonly projection (useMemo) carries SYMBOL_OBSERVABLE_READABLE and
+                        // has no writable symbol, so reading only the writable one reported every
+                        // well-typed readonly observable as type "none".
+                        const incomingOpts = ((incoming[SYMBOL_OBSERVABLE_WRITABLE] ?? incoming[SYMBOL_OBSERVABLE_READABLE]) as any)?.options as ObservableOptions<any> | undefined
                         if (consumerOpts?.type && consumerOpts.type !== incomingOpts?.type) {
                             console.warn(`[woby] prop "${key}" type mismatch: default observable expects type "${consumerOpts.type}" but the JSX-provided observable has type "${incomingOpts?.type ?? 'none'}". HTML-attribute syncs on this prop will not be type-converted.`)
                         }
@@ -487,6 +496,12 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 })
             })
 
+            // Drop anything recorded while no observer was attached — reflection effects keep
+            // running across disconnect, and those removals produced no mutation record for
+            // this observer to consume. A stale count would swallow the first genuine
+            // removeAttribute a consumer makes after (re)connection.
+            trackSelfRemovedAttributes(this).clear()
+
             this._attrObserver.observe(this, { attributes: true, attributeOldValue: true })
         }
 
@@ -535,6 +550,16 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 const normalizedPath = normalizePropertyPath(name)
                 setNestedProperty(this, normalizedPath, newValue)
             } else if (newValue === null) {
+                // Was this removal ours? setProp reflects every prop onto this host, and
+                // setAttributeStatic expresses a nil or `false` value by removing the
+                // attribute (HtmlBoolean.toHtml(false) === undefined), which our own observer
+                // then reports straight back here. Restoring the snapshot for that would
+                // overwrite the very value that caused the removal — a boolean prop whose
+                // construction-time value was `true` could never be set to `false`, because
+                // every write of `false` was immediately undone. A removal woby did not
+                // perform is a genuine "unset this prop" and still restores the default below.
+                if (consumeSelfRemovedAttribute(this, name)) return
+
                 // Attribute removed. The platform treats a removed attribute as "unset", so
                 // put the prop back to the value it had before any attribute was applied
                 // rather than forwarding `null` — a typed observable rejects null outright

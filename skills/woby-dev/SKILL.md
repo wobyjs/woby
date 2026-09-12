@@ -93,11 +93,11 @@ dv2 console --json
 - `[LOG]` — test pass/fail markers, component output
 - `[ERROR]` — uncaught errors (stack overflows, type errors, etc.)
 
-⚠️ **Console 1000-message cap:** `dv2 console` returns only ~1000 buffered messages, so the full suite (>1500 pass logs) is truncated. Read the uncapped global counters `util.tsx` maintains instead:
+⚠️ **Console 1000-message cap:** `dv2 console` returns only ~1000 buffered messages, so the full suite (~2200 pass logs) is truncated. Read the uncapped global counters `util.tsx` maintains instead:
 ```powershell
 dv2 eval --script "JSON.stringify({ pass: globalThis.__passLogCount, total: globalThis.__consoleLogCount, failures: (globalThis.__testFailures||[]).length })"
 ```
-Authoritative pass = `__passLogCount` (baseline ~1500+); authoritative fail signal = `__testFailures.length === 0`. See the `woby-test-verification` memory.
+Authoritative pass = `__passLogCount` (baseline ~2200); authoritative fail signal = `__testFailures.length === 0`. See the `woby-test-verification` memory.
 
 ### DOM Inspection
 
@@ -229,6 +229,44 @@ This means when a JSX prop like `value={321}` is passed to a custom element, by 
 
 **Fix:** Add `e.stopPropagation()` at the top of the internal `handleClick` function inside the custom element.
 
+### Custom element undoes its own prop write (attribute self-removal)
+
+**Symptom:** `el.props.flag(false)` on a `$(true, HtmlBoolean)` prop reads `true` again one
+microtask later. Only reproduces when the prop's construction-time value was `true`.
+
+**Cause:** a loop entirely inside `custom_element.ts`:
+
+1. `setProp` → `setAttribute` → `setAttributeStatic` reflects the prop onto the host.
+2. `HtmlBoolean.toHtml(false)` is `undefined`, so `setAttributeStatic` calls `removeAttribute`.
+3. The host's own `_attrObserver` (installed in `connectedCallback`) reports that removal.
+4. `attributeChangedCallback1`'s `newValue === null` branch treats it as a consumer "unset this
+   prop" and restores the `_propDefaults` snapshot — the constructor-time `true` — over the write.
+
+**Fix (shipped 2.0.169):** provenance, not inference. `src/utils/setters.ts` exports
+`trackSelfRemovedAttributes` / `consumeSelfRemovedAttribute` over a per-element
+`Map<attr, count>` under `SYMBOL_SELF_REMOVED_ATTRIBUTES`; `setAttributeStatic` marks before
+`removeAttribute`, and the `newValue === null` branch returns early when it can consume a mark.
+
+Three details that are load-bearing:
+- **Counts, not a flag** — the observer fires once per mutation record, so two self-removals of the
+  same attribute must suppress two restores.
+- **`hasAttribute` guard when marking** — removing an already-absent attribute produces no mutation
+  record, so marking it would leave a phantom count for a later *user* removal to consume.
+- **`.clear()` in `connectedCallback`** — reflection effects keep running across disconnect and
+  their removals produce no record for the new observer, so a stale count would swallow the first
+  genuine `removeAttribute` after reconnection.
+
+**Do not "fix" this by inferring from the value** (`toHtml(current) === undefined` ⇒ assume it was
+ours). That also suppresses legitimate restores: `$(true, HtmlBoolean)` on an element authored
+`<el flag="false">` has no reflection effect at all (`connectedCallback` skips `setProp` when the
+attribute is present), and a user `removeAttribute` there must restore `true`.
+
+**Why the suite missed it for so long:** every CE boolean in the playground was either declared
+`$(false, …)` — restoring `false` over `false` is a no-op — or set once from a static literal and
+never touched. `TestAttrRemovalRestoresDefault` covers the same branch but drives removal from
+*outside*. Regression test: `demo/playground/src/TestCeBooleanPropWriteback.html.tsx`, which pins
+both directions. **When adding a boolean attribute test, start it at `true`.**
+
 ### Vite serving stale module after rebuild
 
 **Symptom:** Fix applied to `soby/dist/`, rebuild ran, but browser console still shows old line numbers or old behavior.
@@ -249,7 +287,7 @@ This means when a JSX prop like `value={321}` is passed to a custom element, by 
 
 ## Debugging Workflow
 
-1. **Read the playground console errors first.** Playwright `browser_console_messages(level: 'error')` surfaces stack overflows and assertion failures immediately.
+1. **Read the playground console errors first.** `dv4 console --type error` surfaces stack overflows and assertion failures immediately. Use the `dv*` CLI — do not hand-roll a Playwright or raw CDP script (see the `dv-console-only` memory).
 
 2. **Check file timestamps.** If you rebuilt soby but errors still reference old line numbers, Vite cache is stale — restart the server.
 
@@ -286,6 +324,7 @@ Each test file exports a component and optionally a `.test` object with `expect(
 1. Start or restart dev server (pick port NOT in 5xxx, e.g. 7214)
 2. Navigate: `dv2 navigate http://localhost:7214`
 3. Check errors: `dv2 console --type error` → should be 0 errors (ignore Vite HMR `WebSocket closed` noise from HMR-port collisions)
-4. Check test results via the uncapped globals (see cap warning above): `dv2 eval --script "globalThis.__passLogCount + '/' + globalThis.__consoleLogCount + ' pass, ' + (globalThis.__testFailures||[]).length + ' fail'"` → expect >1500 pass, 0 fail
-5. For click tests (TestWobyOnClick, TestShadowOnClick): these require DOM — they auto-fire clicks via `button.click()` in `useEffect`. Verify with `dv2 inspect -s` or `dv2 get-text -s`
-6. Use `--json` flag for machine-readable output to pipe into other tools
+4. Check test results via the uncapped globals (see cap warning above): `dv2 eval --script "globalThis.__passLogCount + '/' + globalThis.__consoleLogCount + ' pass, ' + (globalThis.__testFailures||[]).length + ' fail'"` → expect ~2200 pass. Known pre-existing failures as of 2.0.169: `TestStyleContextRef` ×2 (`style$` @-ref bypass). `TestEventClickStopPropagation` is timing-flaky — re-run before blaming a change for it.
+5. Run the node/SSR suite too: `pnpm test` from the woby root → 320 files, 1370 assertions, 0 failed (~280s). `.html.tsx` files are browser-only and skipped there by design, so a DOM-dependent fix needs BOTH suites
+6. For click tests (TestWobyOnClick, TestShadowOnClick): these require DOM — they auto-fire clicks via `button.click()` in `useEffect`. Verify with `dv2 inspect -s` or `dv2 get-text -s`
+7. Use `--json` flag for machine-readable output to pipe into other tools
