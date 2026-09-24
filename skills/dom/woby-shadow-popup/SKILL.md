@@ -173,7 +173,7 @@ onClick={(e) => { e.stopPropagation(); yourHandler() }}
 ### Clicking the Host Doesn't Trigger Woby's Shadow DOM Delegation
 Clicking the custom element host (`document.querySelector('my-element').click()`) does NOT trigger woby's delegated onClick — you must click the actual button *inside* the shadow root.
 
-**Fix (preferred):** use `dv click` with a `>>>` shadow-pierce selector. It resolves the inner button's node and dispatches a real CDP input click, which fires woby's delegation correctly:
+**Fix (preferred):** use `dv1 click` with a `>>>` shadow-pierce selector. It resolves the inner button's node and dispatches a real CDP input click, which fires woby's delegation correctly:
 ```bash
 dv3 click "my-element >>> button"
 ```
@@ -438,7 +438,7 @@ This applies to ALL style properties sourced from observables. Class arrays that
 ### Clicking Inside Shadow DOM
 **Problem:** `document.querySelector('sy-element').click()` clicks the host element, not the button inside shadow DOM.
 
-**Fix (preferred):** use `dv click` with `>>>` — it pierces the shadow root and dispatches a real click:
+**Fix (preferred):** use `dv1 click` with `>>>` — it pierces the shadow root and dispatches a real click:
 ```bash
 dv3 click "sy-element >>> button"
 ```

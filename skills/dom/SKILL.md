@@ -1,140 +1,44 @@
 ---
 name: dom
-description: 'Master DOM skill using @missbjs/dv1-6 CLI for professional-grade DOM design, debugging, theming, print layout, and responsive development. Use dv1-6 CLI for all browser interactions including console log/error/assert reading. Each dv binary manages its own Chrome profile (dv1-dv6). Always open HEADED mode for user inspection. Vite workflow: `pnpm dev --port <port>` ONCE (HMR, pick port NOT in 5xxx), then dv* navigate to it. If 404 → restart dev. If reload loop → stop only the instance you started (`dv* stop`, or taskkill by PID); NEVER kill by image name. Automatically routes to appropriate sub-skills — dom-design for layout and UX design, dom-debug for debugging issues, dom-theme for color/font theming, dom-print for print media, dom-mobile for mobile-specific, dom-desktop for desktop-specific, dom-mobile-desktop for cross-device optimization. All sub-skills follow professional design workflow with verification and self-check to production level. **CRITICAL: Each agent must use a unique dv binary to avoid conflicts with other parallel agents. DO NOT use default dv1 without checking availability. DO NOT close Chrome instances launched by other agents.**'
+description: 'Master DOM skill using @missbjs/dv1-6 CLI for professional-grade DOM design, debugging, theming, print layout, and responsive development. Use dv1-6 CLI for all browser interactions including console log/error/assert reading. Each dv binary manages its own Chrome profile (dv1-dv6). Always open HEADED mode for user inspection. Vite workflow: `pnpm dev --port <port>` ONCE (HMR, pick port NOT in 5xxx), then dv* navigate to it. If 404 → restart dev. If reload loop → stop only the instance you started (`dv* stop`, or taskkill by PID); NEVER kill by image name. Automatically routes to appropriate sub-skills — dom-design for layout and UX design, dom-debug for debugging issues, dom-theme for color/font theming, dom-print for print media, dom-mobile for mobile-specific, dom-desktop for desktop-specific, dom-mobile-desktop for cross-device optimization. All sub-skills follow professional design workflow with verification and self-check to production level. **CRITICAL: Use only dv1-dv6, never bare dv or --profile. Default dv1 unless the user names another; each concurrent task gets its own dv1-dv6 profile. DO NOT close Chrome instances launched by other tasks.**'
 ---
 
 # DOM Master Skill (@missbjs/dv1-6 CLI)
 
 Orchestrates specialized DOM sub-skills for professional-grade web development using @missbjs/dv1-6 CLI.
 
-## ⚠️ CRITICAL: Parallel Agent Profile Management
+## ⚠️ CRITICAL: Profile Rules (dv1–dv6 only)
 
-**If you are running alongside other agents using this skill, you MUST coordinate Chrome profile usage to avoid conflicts.**
+**Use only the `dv1`…`dv6` commands.** Never run bare `dv`, `dv.exe`, or pass
+`--profile` — each dvN is pinned to its own fixed Chrome profile, and no other
+profile may ever be created.
 
-### Step 1: Determine Which Profile to Use
-
-**Decision Tree - Answer these questions before launching Chrome:**
+### Which profile
 
 ```
-Q1: Is this task OAuth/authentication related?
-    YES → Use dv1
-    NO  → Continue to Q2
-
-Q2: Are other agents currently using Chrome profiles?
-    How to check:
-    - Look for running Chrome processes with remote debugging
-    - Review any coordination notes from other agents
-    
-    IF unsure → Assume other agents are using dv1-dv3, use dv4-dv6
-    
-Q3: Which profiles are available?
-    Check each sequentially using dv* status:
-    dv1 status
-    dv2 status
-    dv3 status
-    dv4 status
-    dv5 status
-    dv6 status
-
-    IF command lists pages → Profile is IN USE by another agent
-    IF command fails/no Chrome running → Profile is AVAILABLE
-    
-Q4: Select the first available profile:
-    - Priority order: dv2 → dv3 → dv4 → dv5 → dv6
-    - (Skip dv1 unless OAuth needed)
-    
-Q5: Document your profile choice:
-    Tell the user: "Using dvX"
-    This helps other agents know which profiles are taken
+User named a profile (e.g. "use dv3")  → use that one
+User did not name one                   → dv1
+You are one of several concurrent tasks → one profile per task: dv1, dv2, … dv6
 ```
 
-### Step 2: Check Availability BEFORE Launching
+Why one profile per concurrent task: running several tasks on separate tabs
+of a single browser does not work — tabs steal focus and commands land on the
+wrong page. Six profiles = up to six concurrent tasks.
 
-**MANDATORY: Check if the profile is already in use before launching Chrome.**
+### Rules
+
+1. **✅ DO** default to `dv1` unless the user names another profile
+2. **✅ DO** give each concurrent task its own profile (dv2–dv6)
+3. **✅ DO** tell the user which profile you're using ("Using dv2")
+4. **❌ DO NOT** run bare `dv` / `dv.exe` or pass `--profile`
+5. **❌ DO NOT** create any other profile or user-data-dir
+6. **❌ DO NOT** close or kill Chrome instances launched by other tasks
+7. **❌ DO NOT** log out of, clear cookies on, or reset a profile's session unless the user asks
 
 ```bash
-dv1 status
-dv2 status
-dv3 status
-dv4 status
-dv5 status
-dv6 status
-
-# IF the command lists pages → Chrome is running on this profile (IN USE)
-# IF the command shows "Chrome is not running" → Profile is AVAILABLE
+dv1 start     # launches Chrome on dv1's fixed profile if not already running
+dv1 status    # lists open pages
 ```
-
-**What to do if profile is in use:**
-
-1. **DO NOT close the existing Chrome instance** - it belongs to another agent
-2. **DO NOT kill the process** - you will break the other agent's work
-3. **Choose a different profile** - try the next one in sequence
-4. **If all profiles are in use** - inform the user and wait, or coordinate with other agents
-
-### Step 3: Launch Chrome
-
-**Once you've verified the profile is available, launch Chrome:**
-
-```bash
-dv2 start
-dv3 start
-dv4 start
-dv5 start
-dv6 start
-```
-
-**Verify Chrome started successfully:**
-
-```bash
-dv2 status
-
-# Should list open pages
-```
-
-### Step 4: Available Profiles
-
-| Command | Purpose |
-|---------|---------|
-| dv1 | OAuth/authentication |
-| dv2 | Parallel testing |
-| dv3 | Parallel testing |
-| dv4 | Parallel testing |
-| dv5 | Parallel testing |
-| dv6 | Parallel testing |
-
-### Absolute Rules for Parallel Agents
-
-1. **✅ DO** check availability before launching Chrome
-2. **✅ DO** use a unique profile not used by other agents
-3. **✅ DO** tell the user which profile you're using
-4. **✅ DO** coordinate with other agents if all profiles are busy
-5. **❌ DO NOT** use dv1 by default without checking
-6. **❌ DO NOT** close Chrome instances launched by other agents
-7. **❌ DO NOT** kill Chrome processes started by other agents
-8. **❌ DO NOT** assume dv1 is available - it may be in use for OAuth
-
-### Parallel Agent Coordination Example
-
-```
-Agent A: "I need to test OAuth login. Checking dv1..."
-         [dv1 status - available]
-         "Using dv1 for OAuth testing"
-         [Launches Chrome: dv1 start]
-
-Agent B: "I need to debug a layout issue. Checking profiles..."
-         [dv1 - IN USE by Agent A]
-         [dv2 - available]
-         "Using dv2 for debugging"
-         [Launches Chrome: dv2 start]
-
-Agent C: "I need to test responsive design. Checking profiles..."
-         [dv1, dv2 - IN USE]
-         [dv3 - available]
-         "Using dv3"
-         [Launches Chrome: dv3 start]
-```
-
-**All three agents work simultaneously without conflicts!**
 
 ---
 
@@ -241,20 +145,20 @@ Use this master skill when you need comprehensive DOM work that includes:
 **Use ONLY these 6 dv profiles. DO NOT create new profiles.**
 
 ```bash
-dv1  # OAuth/authentication
-dv2  # Parallel testing
-dv3  # Parallel testing
-dv4  # Parallel testing
-dv5  # Parallel testing
-dv6  # Parallel testing
+dv1  # default — use unless the user names another profile
+dv2  # concurrent task 2
+dv3  # concurrent task 3
+dv4  # concurrent task 4
+dv5  # concurrent task 5
+dv6  # concurrent task 6
 ```
 
 **Rules**:
-1. **ALWAYS use one of these 6 dv binaries**
-2. **dv1 is for OAuth** - preserve login state, DO NOT clear cookies/session
-3. **Use dv2 through dv6 for parallel testing** - these can be cleared/reset
+1. **ALWAYS use one of these 6 dv binaries** — never bare `dv`, `dv.exe`, or `--profile`
+2. **Default to dv1** unless the user names another profile
+3. **One profile per concurrent task** — several tasks on tabs of one browser does not work
 4. **DO NOT create new profiles** - agents will be blamed if they use profiles not in this list
-5. **Each agent must use a unique profile** to avoid conflicts with parallel agents
+5. **Preserve each profile's login state** - DO NOT clear cookies/session unless the user asks
 
 ### Why @missbjs/dv CLI over agent-browser
 
@@ -446,7 +350,7 @@ dv2 console --type error
 dv2 console --type log
 
 # ── Step 5: Make code changes ──
-# HMR auto-reloads. No need to restart dv navigate.
+# HMR auto-reloads. No need to restart dv1 navigate.
 # Just re-read console after changes:
 dv2 console --type error
 

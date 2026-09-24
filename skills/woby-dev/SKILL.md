@@ -65,25 +65,25 @@ The playground auto-runs tests on load and logs results to the browser console. 
 # Pick a random port NOT in 5xxx range (avoid collisions with common ports) e.g. 7214, 8362, 9451
 pnpm dev --port 7214
 
-# 1. Start Chrome (pick available profile, e.g. dv2). Headed by default; pass --headless to hide.
-dv2 start
+# 1. Start Chrome on dv1 (default; a concurrent task uses its own dv2–dv6). Headed by default; pass --headless to hide.
+dv1 start
 
 # 2. Navigate to playground (url is POSITIONAL; `goto` is an alias)
-dv2 navigate http://localhost:7214
+dv1 navigate http://localhost:7214
 
 # 3. Read all console logs (test results, component output)
-dv2 console --type log
+dv1 console --type log
 
 # 4. Check for errors only (stack overflows, assertion failures, type errors)
-dv2 console --type error
+dv1 console --type error
 
 # 5. Filter by pattern, or emit machine-readable JSON
-dv2 console --filter "❌"
-dv2 console --json
+dv1 console --filter "❌"
+dv1 console --json
 ```
 
 > **dv* CLI v1.0.0 (upgraded).** Syntax changed from earlier docs:
-> - `dv2 start` is **headed by default** — use `--headless` to hide (old `--headed` flag removed).
+> - `dv1 start` is **headed by default** — use `--headless` to hide (old `--headed` flag removed).
 > - `navigate`/`goto` take the **url as a positional arg** (old `--url <url>` removed).
 > - `console --type` accepts `log|warn|error|info|debug` (no `assert` type); `console --filter <pattern>` scans the buffer.
 > - `inspect|query-all|get-text|get-html|inspect` take the selector via **`-s/--selector`** (old positional selector removed).
@@ -93,9 +93,9 @@ dv2 console --json
 - `[LOG]` — test pass/fail markers, component output
 - `[ERROR]` — uncaught errors (stack overflows, type errors, etc.)
 
-⚠️ **Console 1000-message cap:** `dv2 console` returns only ~1000 buffered messages, so the full suite (~2200 pass logs) is truncated. Read the uncapped global counters `util.tsx` maintains instead:
+⚠️ **Console 1000-message cap:** `dv1 console` returns only ~1000 buffered messages, so the full suite (~2200 pass logs) is truncated. Read the uncapped global counters `util.tsx` maintains instead:
 ```powershell
-dv2 eval --script "JSON.stringify({ pass: globalThis.__passLogCount, total: globalThis.__consoleLogCount, failures: (globalThis.__testFailures||[]).length })"
+dv1 eval --script "JSON.stringify({ pass: globalThis.__passLogCount, total: globalThis.__consoleLogCount, failures: (globalThis.__testFailures||[]).length })"
 ```
 Authoritative pass = `__passLogCount` (baseline ~2200); authoritative fail signal = `__testFailures.length === 0`. See the `woby-test-verification` memory.
 
@@ -103,34 +103,34 @@ Authoritative pass = `__passLogCount` (baseline ~2200); authoritative fail signa
 
 ```powershell
 # Inspect a specific element (selector via -s/--selector)
-dv2 inspect -s 'counter-element'
+dv1 inspect -s 'counter-element'
 
 # Query all matching elements
-dv2 query-all -s 'counter-element'
+dv1 query-all -s 'counter-element'
 
 # Get text content
-dv2 get-text -s '.result-container'
+dv1 get-text -s '.result-container'
 
 # Get full HTML of an element
-dv2 get-html -s '#app'
+dv1 get-html -s '#app'
 ```
 
 ### Screenshots & Snapshots
 
 ```powershell
 # Visual check (output path is POSITIONAL)
-dv2 screenshot screenshot.png
+dv1 screenshot screenshot.png
 
 # Accessibility tree snapshot (useful for SSR output verification)
-dv2 snapshot
+dv1 snapshot
 ```
 
 ### Quick JS Evaluation
 
 ```powershell
 # Evaluate arbitrary JS in page context
-dv2 eval --script "window.__playwright_console"
-dv2 eval --script "document.querySelector('counter-element').shadowRoot.querySelector('button').click()"
+dv1 eval --script "window.__playwright_console"
+dv1 eval --script "document.querySelector('counter-element').shadowRoot.querySelector('button').click()"
 ```
 
 ---
@@ -287,7 +287,7 @@ both directions. **When adding a boolean attribute test, start it at `true`.**
 
 ## Debugging Workflow
 
-1. **Read the playground console errors first.** `dv4 console --type error` surfaces stack overflows and assertion failures immediately. Use the `dv*` CLI — do not hand-roll a Playwright or raw CDP script (see the `dv-console-only` memory).
+1. **Read the playground console errors first.** `dv1 console --type error` surfaces stack overflows and assertion failures immediately. Use the `dv*` CLI — do not hand-roll a Playwright or raw CDP script (see the `dv-console-only` memory).
 
 2. **Check file timestamps.** If you rebuilt soby but errors still reference old line numbers, Vite cache is stale — restart the server.
 
@@ -322,9 +322,9 @@ Each test file exports a component and optionally a `.test` object with `expect(
 ## Playground Test Protocol
 
 1. Start or restart dev server (pick port NOT in 5xxx, e.g. 7214)
-2. Navigate: `dv2 navigate http://localhost:7214`
-3. Check errors: `dv2 console --type error` → should be 0 errors (ignore Vite HMR `WebSocket closed` noise from HMR-port collisions)
-4. Check test results via the uncapped globals (see cap warning above): `dv2 eval --script "globalThis.__passLogCount + '/' + globalThis.__consoleLogCount + ' pass, ' + (globalThis.__testFailures||[]).length + ' fail'"` → expect ~2200 pass. Known pre-existing failures as of 2.0.169: `TestStyleContextRef` ×2 (`style$` @-ref bypass). `TestEventClickStopPropagation` is timing-flaky — re-run before blaming a change for it.
+2. Navigate: `dv1 navigate http://localhost:7214`
+3. Check errors: `dv1 console --type error` → should be 0 errors (ignore Vite HMR `WebSocket closed` noise from HMR-port collisions)
+4. Check test results via the uncapped globals (see cap warning above): `dv1 eval --script "globalThis.__passLogCount + '/' + globalThis.__consoleLogCount + ' pass, ' + (globalThis.__testFailures||[]).length + ' fail'"` → expect ~2200 pass. Known pre-existing failures as of 2.0.169: `TestStyleContextRef` ×2 (`style$` @-ref bypass). `TestEventClickStopPropagation` is timing-flaky — re-run before blaming a change for it.
 5. Run the node/SSR suite too: `pnpm test` from the woby root → 320 files, 1370 assertions, 0 failed (~280s). `.html.tsx` files are browser-only and skipped there by design, so a DOM-dependent fix needs BOTH suites
-6. For click tests (TestWobyOnClick, TestShadowOnClick): these require DOM — they auto-fire clicks via `button.click()` in `useEffect`. Verify with `dv2 inspect -s` or `dv2 get-text -s`
+6. For click tests (TestWobyOnClick, TestShadowOnClick): these require DOM — they auto-fire clicks via `button.click()` in `useEffect`. Verify with `dv1 inspect -s` or `dv1 get-text -s`
 7. Use `--json` flag for machine-readable output to pipe into other tools
