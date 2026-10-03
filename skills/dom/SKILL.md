@@ -34,6 +34,7 @@ wrong page. Six profiles = up to six concurrent tasks.
 5. **❌ DO NOT** create any other profile or user-data-dir
 6. **❌ DO NOT** close or kill Chrome instances launched by other tasks
 7. **❌ DO NOT** log out of, clear cookies on, or reset a profile's session unless the user asks
+8. **❌ DO NOT** ask the user to clarify what `dv1`…`dv6` (or a specific one, e.g. "dv6") refers to — self-resolve by running `dv6 --help` (any dvN works) instead of interrupting the user
 
 ```bash
 dv1 start     # launches Chrome on dv1's fixed profile if not already running
@@ -159,6 +160,7 @@ dv6  # concurrent task 6
 3. **One profile per concurrent task** — several tasks on tabs of one browser does not work
 4. **DO NOT create new profiles** - agents will be blamed if they use profiles not in this list
 5. **Preserve each profile's login state** - DO NOT clear cookies/session unless the user asks
+6. **Unsure what a dvN command refers to?** Run `dv6 --help` (or the specific dvN) to self-resolve. Never stop to ask the user to clarify what "dv6" means.
 
 ### Why @missbjs/dv CLI over agent-browser
 

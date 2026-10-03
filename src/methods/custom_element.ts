@@ -22,7 +22,7 @@
  * @module customElement
  */
 
-import { $$, isObservable } from "./soby"
+import { $, $$, isObservable } from "./soby"
 import { SYMBOL_DEFAULT, SYMBOL_JSX } from '../constants'
 import { setChild, setProp, trackSelfRemovedAttributes, consumeSelfRemovedAttribute } from "../utils/setters"
 import { createElement } from "./create_element"
@@ -183,10 +183,13 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
     tagName: string,
     component: JSX.Component<P> | ContextProvider<any>
 ): void => {
-    const defaultPropsFn = (component as any)[SYMBOL_DEFAULT]
-    if (!defaultPropsFn) {
-        console.error(`Component ${tagName} is missing default props.`)
-    }
+    // A component registered without defaults() is still a valid custom element: it just
+    // declares no reactive props. Give it the minimal set the constructor relies on (a
+    // writable `children` for the slot) and pass its JSX props through as plain values below.
+    // This used to console.error here and then throw `defaultPropsFn is not a function` on
+    // construction, which aborted the whole surrounding render.
+    const declaredDefaults = (component as any)[SYMBOL_DEFAULT] as (() => P) | undefined
+    const defaultPropsFn: () => P = declaredDefaults ?? (() => ({ children: $() }) as any)
 
     const C = class extends HTMLElement {
         static __component__ = component;
@@ -272,6 +275,9 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                     if (key === 'children') continue
                     if (key in defaultProps && isObservableWritable(defaultProps[key])) {
                         mergeInto(key, (props as any)[key])
+                    } else if (!declaredDefaults) {
+                        // No declared props to merge into: hand the JSX value over as-is.
+                        (defaultProps as any)[key] = (props as any)[key]
                     }
                 }
                 // Populate the children observable from JSX props when it is writable.
@@ -440,41 +446,58 @@ export const createBrowserCustomElement = <P extends { children?: Observable<JSX
                 this._attrObserver.disconnect()
             }
 
-            const { props: p } = this
-            const aKeys = Object.keys(p).filter(k => k !== 'children' && isObservable(p[k]))
-            const rKeys = Object.keys(p).filter(k => isPureFunction(p[k]) || isObject(p[k]))
+            // untrack: connectedCallback runs synchronously inside whichever effect inserted
+            // this element. The sync below reads every prop and writes the re-parsed attribute
+            // back into it, so a tracked read would subscribe the INSERTING effect to these
+            // props. A round-trip that isn't `equals`-stable (a Date with no HtmlDate loses ms
+            // to toUTCString) then stales that effect, which rebuilds and re-inserts the
+            // element, which connects and writes again — an unbounded render loop. untrack
+            // clears only the observer, so effects created by setProp keep their owner.
+            untrack(() => {
+                const { props: p } = this
+                const aKeys = Object.keys(p).filter(k => k !== 'children' && isObservable(p[k]))
+                const rKeys = Object.keys(p).filter(k => isPureFunction(p[k]) || isObject(p[k]))
 
-            rKeys.forEach(k => this.removeAttribute(this.propDict[k] ?? k))
+                rKeys.forEach(k => this.removeAttribute(this.propDict[k] ?? k))
 
-            for (const k of aKeys as any) {
-                // When isJsx, skip complex object props that would stringify to [object Object]
-                // and cannot be meaningfully converted back from an HTML attribute.
-                // Only set primitive-typed observable values as HTML attributes.
-                if (isJsx(p)) {
-                    const val = $$(p[k])
-                    if (isObject(val) && !(val instanceof Date)) continue
+                for (const k of aKeys as any) {
+                    // When isJsx, skip complex object props that would stringify to [object Object]
+                    // and cannot be meaningfully converted back from an HTML attribute.
+                    // Only set primitive-typed observable values as HTML attributes.
+                    if (isJsx(p)) {
+                        const val = $$(p[k])
+                        if (isObject(val) && !(val instanceof Date)) continue
+                    }
+                    // Only reflect the observable value onto the host attribute when the
+                    // attribute is ABSENT (i.e. populate defaults for props the author did
+                    // not write). In JSX mode createElement's setProps already wrote every
+                    // authored attribute as the original string (e.g. active="true"); forcing
+                    // reflection here re-derives it from the typed observable and LOSES
+                    // information — HtmlBoolean.toHtml(true) === '' would clobber active="true"
+                    // into active="". Reactive observable props keep their binding via the
+                    // setProps call in createElement, so skipping present attributes is safe.
+                    if (!this.attributes[this.propDict[k]])
+                        setProp(this, this.propDict[k], p[k], callStack('connectedCallback'))
                 }
-                // Only reflect the observable value onto the host attribute when the
-                // attribute is ABSENT (i.e. populate defaults for props the author did
-                // not write). In JSX mode createElement's setProps already wrote every
-                // authored attribute as the original string (e.g. active="true"); forcing
-                // reflection here re-derives it from the typed observable and LOSES
-                // information — HtmlBoolean.toHtml(true) === '' would clobber active="true"
-                // into active="". Reactive observable props keep their binding via the
-                // setProps call in createElement, so skipping present attributes is safe.
-                if (!this.attributes[this.propDict[k]])
-                    setProp(this, this.propDict[k], p[k], callStack('connectedCallback'))
-            }
 
-            for (const attr of this.attributes as any) {
-                // For JSX-created elements, @-prefixed context refs were already
-                // resolved in the constructor (via ambient soby context). Re-resolving
-                // here in connectedCallback would fail: ambient context is gone and the
-                // DOM walk (collectAncestorContextWrap) cannot find invisible JSX providers
-                // (<Context.Provider>) since they have no DOM node. Skip @-refs for JSX.
-                if (isJsx(p) && isContextRef(attr.value)) continue
-                this.attributeChangedCallback1(attr.name, undefined, attr.value)
-            }
+                for (const attr of this.attributes as any) {
+                    // For JSX-created elements, @-prefixed context refs were already
+                    // resolved in the constructor (via ambient soby context). Re-resolving
+                    // here in connectedCallback would fail: ambient context is gone and the
+                    // DOM walk (collectAncestorContextWrap) cannot find invisible JSX providers
+                    // (<Context.Provider>) since they have no DOM node. Skip @-refs for JSX.
+                    if (isJsx(p) && isContextRef(attr.value)) continue
+                    // A JSX-supplied plain (non-observable) prop — e.g. a no-defaults()
+                    // component's fallback props — already holds its original typed value.
+                    // Replaying the host's stringified attribute through here would
+                    // permanently coerce it (a number/boolean prop turns into a string).
+                    if (isJsx(p)) {
+                        const propName = kebabToCamelCase(attr.name)
+                        if (propName in p && !isObservable(p[propName])) continue
+                    }
+                    this.attributeChangedCallback1(attr.name, undefined, attr.value)
+                }
+            })
 
             this._attrObserver?.disconnect()
             this._attrObserver = new MutationObserver(mutations => {

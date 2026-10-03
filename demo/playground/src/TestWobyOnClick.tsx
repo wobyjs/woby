@@ -1,5 +1,5 @@
 import { $, $$, customElement, defaults, useEffect, type JSX } from 'woby'
-import { registerTestObservable } from './util'
+import { assert, registerTestObservable } from './util'
 
 const name = 'TestWobyOnClick'
 
@@ -53,42 +53,38 @@ const TestWobyOnClick = (): JSX.Element => {
         console.log(`[${name}] External handler! Count:`, externalCount())
     })
 
-    // Auto-test: fire click and verify counter increments
+    // Auto-test: fire click and verify counter increments. <ClickBtnExternal> is used as a
+    // component here (not the <click-btn-external> tag), so look the button up inside this
+    // test's own wrapper rather than by tag name across the document.
+    const externalHost = $<HTMLElement>()
+
     useEffect(() => {
         // These assertions drive real clicks, so they are browser-only; the Node SSR
         // runner has no document and the effect would throw after the render check.
         if (typeof document === 'undefined') return
-        const el = document.querySelector('click-btn-external')
-        if (!el) {
-            console.log(`[${name}] ⚠️ click-btn-external not found`)
-            return
-        }
+        const host = $$(externalHost)
+        if (!host) return
 
-        const button = el.querySelector('button') as HTMLButtonElement
-        if (!button) {
-            console.log(`[${name}] ⚠️ button not found`)
-            testStatus('fail')
-            return
-        }
-
-        console.log(`[${name}] ✅ Found button, firing click...`)
-        const initial = externalCount()
-
-        // Fire click
-        button.click()
-
-        // Check after
+        // Wait a macrotask so the subtree is attached and woby's delegated listener is live.
         setTimeout(() => {
-            const after = externalCount()
-            console.log(`[${name}] Count: ${initial} -> ${after}`)
-            if (after === initial + 1) {
-                console.log(`[${name}] ✅ External handler triggered!`)
-                testStatus('pass')
-            } else {
-                console.log(`[${name}] ❌ FAIL - onClick not triggered`)
+            const button = host.querySelector('button') as HTMLButtonElement | null
+            assert(!!button, `[${name}] external handler button not rendered`)
+            if (!button) {
                 testStatus('fail')
+                return
             }
-        }, 50)
+
+            const initial = externalCount()
+            button.click()
+
+            setTimeout(() => {
+                const after = externalCount()
+                const ok = after === initial + 1
+                assert(ok, `[${name}] onClick prop not triggered: count ${initial} -> ${after}`)
+                testStatus(ok ? 'pass' : 'fail')
+                if (ok) console.log(`✅ [${name}] external onClick prop handler triggered (${initial} -> ${after})`)
+            }, 50)
+        }, 0)
     })
 
     return (
@@ -99,7 +95,9 @@ const TestWobyOnClick = (): JSX.Element => {
             <ClickBtnInternal />
 
             <h3>Method 2: External Handler (passed as prop)</h3>
-            <ClickBtnExternal label="Click Me (External)" onClick={handleExternalClick} />
+            <div ref={externalHost}>
+                <ClickBtnExternal label="Click Me (External)" onClick={handleExternalClick} />
+            </div>
 
             <p>External Count: {externalCount}</p>
             <p>Status: <strong style={{ color: () =>

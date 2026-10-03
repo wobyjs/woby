@@ -121,6 +121,7 @@ import TestDynamicObservableComponent from './src/TestDynamicObservableComponent
 import TestDynamicObservableProps from './src/TestDynamicObservableProps'
 import TestDynamicStoreProps from './src/TestDynamicStoreProps'
 import TestErrorBoundary from './src/TestErrorBoundary'
+import TestErrorBoundarySiblings from './src/TestErrorBoundarySiblings'
 import TestErrorBoundaryNoError from './src/TestErrorBoundaryNoError'
 import TestErrorBoundaryChildrenFunction from './src/TestErrorBoundaryChildrenFunction'
 import TestErrorBoundaryChildrenObservableStatic from './src/TestErrorBoundaryChildrenObservableStatic'
@@ -350,6 +351,8 @@ import TestTailwindWithImportHTML from './src/TestTailwindWithImportHTML'
 import TestHtmlOnClick from './src/TestHtmlOnClick.html'
 import TestAttrRemovalRestoresDefault from './src/TestAttrRemovalRestoresDefault.html'
 import TestCeBooleanPropWriteback from './src/TestCeBooleanPropWriteback.html'
+import TestCeConnectUntracked from './src/TestCeConnectUntracked.html'
+import TestCeNoDefaults from './src/TestCeNoDefaults.html'
 import TestSsrCustomElement from './src/TestSsrCustomElement'
 import TestSsrDocumentQuery from './src/TestSsrDocumentQuery'
 import TestSsrElement from './src/TestSsrElement'
@@ -451,6 +454,7 @@ const tests = [
 	TestDynamicStoreProps,
 
 	TestErrorBoundary,
+	TestErrorBoundarySiblings,
 	TestErrorBoundaryNoError,
 	TestErrorBoundaryChildrenFunction,
 	TestErrorBoundaryChildrenObservableStatic,
@@ -712,6 +716,8 @@ const tests = [
 	TestHtmlOnClick,
 	TestAttrRemovalRestoresDefault,
 	TestCeBooleanPropWriteback,
+	TestCeConnectUntracked,
+	TestCeNoDefaults,
 
 	// Tailwind Tests
 	TestTailwindNoImport,

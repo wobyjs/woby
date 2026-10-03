@@ -292,14 +292,7 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
             const node = child as Node
 
             if (!fragmentOnly) {
-                try { parent.insertBefore(node, null) }
-                catch (e) {
-                    console.error('[DEBUG insertBefore] FAILED node:', node, 'typeof:', typeof node, 'nodeType:', (node as any)?.nodeType, 'constructor:', (node as any)?.constructor?.name, 'toString:', Object.prototype.toString.call(node), 'parent:', parent, 'parent.tagName:', (parent as any)?.tagName)
-                    console.error('[DEBUG insertBefore] child that passed nodeType check:', JSON.stringify((child as any)?.constructor?.name), 'child typeof:', typeof child, 'child nodeType:', typeof (child as Node)?.nodeType)
-                    // Log the full stack trace
-                    console.error('[DEBUG insertBefore] Error stack:', (e as Error)?.stack)
-                    throw e
-                }
+                parent.insertBefore(node, null)
             }
 
             FragmentUtils.replaceWithNode(fragment, node)
@@ -337,19 +330,18 @@ export const setChildStatic = (parent: HTMLElement | Node, fragment: Fragment, f
     if (isSSR && Array.isArray(child) && children.some(c => typeof c === 'function')) {
         const tempResolved = children.map((c, i) => {
             if (typeof c === 'function') {
-                try {
-                    let resolved = (c as Function)()
+                // No try/catch: a throwing child must propagate to the nearest ErrorBoundary
+                // (or the renderToString caller), exactly as it does in DOM mode. Swallowing it
+                // here logged a stray error and handed the raw function back, so the throwing
+                // child ran a second time before the boundary finally caught it.
+                let resolved = (c as Function)()
 
-                    // If the result is also a function (e.g., JSX.Element), resolve it too
-                    while (typeof resolved === 'function') {
-                        resolved = (resolved as Function)()
-                    }
-
-                    return resolved
-                } catch (e) {
-                    console.error('[setChildStatic] Failed to resolve function:', e)
-                    return c
+                // If the result is also a function (e.g., JSX.Element), resolve it too
+                while (typeof resolved === 'function') {
+                    resolved = (resolved as Function)()
                 }
+
+                return resolved
             }
             return c
         })
